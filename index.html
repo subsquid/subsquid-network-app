@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+
+  <title>Subsquid Network App</title>
+
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" />
+
+  <meta property="og:title" content="Subsquid Network App"/>
+<!--  <meta property="og:image" content="/aquarium-social.png"/>-->
+<!--  <meta property="og:description" content="Join thousands of developers who use Subsquid Cloud to deploy GraphQL APIs and sophisticated indexers for Web3 apps"/>-->
+<!--  <meta property="og:image:width" content="1200"/>-->
+<!--  <meta property="og:image:height" content="630"/>-->
+
+    <!-- Google tag (gtag.js) -->
+<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6JBS6RNP90"></script>-->
+<!--    <script>-->
+<!--    window.dataLayer = window.dataLayer || [];-->
+<!--    function gtag(){dataLayer.push(arguments);}-->
+<!--    gtag('js', new Date());-->
+
+<!--    gtag('config', 'G-6JBS6RNP90');-->
+<!--    </script>-->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <style>
+    #loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+      display: none;
+      transition: all 100ms ease-out;
+    }
+
+    #loader.show {
+      display: flex;
+      opacity: 0;
+    }
+
+    #loader.visible {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.4);
+    }
+    .subsquid-loader {
+      width: 48px;
+      height: 48px;
+      margin: auto;
+      position: relative;
+    }
+
+    .subsquid-loader:before {
+      content: '';
+      width: 48px;
+      height: 5px;
+      background: #000;
+      opacity: 0.25;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      border-radius: 50%;
+      animation: shadow 0.5s linear infinite;
+    }
+
+    .subsquid-loader:after {
+      content: '';
+      font-size: 60px;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      animation: bxSpin 0.5s linear infinite;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 4px;
+    }
+
+    @keyframes bxSpin {
+      17% {
+        border-bottom-right-radius: 3px;
+      }
+      25% {
+        transform: translateY(9px) rotate(22.5deg);
+      }
+      50% {
+        transform: translateY(18px) scale(1, .9) rotate(45deg);
+        border-bottom-right-radius: 40px;
+      }
+      75% {
+        transform: translateY(9px) rotate(67.5deg);
+      }
+      100% {
+        transform: translateY(0) rotate(90deg);
+      }
+    }
+
+    @keyframes shadow {
+      0%, 100% {
+        transform: scale(1, 1);
+      }
+      50% {
+        transform: scale(1.2, 1);
+      }
+    }
+
+
+    body, html, #root {
+      min-height: 100%;
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: #f6f8fb;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<div id="loader" class="show visible">
+  <div class="subsquid-loader"></div>
+</div>
+<script>
+  const theme = localStorage.getItem("theme") || 'light';
+  const loader = document.getElementById('loader')
+  if(theme === 'dark') {
+    loader?.classList.add("dark")
+  } else {
+    loader?.classList.remove("dark")
+  }
+</script>
+<script type="module" src="/src/index.tsx"></script>
+</body>
+</html>
