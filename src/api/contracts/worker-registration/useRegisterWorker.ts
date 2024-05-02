@@ -13,7 +13,7 @@ import {
   WriteContractRes,
 } from '@api/contracts/utils';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
-import { useNetworkSettings } from '@api/subsquid-network-squid';
+import { AccountType, SourceWallet, useNetworkSettings } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
@@ -23,7 +23,7 @@ import { WORKER_REGISTRATION_CONTRACT_ABI } from './WorkerRegistration.abi';
 
 export interface AddWorkerRequest extends WorkerMetadata {
   peerId: string;
-  vestingContract: string;
+  source: SourceWallet;
 }
 
 function useRegisterFromWallet() {
@@ -33,6 +33,7 @@ function useRegisterFromWallet() {
     abi: WORKER_REGISTRATION_CONTRACT_ABI,
     functionName: 'register',
   });
+
   const [approveSqd] = useApproveSqd();
   const { bondAmount } = useNetworkSettings();
   const tryCallRegistrationContract = async ({
@@ -77,7 +78,7 @@ function useRegisterWorkerFromVestingContract() {
   const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
 
-  return async ({ peerId, vestingContract, ...rest }: AddWorkerRequest): Promise<TxResult> => {
+  return async ({ peerId, source, ...rest }: AddWorkerRequest): Promise<TxResult> => {
     try {
       const bond = await publicClient.readContract({
         address: contracts.WORKER_REGISTRATION,
@@ -93,7 +94,7 @@ function useRegisterWorkerFromVestingContract() {
 
       const { request } = await publicClient.simulateContract({
         account,
-        address: vestingContract as `0x${string}`,
+        address: source.id as `0x${string}`,
         abi: VESTING_CONTRACT_ABI,
         functionName: 'execute',
         args: [contracts.WORKER_REGISTRATION, data, bond],
@@ -124,9 +125,10 @@ export function useRegisterWorker() {
   const registerWorker = async (req: AddWorkerRequest): Promise<WriteContractRes> => {
     setLoading(true);
 
-    const { tx, error } = req.vestingContract
-      ? await registerVestingContract(req)
-      : await registerWorkerContract(req);
+    const { tx, error } =
+      req.source.type === AccountType.Vesting
+        ? await registerVestingContract(req)
+        : await registerWorkerContract(req);
 
     if (!tx) {
       logger.debug(`registering worker failed ${error}`);

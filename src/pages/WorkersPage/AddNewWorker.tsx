@@ -6,7 +6,7 @@ import Decimal from 'decimal.js';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 
-import { fromSqd, toSqd } from '@api/contracts/utils.ts';
+import { fromSqd } from '@api/contracts/utils.ts';
 import { useRegisterWorker } from '@api/contracts/worker-registration/useRegisterWorker';
 import { useMySources } from '@api/subsquid-network-squid';
 import { useNetworkSettings } from '@api/subsquid-network-squid/settings-graphql';
@@ -33,7 +33,7 @@ export function AddNewWorker() {
       website: '',
       email: '',
       peerId: '',
-      vestingContract: '',
+      source: '',
     },
     validationSchema: addWorkerSchema,
     validateOnChange: true,
@@ -41,7 +41,13 @@ export function AddNewWorker() {
     validateOnMount: true,
 
     onSubmit: async values => {
-      const { success } = await registerWorker(values);
+      const source = sources.find(s => s.id === values.source);
+      if (!source) return;
+
+      const { success } = await registerWorker({
+        ...values,
+        source,
+      });
       if (!success) return;
 
       navigate('/profile/workers');
@@ -50,16 +56,16 @@ export function AddNewWorker() {
 
   useEffect(() => {
     if (isContractsLoading) return;
-    else if (formik.values.vestingContract) return;
+    else if (formik.values.source) return;
     else if (isSettingsLoading) return;
 
-    const contract =
+    const source =
       sources.find(c => fromSqd(c.balance).greaterThanOrEqualTo(bondAmount)) || sources[0];
-    if (!contract) return;
+    if (!source) return;
 
     formik.setValues({
       ...formik.values,
-      vestingContract: contract.id,
+      source: source.id,
     });
   }, [formik, isContractsLoading, sources, bondAmount, isSettingsLoading]);
 
@@ -77,7 +83,7 @@ export function AddNewWorker() {
         <Card>
           <FormRow>
             <FormikSelect
-              id="vestingContract"
+              id="source"
               disabled={!sources.length}
               showErrorOnlyOfTouched
               options={sources.map(s => {
