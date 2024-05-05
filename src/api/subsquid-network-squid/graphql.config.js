@@ -5,7 +5,8 @@ import 'dotenv/config';
 export default {
   overwrite: true,
   schema:
-    process.env.SQUID_API_URL || ' https://squid.subsquid.io/subsquid-network-indexer/v/v7/graphql',
+    process.env.SQUID_API_URL ||
+    'https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql',
   documents: ['src/api/subsquid-network-squid/*.graphql'],
   hooks: {
     afterOneFileWrite: ['prettier --write'],

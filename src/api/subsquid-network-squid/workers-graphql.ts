@@ -65,7 +65,7 @@ export class BlockchainApiWorker {
         utilizedPercent: totalDelegation.div(delegationLimit).mul(100),
       },
       delegationEnabled: capacity.greaterThan(0),
-      ownedByMe: worker?.realOwner.id === address,
+      ownedByMe: worker.realOwner?.id === address,
     });
 
     this.myDelegationsTotal = this.myDelegations.reduce(

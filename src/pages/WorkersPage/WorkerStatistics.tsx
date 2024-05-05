@@ -64,7 +64,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
         >
           <WorkerColumn>
             <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
-              <WorkerColumnLabel>APR</WorkerColumnLabel>
+              <WorkerColumnLabel>Delegator APR</WorkerColumnLabel>
               <Box>{percentFormatter(worker.stakerApr)}</Box>
             </Stack>
           </WorkerColumn>

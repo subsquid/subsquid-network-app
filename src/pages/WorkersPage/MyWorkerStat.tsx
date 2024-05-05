@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Divider, Stack, styled } from '@mui/material';
 
 import { formatSqd } from '@api/contracts/utils';
@@ -26,6 +27,10 @@ export const MyWorkerStat = ({ worker }: { worker: BlockchainApiWorker }) => {
         direction="row"
         justifyContent="space-between"
       >
+        <Box>
+          <MyWorkerLabel>Worker APR</MyWorkerLabel>
+          <MyWorkerValue>{percentFormatter(worker.apr)}</MyWorkerValue>
+        </Box>
         <Box>
           <MyWorkerLabel>My Bond</MyWorkerLabel>
           <MyWorkerValue>{formatSqd(worker.bond)}</MyWorkerValue>
