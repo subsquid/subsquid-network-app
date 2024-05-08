@@ -12,7 +12,7 @@ const PageTitleWrapper = styled('div', {
 
   '& .title': {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'start',
     gap: theme.spacing(3.5),
 
     [theme.breakpoints.down('xxs')]: {

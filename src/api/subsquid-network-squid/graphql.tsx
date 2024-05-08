@@ -773,7 +773,9 @@ export enum CommitmentOrderByInput {
 
 export type CommitmentRecipient = {
   __typename?: 'CommitmentRecipient';
+  stakerApr: Scalars['Float']['output'];
   stakerReward: Scalars['BigInt']['output'];
+  workerApr: Scalars['Float']['output'];
   workerId: Scalars['String']['output'];
   workerReward: Scalars['BigInt']['output'];
 };
@@ -2110,7 +2112,7 @@ export type Query = {
   /** @deprecated Use settingsById */
   settingsByUniqueInput?: Maybe<Settings>;
   settingsConnection: SettingsConnection;
-  squidStatus?: Maybe<SquidStatus>;
+  squidStatus: SquidStatus;
   statistics: Array<Statistics>;
   statisticsById?: Maybe<Statistics>;
   /** @deprecated Use statisticsById */
@@ -2659,8 +2661,8 @@ export type SettingsWhereInput = {
 
 export type SquidStatus = {
   __typename?: 'SquidStatus';
-  /** The height of the processed part of the chain */
-  height?: Maybe<Scalars['Int']['output']>;
+  finalizedHeight: Scalars['Float']['output'];
+  height: Scalars['Float']['output'];
 };
 
 export type Statistics = {
@@ -4169,7 +4171,7 @@ export type SquidNetworkHeightQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SquidNetworkHeightQuery = {
   __typename?: 'Query';
-  squidStatus?: { __typename?: 'SquidStatus'; height?: number };
+  squidStatus: { __typename?: 'SquidStatus'; height: number };
 };
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
@@ -4394,6 +4396,7 @@ export type MyDelegationsQuery = {
   delegations: Array<{
     __typename?: 'Delegation';
     claimableReward: any;
+    claimedReward: any;
     deposit: any;
     worker: {
       __typename?: 'Worker';
@@ -4897,6 +4900,7 @@ export const MyDelegationsDocument = `
     query myDelegations($address: String!) {
   delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
     claimableReward
+    claimedReward
     deposit
     worker {
       ...WorkerFragment

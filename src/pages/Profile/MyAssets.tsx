@@ -8,7 +8,7 @@ import { useMyAssets } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ClaimButton } from '@pages/WorkersPage/ClaimButton';
+import { ClaimButton } from '@pages/DashboardPage/ClaimButton';
 
 export function MyAssets() {
   const { isLoading, assets } = useMyAssets();

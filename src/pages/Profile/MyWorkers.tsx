@@ -10,9 +10,8 @@ import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
+import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
-
-import { WorkerName } from '../WorkersPage/WorkerName';
 
 export function MyWorkers() {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ export function MyWorkers() {
         title="My workers"
         endAdornment={
           <Stack direction="row" spacing={2}>
-            <Link to="/profile/workers/add">
+            <Link to="/workers/add">
               <Button variant="contained">Add worker</Button>
             </Link>
           </Stack>
@@ -49,7 +48,7 @@ export function MyWorkers() {
             {data.map(worker => {
               return (
                 <TableRow
-                  onClick={() => navigate(`/profile/workers/${worker.peerId}`)}
+                  onClick={() => navigate(`/workers/${worker.peerId}`)}
                   className="hoverable"
                   key={worker.peerId}
                 >

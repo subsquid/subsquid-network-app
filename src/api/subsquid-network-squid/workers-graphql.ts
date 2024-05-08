@@ -64,7 +64,7 @@ export class BlockchainApiWorker {
         capacity,
         utilizedPercent: totalDelegation.div(delegationLimit).mul(100),
       },
-      delegationEnabled: capacity.greaterThan(0),
+      delegationEnabled: true,
       ownedByMe: worker.realOwner?.id === address,
     });
 
@@ -88,6 +88,7 @@ export enum WorkerSortBy {
   Uptime24h = 'uptime_24h',
   Uptime90d = 'uptime_90d',
   StakerAPR = 'staker_apr',
+  WorkerAPR = 'apr',
   DelegationCapacity = 'delegation_capacity',
 }
 
@@ -146,6 +147,8 @@ export function useWorkers({
             return a.totalDelegations.capacity.minus(b.totalDelegations.capacity).toNumber();
           case WorkerSortBy.StakerAPR:
             return (a.stakerApr || 0) - (b.stakerApr || 0);
+          case WorkerSortBy.WorkerAPR:
+            return (a.apr || 0) - (b.apr || 0);
           default:
             return a.createdAt.valueOf() - b.createdAt.valueOf();
         }
@@ -323,6 +326,7 @@ type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 type Delegation = ArrayElement<MyDelegationsQuery['delegations']> & {
+  totalReward: any;
   worker: BlockchainApiWorker;
 };
 
@@ -339,6 +343,7 @@ export function useMyDelegations() {
       (data?.delegations || []).map(d => {
         return {
           ...d,
+          totalReward: new Decimal(d.claimedReward).add(d.claimableReward).toFixed(0),
           worker: new BlockchainApiWorker({
             worker: d.worker,
             address,

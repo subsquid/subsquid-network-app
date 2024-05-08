@@ -14,7 +14,6 @@ import classnames from 'classnames';
 import { Outlet } from 'react-router-dom';
 
 import { Logo } from '@components/Logo';
-import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
 import { UserMenu } from '@layouts/NetworkLayout/UserMenu.tsx';

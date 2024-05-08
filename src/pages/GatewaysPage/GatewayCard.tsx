@@ -7,8 +7,8 @@ import { Link } from 'react-router-dom';
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
 import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
-import { GatewayStake } from '@pages/GatewayPage/GatewayStake';
-import { GatewayUnstake } from '@pages/GatewayPage/GatewayUnstake';
+import { GatewayStake } from '@pages/GatewaysPage/GatewayStake';
+import { GatewayUnstake } from '@pages/GatewaysPage/GatewayUnstake';
 
 export const PeerIdRow = styled(Box, {
   name: 'PeerIdRow',
@@ -41,7 +41,7 @@ function GatewayTitle({ gateway }: { gateway: BlockchainGateway }) {
           <GatewayUnstake gateway={gateway} />
         ) : null}
         {/*{gateway.ownedByMe ? (*/}
-        {/*  <Link to={`/profile/workers/${gateway.id}/edit`}>*/}
+        {/*  <Link to={`/workers/${gateway.id}/edit`}>*/}
         {/*    <IconButton>*/}
         {/*      <EditIcon size={18} color="#1D1D1F" />*/}
         {/*    </IconButton>*/}

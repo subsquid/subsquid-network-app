@@ -141,8 +141,10 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       {/*  path="/network-dashboard"*/}
       {/*/>*/}
 
+      <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
       <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
-      <Item LeftIcon={AccountIcon} label="Profile" onClick={onItemClick} path="/profile" />
+      <Item LeftIcon={AccountIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
+      <Item LeftIcon={DocumentIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
 
       <div style={{ flex: 1 }} />
 
@@ -158,6 +160,7 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
         path={process.env.DISCORD_API_URL || ''}
         target="_blank"
         LeftIcon={ContactsIcon}
+        RightIcon={OpenInNewIcon}
       />
     </>
   );

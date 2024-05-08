@@ -26,7 +26,7 @@ export function GatewayUnregister({ gateway }: { gateway: BlockchainGateway }) {
           const { failedReason } = await unregisterGateway({ gateway });
 
           if (!failedReason) {
-            navigate('/profile/gateways');
+            navigate('/gateways');
           }
         }}
         variant="contained"

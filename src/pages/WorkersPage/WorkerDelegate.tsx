@@ -29,7 +29,10 @@ export function WorkerDelegate({ worker }: { worker: BlockchainApiWorker }) {
   const { delegateToWorker, error, isLoading } = useWorkerDelegate();
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (event: React.UIEvent) => {
+    event.stopPropagation();
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
 
   const {

@@ -57,7 +57,7 @@ function WorkerTitle({ worker }: { worker: BlockchainApiFullWorker }) {
         ) : null}
         {worker.myDelegationsTotal.greaterThan(0) ? <WorkerUndelegate worker={worker} /> : null}
         {worker.ownedByMe ? (
-          <Link to={`/profile/workers/${worker.peerId}/edit`}>
+          <Link to={`/workers/${worker.peerId}/edit`}>
             <IconButton>
               <EditIcon size={18} color="#1D1D1F" />
             </IconButton>

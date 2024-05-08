@@ -149,6 +149,7 @@ query myAssets($address: String!) {
 query myDelegations($address: String!) {
   delegations(where:{realOwner:{id_eq:$address}, deposit_gt: 0}) {
     claimableReward
+    claimedReward
     deposit
     worker {
       ...WorkerFragment
