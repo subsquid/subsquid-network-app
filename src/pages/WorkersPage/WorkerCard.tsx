@@ -48,6 +48,13 @@ function WorkerTitle({ worker }: { worker: BlockchainApiFullWorker }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box sx={{ fontSize: '1.5rem', lineHeight: 1.4 }}>{worker.name || worker.peerId}</Box>
+      {worker.ownedByMe ? (
+        <Link to={`/workers/${worker.peerId}/edit`}>
+          <IconButton>
+            <EditIcon size={18} color="#1D1D1F" />
+          </IconButton>
+        </Link>
+      ) : null}
       <Box sx={{ flex: 1, ml: 1 }}>
         <WorkerStatus worker={worker} />
       </Box>
@@ -56,13 +63,6 @@ function WorkerTitle({ worker }: { worker: BlockchainApiFullWorker }) {
           <WorkerDelegate worker={worker} />
         ) : null}
         {worker.myDelegationsTotal.greaterThan(0) ? <WorkerUndelegate worker={worker} /> : null}
-        {worker.ownedByMe ? (
-          <Link to={`/workers/${worker.peerId}/edit`}>
-            <IconButton>
-              <EditIcon size={18} color="#1D1D1F" />
-            </IconButton>
-          </Link>
-        ) : null}
       </Stack>
     </Box>
   );
