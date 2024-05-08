@@ -21,12 +21,12 @@ export function MyDelegations() {
   const { delegations, isLoading } = useMyDelegations();
   const { SQD_TOKEN } = useContracts();
 
-  if (isLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle />
-      {delegations.length ? (
+      {isLoading ? (
+        <Loader />
+      ) : delegations.length ? (
         <BorderedTable>
           <TableHead>
             <TableRow>

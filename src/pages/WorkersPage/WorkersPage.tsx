@@ -20,8 +20,6 @@ export function MyWorkers() {
   const { data, isLoading } = useMyWorkers();
   const { isConnected } = useAccount();
 
-  if (isLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle
@@ -31,7 +29,9 @@ export function MyWorkers() {
           </Button>
         }
       />
-      {data.length ? (
+      {isLoading ? (
+        <Loader />
+      ) : data.length ? (
         <BorderedTable>
           <TableHead>
             <TableRow>

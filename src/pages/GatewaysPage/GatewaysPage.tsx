@@ -18,8 +18,6 @@ export function MyGateways() {
   const { data, isLoading } = useMyGateways();
   const { SQD_TOKEN } = useContracts();
 
-  if (isLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle
@@ -31,7 +29,9 @@ export function MyGateways() {
           </Stack>
         }
       />
-      {data.length ? (
+      {isLoading ? (
+        <Loader />
+      ) : data.length ? (
         <BorderedTable>
           <TableHead>
             <TableRow>
