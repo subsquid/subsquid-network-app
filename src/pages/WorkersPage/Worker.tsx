@@ -25,7 +25,7 @@ const sx = {
   },
 };
 
-const Worker = ({ backPath }: { backPath: string }) => {
+export const Worker = ({ backPath }: { backPath: string }) => {
   const { peerId } = useParams<{ peerId: string }>();
   const { data: worker, isPending } = useWorkerByPeerId(peerId);
 
@@ -68,5 +68,3 @@ const Worker = ({ backPath }: { backPath: string }) => {
     </CenteredPageWrapper>
   );
 };
-
-export default Worker;

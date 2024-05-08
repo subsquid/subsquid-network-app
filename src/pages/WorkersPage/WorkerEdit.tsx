@@ -93,7 +93,7 @@ export function WorkerEdit() {
 
   return (
     <CenteredPageWrapper>
-      <NetworkPageTitle backPath={`/profile/workers/${peerId}`} title="Edit worker" />
+      <NetworkPageTitle backPath={`/workers/${peerId}`} title="Edit worker" />
       <WorkerForm worker={worker} />
     </CenteredPageWrapper>
   );

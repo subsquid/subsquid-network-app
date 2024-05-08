@@ -53,7 +53,7 @@ export function AddNewGateway() {
       });
       if (!success) return;
 
-      navigate('/profile/gateways');
+      navigate('/gateways');
     },
   });
 
@@ -74,7 +74,7 @@ export function AddNewGateway() {
 
   return (
     <CenteredPageWrapper>
-      <NetworkPageTitle backPath="/profile/gateways" title="Gateway registration" />
+      <NetworkPageTitle backPath="/gateways" title="Gateway registration" />
 
       <Form onSubmit={formik.handleSubmit}>
         <Card>

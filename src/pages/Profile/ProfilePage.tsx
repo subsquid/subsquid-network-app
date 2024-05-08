@@ -61,19 +61,19 @@ export function ProfilePage() {
             tabs={[
               {
                 title: 'Assets',
-                path: '/profile/assets',
+                path: '/assets',
               },
               {
                 title: 'My delegations',
-                path: '/profile/delegations',
+                path: '/delegations',
               },
               {
                 title: 'My workers',
-                path: '/profile/workers',
+                path: '/workers',
               },
               {
                 title: 'My gateways',
-                path: '/profile/gateways',
+                path: '/gateways',
                 // disabled: !demoFeaturesEnabled(),
               },
             ]}

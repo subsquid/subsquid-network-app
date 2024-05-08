@@ -28,7 +28,10 @@ export function WorkerUndelegate({ worker }: { worker: BlockchainApiWorker }) {
   const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (e: React.UIEvent) => {
+    e.stopPropagation();
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
 
   const options = useMemo(

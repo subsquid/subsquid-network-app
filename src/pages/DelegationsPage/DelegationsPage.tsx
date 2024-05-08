@@ -1,18 +1,20 @@
 import React from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters.ts';
-import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { formatSqd } from '@api/contracts/utils';
 import { useMyDelegations } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
-import { NetworkPageTitle } from '@layouts/NetworkLayout';
+import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 
 export function MyDelegations() {
   const navigate = useNavigate();
@@ -31,16 +33,17 @@ export function MyDelegations() {
                 <TableCell>Worker</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Uptime last 24h</TableCell>
-                <TableCell>Uptime last 90 days</TableCell>
+                <TableCell>Delegation</TableCell>
                 <TableCell>APR</TableCell>
-                <TableCell>My delegation</TableCell>
+                <TableCell>Total reward</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {delegations.map(d => {
                 return (
                   <TableRow
-                    onClick={() => navigate(`/workers/${d.worker.peerId}?backPath=/delegations`)}
+                    onClick={() => navigate(`/delegations/workers/${d.worker.peerId}`)}
                     className="hoverable"
                     key={d.worker.peerId}
                   >
@@ -51,9 +54,15 @@ export function MyDelegations() {
                       <WorkerStatus worker={d.worker} />
                     </TableCell>
                     <TableCell>{percentFormatter(d.worker.uptime24Hours)}</TableCell>
-                    <TableCell>{percentFormatter(d.worker.uptime90Days)}</TableCell>
-                    <TableCell>{percentFormatter(d.worker.stakerApr)}</TableCell>
                     <TableCell>{formatSqd(d.deposit)}</TableCell>
+                    <TableCell>{percentFormatter(d.worker.stakerApr)}</TableCell>
+                    <TableCell>{formatSqd(d.totalReward)}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={2}>
+                        <WorkerDelegate worker={d.worker} />
+                        <WorkerUndelegate worker={d.worker} />
+                      </Stack>
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -64,5 +73,14 @@ export function MyDelegations() {
         )}
       </ConnectedWalletRequired>
     </Box>
+  );
+}
+
+export function DelegationsPage() {
+  return (
+    <CenteredPageWrapper className="wide">
+      <MyDelegations />
+      <Outlet />
+    </CenteredPageWrapper>
   );
 }

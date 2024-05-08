@@ -77,6 +77,7 @@ export function useMyAssets() {
     const workers = data?.workers || [];
 
     let balance = new Decimal(0);
+    let vesting = new Decimal(0);
     let bonded = new Decimal(0);
     let claimable = new Decimal(0);
     let delegated = new Decimal(0);
@@ -85,7 +86,7 @@ export function useMyAssets() {
       balance = balance.add(a.balance);
 
       for (const o of a.owned) {
-        balance = balance.add(o.balance);
+        vesting = vesting.add(o.balance);
       }
     }
     for (const w of workers) {
@@ -99,6 +100,7 @@ export function useMyAssets() {
 
     return {
       balance: balance.toFixed(0),
+      vesting: vesting.toFixed(0),
       bonded: bonded.toFixed(0),
       claimable: claimable.toFixed(0),
       delegated: delegated.toFixed(0),

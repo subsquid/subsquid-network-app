@@ -113,9 +113,12 @@ export function ConfirmDialog({
     onApprove?.();
     onResult?.(true);
   };
+  const onClick = (event: React.UIEvent) => {
+    event.stopPropagation();
+  };
 
   return (
-    <Dialog open={open} onClose={onReject} disableAutoFocus disableEnforceFocus>
+    <Dialog open={open} onClick={onClick} onClose={onReject} disableAutoFocus disableEnforceFocus>
       <ConfirmWrapper
         sx={{
           maxWidth: !mobile ? maxWidth : undefined,
