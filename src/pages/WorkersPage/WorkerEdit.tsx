@@ -83,7 +83,7 @@ export function WorkerEdit() {
   const { data: worker, isPending } = useWorkerByPeerId(peerId);
 
   if (isPending) return <Loader />;
-  else if (!worker) {
+  else if (!worker || !worker.ownedByMe) {
     return (
       <Box>
         Worker <b>{peerId}</b> not found

@@ -28,7 +28,7 @@ export const AppRoutes = () => {
         <Route element={<WorkersPage />} index />
         <Route element={<AddNewWorker />} path="add" />
         <Route element={<Worker backPath="/workers" />} path=":peerId" />
-        <Route element={<WorkerEdit />} path="workers/:peerId/edit" />
+        <Route element={<WorkerEdit />} path=":peerId/edit" />
       </Route>
       <Route element={<NetworkLayout />} path="/delegations">
         <Route element={<DelegationsPage />} index />
