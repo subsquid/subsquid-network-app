@@ -5,7 +5,7 @@ import Decimal from 'decimal.js';
 import { formatSqd } from '@api/contracts/utils';
 import { useAccount } from '@network/useAccount';
 
-import { SQUID_DATASOURCE } from './datasource';
+import { useSquidDataSource } from './datasource';
 import { AccountType, useAccountQuery, useMyAssetsQuery } from './graphql';
 
 export type SourceWallet = {
@@ -16,10 +16,11 @@ export type SourceWallet = {
 };
 
 export function useMySources({ enabled }: { enabled?: boolean } = {}) {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
   const requestEnabled = enabled && !!address;
   const { data: data, isPending } = useAccountQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       address: address || '',
     },
@@ -60,11 +61,12 @@ export function useMySources({ enabled }: { enabled?: boolean } = {}) {
 }
 
 export function useMyAssets() {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
 
   const enabled = !!address;
   const { data, isLoading } = useMyAssetsQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       address: address || '',
     },

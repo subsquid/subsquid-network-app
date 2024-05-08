@@ -44,7 +44,7 @@ export function useSwitchNetwork() {
         severity: 'warning',
       });
     }
-  }, [connector, enqueueSnackbar]);
+  }, [connector, enqueueSnackbar, contracts.SQD]);
 
   useEffect(() => {
     if (!isConnected) return;

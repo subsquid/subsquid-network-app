@@ -6,7 +6,7 @@ import { groupBy, mapValues, values } from 'lodash-es';
 import { formatSqd, fromSqd, humanReadableSqd } from '@api/contracts/utils';
 import { useAccount } from '@network/useAccount.ts';
 
-import { SQUID_DATASOURCE } from './datasource';
+import { useSquidDataSource } from './datasource';
 import {
   AccountType,
   ClaimType,
@@ -111,10 +111,11 @@ export function useWorkers({
   sortBy: WorkerSortBy;
   sortDir: SortDir;
 }) {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
   const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
 
-  const { data, isPending } = useAllWorkersQuery(SQUID_DATASOURCE, {});
+  const { data, isPending } = useAllWorkersQuery(datasource, {});
 
   const filteredData = useMemo(() => {
     const filtered = (data?.workers || [])
@@ -172,12 +173,13 @@ export function useWorkers({
 }
 
 export function useMyWorkers() {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
   const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
 
   const enabled = !!address;
   const { data, isLoading } = useMyWorkersQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       address: address || '',
     },
@@ -203,12 +205,13 @@ export function useMyWorkers() {
 }
 
 export function useWorkerByPeerId(peerId?: string) {
+  const datasource = useSquidDataSource();
   const enabled = !!peerId;
   const { address } = useAccount();
   const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
 
   const { data, isPending } = useWorkerByPeerIdQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       peerId: peerId || '',
       address: address || '',
@@ -234,9 +237,10 @@ export function useWorkerByPeerId(peerId?: string) {
 // TODO: remove hardcoded date
 export function useWorkerDaysUptimeById(workerId?: string) {
   const enabled = !!workerId;
+  const datasource = useSquidDataSource();
 
   const { data, isLoading } = useWorkerDaysUptimeByIdQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       id: workerId || '',
       from: '2024-01-23T12:00:00.000000Z',
@@ -259,8 +263,9 @@ export function useWorkerDaysUptimeById(workerId?: string) {
 
 export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
   const { address } = useAccount();
+  const datasource = useSquidDataSource();
 
-  const { data, isLoading } = useMyClaimsAvailableQuery(SQUID_DATASOURCE, {
+  const { data, isLoading } = useMyClaimsAvailableQuery(datasource, {
     address: address || '',
   });
 
@@ -334,8 +339,9 @@ type Delegation = ArrayElement<MyDelegationsQuery['delegations']> & {
 export function useMyDelegations() {
   const { address } = useAccount();
   const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const datasource = useSquidDataSource();
 
-  const { data, isLoading } = useMyDelegationsQuery(SQUID_DATASOURCE, {
+  const { data, isLoading } = useMyDelegationsQuery(datasource, {
     address: address || '',
   });
 

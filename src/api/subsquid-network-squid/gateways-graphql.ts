@@ -1,4 +1,4 @@
-import { SQUID_DATASOURCE } from '@api/subsquid-network-squid/datasource';
+import { useSquidDataSource } from '@api/subsquid-network-squid/datasource';
 import { useAccount } from '@network/useAccount';
 
 import { GatewayFragmentFragment, useGatewayByPeerIdQuery, useMyGatewaysQuery } from './graphql';
@@ -25,11 +25,12 @@ export class BlockchainGateway {
 }
 
 export function useMyGateways() {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
 
   const enabled = !!address;
   const { data, isLoading } = useMyGatewaysQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       address: address || '',
     },
@@ -54,11 +55,12 @@ export function useMyGateways() {
 }
 
 export function useGatewayByPeerId(peerId?: string) {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
   const enabled = !!peerId;
 
   const { data, isLoading } = useGatewayByPeerIdQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       peerId: peerId || '',
     },

@@ -43,11 +43,13 @@ jobs:
           if [ "$REF" = "refs/heads/main" ]; then
               echo "::set-output name=app_env::prod"
               echo "::set-output name=wc_project_id::475eff0658d0f3300ca18971418d261b"
-              echo "::set-output name=squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/v/v1/graphql"
           else
               echo "::set-output name=app_env::dev"
               echo "::set-output name=wc_project_id::ec2facac9eaaca7cc0584baadc935c01"
-              echo "::set-output name=squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/v/v1/graphql"
           fi
         env:
           REF: ${{ github.ref }}

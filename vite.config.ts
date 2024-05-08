@@ -16,7 +16,12 @@ export default defineConfig({
     ),
     'process.env.DOCS_API_URL': encode(process.env.DOCS_API_URL || 'https://docs.subsquid.io'),
 
-    'process.env.SQUID_API_URL': encode(process.env.SQUID_API_URL || 'http://localhost:4350'),
+    'process.env.TESTNET_SQUID_API_URL': encode(
+      process.env.TESTNET_SQUID_API_URL || 'http://localhost:4350',
+    ),
+    'process.env.MAINNET_SQUID_API_URL': encode(
+      process.env.MAINNET_SQUID_API_URL || 'http://localhost:4350',
+    ),
     'process.env.WALLET_CONNECT_PROJECT_ID': encode(process.env.WALLET_CONNECT_PROJECT_ID || ''),
     'process.env.ENABLE_DEMO_FEATURES': encode(process.env.ENABLE_DEMO_FEATURES || 'false'),
     'process.env.BLOCK_CHAIN_NODE_ADDRESS': encode(process.env.BLOCK_CHAIN_NODE_ADDRESS),
