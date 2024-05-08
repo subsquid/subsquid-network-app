@@ -5,7 +5,9 @@ import Decimal from 'decimal.js';
 import trimEnd from 'lodash-es/trimEnd';
 import { BaseError as BaseViemError, formatUnits, parseUnits, toHex } from 'viem';
 
-import { SQD_DECIMALS, SQD_TOKEN } from './consts';
+import { useContracts } from '@network/useContracts';
+
+import { SQD_DECIMALS } from './consts';
 
 export type TxResult = { tx: WriteContractResult; error?: never } | { error: string; tx?: never };
 
@@ -54,7 +56,11 @@ export function humanReadableSqd(value?: string | bigint | number) {
   return trimEnd(trimEnd(v, '0'), '.');
 }
 
-export function formatSqd(value?: string | Decimal | number, decimals?: number) {
+export function formatSqd(
+  SQD_TOKEN: string,
+  value: string | Decimal | number | undefined,
+  decimals?: number,
+) {
   if (!value) return `0 ${SQD_TOKEN}`;
 
   value = typeof value === 'string' ? fromSqd(value) : value;

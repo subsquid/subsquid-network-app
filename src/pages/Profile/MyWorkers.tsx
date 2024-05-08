@@ -10,12 +10,14 @@ import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
+import { useContracts } from '@network/useContracts';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 
 export function MyWorkers() {
   const navigate = useNavigate();
   const { data, isLoading } = useMyWorkers();
+  const { SQD_TOKEN } = useContracts();
 
   if (isLoading) return <Loader />;
 
@@ -61,8 +63,8 @@ export function MyWorkers() {
                   <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
                   <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
                   <TableCell>{percentFormatter(worker.apr)}</TableCell>
-                  <TableCell>{formatSqd(worker.totalDelegations.total)}</TableCell>
-                  <TableCell>{formatSqd(worker.claimableReward)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, worker.totalDelegations.total)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, worker.claimableReward)}</TableCell>
                 </TableRow>
               );
             })}

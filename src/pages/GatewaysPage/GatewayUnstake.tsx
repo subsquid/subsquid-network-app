@@ -6,7 +6,6 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { useUnstakeGateway } from '@api/contracts/gateway-registration/useUnstakeGateway';
-import { formatSqd } from '@api/contracts/utils';
 import { useMySources } from '@api/subsquid-network-squid';
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
 import { BlockchainContractError } from '@components/BlockchainContractError';
@@ -45,7 +44,6 @@ export function GatewayUnstake({ gateway }: { gateway: BlockchainGateway }) {
               id: gateway.owner.id,
               type: gateway.owner.type,
               balance: gateway.totalStaked,
-              balanceFormatted: formatSqd(gateway.totalStaked),
             }}
           />
         ),

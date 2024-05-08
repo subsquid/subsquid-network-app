@@ -11,11 +11,13 @@ import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useContracts } from '@network/useContracts';
 import { GatewayName } from '@pages/GatewaysPage/GatewayName';
 
 export function MyGateways() {
   const navigate = useNavigate();
   const { data, isLoading } = useMyGateways();
+  const { SQD_TOKEN } = useContracts();
 
   if (isLoading) return <Loader />;
 
@@ -53,8 +55,8 @@ export function MyGateways() {
                     <TableCell>
                       <GatewayName gateway={gateway} />
                     </TableCell>
-                    <TableCell>{formatSqd(gateway.pendingStaked)}</TableCell>
-                    <TableCell>{formatSqd(gateway.totalStaked)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
                     <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
                   </TableRow>
                 );

@@ -7,6 +7,7 @@ import Decimal from 'decimal.js';
 import { formatSqd } from '@api/contracts/utils';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
+import { useContracts } from '@network/useContracts';
 
 import { WorkerColumn, WorkerColumnLabel } from './WorkerStatistics';
 
@@ -22,6 +23,8 @@ export const MyWorkerValue = styled(Box, {
 }));
 
 export const MyWorkerStat = ({ worker }: { worker: BlockchainApiWorker }) => {
+  const { SQD_TOKEN } = useContracts();
+
   return (
     <Card noShadow title="My bond and rewards">
       <Stack
@@ -39,13 +42,15 @@ export const MyWorkerStat = ({ worker }: { worker: BlockchainApiWorker }) => {
         <WorkerColumn>
           <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
             <WorkerColumnLabel>Bond</WorkerColumnLabel>
-            <Box>{formatSqd(worker.bond)}</Box>
+            <Box>{formatSqd(SQD_TOKEN, worker.bond)}</Box>
           </Stack>
         </WorkerColumn>
         <WorkerColumn>
           <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
             <WorkerColumnLabel>Total rewards</WorkerColumnLabel>
-            <Box>{formatSqd(new Decimal(worker.claimedReward).add(worker.claimableReward))}</Box>
+            <Box>
+              {formatSqd(SQD_TOKEN, new Decimal(worker.claimedReward).add(worker.claimableReward))}
+            </Box>
           </Stack>
         </WorkerColumn>
       </Stack>

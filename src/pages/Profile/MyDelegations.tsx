@@ -11,12 +11,14 @@ import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useContracts } from '@network/useContracts';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 
 export function MyDelegations() {
   const navigate = useNavigate();
   const { delegations, isLoading } = useMyDelegations();
+  const { SQD_TOKEN } = useContracts();
 
   if (isLoading) return <Loader />;
 
@@ -53,7 +55,7 @@ export function MyDelegations() {
                     <TableCell>{percentFormatter(d.worker.uptime24Hours)}</TableCell>
                     <TableCell>{percentFormatter(d.worker.uptime90Days)}</TableCell>
                     <TableCell>{percentFormatter(d.worker.stakerApr)}</TableCell>
-                    <TableCell>{formatSqd(d.deposit)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, d.deposit)}</TableCell>
                   </TableRow>
                 );
               })}

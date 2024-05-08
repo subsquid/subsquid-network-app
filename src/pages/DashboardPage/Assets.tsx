@@ -12,10 +12,12 @@ import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useContracts } from '@network/useContracts';
 import { ClaimButton } from '@pages/DashboardPage/ClaimButton';
 
 export function MyAssets() {
   const { isLoading, assets } = useMyAssets();
+  const { SQD_TOKEN } = useContracts();
 
   const data = useMemo(
     () => [
@@ -91,7 +93,7 @@ export function MyAssets() {
                     >
                       <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
                       <HelpTooltip help={d.tip}>
-                        <Box sx={{ fontWeight: 500 }}>{formatSqd(d.value, 2)}</Box>
+                        <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, d.value, 2)}</Box>
                       </HelpTooltip>
                     </Stack>
                     {d.sub?.map(s => (
@@ -104,7 +106,7 @@ export function MyAssets() {
                       >
                         <Box width={16}></Box>
                         <Chip sx={{ background: d.background, color: d.color }} label={s.name} />
-                        <Box sx={{ fontWeight: 500 }}>{formatSqd(s.value, 2)}</Box>
+                        <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, s.value, 2)}</Box>
                       </Stack>
                     ))}
                   </>
@@ -149,7 +151,7 @@ export function MyAssets() {
                 <Box sx={{ textAlign: 'center', width: '100%' }}>
                   <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
                   <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
-                    {formatSqd(assets.total, 2)}
+                    {formatSqd(SQD_TOKEN, assets.total, 2)}
                   </Box>
                 </Box>
               </Box>

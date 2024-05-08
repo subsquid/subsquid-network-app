@@ -13,20 +13,23 @@ import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
+import { useContracts } from '@network/useContracts';
 
-export const delegateSchema = yup.object({
-  source: yup.string().label('Source').trim().required('Source is required'),
-  amount: yup
-    .number()
-    .label('Amount')
-    .moreThan(0)
-    .required('Amount is required')
-    .max(yup.ref('max'), ({ max }) => `Amount should be less than ${formatSqd(max)} `),
-  max: yup.number().label('Max').required('Max is required'),
-});
+export const delegateSchema = (SQD_TOKEN: string) =>
+  yup.object({
+    source: yup.string().label('Source').trim().required('Source is required'),
+    amount: yup
+      .number()
+      .label('Amount')
+      .moreThan(0)
+      .required('Amount is required')
+      .max(yup.ref('max'), ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, max)} `),
+    max: yup.number().label('Max').required('Max is required'),
+  });
 
 export function WorkerDelegate({ worker }: { worker: BlockchainApiWorker }) {
   const { delegateToWorker, error, isLoading } = useWorkerDelegate();
+  const { SQD_TOKEN } = useContracts();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (event: React.UIEvent) => {
@@ -50,7 +53,7 @@ export function WorkerDelegate({ worker }: { worker: BlockchainApiWorker }) {
       amount: '0',
       max: '0',
     },
-    validationSchema: delegateSchema,
+    validationSchema: delegateSchema(SQD_TOKEN),
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,

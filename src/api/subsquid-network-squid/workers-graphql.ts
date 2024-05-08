@@ -5,6 +5,7 @@ import { groupBy, mapValues, values } from 'lodash-es';
 
 import { formatSqd, fromSqd, humanReadableSqd } from '@api/contracts/utils';
 import { useAccount } from '@network/useAccount.ts';
+import { useContracts } from '@network/useContracts';
 
 import { useSquidDataSource } from './datasource';
 import {
@@ -263,6 +264,7 @@ export function useWorkerDaysUptimeById(workerId?: string) {
 
 export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
   const { address } = useAccount();
+  const { SQD_TOKEN } = useContracts();
   const datasource = useSquidDataSource();
 
   const { data, isLoading } = useMyClaimsAvailableQuery(datasource, {
@@ -300,7 +302,7 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
           return {
             ...g[0].owner,
             balance: total.toFixed(0),
-            balanceFormatted: formatSqd(total),
+            balanceFormatted: formatSqd(SQD_TOKEN, total),
           };
         }),
       ),
@@ -317,7 +319,7 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
         }),
       ),
     };
-  }, [data, source]);
+  }, [SQD_TOKEN, data?.delegations, data?.workers, source]);
 
   return {
     isLoading,

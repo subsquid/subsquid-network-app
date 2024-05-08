@@ -11,6 +11,7 @@ import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useContracts } from '@network/useContracts';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
@@ -19,6 +20,7 @@ import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 export function MyDelegations() {
   const navigate = useNavigate();
   const { delegations, isLoading } = useMyDelegations();
+  const { SQD_TOKEN } = useContracts();
 
   if (isLoading) return <Loader />;
 
@@ -54,9 +56,9 @@ export function MyDelegations() {
                       <WorkerStatus worker={d.worker} />
                     </TableCell>
                     <TableCell>{percentFormatter(d.worker.uptime24Hours)}</TableCell>
-                    <TableCell>{formatSqd(d.deposit)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, d.deposit)}</TableCell>
                     <TableCell>{percentFormatter(d.worker.stakerApr)}</TableCell>
-                    <TableCell>{formatSqd(d.totalReward)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, d.totalReward)}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={2}>
                         <WorkerDelegate worker={d.worker} />

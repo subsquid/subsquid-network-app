@@ -16,6 +16,7 @@ import HoverPopover from 'material-ui-popup-state/HoverPopover';
 import { formatSqd } from '@api/contracts/utils';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { PopoverContent, PopoverTable } from '@components/Popover';
+import { useContracts } from '@network/useContracts';
 
 const WorkerCapacityValue = styled(Box, {
   name: 'WorkerCapacityValue',
@@ -58,6 +59,7 @@ export const WorkerDelegationCapacity = ({
   value: BlockchainApiWorker['totalDelegations'];
 }) => {
   const popupState = usePopupState({ variant: 'popover', popupId: 'delegation' });
+  const { SQD_TOKEN } = useContracts();
 
   return (
     <Stack spacing={1} direction="row" alignItems="center" {...bindHover(popupState)}>
@@ -99,15 +101,15 @@ export const WorkerDelegationCapacity = ({
             <TableBody>
               <TableRow>
                 <TableCell component="th">Delegation capacity</TableCell>
-                <TableCell align="right">{formatSqd(capacity)}</TableCell>
+                <TableCell align="right">{formatSqd(SQD_TOKEN, capacity)}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell component="th">Delegated</TableCell>
-                <TableCell align="right">{formatSqd(total)}</TableCell>
+                <TableCell align="right">{formatSqd(SQD_TOKEN, total)}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell component="th">Delegation limit</TableCell>
-                <TableCell align="right">{formatSqd(limit)}</TableCell>
+                <TableCell align="right">{formatSqd(SQD_TOKEN, limit)}</TableCell>
               </TableRow>
             </TableBody>
           </PopoverTable>

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import Decimal from 'decimal.js';
 
-import { formatSqd } from '@api/contracts/utils';
 import { useAccount } from '@network/useAccount';
 
 import { useSquidDataSource } from './datasource';
@@ -12,7 +11,6 @@ export type SourceWallet = {
   id: string;
   type: AccountType;
   balance: string;
-  balanceFormatted: string;
 };
 
 export function useMySources({ enabled }: { enabled?: boolean } = {}) {
@@ -38,14 +36,12 @@ export function useMySources({ enabled }: { enabled?: boolean } = {}) {
             type: AccountType.User,
             id: address as string,
             balance: '0',
-            balanceFormatted: '0',
           },
         ]
       : [wallet, ...wallet.owned].map(a => ({
           type: a.type,
           id: a.id,
           balance: a.balance as string,
-          balanceFormatted: formatSqd(a.balance),
         }));
   }, [address, wallet]);
 
