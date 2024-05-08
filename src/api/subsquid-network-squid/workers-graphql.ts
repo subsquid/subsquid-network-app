@@ -19,6 +19,7 @@ import {
   useWorkerDaysUptimeByIdQuery,
   WorkerFragmentFragment,
   WorkerFullFragmentFragment,
+  WorkerStatus,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
 
@@ -64,7 +65,7 @@ export class BlockchainApiWorker {
         capacity,
         utilizedPercent: totalDelegation.div(delegationLimit).mul(100),
       },
-      delegationEnabled: true,
+      delegationEnabled: worker.status === WorkerStatus.Active,
       ownedByMe: worker.realOwner?.id === address,
     });
 
