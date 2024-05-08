@@ -219,6 +219,8 @@ export function useWorkerByPeerId(peerId?: string) {
     },
     {
       select: res => {
+        if (!res.workers.length) return;
+
         return new BlockchainApiFullWorker({
           worker: res.workers[0],
           address,
