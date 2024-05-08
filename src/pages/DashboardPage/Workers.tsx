@@ -116,7 +116,7 @@ export function Workers() {
           {workers.map(worker => {
             return (
               <TableRow
-                onClick={() => navigate(`/dashboard/workers/${worker.peerId}`)}
+                onClick={() => navigate(`/workers/${worker.peerId}?backPath=/dashboard`)}
                 className="hoverable"
                 key={worker.peerId}
               >

@@ -10,7 +10,6 @@ import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
 import { GatewayName } from '@pages/GatewaysPage/GatewayName';
 
@@ -24,7 +23,6 @@ export function MyGateways() {
   return (
     <Box>
       <NetworkPageTitle
-        title="My gateways"
         endAdornment={
           <Stack direction="row" spacing={2}>
             <Button variant="contained" component={Link} to="/gateways/add">
@@ -33,40 +31,38 @@ export function MyGateways() {
           </Stack>
         }
       />
-      <ConnectedWalletRequired>
-        {data.length ? (
-          <BorderedTable>
-            <TableHead>
-              <TableRow>
-                <TableCell>Gateway</TableCell>
-                <TableCell>Pending lock</TableCell>
-                <TableCell>Locked</TableCell>
-                <TableCell>Created</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map(gateway => {
-                return (
-                  <TableRow
-                    onClick={() => navigate(`/gateways/${gateway.id}`)}
-                    className="hoverable"
-                    key={gateway.id}
-                  >
-                    <TableCell>
-                      <GatewayName gateway={gateway} />
-                    </TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
-                    <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </BorderedTable>
-        ) : (
-          <Card sx={{ textAlign: 'center' }}>No items to show</Card>
-        )}
-      </ConnectedWalletRequired>
+      {data.length ? (
+        <BorderedTable>
+          <TableHead>
+            <TableRow>
+              <TableCell>Gateway</TableCell>
+              <TableCell>Pending lock</TableCell>
+              <TableCell>Locked</TableCell>
+              <TableCell>Created</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map(gateway => {
+              return (
+                <TableRow
+                  onClick={() => navigate(`/gateways/${gateway.id}`)}
+                  className="hoverable"
+                  key={gateway.id}
+                >
+                  <TableCell>
+                    <GatewayName gateway={gateway} />
+                  </TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
+                  <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </BorderedTable>
+      ) : (
+        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
+      )}
     </Box>
   );
 }

@@ -11,7 +11,6 @@ import { CopyToClipboard } from '@components/CopyToClipboard';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
 import { ClaimButton } from '@pages/DashboardPage/ClaimButton';
 
@@ -77,88 +76,86 @@ export function MyAssets() {
     <Box>
       <NetworkPageTitle title="Assets" endAdornment={<ClaimButton />} />
 
-      <ConnectedWalletRequired>
-        <Card>
-          <Stack direction="row" justifyContent="space-between">
-            <Box>
-              {data.map((d, i) => {
-                return (
-                  <>
+      <Card>
+        <Stack direction="row" justifyContent="space-between">
+          <Box>
+            {data.map((d, i) => {
+              return (
+                <>
+                  <Stack
+                    key={d.name}
+                    alignItems="center"
+                    sx={{ mb: i === data.length - 1 ? 0 : 2 }}
+                    direction="row"
+                    spacing={1}
+                  >
+                    <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
+                    <HelpTooltip help={d.tip}>
+                      <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, d.value, 2)}</Box>
+                    </HelpTooltip>
+                  </Stack>
+                  {d.sub?.map(s => (
                     <Stack
-                      key={d.name}
+                      key={d.name + s.name}
                       alignItems="center"
                       sx={{ mb: i === data.length - 1 ? 0 : 2 }}
                       direction="row"
                       spacing={1}
                     >
-                      <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
-                      <HelpTooltip help={d.tip}>
-                        <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, d.value, 2)}</Box>
-                      </HelpTooltip>
+                      <Box width={16}></Box>
+                      <Chip sx={{ background: d.background, color: d.color }} label={s.name} />
+                      <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, s.value, 2)}</Box>
                     </Stack>
-                    {d.sub?.map(s => (
-                      <Stack
-                        key={d.name + s.name}
-                        alignItems="center"
-                        sx={{ mb: i === data.length - 1 ? 0 : 2 }}
-                        direction="row"
-                        spacing={1}
-                      >
-                        <Box width={16}></Box>
-                        <Chip sx={{ background: d.background, color: d.color }} label={s.name} />
-                        <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, s.value, 2)}</Box>
-                      </Stack>
-                    ))}
-                  </>
-                );
-              })}
-            </Box>
-            <Box sx={{ position: 'relative', alignContent: 'center' }}>
-              <PieChart width={210} height={210}>
-                <Pie
-                  data={data}
-                  animationBegin={0}
-                  animationDuration={0}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={105}
-                  dataKey="value"
-                >
-                  {data.map(i => (
-                    <Cell
-                      onClick={e => {
-                        e.preventDefault();
-                      }}
-                      key={i.name}
-                      fill={i.background}
-                    />
                   ))}
-                </Pie>
-              </PieChart>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  display: 'flex',
-                  width: '100%',
-                  alignItems: 'center',
-                }}
+                </>
+              );
+            })}
+          </Box>
+          <Box sx={{ position: 'relative', alignContent: 'center' }}>
+            <PieChart width={210} height={210}>
+              <Pie
+                data={data}
+                animationBegin={0}
+                animationDuration={0}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={105}
+                dataKey="value"
               >
-                <Box sx={{ textAlign: 'center', width: '100%' }}>
-                  <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
-                  <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
-                    {formatSqd(SQD_TOKEN, assets.total, 2)}
-                  </Box>
+                {data.map(i => (
+                  <Cell
+                    onClick={e => {
+                      e.preventDefault();
+                    }}
+                    key={i.name}
+                    fill={i.background}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                width: '100%',
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={{ textAlign: 'center', width: '100%' }}>
+                <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
+                <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
+                  {formatSqd(SQD_TOKEN, assets.total, 2)}
                 </Box>
               </Box>
             </Box>
-          </Stack>
-        </Card>
-      </ConnectedWalletRequired>
+          </Box>
+        </Stack>
+      </Card>
     </Box>
   );
 }

@@ -8,6 +8,7 @@ import { useAccount } from 'wagmi';
 import { PageTabs } from '@components/PageTabs';
 import { WalletIcon } from '@icons/WalletIcon';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
+import { MyAssets } from '@pages/DashboardPage/Assets';
 
 export const DelegationTab = styled(Tab)(({ theme }) => ({
   textTransform: 'none',
@@ -54,26 +55,29 @@ export function ProfilePage() {
 
   return (
     <CenteredPageWrapper className="wide">
-      <Stack sx={{ mb: 3 }} direction="row" alignItems="flex-start" justifyContent="space-between">
+      <MyAssets />
+      <Box sx={{ height: 64 }} />
+      <Stack
+        direction="row"
+        alignItems="flex-start"
+        justifyContent="space-between"
+        sx={{ position: 'absolute' }}
+      >
         <Box>
           <PageTabs
             TabComponent={DelegationTab}
             tabs={[
               {
-                title: 'Assets',
-                path: '/assets',
+                title: 'Delegations',
+                path: '/profile/delegations',
               },
               {
-                title: 'My delegations',
-                path: '/delegations',
+                title: 'Workers',
+                path: '/profile/workers',
               },
               {
-                title: 'My workers',
-                path: '/workers',
-              },
-              {
-                title: 'My gateways',
-                path: '/gateways',
+                title: 'Gateways',
+                path: '/profile/gateways',
                 // disabled: !demoFeaturesEnabled(),
               },
             ]}
