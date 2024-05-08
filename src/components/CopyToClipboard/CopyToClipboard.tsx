@@ -46,9 +46,6 @@ export const Wrapper = styled(Stack)(({ theme }) => ({
   '& .nowrap': {
     whiteSpace: 'nowrap',
   },
-  '& .content': {
-    color: theme.palette.text.primary,
-  },
 }));
 
 export const CopyToClipboard = ({

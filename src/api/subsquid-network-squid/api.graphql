@@ -130,6 +130,7 @@ query myAssets($address: String!) {
   accounts(where:{id_eq: $address}) {
     balance
     owned {
+      id
       balance
     }
   }

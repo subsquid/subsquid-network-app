@@ -4481,7 +4481,7 @@ export type MyAssetsQuery = {
   accounts: Array<{
     __typename?: 'Account';
     balance: any;
-    owned: Array<{ __typename?: 'Account'; balance: any }>;
+    owned: Array<{ __typename?: 'Account'; id: string; balance: any }>;
   }>;
   workers: Array<{ __typename?: 'Worker'; bond: any; claimableReward: any }>;
   delegations: Array<{ __typename?: 'Delegation'; claimableReward: any; deposit: any }>;
@@ -4963,6 +4963,7 @@ export const MyAssetsDocument = `
   accounts(where: {id_eq: $address}) {
     balance
     owned {
+      id
       balance
     }
   }

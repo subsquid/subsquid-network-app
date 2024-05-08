@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
 
+import { addressFormatter } from '@lib/formatters/formatters';
 import { Box, Chip, Stack } from '@mui/material';
 import { Cell, Pie, PieChart } from 'recharts';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useMyAssets } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
+import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
@@ -24,9 +26,20 @@ export function MyAssets() {
       },
       {
         name: 'Locked',
-        value: fromSqd(assets.vesting).toNumber(),
+        value: fromSqd(assets.locked).toNumber(),
         background: '#E3F7E0',
         color: '#55AD44',
+        sub: assets.vestings.map(v => {
+          return {
+            name: (
+              <CopyToClipboard
+                text={v.address}
+                content={addressFormatter(v.address, true)}
+              ></CopyToClipboard>
+            ),
+            value: fromSqd(v.balance).toNumber(),
+          };
+        }),
       },
       {
         name: 'Claimable',
@@ -62,16 +75,31 @@ export function MyAssets() {
             <Box>
               {data.map((d, i) => {
                 return (
-                  <Stack
-                    key={d.name}
-                    alignItems="center"
-                    sx={{ mb: i === data.length - 1 ? 0 : 2 }}
-                    direction="row"
-                    spacing={1}
-                  >
-                    <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
-                    <Box sx={{ fontWeight: 500 }}>{formatSqd(d.value, 2)}</Box>
-                  </Stack>
+                  <>
+                    <Stack
+                      key={d.name}
+                      alignItems="center"
+                      sx={{ mb: i === data.length - 1 ? 0 : 2 }}
+                      direction="row"
+                      spacing={1}
+                    >
+                      <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
+                      <Box sx={{ fontWeight: 500 }}>{formatSqd(d.value, 2)}</Box>
+                    </Stack>
+                    {d.sub?.map(s => (
+                      <Stack
+                        key={d.name + s.name}
+                        alignItems="center"
+                        sx={{ mb: i === data.length - 1 ? 0 : 2 }}
+                        direction="row"
+                        spacing={1}
+                      >
+                        <Box width={16}></Box>
+                        <Chip sx={{ background: d.background, color: d.color }} label={s.name} />
+                        <Box sx={{ fontWeight: 500 }}>{formatSqd(s.value, 2)}</Box>
+                      </Stack>
+                    ))}
+                  </>
                 );
               })}
             </Box>

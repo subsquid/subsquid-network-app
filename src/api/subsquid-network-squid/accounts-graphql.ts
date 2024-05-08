@@ -77,16 +77,18 @@ export function useMyAssets() {
     const workers = data?.workers || [];
 
     let balance = new Decimal(0);
-    let vesting = new Decimal(0);
+    let locked = new Decimal(0);
     let bonded = new Decimal(0);
     let claimable = new Decimal(0);
     let delegated = new Decimal(0);
+    const vestings: { address: string; balance: string }[] = [];
 
     for (const a of accounts) {
       balance = balance.add(a.balance);
 
       for (const o of a.owned) {
-        vesting = vesting.add(o.balance);
+        locked = locked.add(o.balance);
+        vestings.push({ address: o.id, balance: new Decimal(o.balance).toFixed(0) });
       }
     }
     for (const w of workers) {
@@ -100,11 +102,12 @@ export function useMyAssets() {
 
     return {
       balance: balance.toFixed(0),
-      vesting: vesting.toFixed(0),
+      locked: locked.toFixed(0),
       bonded: bonded.toFixed(0),
       claimable: claimable.toFixed(0),
       delegated: delegated.toFixed(0),
-      total: balance.add(bonded).add(claimable).add(delegated).toFixed(0),
+      vestings,
+      total: balance.add(locked).add(bonded).add(claimable).add(delegated).toFixed(0),
     };
   }, [data]);
 

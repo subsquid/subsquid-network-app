@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 
+import { addressFormatter } from '@lib/formatters/formatters';
 import { ExpandMore } from '@mui/icons-material';
 import { Box, Button, Menu, Stack, styled } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
@@ -41,7 +42,7 @@ export function UserMenu() {
   }, []);
 
   const maskedAddress = useMemo(() => {
-    return address ? `${address.substring(0, 4)}...${address?.slice(-4)}` : '';
+    return address ? addressFormatter(address, true) : '';
   }, [address]);
 
   if (!address || !isConnected) {
