@@ -8,7 +8,6 @@ import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 
 import { SortDir, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
-import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { Search } from '@components/Search/Search';
 import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';

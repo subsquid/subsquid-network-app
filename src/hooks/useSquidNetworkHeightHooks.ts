@@ -4,19 +4,20 @@ import { logger } from '@logger';
 import { useQueryClient } from '@tanstack/react-query';
 import { max, partition } from 'lodash-es';
 
-import { SQUID_DATASOURCE, useSquidNetworkHeightQuery } from '@api/subsquid-network-squid';
+import { useSquidDataSource, useSquidNetworkHeightQuery } from '@api/subsquid-network-squid';
 import { localStorageStringSerializer, useLocalStorageState } from '@hooks/useLocalStorageState';
 
 type HeightHook = { height: number; invalidateQueries: unknown[] };
 
 export function useSquidNetworkHeightHooks() {
   const queryClient = useQueryClient();
+  const dataSource = useSquidDataSource();
   const [heightHooksRaw, setHeightHooksRaw] = useLocalStorageState<string>('squid_height_hooks', {
     defaultValue: '[]',
     serializer: localStorageStringSerializer,
   });
   const { data, isLoading } = useSquidNetworkHeightQuery(
-    SQUID_DATASOURCE,
+    dataSource,
     {},
     {
       refetchInterval: 2000,

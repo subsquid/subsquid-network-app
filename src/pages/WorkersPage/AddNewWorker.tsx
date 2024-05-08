@@ -4,7 +4,7 @@ import { LoadingButton } from '@mui/lab';
 import { Box } from '@mui/material';
 import Decimal from 'decimal.js';
 import { useFormik } from 'formik';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { fromSqd } from '@api/contracts/utils.ts';
 import { useRegisterWorker } from '@api/contracts/worker-registration/useRegisterWorker';

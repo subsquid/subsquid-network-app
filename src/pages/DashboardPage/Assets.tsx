@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { addressFormatter } from '@lib/formatters/formatters';
-import { Box, Chip, Stack, Tooltip } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import { Cell, Pie, PieChart } from 'recharts';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';

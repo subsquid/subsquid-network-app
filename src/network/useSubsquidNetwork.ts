@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+
+import { useQueryClient } from '@tanstack/react-query';
 import useLocalStorageState from 'use-local-storage-state';
 
 import { localStorageStringSerializer } from '@hooks/useLocalStorageState.ts';
@@ -19,5 +22,12 @@ export function useSubsquidNetwork(): [NetworkName, (app: NetworkName) => void] 
     defaultValue: defaultApp,
   });
 
-  return [validate(app), changeApp];
+  const queryClient = useQueryClient();
+
+  const changeAndReset = (network: NetworkName) => {
+    changeApp(network);
+    queryClient.clear();
+  };
+
+  return [validate(app), changeAndReset];
 }

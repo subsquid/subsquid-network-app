@@ -14,6 +14,7 @@ import classnames from 'classnames';
 import { Outlet } from 'react-router-dom';
 
 import { Logo } from '@components/Logo';
+import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
 import { UserMenu } from '@layouts/NetworkLayout/UserMenu.tsx';
@@ -261,7 +262,7 @@ export const NetworkLayout = ({
   const theme = useTheme();
   const narrowLg = useMediaQuery(theme.breakpoints.down('lg'));
   const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
-  // const isMobile = useMediaQuery(theme.breakpoints.down('xxs'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('xxs'));
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -289,7 +290,7 @@ export const NetworkLayout = ({
             ) : null}
           </AppToolbarSidebar>
           <AppToolbarContent />
-          {/*<NetworkSwitcher hideText={isMobile} />*/}
+          <NetworkSwitcher hideText={isMobile} />
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}
           <UserMenu />
