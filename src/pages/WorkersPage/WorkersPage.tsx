@@ -4,7 +4,6 @@ import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
-import { formatSqd } from '@api/contracts/utils';
 import { useMyWorkers } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';

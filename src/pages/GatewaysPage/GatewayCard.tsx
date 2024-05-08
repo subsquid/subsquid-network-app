@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { Divider, IconButton, Stack, styled } from '@mui/material';
+import { Divider, Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
-import { Link } from 'react-router-dom';
 
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
 import { Avatar } from '@components/Avatar';
