@@ -81,7 +81,7 @@ export function SortableHeaderCell<S>({
       <ClickableStack
         onClick={handleSortChange(sort)}
         direction="row"
-        alignItems="flex-start"
+        alignItems="center"
         justifyContent="flex-start"
         spacing={1}
       >
