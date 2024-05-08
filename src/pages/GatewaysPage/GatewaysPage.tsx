@@ -19,8 +19,6 @@ export function MyGateways() {
   const { data, isLoading } = useMyGateways();
   const { SQD_TOKEN } = useContracts();
 
-  if (isLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle
@@ -33,40 +31,40 @@ export function MyGateways() {
           </Stack>
         }
       />
-      <ConnectedWalletRequired>
-        {data.length ? (
-          <BorderedTable>
-            <TableHead>
-              <TableRow>
-                <TableCell>Gateway</TableCell>
-                <TableCell>Pending lock</TableCell>
-                <TableCell>Locked</TableCell>
-                <TableCell>Created</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map(gateway => {
-                return (
-                  <TableRow
-                    onClick={() => navigate(`/gateways/${gateway.id}`)}
-                    className="hoverable"
-                    key={gateway.id}
-                  >
-                    <TableCell>
-                      <GatewayName gateway={gateway} />
-                    </TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
-                    <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </BorderedTable>
-        ) : (
-          <Card sx={{ textAlign: 'center' }}>No items to show</Card>
-        )}
-      </ConnectedWalletRequired>
+      {isLoading ? (
+        <Loader />
+      ) : data.length ? (
+        <BorderedTable>
+          <TableHead>
+            <TableRow>
+              <TableCell>Gateway</TableCell>
+              <TableCell>Pending lock</TableCell>
+              <TableCell>Locked</TableCell>
+              <TableCell>Created</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map(gateway => {
+              return (
+                <TableRow
+                  onClick={() => navigate(`/gateways/${gateway.id}`)}
+                  className="hoverable"
+                  key={gateway.id}
+                >
+                  <TableCell>
+                    <GatewayName gateway={gateway} />
+                  </TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
+                  <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </BorderedTable>
+      ) : (
+        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
+      )}
     </Box>
   );
 }

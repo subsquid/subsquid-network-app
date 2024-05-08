@@ -21,8 +21,6 @@ export function MyWorkers() {
   const { data, isLoading } = useMyWorkers();
   const { isConnected } = useAccount();
 
-  if (isLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle
@@ -33,48 +31,48 @@ export function MyWorkers() {
           </Button>
         }
       />
-      <ConnectedWalletRequired>
-        {data.length ? (
-          <BorderedTable>
-            <TableHead>
-              <TableRow>
-                <TableCell>Worker</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Uptime last 24 hours</TableCell>
-                <TableCell>Uptime last 90 days</TableCell>
-                <TableCell>APR</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map(worker => {
-                return (
-                  <TableRow
-                    onClick={() => navigate(`/workers/${worker.peerId}`)}
-                    className="hoverable"
-                    key={worker.peerId}
-                  >
-                    <TableCell>
-                      <WorkerName worker={worker} />
-                    </TableCell>
-                    <TableCell>
-                      <WorkerStatus worker={worker} />
-                    </TableCell>
-                    <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
-                    <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
-                    <TableCell>{percentFormatter(worker.apr)}</TableCell>
-                    <TableCell>
-                      <WorkerDelegate worker={worker} />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </BorderedTable>
-        ) : (
-          <Card sx={{ textAlign: 'center' }}>No items to show</Card>
-        )}
-      </ConnectedWalletRequired>
+      {isLoading ? (
+        <Loader />
+      ) : data.length ? (
+        <BorderedTable>
+          <TableHead>
+            <TableRow>
+              <TableCell>Worker</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Uptime last 24 hours</TableCell>
+              <TableCell>Uptime last 90 days</TableCell>
+              <TableCell>APR</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map(worker => {
+              return (
+                <TableRow
+                  onClick={() => navigate(`/workers/${worker.peerId}`)}
+                  className="hoverable"
+                  key={worker.peerId}
+                >
+                  <TableCell>
+                    <WorkerName worker={worker} />
+                  </TableCell>
+                  <TableCell>
+                    <WorkerStatus worker={worker} />
+                  </TableCell>
+                  <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
+                  <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                  <TableCell>{percentFormatter(worker.apr)}</TableCell>
+                  <TableCell>
+                    <WorkerDelegate worker={worker} />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </BorderedTable>
+      ) : (
+        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
+      )}
     </Box>
   );
 }

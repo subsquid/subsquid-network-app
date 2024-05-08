@@ -9,6 +9,7 @@ const PageTitleWrapper = styled('div', {
   name: 'PageTitleWrapper',
 })(({ theme }) => ({
   marginBottom: theme.spacing(5),
+  minHeight: theme.spacing(5),
 
   '& .title': {
     display: 'flex',

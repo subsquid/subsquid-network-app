@@ -71,13 +71,13 @@ export function MyAssets() {
     [assets],
   );
 
-  if (isLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle title="Assets" endAdornment={<ClaimButton />} />
 
-      <ConnectedWalletRequired>
+      {isLoading ? (
+        <Loader />
+      ) : (
         <Card>
           <Stack direction="row" justifyContent="space-between">
             <Box>
@@ -158,7 +158,7 @@ export function MyAssets() {
             </Box>
           </Stack>
         </Card>
-      </ConnectedWalletRequired>
+      )}
     </Box>
   );
 }

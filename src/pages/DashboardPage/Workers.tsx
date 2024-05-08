@@ -8,6 +8,7 @@ import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 
 import { SortDir, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
+import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { Search } from '@components/Search/Search';
 import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';
@@ -68,8 +69,6 @@ export function Workers() {
     sortDir: query.sortDir as SortDir,
   });
 
-  if (isLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle
@@ -79,67 +78,75 @@ export function Workers() {
         }
       />
 
-      <BorderedTable>
-        <TableHead>
-          <TableRow>
-            <TableCell>Worker</TableCell>
-            <TableCell>Status</TableCell>
-            <SortableHeaderCell
-              width={75}
-              sort={WorkerSortBy.Uptime24h}
-              query={query}
-              setQuery={setQuery}
-            >
-              Uptime last 24 hours
-            </SortableHeaderCell>
-            <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
-              Worker APR
-            </SortableHeaderCell>
-            <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
-              Staker APR
-            </SortableHeaderCell>
-            {/*<SortableHeaderCell*/}
-            {/*  width={70}*/}
-            {/*  sort={WorkerSortBy.DelegationCapacity}*/}
-            {/*  query={query}*/}
-            {/*  setQuery={setQuery}*/}
-            {/*>*/}
-            {/*  Delegation capacity*/}
-            {/*</SortableHeaderCell>*/}
-            <SortableHeaderCell sort={WorkerSortBy.JoinedAt} query={query} setQuery={setQuery}>
-              Joined date
-            </SortableHeaderCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {workers.map(worker => {
-            return (
-              <TableRow
-                onClick={() => navigate(`/dashboard/workers/${worker.peerId}`)}
-                className="hoverable"
-                key={worker.peerId}
-              >
-                <TableCell>
-                  <WorkerName worker={worker} />
-                </TableCell>
-                <TableCell>
-                  <WorkerStatus worker={worker} />
-                </TableCell>
-                <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
-                <TableCell>{percentFormatter(worker.apr)}</TableCell>
-                <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
-                {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
-                <TableCell>{dateFormat(worker.createdAt)}</TableCell>
-                <TableCell>
-                  <WorkerDelegate worker={worker} />
-                </TableCell>
+      {isLoading ? (
+        <Loader />
+      ) : workers.length ? (
+        <>
+          <BorderedTable>
+            <TableHead>
+              <TableRow>
+                <TableCell>Worker</TableCell>
+                <TableCell>Status</TableCell>
+                <SortableHeaderCell
+                  width={75}
+                  sort={WorkerSortBy.Uptime24h}
+                  query={query}
+                  setQuery={setQuery}
+                >
+                  Uptime last 24 hours
+                </SortableHeaderCell>
+                <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
+                  Worker APR
+                </SortableHeaderCell>
+                <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
+                  Staker APR
+                </SortableHeaderCell>
+                {/*<SortableHeaderCell*/}
+                {/*  width={70}*/}
+                {/*  sort={WorkerSortBy.DelegationCapacity}*/}
+                {/*  query={query}*/}
+                {/*  setQuery={setQuery}*/}
+                {/*>*/}
+                {/*  Delegation capacity*/}
+                {/*</SortableHeaderCell>*/}
+                <SortableHeaderCell sort={WorkerSortBy.JoinedAt} query={query} setQuery={setQuery}>
+                  Joined date
+                </SortableHeaderCell>
+                <TableCell></TableCell>
               </TableRow>
-            );
-          })}
-        </TableBody>
-      </BorderedTable>
-      <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
+            </TableHead>
+            <TableBody>
+              {workers.map(worker => {
+                return (
+                  <TableRow
+                    onClick={() => navigate(`/workers/${worker.peerId}?backPath=/dashboard`)}
+                    className="hoverable"
+                    key={worker.peerId}
+                  >
+                    <TableCell>
+                      <WorkerName worker={worker} />
+                    </TableCell>
+                    <TableCell>
+                      <WorkerStatus worker={worker} />
+                    </TableCell>
+                    <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
+                    <TableCell>{percentFormatter(worker.apr)}</TableCell>
+                    <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
+                    {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
+                    <TableCell>{dateFormat(worker.createdAt)}</TableCell>
+                    <TableCell>
+                      <WorkerDelegate worker={worker} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </BorderedTable>
+          <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
+        </>
+      ) : (
+        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
+      )}
     </Box>
   );
 }
