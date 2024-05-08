@@ -63,7 +63,8 @@ jobs:
           WALLET_CONNECT_PROJECT_ID: ${{ steps.env.outputs.wc_project_id }}
           ENABLE_DEMO_FEATURES: ${{ steps.env.outputs.enable_demo_features }}
           NETWORK: ${{ steps.env.outputs.network }}
-          SQUID_API_URL: ${{ steps.env.outputs.squid_api_url }}
+          TESTNET_SQUID_API_URL: ${{ steps.env.outputs.testnet_squid_api_url }}
+          MAINNET_SQUID_API_URL: ${{ steps.env.outputs.mainnet_squid_api_url }}
 
 
       # Build and push images to Google Container Registry
