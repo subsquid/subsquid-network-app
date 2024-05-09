@@ -49,7 +49,7 @@ export class BlockchainApiWorker {
   }[] = [];
   myDelegationsTotal: Decimal;
   myDelegationsRewardsTotal: Decimal;
-  totalReward: Decimal;
+  totalReward: string;
 
   constructor({ worker, address }: { worker: WorkerFragmentFragment; address?: `0x${string}` }) {
     const totalDelegation = fromSqd(worker.totalDelegation);
@@ -74,7 +74,7 @@ export class BlockchainApiWorker {
       new Decimal(0),
     );
 
-    this.totalReward = new Decimal(this.claimedReward).add(this.claimableReward);
+    this.totalReward = new Decimal(this.claimedReward).add(this.claimableReward).toFixed(0);
   }
 }
 
