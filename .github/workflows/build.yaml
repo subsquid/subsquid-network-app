@@ -43,11 +43,15 @@ jobs:
           if [ "$REF" = "refs/heads/main" ]; then
               echo "::set-output name=app_env::prod"
               echo "::set-output name=wc_project_id::475eff0658d0f3300ca18971418d261b"
-              echo "::set-output name=squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/v/v1/graphql"
+              echo "::set-output name=enable_demo_features::false"
           else
               echo "::set-output name=app_env::dev"
               echo "::set-output name=wc_project_id::ec2facac9eaaca7cc0584baadc935c01"
-              echo "::set-output name=squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
+              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/v/v1/graphql"
+              echo "::set-output name=enable_demo_features::true"
           fi
         env:
           REF: ${{ github.ref }}
@@ -61,7 +65,8 @@ jobs:
           WALLET_CONNECT_PROJECT_ID: ${{ steps.env.outputs.wc_project_id }}
           ENABLE_DEMO_FEATURES: ${{ steps.env.outputs.enable_demo_features }}
           NETWORK: ${{ steps.env.outputs.network }}
-          SQUID_API_URL: ${{ steps.env.outputs.squid_api_url }}
+          TESTNET_SQUID_API_URL: ${{ steps.env.outputs.testnet_squid_api_url }}
+          MAINNET_SQUID_API_URL: ${{ steps.env.outputs.mainnet_squid_api_url }}
 
 
       # Build and push images to Google Container Registry

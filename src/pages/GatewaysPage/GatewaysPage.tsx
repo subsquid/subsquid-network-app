@@ -2,35 +2,38 @@ import React from 'react';
 
 import { dateFormat } from '@i18n';
 import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 import { formatSqd } from '@api/contracts/utils';
 import { useMyGateways } from '@api/subsquid-network-squid/gateways-graphql';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
-import { NetworkPageTitle } from '@layouts/NetworkLayout';
-import { GatewayName } from '@pages/GatewayPage/GatewayName';
+import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
+import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useContracts } from '@network/useContracts';
+import { GatewayName } from '@pages/GatewaysPage/GatewayName';
 
 export function MyGateways() {
   const navigate = useNavigate();
   const { data, isLoading } = useMyGateways();
-
-  if (isLoading) return <Loader />;
+  const { SQD_TOKEN } = useContracts();
 
   return (
     <Box>
       <NetworkPageTitle
-        title="My gateways"
+        title="My Gateways"
         endAdornment={
           <Stack direction="row" spacing={2}>
-            <Link to="/profile/gateways/add">
-              <Button variant="contained">Add gateway</Button>
-            </Link>
+            <Button variant="contained" component={Link} to="/gateways/add">
+              Add gateway
+            </Button>
           </Stack>
         }
       />
-      {data.length ? (
+      {isLoading ? (
+        <Loader />
+      ) : data.length ? (
         <BorderedTable>
           <TableHead>
             <TableRow>
@@ -44,15 +47,15 @@ export function MyGateways() {
             {data.map(gateway => {
               return (
                 <TableRow
-                  onClick={() => navigate(`/profile/gateways/${gateway.id}`)}
+                  onClick={() => navigate(`/gateways/${gateway.id}`)}
                   className="hoverable"
                   key={gateway.id}
                 >
                   <TableCell>
                     <GatewayName gateway={gateway} />
                   </TableCell>
-                  <TableCell>{formatSqd(gateway.pendingStaked)}</TableCell>
-                  <TableCell>{formatSqd(gateway.totalStaked)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
                   <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
                 </TableRow>
               );
@@ -63,5 +66,16 @@ export function MyGateways() {
         <Card sx={{ textAlign: 'center' }}>No items to show</Card>
       )}
     </Box>
+  );
+}
+
+export function GatewaysPage() {
+  return (
+    <CenteredPageWrapper className="wide">
+      <ConnectedWalletRequired>
+        <MyGateways />
+      </ConnectedWalletRequired>
+      <Outlet />
+    </CenteredPageWrapper>
   );
 }

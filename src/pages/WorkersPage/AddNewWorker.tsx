@@ -50,7 +50,7 @@ export function AddNewWorker() {
       });
       if (!success) return;
 
-      navigate('/profile/workers');
+      navigate('/workers');
     },
   });
 
@@ -73,7 +73,7 @@ export function AddNewWorker() {
 
   return (
     <CenteredPageWrapper>
-      <NetworkPageTitle backPath="/profile/workers" title="Worker registration">
+      <NetworkPageTitle backPath="/workers" title="Worker registration">
         {/*Worker registration Lorem ipsum dolor sit amet consectetur. Learn more quis tempus proin. Id*/}
         {/*rhoncus cras nibh vitae in quis porttitor cum laoreet. Integer consectetur lacus at netus.*/}
         {/*Tincidunt aliquam.*/}

@@ -3,16 +3,13 @@ import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { NetworkLayout } from '@layouts/NetworkLayout';
-import { AddNewGateway } from '@pages/GatewayPage/AddNewGateway.tsx';
-import { Gateway } from '@pages/GatewayPage/Gateway.tsx';
-// import NetworkDashboardPage from '@pages/NetworkDashboard/NetworkDashboardPage.tsx';
-import { MyAssets } from '@pages/Profile/MyAssets.tsx';
-import { MyDelegations } from '@pages/Profile/MyDelegations.tsx';
-import { MyGateways } from '@pages/Profile/MyGateways.tsx';
-import { MyWorkers } from '@pages/Profile/MyWorkers.tsx';
-import { ProfilePage } from '@pages/Profile/ProfilePage.tsx';
+import { DashboardPage } from '@pages/DashboardPage/DashboardPage.tsx';
+import { DelegationsPage } from '@pages/DelegationsPage/DelegationsPage.tsx';
+import { AddNewGateway } from '@pages/GatewaysPage/AddNewGateway.tsx';
+import { Gateway } from '@pages/GatewaysPage/Gateway.tsx';
+import { GatewaysPage } from '@pages/GatewaysPage/GatewaysPage.tsx';
 import { AddNewWorker } from '@pages/WorkersPage/AddNewWorker.tsx';
-import Worker from '@pages/WorkersPage/Worker.tsx';
+import { Worker } from '@pages/WorkersPage/Worker.tsx';
 import { WorkerEdit } from '@pages/WorkersPage/WorkerEdit.tsx';
 import { WorkersPage } from '@pages/WorkersPage/WorkersPage.tsx';
 
@@ -23,31 +20,26 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
+      <Route element={<NetworkLayout />} path="/dashboard">
+        <Route element={<DashboardPage />} index />
+        <Route element={<Worker backPath="/dashboard" />} path="workers/:peerId" />
+      </Route>
       <Route element={<NetworkLayout />} path="/workers">
         <Route element={<WorkersPage />} index />
+        <Route element={<AddNewWorker />} path="add" />
         <Route element={<Worker backPath="/workers" />} path=":peerId" />
+        <Route element={<WorkerEdit />} path=":peerId/edit" />
       </Route>
-      {/*<Route element={<NetworkLayout />} path="/network-dashboard">*/}
-      {/*  <Route index element={<NetworkDashboardPage />} />*/}
-      {/*</Route>*/}
-      <Route element={<NetworkLayout />} path="/profile">
-        <Route path="" element={<ProfilePage />}>
-          <Route element={<MyAssets />} path="assets" />
-          <Route element={<MyDelegations />} path="delegations" />
-
-          <Route element={<AddNewWorker />} path="workers/add" />
-          <Route element={<MyWorkers />} path="workers" />
-          <Route element={<WorkerEdit />} path="workers/:peerId/edit" />
-          <Route element={<Worker backPath="/profile/workers" />} path="workers/:peerId" />
-
-          <Route element={<AddNewGateway />} path="gateways/add" />
-          <Route element={<MyGateways />} path="gateways" />
-          <Route element={<Gateway backPath="/profile/gateways" />} path="gateways/:peerId" />
-
-          <Route element={<Navigate to="assets" replace={true} />} index />
-        </Route>
+      <Route element={<NetworkLayout />} path="/delegations">
+        <Route element={<DelegationsPage />} index />
+        <Route element={<Worker backPath="/delegations" />} path="workers/:peerId" />
       </Route>
-      <Route element={<Navigate to="/workers" replace={true} />} path="*" />
+      <Route element={<NetworkLayout />} path="/gateways">
+        <Route element={<GatewaysPage />} index />
+        <Route element={<AddNewGateway />} path="add" />
+        <Route element={<Gateway backPath="/gateways" />} path=":peerId" />
+      </Route>
+      <Route element={<Navigate to="/dashboard" replace={true} />} path="*" />
     </Routes>
   );
 };

@@ -24,15 +24,18 @@ export function NetworkSwitcher({
 }) {
   const [network, changNetwork] = useSubsquidNetwork();
 
+  const inverseNetworkName = (name: string) =>
+    name === NetworkName.Mainnet ? NetworkName.Testnet : NetworkName.Mainnet;
+
   const handleAppSwitch = () => {
-    changNetwork(network === NetworkName.Mainnet ? NetworkName.Testnet : NetworkName.Mainnet);
+    changNetwork(inverseNetworkName(network));
   };
 
   return (
     <>
       <SwitchButton fill={color} onClick={handleAppSwitch} sx={sx}>
         <SwitchArrowsIcon fill={color} />
-        {hideText ? null : `Switch to ${capitalize(network)}`}
+        {hideText ? null : `Switch to ${capitalize(inverseNetworkName(network))}`}
       </SwitchButton>
     </>
   );

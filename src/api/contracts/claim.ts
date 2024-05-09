@@ -47,7 +47,7 @@ function useClaimFromVestingContract() {
       const data = encodeFunctionData({
         abi: REWARD_TREASURY_CONTRACT_ABI,
         functionName: 'claimFor',
-        args: [contracts.REWARD_DISTRIBUTION, wallet.id as `0x${string}`],
+        args: [contracts.REWARD_DISTRIBUTION, account as `0x${string}`],
       });
 
       const { request } = await publicClient.simulateContract({

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { logger } from '@logger';
+import Decimal from 'decimal.js';
 import { encodeFunctionData } from 'viem';
 import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
 
@@ -13,7 +14,7 @@ import {
   WriteContractRes,
 } from '@api/contracts/utils';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
-import { AccountType, SourceWallet, useNetworkSettings } from '@api/subsquid-network-squid';
+import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
@@ -28,14 +29,15 @@ export interface AddWorkerRequest extends WorkerMetadata {
 
 function useRegisterFromWallet() {
   const contracts = useContracts();
+  const publicClient = usePublicClient();
+  const [approveSqd] = useApproveSqd();
+
   const { writeAsync } = useContractWrite({
     address: contracts.WORKER_REGISTRATION,
     abi: WORKER_REGISTRATION_CONTRACT_ABI,
     functionName: 'register',
   });
 
-  const [approveSqd] = useApproveSqd();
-  const { bondAmount } = useNetworkSettings();
   const tryCallRegistrationContract = async ({
     peerId,
     ...rest
@@ -55,9 +57,15 @@ function useRegisterFromWallet() {
     const res = await tryCallRegistrationContract(req);
     // Try to approve SQD
     if (isApproveRequiredError(res.error)) {
+      const bond = await publicClient.readContract({
+        address: contracts.WORKER_REGISTRATION,
+        abi: WORKER_REGISTRATION_CONTRACT_ABI,
+        functionName: 'bondAmount',
+      });
+
       const approveRes = await approveSqd({
         contractAddress: contracts.WORKER_REGISTRATION,
-        amount: bondAmount,
+        amount: new Decimal(bond.toString()),
       });
       if (!approveRes.success) {
         return { error: approveRes.failedReason };

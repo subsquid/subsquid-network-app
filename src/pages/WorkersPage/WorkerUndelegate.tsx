@@ -12,23 +12,32 @@ import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { SourceWalletOption } from '@components/SourceWallet';
+import { useContracts } from '@network/useContracts';
 
-export const undelegateSchema = yup.object({
-  source: yup.string().label('Source').trim().required('Source is required'),
-  amount: yup
-    .number()
-    .label('Amount')
-    .moreThan(0)
-    .required('Amount is required')
-    .max(yup.ref('max'), ({ max }) => `Amount should be less than ${formatSqd(max)} `),
-  max: yup.string().label('Max').required('Max is required'),
-});
+export const undelegateSchema = (SQD_TOKEN: string) =>
+  yup.object({
+    source: yup.string().label('Source').trim().required('Source is required'),
+    amount: yup
+      .number()
+      .label('Amount')
+      .moreThan(0)
+      .required('Amount is required')
+      .max(
+        yup.ref('max'),
+        ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, new Decimal(max))} `,
+      ),
+    max: yup.string().label('Max').required('Max is required'),
+  });
 
 export function WorkerUndelegate({ worker }: { worker: BlockchainApiWorker }) {
   const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
+  const { SQD_TOKEN } = useContracts();
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (e: React.UIEvent) => {
+    e.stopPropagation();
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
 
   const options = useMemo(
@@ -42,7 +51,6 @@ export function WorkerUndelegate({ worker }: { worker: BlockchainApiWorker }) {
                 source={{
                   id: s.owner.id,
                   balance: s.deposit,
-                  balanceFormatted: formatSqd(s.deposit),
                   type: s.owner.type,
                 }}
               />
@@ -59,7 +67,7 @@ export function WorkerUndelegate({ worker }: { worker: BlockchainApiWorker }) {
       amount: '0',
       max: '0',
     },
-    validationSchema: undelegateSchema,
+    validationSchema: undelegateSchema(SQD_TOKEN),
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,

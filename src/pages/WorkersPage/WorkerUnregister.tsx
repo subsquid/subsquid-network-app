@@ -30,6 +30,7 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }
                 source: worker.owner,
               });
             }}
+            disabled={worker.locked}
             variant="contained"
             color="success"
           >

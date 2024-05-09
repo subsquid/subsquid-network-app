@@ -13,28 +13,34 @@ import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
+import { useContracts } from '@network/useContracts';
 
 const MIN_BLOCKS_LOCK = 1000;
 
-export const stakeSchema = yup.object({
-  source: yup.string().label('Source').trim().required('Source is required'),
-  amount: yup
-    .number()
-    .label('Amount')
-    .moreThan(0)
-    .required('Amount is required')
-    .max(yup.ref('max'), ({ max }) => `Amount should be less than ${formatSqd(max)} `),
-  max: yup.number().label('Max').required('Max is required'),
-  autoExtension: yup.boolean().label('Auto extend').default(true),
-  durationBlocks: yup
-    .number()
-    .label('Locked blocks duration')
-    .min(MIN_BLOCKS_LOCK, ({ min }) => `Tokens must be locked at least ${min} blocks`)
-    .required('Lock min blocks is required'),
-});
+export const stakeSchema = (SQD_TOKEN: string) =>
+  yup.object({
+    source: yup.string().label('Source').trim().required('Source is required'),
+    amount: yup
+      .number()
+      .label('Amount')
+      .moreThan(0)
+      .required('Amount is required')
+      .max(
+        yup.ref('max'),
+        ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, new Decimal(max))} `,
+      ),
+    max: yup.number().label('Max').required('Max is required'),
+    autoExtension: yup.boolean().label('Auto extend').default(true),
+    durationBlocks: yup
+      .number()
+      .label('Locked blocks duration')
+      .min(MIN_BLOCKS_LOCK, ({ min }) => `Tokens must be locked at least ${min} blocks`)
+      .required('Lock min blocks is required'),
+  });
 
 export function GatewayStake({ gateway }: { gateway: BlockchainGateway }) {
   const { stakeToGateway, error, isLoading } = useStakeGateway();
+  const { SQD_TOKEN } = useContracts();
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -57,7 +63,7 @@ export function GatewayStake({ gateway }: { gateway: BlockchainGateway }) {
       autoExtension: false,
       durationBlocks: MIN_BLOCKS_LOCK,
     },
-    validationSchema: stakeSchema,
+    validationSchema: stakeSchema(SQD_TOKEN),
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,

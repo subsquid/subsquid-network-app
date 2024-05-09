@@ -600,6 +600,18 @@ export enum ClaimOrderByInput {
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLockEndAsc = 'worker_lockEnd_ASC',
+  WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
+  WorkerLockEndDesc = 'worker_lockEnd_DESC',
+  WorkerLockEndDescNullsLast = 'worker_lockEnd_DESC_NULLS_LAST',
+  WorkerLockStartAsc = 'worker_lockStart_ASC',
+  WorkerLockStartAscNullsFirst = 'worker_lockStart_ASC_NULLS_FIRST',
+  WorkerLockStartDesc = 'worker_lockStart_DESC',
+  WorkerLockStartDescNullsLast = 'worker_lockStart_DESC_NULLS_LAST',
+  WorkerLockedAsc = 'worker_locked_ASC',
+  WorkerLockedAscNullsFirst = 'worker_locked_ASC_NULLS_FIRST',
+  WorkerLockedDesc = 'worker_locked_DESC',
+  WorkerLockedDescNullsLast = 'worker_locked_DESC_NULLS_LAST',
   WorkerNameAsc = 'worker_name_ASC',
   WorkerNameAscNullsFirst = 'worker_name_ASC_NULLS_FIRST',
   WorkerNameDesc = 'worker_name_DESC',
@@ -773,7 +785,9 @@ export enum CommitmentOrderByInput {
 
 export type CommitmentRecipient = {
   __typename?: 'CommitmentRecipient';
+  stakerApr: Scalars['Float']['output'];
   stakerReward: Scalars['BigInt']['output'];
+  workerApr: Scalars['Float']['output'];
   workerId: Scalars['String']['output'];
   workerReward: Scalars['BigInt']['output'];
 };
@@ -968,6 +982,18 @@ export enum DelegationOrderByInput {
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLockEndAsc = 'worker_lockEnd_ASC',
+  WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
+  WorkerLockEndDesc = 'worker_lockEnd_DESC',
+  WorkerLockEndDescNullsLast = 'worker_lockEnd_DESC_NULLS_LAST',
+  WorkerLockStartAsc = 'worker_lockStart_ASC',
+  WorkerLockStartAscNullsFirst = 'worker_lockStart_ASC_NULLS_FIRST',
+  WorkerLockStartDesc = 'worker_lockStart_DESC',
+  WorkerLockStartDescNullsLast = 'worker_lockStart_DESC_NULLS_LAST',
+  WorkerLockedAsc = 'worker_locked_ASC',
+  WorkerLockedAscNullsFirst = 'worker_locked_ASC_NULLS_FIRST',
+  WorkerLockedDesc = 'worker_locked_DESC',
+  WorkerLockedDescNullsLast = 'worker_locked_DESC_NULLS_LAST',
   WorkerNameAsc = 'worker_name_ASC',
   WorkerNameAscNullsFirst = 'worker_name_ASC_NULLS_FIRST',
   WorkerNameDesc = 'worker_name_DESC',
@@ -2110,7 +2136,7 @@ export type Query = {
   /** @deprecated Use settingsById */
   settingsByUniqueInput?: Maybe<Settings>;
   settingsConnection: SettingsConnection;
-  squidStatus?: Maybe<SquidStatus>;
+  squidStatus: SquidStatus;
   statistics: Array<Statistics>;
   statisticsById?: Maybe<Statistics>;
   /** @deprecated Use statisticsById */
@@ -2659,8 +2685,8 @@ export type SettingsWhereInput = {
 
 export type SquidStatus = {
   __typename?: 'SquidStatus';
-  /** The height of the processed part of the chain */
-  height?: Maybe<Scalars['Int']['output']>;
+  finalizedHeight: Scalars['Float']['output'];
+  height: Scalars['Float']['output'];
 };
 
 export type Statistics = {
@@ -2973,6 +2999,9 @@ export type Worker = {
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   jailed?: Maybe<Scalars['Boolean']['output']>;
+  lockEnd?: Maybe<Scalars['Int']['output']>;
+  lockStart?: Maybe<Scalars['Int']['output']>;
+  locked?: Maybe<Scalars['Boolean']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   online?: Maybe<Scalars['Boolean']['output']>;
   owner: Account;
@@ -3084,6 +3113,18 @@ export enum WorkerOrderByInput {
   JailedAscNullsFirst = 'jailed_ASC_NULLS_FIRST',
   JailedDesc = 'jailed_DESC',
   JailedDescNullsLast = 'jailed_DESC_NULLS_LAST',
+  LockEndAsc = 'lockEnd_ASC',
+  LockEndAscNullsFirst = 'lockEnd_ASC_NULLS_FIRST',
+  LockEndDesc = 'lockEnd_DESC',
+  LockEndDescNullsLast = 'lockEnd_DESC_NULLS_LAST',
+  LockStartAsc = 'lockStart_ASC',
+  LockStartAscNullsFirst = 'lockStart_ASC_NULLS_FIRST',
+  LockStartDesc = 'lockStart_DESC',
+  LockStartDescNullsLast = 'lockStart_DESC_NULLS_LAST',
+  LockedAsc = 'locked_ASC',
+  LockedAscNullsFirst = 'locked_ASC_NULLS_FIRST',
+  LockedDesc = 'locked_DESC',
+  LockedDescNullsLast = 'locked_DESC_NULLS_LAST',
   NameAsc = 'name_ASC',
   NameAscNullsFirst = 'name_ASC_NULLS_FIRST',
   NameDesc = 'name_DESC',
@@ -3267,6 +3308,18 @@ export enum WorkerRewardOrderByInput {
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLockEndAsc = 'worker_lockEnd_ASC',
+  WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
+  WorkerLockEndDesc = 'worker_lockEnd_DESC',
+  WorkerLockEndDescNullsLast = 'worker_lockEnd_DESC_NULLS_LAST',
+  WorkerLockStartAsc = 'worker_lockStart_ASC',
+  WorkerLockStartAscNullsFirst = 'worker_lockStart_ASC_NULLS_FIRST',
+  WorkerLockStartDesc = 'worker_lockStart_DESC',
+  WorkerLockStartDescNullsLast = 'worker_lockStart_DESC_NULLS_LAST',
+  WorkerLockedAsc = 'worker_locked_ASC',
+  WorkerLockedAscNullsFirst = 'worker_locked_ASC_NULLS_FIRST',
+  WorkerLockedDesc = 'worker_locked_DESC',
+  WorkerLockedDescNullsLast = 'worker_locked_DESC_NULLS_LAST',
   WorkerNameAsc = 'worker_name_ASC',
   WorkerNameAscNullsFirst = 'worker_name_ASC_NULLS_FIRST',
   WorkerNameDesc = 'worker_name_DESC',
@@ -3510,6 +3563,18 @@ export enum WorkerSnapshotOrderByInput {
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLockEndAsc = 'worker_lockEnd_ASC',
+  WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
+  WorkerLockEndDesc = 'worker_lockEnd_DESC',
+  WorkerLockEndDescNullsLast = 'worker_lockEnd_DESC_NULLS_LAST',
+  WorkerLockStartAsc = 'worker_lockStart_ASC',
+  WorkerLockStartAscNullsFirst = 'worker_lockStart_ASC_NULLS_FIRST',
+  WorkerLockStartDesc = 'worker_lockStart_DESC',
+  WorkerLockStartDescNullsLast = 'worker_lockStart_DESC_NULLS_LAST',
+  WorkerLockedAsc = 'worker_locked_ASC',
+  WorkerLockedAscNullsFirst = 'worker_locked_ASC_NULLS_FIRST',
+  WorkerLockedDesc = 'worker_locked_DESC',
+  WorkerLockedDescNullsLast = 'worker_locked_DESC_NULLS_LAST',
   WorkerNameAsc = 'worker_name_ASC',
   WorkerNameAscNullsFirst = 'worker_name_ASC_NULLS_FIRST',
   WorkerNameDesc = 'worker_name_DESC',
@@ -3721,6 +3786,18 @@ export enum WorkerStatusChangeOrderByInput {
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLockEndAsc = 'worker_lockEnd_ASC',
+  WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
+  WorkerLockEndDesc = 'worker_lockEnd_DESC',
+  WorkerLockEndDescNullsLast = 'worker_lockEnd_DESC_NULLS_LAST',
+  WorkerLockStartAsc = 'worker_lockStart_ASC',
+  WorkerLockStartAscNullsFirst = 'worker_lockStart_ASC_NULLS_FIRST',
+  WorkerLockStartDesc = 'worker_lockStart_DESC',
+  WorkerLockStartDescNullsLast = 'worker_lockStart_DESC_NULLS_LAST',
+  WorkerLockedAsc = 'worker_locked_ASC',
+  WorkerLockedAscNullsFirst = 'worker_locked_ASC_NULLS_FIRST',
+  WorkerLockedDesc = 'worker_locked_DESC',
+  WorkerLockedDescNullsLast = 'worker_locked_DESC_NULLS_LAST',
   WorkerNameAsc = 'worker_name_ASC',
   WorkerNameAscNullsFirst = 'worker_name_ASC_NULLS_FIRST',
   WorkerNameDesc = 'worker_name_DESC',
@@ -3968,6 +4045,27 @@ export type WorkerWhereInput = {
   jailed_eq?: InputMaybe<Scalars['Boolean']['input']>;
   jailed_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   jailed_not_eq?: InputMaybe<Scalars['Boolean']['input']>;
+  lockEnd_eq?: InputMaybe<Scalars['Int']['input']>;
+  lockEnd_gt?: InputMaybe<Scalars['Int']['input']>;
+  lockEnd_gte?: InputMaybe<Scalars['Int']['input']>;
+  lockEnd_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lockEnd_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  lockEnd_lt?: InputMaybe<Scalars['Int']['input']>;
+  lockEnd_lte?: InputMaybe<Scalars['Int']['input']>;
+  lockEnd_not_eq?: InputMaybe<Scalars['Int']['input']>;
+  lockEnd_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lockStart_eq?: InputMaybe<Scalars['Int']['input']>;
+  lockStart_gt?: InputMaybe<Scalars['Int']['input']>;
+  lockStart_gte?: InputMaybe<Scalars['Int']['input']>;
+  lockStart_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lockStart_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  lockStart_lt?: InputMaybe<Scalars['Int']['input']>;
+  lockStart_lte?: InputMaybe<Scalars['Int']['input']>;
+  lockStart_not_eq?: InputMaybe<Scalars['Int']['input']>;
+  lockStart_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  locked_eq?: InputMaybe<Scalars['Boolean']['input']>;
+  locked_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  locked_not_eq?: InputMaybe<Scalars['Boolean']['input']>;
   name_contains?: InputMaybe<Scalars['String']['input']>;
   name_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
   name_endsWith?: InputMaybe<Scalars['String']['input']>;
@@ -4169,7 +4267,7 @@ export type SquidNetworkHeightQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SquidNetworkHeightQuery = {
   __typename?: 'Query';
-  squidStatus?: { __typename?: 'SquidStatus'; height?: number };
+  squidStatus: { __typename?: 'SquidStatus'; height: number };
 };
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
@@ -4227,6 +4325,7 @@ export type WorkerFragmentFragment = {
   online?: boolean;
   jailed?: boolean;
   dialOk?: boolean;
+  locked?: boolean;
   owner: { __typename?: 'Account'; id: string };
   realOwner: { __typename?: 'Account'; id: string };
 };
@@ -4269,6 +4368,7 @@ export type AllWorkersQuery = {
     online?: boolean;
     jailed?: boolean;
     dialOk?: boolean;
+    locked?: boolean;
     owner: { __typename?: 'Account'; id: string };
     realOwner: { __typename?: 'Account'; id: string };
   }>;
@@ -4303,6 +4403,7 @@ export type WorkerByPeerIdQuery = {
     online?: boolean;
     jailed?: boolean;
     dialOk?: boolean;
+    locked?: boolean;
     queries24Hours?: any;
     queries90Days?: any;
     scannedData24Hours?: any;
@@ -4359,6 +4460,7 @@ export type MyWorkersQuery = {
     online?: boolean;
     jailed?: boolean;
     dialOk?: boolean;
+    locked?: boolean;
     myDelegations: Array<{
       __typename?: 'Delegation';
       deposit: any;
@@ -4379,7 +4481,7 @@ export type MyAssetsQuery = {
   accounts: Array<{
     __typename?: 'Account';
     balance: any;
-    owned: Array<{ __typename?: 'Account'; balance: any }>;
+    owned: Array<{ __typename?: 'Account'; id: string; balance: any }>;
   }>;
   workers: Array<{ __typename?: 'Worker'; bond: any; claimableReward: any }>;
   delegations: Array<{ __typename?: 'Delegation'; claimableReward: any; deposit: any }>;
@@ -4394,7 +4496,9 @@ export type MyDelegationsQuery = {
   delegations: Array<{
     __typename?: 'Delegation';
     claimableReward: any;
+    claimedReward: any;
     deposit: any;
+    locked?: boolean;
     worker: {
       __typename?: 'Worker';
       id: string;
@@ -4417,6 +4521,7 @@ export type MyDelegationsQuery = {
       online?: boolean;
       jailed?: boolean;
       dialOk?: boolean;
+      locked?: boolean;
       owner: { __typename?: 'Account'; id: string };
       realOwner: { __typename?: 'Account'; id: string };
     };
@@ -4576,6 +4681,7 @@ export const WorkerFragmentFragmentDoc = `
   online
   jailed
   dialOk
+  locked
   owner {
     id
   }
@@ -4858,6 +4964,7 @@ export const MyAssetsDocument = `
   accounts(where: {id_eq: $address}) {
     balance
     owned {
+      id
       balance
     }
   }
@@ -4897,7 +5004,9 @@ export const MyDelegationsDocument = `
     query myDelegations($address: String!) {
   delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
     claimableReward
+    claimedReward
     deposit
+    locked
     worker {
       ...WorkerFragment
     }

@@ -8,10 +8,12 @@ import { useMyAssets } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ClaimButton } from '@pages/WorkersPage/ClaimButton';
+import { useContracts } from '@network/useContracts';
+import { ClaimButton } from '@pages/DashboardPage/ClaimButton';
 
 export function MyAssets() {
   const { isLoading, assets } = useMyAssets();
+  const { SQD_TOKEN } = useContracts();
 
   const data = useMemo(
     () => [
@@ -56,7 +58,7 @@ export function MyAssets() {
               return (
                 <Stack key={d.name} alignItems="center" sx={{ mb: 2 }} direction="row" spacing={1}>
                   <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
-                  <Box sx={{ fontWeight: 500 }}>{formatSqd(d.value, 2)}</Box>
+                  <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, d.value, 2)}</Box>
                 </Stack>
               );
             })}

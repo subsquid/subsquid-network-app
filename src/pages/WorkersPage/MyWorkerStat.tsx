@@ -2,10 +2,14 @@ import React from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Divider, Stack, styled } from '@mui/material';
+import Decimal from 'decimal.js';
 
 import { formatSqd } from '@api/contracts/utils';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
+import { useContracts } from '@network/useContracts';
+
+import { WorkerColumn, WorkerColumnLabel } from './WorkerStatistics';
 
 export const MyWorkerLabel = styled(Box, {
   name: 'MyWorkerLabel',
@@ -19,30 +23,36 @@ export const MyWorkerValue = styled(Box, {
 }));
 
 export const MyWorkerStat = ({ worker }: { worker: BlockchainApiWorker }) => {
+  const { SQD_TOKEN } = useContracts();
+
   return (
     <Card noShadow title="My bond and rewards">
       <Stack
         divider={<Divider orientation="vertical" flexItem />}
-        spacing={3}
+        spacing={2}
         direction="row"
         justifyContent="space-between"
       >
-        <Box>
-          <MyWorkerLabel>Worker APR</MyWorkerLabel>
-          <MyWorkerValue>{percentFormatter(worker.apr)}</MyWorkerValue>
-        </Box>
-        <Box>
-          <MyWorkerLabel>My Bond</MyWorkerLabel>
-          <MyWorkerValue>{formatSqd(worker.bond)}</MyWorkerValue>
-        </Box>
-        <Box>
-          <MyWorkerLabel>My total rewards</MyWorkerLabel>
-          <MyWorkerValue>{formatSqd(worker.claimedReward)}</MyWorkerValue>
-        </Box>
-        <Box>
-          <MyWorkerLabel>Claimable rewards</MyWorkerLabel>
-          <MyWorkerValue>{formatSqd(worker.claimableReward)}</MyWorkerValue>
-        </Box>
+        <WorkerColumn>
+          <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
+            <WorkerColumnLabel>Worker APR</WorkerColumnLabel>
+            <Box>{percentFormatter(worker.apr)}</Box>
+          </Stack>
+        </WorkerColumn>
+        <WorkerColumn>
+          <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
+            <WorkerColumnLabel>Bond</WorkerColumnLabel>
+            <Box>{formatSqd(SQD_TOKEN, worker.bond)}</Box>
+          </Stack>
+        </WorkerColumn>
+        <WorkerColumn>
+          <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
+            <WorkerColumnLabel>Total rewards</WorkerColumnLabel>
+            <Box>
+              {formatSqd(SQD_TOKEN, new Decimal(worker.claimedReward).add(worker.claimableReward))}
+            </Box>
+          </Stack>
+        </WorkerColumn>
       </Stack>
     </Card>
   );

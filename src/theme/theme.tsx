@@ -276,9 +276,10 @@ export const useCreateTheme = (mode: PaletteType) => {
               a: {
                 color: colors.importantLink.main,
                 textDecoration: 'none',
-                '&:hover': {
-                  color: colors.importantLink.hover,
-                },
+                // FIXME: commented becasue there are no <a> links in the app, but this ruins buttons with Link component
+                // '&:hover': {
+                //   color: colors.importantLink.hover,
+                // },
               },
               '#cf-turnstile': {
                 width: 'auto !important',

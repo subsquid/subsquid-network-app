@@ -5,12 +5,12 @@ import { groupBy, mapValues, values } from 'lodash-es';
 
 import { formatSqd, fromSqd, humanReadableSqd } from '@api/contracts/utils';
 import { useAccount } from '@network/useAccount.ts';
+import { useContracts } from '@network/useContracts';
 
-import { SQUID_DATASOURCE } from './datasource';
+import { useSquidDataSource } from './datasource';
 import {
   AccountType,
   ClaimType,
-  MyDelegationsQuery,
   useAllWorkersQuery,
   useMyClaimsAvailableQuery,
   useMyDelegationsQuery,
@@ -19,6 +19,7 @@ import {
   useWorkerDaysUptimeByIdQuery,
   WorkerFragmentFragment,
   WorkerFullFragmentFragment,
+  WorkerStatus,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
 
@@ -39,32 +40,27 @@ export class BlockchainApiWorker {
     utilizedPercent: new Decimal(0),
   };
   delegationEnabled: boolean = false;
-  myDelegations: { owner: { id: string; type: AccountType }; deposit: string; locked: boolean }[] =
-    [];
+  myDelegations: {
+    owner: { id: string; type: AccountType };
+    deposit: string;
+    locked?: boolean;
+    claimableReward: string;
+    claimedReward: string;
+  }[] = [];
   myDelegationsTotal: Decimal;
+  myDelegationsRewardsTotal: Decimal;
+  totalReward: Decimal;
 
-  constructor({
-    worker,
-    delegationLimit,
-    address,
-  }: {
-    worker: WorkerFragmentFragment;
-    delegationLimit: Decimal;
-    address?: `0x${string}`;
-  }) {
+  constructor({ worker, address }: { worker: WorkerFragmentFragment; address?: `0x${string}` }) {
     const totalDelegation = fromSqd(worker.totalDelegation);
-    const capacity = delegationLimit.minus(totalDelegation);
 
     Object.assign(this, {
       ...worker,
       createdAt: new Date(worker.createdAt),
       totalDelegations: {
-        limit: delegationLimit,
         total: totalDelegation,
-        capacity,
-        utilizedPercent: totalDelegation.div(delegationLimit).mul(100),
       },
-      delegationEnabled: capacity.greaterThan(0),
+      delegationEnabled: worker.status === WorkerStatus.Active,
       ownedByMe: worker.realOwner?.id === address,
     });
 
@@ -72,6 +68,13 @@ export class BlockchainApiWorker {
       (t, r) => t.add(fromSqd(r.deposit)),
       new Decimal(0),
     );
+
+    this.myDelegationsRewardsTotal = this.myDelegations.reduce(
+      (t, r) => t.add(fromSqd(r.claimableReward)).add(fromSqd(r.claimedReward)),
+      new Decimal(0),
+    );
+
+    this.totalReward = new Decimal(this.claimedReward).add(this.claimableReward);
   }
 }
 
@@ -88,6 +91,7 @@ export enum WorkerSortBy {
   Uptime24h = 'uptime_24h',
   Uptime90d = 'uptime_90d',
   StakerAPR = 'staker_apr',
+  WorkerAPR = 'apr',
   DelegationCapacity = 'delegation_capacity',
 }
 
@@ -109,10 +113,11 @@ export function useWorkers({
   sortBy: WorkerSortBy;
   sortDir: SortDir;
 }) {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
 
-  const { data, isPending } = useAllWorkersQuery(SQUID_DATASOURCE, {});
+  const { data, isPending } = useAllWorkersQuery(datasource, {});
 
   const filteredData = useMemo(() => {
     const filtered = (data?.workers || [])
@@ -129,7 +134,6 @@ export function useWorkers({
         return new BlockchainApiWorker({
           worker,
           address,
-          delegationLimit,
         });
       })
       .sort((a, b) => {
@@ -146,6 +150,8 @@ export function useWorkers({
             return a.totalDelegations.capacity.minus(b.totalDelegations.capacity).toNumber();
           case WorkerSortBy.StakerAPR:
             return (a.stakerApr || 0) - (b.stakerApr || 0);
+          case WorkerSortBy.WorkerAPR:
+            return (a.apr || 0) - (b.apr || 0);
           default:
             return a.createdAt.valueOf() - b.createdAt.valueOf();
         }
@@ -159,7 +165,7 @@ export function useWorkers({
       totalPages: Math.floor(filtered.length / perPage),
       workers: filtered.slice((normalizedPage - 1) * perPage, normalizedPage * perPage),
     };
-  }, [data?.workers, search, sortBy, sortDir, address, delegationLimit, page, perPage]);
+  }, [data?.workers, search, sortBy, sortDir, address, page, perPage]);
 
   return {
     ...filteredData,
@@ -168,12 +174,13 @@ export function useWorkers({
 }
 
 export function useMyWorkers() {
+  const datasource = useSquidDataSource();
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const enabled = !!address;
   const { data, isLoading } = useMyWorkersQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       address: address || '',
     },
@@ -184,7 +191,6 @@ export function useMyWorkers() {
             new BlockchainApiWorker({
               worker: w,
               address,
-              delegationLimit,
             }),
         );
       },
@@ -199,22 +205,24 @@ export function useMyWorkers() {
 }
 
 export function useWorkerByPeerId(peerId?: string) {
+  const datasource = useSquidDataSource();
   const enabled = !!peerId;
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const { data, isPending } = useWorkerByPeerIdQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       peerId: peerId || '',
       address: address || '',
     },
     {
       select: res => {
+        if (!res.workers.length) return;
+
         return new BlockchainApiFullWorker({
           worker: res.workers[0],
           address,
-          delegationLimit,
         });
       },
       enabled,
@@ -230,9 +238,10 @@ export function useWorkerByPeerId(peerId?: string) {
 // TODO: remove hardcoded date
 export function useWorkerDaysUptimeById(workerId?: string) {
   const enabled = !!workerId;
+  const datasource = useSquidDataSource();
 
   const { data, isLoading } = useWorkerDaysUptimeByIdQuery(
-    SQUID_DATASOURCE,
+    datasource,
     {
       id: workerId || '',
       from: '2024-01-23T12:00:00.000000Z',
@@ -255,8 +264,10 @@ export function useWorkerDaysUptimeById(workerId?: string) {
 
 export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
   const { address } = useAccount();
+  const { SQD_TOKEN } = useContracts();
+  const datasource = useSquidDataSource();
 
-  const { data, isLoading } = useMyClaimsAvailableQuery(SQUID_DATASOURCE, {
+  const { data, isLoading } = useMyClaimsAvailableQuery(datasource, {
     address: address || '',
   });
 
@@ -291,7 +302,7 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
           return {
             ...g[0].owner,
             balance: total.toFixed(0),
-            balanceFormatted: formatSqd(total),
+            balanceFormatted: formatSqd(SQD_TOKEN, total),
           };
         }),
       ),
@@ -308,7 +319,7 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
         }),
       ),
     };
-  }, [data, source]);
+  }, [SQD_TOKEN, data?.delegations, data?.workers, source]);
 
   return {
     isLoading,
@@ -319,35 +330,37 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
   };
 }
 
-type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+// type ArrayElement<ArrayType extends readonly unknown[]> =
+//   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
-type Delegation = ArrayElement<MyDelegationsQuery['delegations']> & {
-  worker: BlockchainApiWorker;
-};
+// type Delegation = {
+//   worker: BlockchainApiWorker;
+//   totalReward: any;
+//   delegations: Omit<ArrayElement<MyDelegationsQuery['delegations']>, 'worker'>[];
+// };
 
 export function useMyDelegations() {
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
+  const datasource = useSquidDataSource();
 
-  const { data, isLoading } = useMyDelegationsQuery(SQUID_DATASOURCE, {
+  const { data, isLoading } = useMyDelegationsQuery(datasource, {
     address: address || '',
   });
 
-  const delegations: Delegation[] = useMemo(
-    () =>
-      (data?.delegations || []).map(d => {
-        return {
-          ...d,
-          worker: new BlockchainApiWorker({
-            worker: d.worker,
-            address,
-            delegationLimit,
-          }),
-        };
-      }),
-    [address, data?.delegations, delegationLimit],
-  );
+  const delegations: BlockchainApiWorker[] = useMemo(() => {
+    const workers: Map<string, BlockchainApiWorker> = new Map();
+    for (const d of data?.delegations || []) {
+      let worker = workers.get(d.worker.id);
+      if (!worker) {
+        worker = d.worker as BlockchainApiWorker;
+        worker.myDelegations = [];
+        workers.set(worker.id, worker);
+      }
+      worker.myDelegations.push(d);
+    }
+    return [...workers.values()].map(worker => new BlockchainApiWorker({ worker }));
+  }, [data?.delegations]);
 
   return {
     isLoading: isSettingsLoading || isLoading,

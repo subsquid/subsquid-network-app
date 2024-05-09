@@ -9,5 +9,5 @@ import { BasicMenuItem } from './BasicMenuItem';
 export function LogoutMenuItem() {
   const reload = useAppReload({ clearStorage: true, to: '/' });
 
-  return <BasicMenuItem LeftIcon={LogoutIcon} label="Logout" onClick={() => reload()} />;
+  return <BasicMenuItem LeftIcon={LogoutIcon} label="Disconnect" onClick={() => reload()} />;
 }

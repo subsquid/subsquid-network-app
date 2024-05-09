@@ -83,7 +83,7 @@ export function WorkerEdit() {
   const { data: worker, isPending } = useWorkerByPeerId(peerId);
 
   if (isPending) return <Loader />;
-  else if (!worker) {
+  else if (!worker || !worker.ownedByMe) {
     return (
       <Box>
         Worker <b>{peerId}</b> not found
@@ -93,7 +93,7 @@ export function WorkerEdit() {
 
   return (
     <CenteredPageWrapper>
-      <NetworkPageTitle backPath={`/profile/workers/${peerId}`} title="Edit worker" />
+      <NetworkPageTitle backPath={`/workers/${peerId}`} title="Edit worker" />
       <WorkerForm worker={worker} />
     </CenteredPageWrapper>
   );

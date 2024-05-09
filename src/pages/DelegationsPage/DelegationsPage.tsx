@@ -1,58 +1,49 @@
 import React from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters.ts';
-import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { formatSqd } from '@api/contracts/utils';
-import { useMyWorkers } from '@api/subsquid-network-squid';
+import { useMyDelegations } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
-import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 
-export function MyWorkers() {
+export function MyDelegations() {
   const navigate = useNavigate();
-
-  const { data, isLoading } = useMyWorkers();
-  const { isConnected } = useAccount();
+  const { delegations, isLoading } = useMyDelegations();
   const { SQD_TOKEN } = useContracts();
 
   return (
     <Box>
-      <NetworkPageTitle
-        title="My Workers"
-        endAdornment={
-          <Button variant="contained" disabled={!isConnected} component={Link} to="/workers/add">
-            Add worker
-          </Button>
-        }
-      />
+      <NetworkPageTitle title="My Delegations" />
       {isLoading ? (
         <Loader />
-      ) : data.length ? (
+      ) : delegations.length ? (
         <BorderedTable>
           <TableHead>
             <TableRow>
               <TableCell width={275}>Worker</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Uptime, 24h</TableCell>
+              <TableCell>Delegation</TableCell>
               <TableCell>APR, 7d</TableCell>
               <TableCell>Total reward</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map(worker => {
+            {delegations.map(worker => {
               return (
                 <TableRow
-                  onClick={() => navigate(`/workers/${worker.peerId}`)}
+                  onClick={() => navigate(`/workers/${worker.peerId}?backPath=/delegations`)}
                   className="hoverable"
                   key={worker.peerId}
                 >
@@ -62,13 +53,14 @@ export function MyWorkers() {
                   <TableCell>
                     <WorkerStatus worker={worker} />
                   </TableCell>
-                  <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
-                  <TableCell>{percentFormatter(worker.apr)}</TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
+                  <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
                   <TableCell>
-                    <Box display="flex" justifyContent="flex-end">
+                    <Stack direction="row" spacing={2} justifyContent="flex-end">
                       <WorkerDelegate worker={worker} />
-                    </Box>
+                      <WorkerUndelegate worker={worker} />
+                    </Stack>
                   </TableCell>
                 </TableRow>
               );
@@ -82,11 +74,11 @@ export function MyWorkers() {
   );
 }
 
-export function WorkersPage() {
+export function DelegationsPage() {
   return (
     <CenteredPageWrapper className="wide">
       <ConnectedWalletRequired>
-        <MyWorkers />
+        <MyDelegations />
       </ConnectedWalletRequired>
       <Outlet />
     </CenteredPageWrapper>

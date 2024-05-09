@@ -4,6 +4,7 @@ import { Box, Stack, styled } from '@mui/material';
 
 import { formatSqd } from '@api/contracts/utils';
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
+import { useContracts } from '@network/useContracts';
 
 const SourceWalletOptionWrapper = styled(Box, {
   name: 'SourceWalletOptionWrapper',
@@ -34,6 +35,8 @@ const SourceWalletBalance = styled(Stack, {
 }));
 
 export const SourceWalletOption = ({ source }: { source: SourceWallet }) => {
+  const { SQD_TOKEN } = useContracts();
+
   return (
     <SourceWalletOptionWrapper>
       <SourceWalletLabel>
@@ -41,7 +44,7 @@ export const SourceWalletOption = ({ source }: { source: SourceWallet }) => {
       </SourceWalletLabel>
       <SourceWalletStack direction="row" spacing={1} justifyContent="space-between">
         <Box>{source.id}</Box>
-        <SourceWalletBalance>{formatSqd(source?.balance)}</SourceWalletBalance>
+        <SourceWalletBalance>{formatSqd(SQD_TOKEN, source?.balance)}</SourceWalletBalance>
       </SourceWalletStack>
     </SourceWalletOptionWrapper>
   );

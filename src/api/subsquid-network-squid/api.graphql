@@ -56,6 +56,7 @@ fragment WorkerFragment on Worker {
   online
   jailed
   dialOk
+  locked
   owner {
     id
   }
@@ -129,6 +130,7 @@ query myAssets($address: String!) {
   accounts(where:{id_eq: $address}) {
     balance
     owned {
+      id
       balance
     }
   }
@@ -149,7 +151,9 @@ query myAssets($address: String!) {
 query myDelegations($address: String!) {
   delegations(where:{realOwner:{id_eq:$address}, deposit_gt: 0}) {
     claimableReward
+    claimedReward
     deposit
+    locked
     worker {
       ...WorkerFragment
     }
