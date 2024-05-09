@@ -48,9 +48,7 @@ export const MyWorkerStat = ({ worker }: { worker: BlockchainApiWorker }) => {
         <WorkerColumn>
           <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
             <WorkerColumnLabel>Total rewards</WorkerColumnLabel>
-            <Box>
-              {formatSqd(SQD_TOKEN, new Decimal(worker.claimedReward).add(worker.claimableReward))}
-            </Box>
+            <Box>{formatSqd(SQD_TOKEN, worker.totalReward)}</Box>
           </Stack>
         </WorkerColumn>
       </Stack>
