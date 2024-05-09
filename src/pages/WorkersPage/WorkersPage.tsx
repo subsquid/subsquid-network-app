@@ -4,6 +4,7 @@ import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
+import { formatSqd } from '@api/contracts/utils';
 import { useMyWorkers } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -11,6 +12,7 @@ import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
+import { useContracts } from '@network/useContracts';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
@@ -20,6 +22,7 @@ export function MyWorkers() {
 
   const { data, isLoading } = useMyWorkers();
   const { isConnected } = useAccount();
+  const { SQD_TOKEN } = useContracts();
 
   return (
     <Box>
@@ -40,8 +43,8 @@ export function MyWorkers() {
               <TableCell>Worker</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Uptime, 24h</TableCell>
-              <TableCell>Uptime, 90d</TableCell>
               <TableCell>APR, 7d</TableCell>
+              <TableCell>Total reward</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
@@ -60,8 +63,8 @@ export function MyWorkers() {
                     <WorkerStatus worker={worker} />
                   </TableCell>
                   <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
-                  <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
                   <TableCell>{percentFormatter(worker.apr)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
                   <TableCell>
                     <WorkerDelegate worker={worker} />
                   </TableCell>

@@ -44,6 +44,7 @@ export class BlockchainApiWorker {
   myDelegations: { owner: { id: string; type: AccountType }; deposit: string; locked: boolean }[] =
     [];
   myDelegationsTotal: Decimal;
+  totalReward: Decimal;
 
   constructor({
     worker,
@@ -74,6 +75,8 @@ export class BlockchainApiWorker {
       (t, r) => t.add(fromSqd(r.deposit)),
       new Decimal(0),
     );
+
+    this.totalReward = new Decimal(this.claimedReward).add(this.claimableReward);
   }
 }
 
