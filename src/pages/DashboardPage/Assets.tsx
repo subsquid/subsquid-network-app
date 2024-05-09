@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 
 import { addressFormatter } from '@lib/formatters/formatters';
-import { Box, Chip, Stack } from '@mui/material';
+import { Box, Button, Chip, Stack } from '@mui/material';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { Cell, Pie, PieChart } from 'recharts';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';
@@ -10,7 +11,9 @@ import { Card } from '@components/Card';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
+import { WalletIcon } from '@icons/WalletIcon';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
+import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 
 import { ClaimButton } from './ClaimButton';
@@ -18,6 +21,8 @@ import { ClaimButton } from './ClaimButton';
 export function MyAssets() {
   const { isLoading, assets } = useMyAssets();
   const { SQD_TOKEN } = useContracts();
+  const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   const data = useMemo(
     () => [
@@ -75,88 +80,99 @@ export function MyAssets() {
     <Box>
       <NetworkPageTitle title="My Assets" endAdornment={<ClaimButton />} />
 
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <Card>
-          <Stack direction="row" justifyContent="space-between">
-            <Box>
-              {data.map((d, i) => {
-                return (
-                  <>
-                    <Stack
-                      key={d.name}
-                      alignItems="center"
-                      sx={{ mb: i === data.length - 1 ? 0 : 2 }}
-                      direction="row"
-                      spacing={1}
-                    >
-                      <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
-                      <HelpTooltip help={d.tip}>
-                        <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, d.value, 2)}</Box>
-                      </HelpTooltip>
-                    </Stack>
-                    {d.sub?.map(s => (
+      {isConnected ? (
+        isLoading ? (
+          <Loader />
+        ) : (
+          <Card>
+            <Stack direction="row" justifyContent="space-between">
+              <Box>
+                {data.map((d, i) => {
+                  return (
+                    <>
                       <Stack
-                        key={d.name + s.name}
+                        key={d.name}
                         alignItems="center"
                         sx={{ mb: i === data.length - 1 ? 0 : 2 }}
                         direction="row"
                         spacing={1}
                       >
-                        <Box width={16}></Box>
-                        <Chip sx={{ background: d.background, color: d.color }} label={s.name} />
-                        <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, s.value, 2)}</Box>
+                        <Chip sx={{ background: d.background, color: d.color }} label={d.name} />
+                        <HelpTooltip help={d.tip}>
+                          <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, d.value, 2)}</Box>
+                        </HelpTooltip>
                       </Stack>
+                      {d.sub?.map(s => (
+                        <Stack
+                          key={d.name + s.name}
+                          alignItems="center"
+                          sx={{ mb: i === data.length - 1 ? 0 : 2 }}
+                          direction="row"
+                          spacing={1}
+                        >
+                          <Box width={16}></Box>
+                          <Chip sx={{ background: d.background, color: d.color }} label={s.name} />
+                          <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, s.value, 2)}</Box>
+                        </Stack>
+                      ))}
+                    </>
+                  );
+                })}
+              </Box>
+              <Box sx={{ position: 'relative', alignContent: 'center' }}>
+                <PieChart width={210} height={210}>
+                  <Pie
+                    data={data}
+                    animationBegin={0}
+                    animationDuration={0}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={105}
+                    dataKey="value"
+                  >
+                    {data.map(i => (
+                      <Cell
+                        onClick={e => {
+                          e.preventDefault();
+                        }}
+                        key={i.name}
+                        fill={i.background}
+                      />
                     ))}
-                  </>
-                );
-              })}
-            </Box>
-            <Box sx={{ position: 'relative', alignContent: 'center' }}>
-              <PieChart width={210} height={210}>
-                <Pie
-                  data={data}
-                  animationBegin={0}
-                  animationDuration={0}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={105}
-                  dataKey="value"
+                  </Pie>
+                </PieChart>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    width: '100%',
+                    alignItems: 'center',
+                  }}
                 >
-                  {data.map(i => (
-                    <Cell
-                      onClick={e => {
-                        e.preventDefault();
-                      }}
-                      key={i.name}
-                      fill={i.background}
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  display: 'flex',
-                  width: '100%',
-                  alignItems: 'center',
-                }}
-              >
-                <Box sx={{ textAlign: 'center', width: '100%' }}>
-                  <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
-                  <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
-                    {formatSqd(SQD_TOKEN, assets.total, 2)}
+                  <Box sx={{ textAlign: 'center', width: '100%' }}>
+                    <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
+                    <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
+                      {formatSqd(SQD_TOKEN, assets.total, 2)}
+                    </Box>
                   </Box>
                 </Box>
               </Box>
-            </Box>
-          </Stack>
+            </Stack>
+          </Card>
+        )
+      ) : (
+        <Card>
+          <Box sx={{ textAlign: 'center' }}>
+            <Box sx={{ mb: 2 }}>Connect your wallet to see assets</Box>
+            <Button variant="contained" startIcon={<WalletIcon />} onClick={openConnectModal}>
+              Connect wallet
+            </Button>
+          </Box>
         </Card>
       )}
     </Box>
