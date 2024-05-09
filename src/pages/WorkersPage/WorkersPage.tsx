@@ -40,7 +40,7 @@ export function MyWorkers() {
         <BorderedTable>
           <TableHead>
             <TableRow>
-              <TableCell>Worker</TableCell>
+              <TableCell width={275}>Worker</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Uptime, 24h</TableCell>
               <TableCell>APR, 7d</TableCell>
@@ -66,7 +66,9 @@ export function MyWorkers() {
                   <TableCell>{percentFormatter(worker.apr)}</TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
                   <TableCell>
-                    <WorkerDelegate worker={worker} />
+                    <Box display="flex" justifyContent="flex-end">
+                      <WorkerDelegate worker={worker} />
+                    </Box>
                   </TableCell>
                 </TableRow>
               );

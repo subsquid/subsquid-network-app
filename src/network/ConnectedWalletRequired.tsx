@@ -4,7 +4,6 @@ import { Box, Button, styled } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
-import { Card } from '@components/Card';
 import { WalletIcon } from '@icons/WalletIcon';
 
 export const ConnectButton = styled(Button, {

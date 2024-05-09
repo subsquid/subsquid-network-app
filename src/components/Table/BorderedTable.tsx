@@ -14,11 +14,21 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
 
   '& td, & th': {
     background: theme.palette.background.paper,
-    padding: theme.spacing(2, 5),
     borderBottom: `1px solid ${theme.palette.background.content}`,
+    padding: theme.spacing(2, 2),
+  },
+
+  '& td:first-child, & th:first-child': {
+    paddingLeft: theme.spacing(5),
+    [theme.breakpoints.down('md')]: {
+      paddingRight: theme.spacing(2.5),
+    },
+  },
+
+  '& td:last-child, & th:last-child': {
+    paddingRight: theme.spacing(5),
     [theme.breakpoints.down('md')]: {
       paddingLeft: theme.spacing(2.5),
-      paddingRight: theme.spacing(2.5),
     },
   },
 

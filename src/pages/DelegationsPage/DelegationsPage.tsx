@@ -31,7 +31,7 @@ export function MyDelegations() {
         <BorderedTable>
           <TableHead>
             <TableRow>
-              <TableCell>Worker</TableCell>
+              <TableCell width={275}>Worker</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Delegation</TableCell>
               <TableCell>APR, 7d</TableCell>
@@ -57,7 +57,7 @@ export function MyDelegations() {
                   <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
                   <TableCell>
-                    <Stack direction="row" spacing={2}>
+                    <Stack direction="row" spacing={2} justifyContent="flex-end">
                       <WorkerDelegate worker={worker} />
                       <WorkerUndelegate worker={worker} />
                     </Stack>

@@ -98,21 +98,16 @@ export function Workers() {
           <BorderedTable>
             <TableHead>
               <TableRow>
-                <TableCell>Worker</TableCell>
+                <TableCell sx={{ minWidth: 275 }}>Worker</TableCell>
                 <TableCell>Status</TableCell>
-                <SortableHeaderCell
-                  width={75}
-                  sort={WorkerSortBy.Uptime24h}
-                  query={query}
-                  setQuery={setQuery}
-                >
+                <SortableHeaderCell sort={WorkerSortBy.Uptime24h} query={query} setQuery={setQuery}>
                   Uptime, 24h
                 </SortableHeaderCell>
                 <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
                   Worker APR, 7d
                 </SortableHeaderCell>
                 <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
-                  Staker APR, 7d
+                  Delegator APR, 7d
                 </SortableHeaderCell>
                 {/*<SortableHeaderCell*/}
                 {/*  width={70}*/}
@@ -148,7 +143,9 @@ export function Workers() {
                     {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
                     <TableCell>{dateFormat(worker.createdAt)}</TableCell>
                     <TableCell>
-                      <WorkerDelegate worker={worker} />
+                      <Box display="flex" justifyContent="flex-end">
+                        <WorkerDelegate worker={worker} />
+                      </Box>
                     </TableCell>
                   </TableRow>
                 );
