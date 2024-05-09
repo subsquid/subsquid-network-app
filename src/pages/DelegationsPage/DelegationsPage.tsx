@@ -39,28 +39,28 @@ export function MyDelegations() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {delegations.map(d => {
+            {delegations.map(worker => {
               return (
                 <TableRow
                   onClick={() =>
-                    navigate(`/workers/${d.worker.peerId}?backPath=/profile/delegations`)
+                    navigate(`/workers/${worker.peerId}?backPath=/profile/delegations`)
                   }
                   className="hoverable"
-                  key={d.worker.peerId}
+                  key={worker.peerId}
                 >
                   <TableCell>
-                    <WorkerName worker={d.worker} />
+                    <WorkerName worker={worker} />
                   </TableCell>
                   <TableCell>
-                    <WorkerStatus worker={d.worker} />
+                    <WorkerStatus worker={worker} />
                   </TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, d.deposit)}</TableCell>
-                  <TableCell>{percentFormatter(d.worker.stakerApr)}</TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, d.totalReward)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
+                  <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={2}>
-                      <WorkerDelegate worker={d.worker} />
-                      <WorkerUndelegate worker={d.worker} />
+                      <WorkerDelegate worker={worker} />
+                      <WorkerUndelegate worker={worker} />
                     </Stack>
                   </TableCell>
                 </TableRow>

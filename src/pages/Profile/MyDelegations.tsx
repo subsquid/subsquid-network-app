@@ -39,23 +39,23 @@ export function MyDelegations() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {delegations.map(d => {
+              {delegations.map(worker => {
                 return (
                   <TableRow
-                    onClick={() => navigate(`/workers/${d.worker.peerId}?backPath=/delegations`)}
+                    onClick={() => navigate(`/workers/${worker.peerId}?backPath=/delegations`)}
                     className="hoverable"
-                    key={d.worker.peerId}
+                    key={worker.peerId}
                   >
                     <TableCell>
-                      <WorkerName worker={d.worker} />
+                      <WorkerName worker={worker} />
                     </TableCell>
                     <TableCell>
-                      <WorkerStatus worker={d.worker} />
+                      <WorkerStatus worker={worker} />
                     </TableCell>
-                    <TableCell>{percentFormatter(d.worker.uptime24Hours)}</TableCell>
-                    <TableCell>{percentFormatter(d.worker.uptime90Days)}</TableCell>
-                    <TableCell>{percentFormatter(d.worker.stakerApr)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, d.deposit)}</TableCell>
+                    <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
+                    <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                    <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
                   </TableRow>
                 );
               })}

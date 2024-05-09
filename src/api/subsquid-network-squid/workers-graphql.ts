@@ -11,7 +11,6 @@ import { useSquidDataSource } from './datasource';
 import {
   AccountType,
   ClaimType,
-  MyDelegationsQuery,
   useAllWorkersQuery,
   useMyClaimsAvailableQuery,
   useMyDelegationsQuery,
@@ -41,31 +40,25 @@ export class BlockchainApiWorker {
     utilizedPercent: new Decimal(0),
   };
   delegationEnabled: boolean = false;
-  myDelegations: { owner: { id: string; type: AccountType }; deposit: string; locked: boolean }[] =
-    [];
+  myDelegations: {
+    owner: { id: string; type: AccountType };
+    deposit: string;
+    locked?: boolean;
+    claimableReward: string;
+    claimedReward: string;
+  }[] = [];
   myDelegationsTotal: Decimal;
+  myDelegationsRewardsTotal: Decimal;
   totalReward: Decimal;
 
-  constructor({
-    worker,
-    delegationLimit,
-    address,
-  }: {
-    worker: WorkerFragmentFragment;
-    delegationLimit: Decimal;
-    address?: `0x${string}`;
-  }) {
+  constructor({ worker, address }: { worker: WorkerFragmentFragment; address?: `0x${string}` }) {
     const totalDelegation = fromSqd(worker.totalDelegation);
-    const capacity = delegationLimit.minus(totalDelegation);
 
     Object.assign(this, {
       ...worker,
       createdAt: new Date(worker.createdAt),
       totalDelegations: {
-        limit: delegationLimit,
         total: totalDelegation,
-        capacity,
-        utilizedPercent: totalDelegation.div(delegationLimit).mul(100),
       },
       delegationEnabled: worker.status === WorkerStatus.Active,
       ownedByMe: worker.realOwner?.id === address,
@@ -73,6 +66,11 @@ export class BlockchainApiWorker {
 
     this.myDelegationsTotal = this.myDelegations.reduce(
       (t, r) => t.add(fromSqd(r.deposit)),
+      new Decimal(0),
+    );
+
+    this.myDelegationsRewardsTotal = this.myDelegations.reduce(
+      (t, r) => t.add(fromSqd(r.claimableReward)).add(fromSqd(r.claimedReward)),
       new Decimal(0),
     );
 
@@ -117,7 +115,7 @@ export function useWorkers({
 }) {
   const datasource = useSquidDataSource();
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const { data, isPending } = useAllWorkersQuery(datasource, {});
 
@@ -136,7 +134,6 @@ export function useWorkers({
         return new BlockchainApiWorker({
           worker,
           address,
-          delegationLimit,
         });
       })
       .sort((a, b) => {
@@ -168,7 +165,7 @@ export function useWorkers({
       totalPages: Math.floor(filtered.length / perPage),
       workers: filtered.slice((normalizedPage - 1) * perPage, normalizedPage * perPage),
     };
-  }, [data?.workers, search, sortBy, sortDir, address, delegationLimit, page, perPage]);
+  }, [data?.workers, search, sortBy, sortDir, address, page, perPage]);
 
   return {
     ...filteredData,
@@ -179,7 +176,7 @@ export function useWorkers({
 export function useMyWorkers() {
   const datasource = useSquidDataSource();
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const enabled = !!address;
   const { data, isLoading } = useMyWorkersQuery(
@@ -194,7 +191,6 @@ export function useMyWorkers() {
             new BlockchainApiWorker({
               worker: w,
               address,
-              delegationLimit,
             }),
         );
       },
@@ -212,7 +208,7 @@ export function useWorkerByPeerId(peerId?: string) {
   const datasource = useSquidDataSource();
   const enabled = !!peerId;
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const { data, isPending } = useWorkerByPeerIdQuery(
     datasource,
@@ -227,7 +223,6 @@ export function useWorkerByPeerId(peerId?: string) {
         return new BlockchainApiFullWorker({
           worker: res.workers[0],
           address,
-          delegationLimit,
         });
       },
       enabled,
@@ -335,38 +330,37 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
   };
 }
 
-type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+// type ArrayElement<ArrayType extends readonly unknown[]> =
+//   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
-type Delegation = ArrayElement<MyDelegationsQuery['delegations']> & {
-  totalReward: any;
-  worker: BlockchainApiWorker;
-};
+// type Delegation = {
+//   worker: BlockchainApiWorker;
+//   totalReward: any;
+//   delegations: Omit<ArrayElement<MyDelegationsQuery['delegations']>, 'worker'>[];
+// };
 
 export function useMyDelegations() {
   const { address } = useAccount();
-  const { isPending: isSettingsLoading, delegationLimit } = useNetworkSettings();
+  const { isPending: isSettingsLoading } = useNetworkSettings();
   const datasource = useSquidDataSource();
 
   const { data, isLoading } = useMyDelegationsQuery(datasource, {
     address: address || '',
   });
 
-  const delegations: Delegation[] = useMemo(
-    () =>
-      (data?.delegations || []).map(d => {
-        return {
-          ...d,
-          totalReward: new Decimal(d.claimedReward).add(d.claimableReward).toFixed(0),
-          worker: new BlockchainApiWorker({
-            worker: d.worker,
-            address,
-            delegationLimit,
-          }),
-        };
-      }),
-    [address, data?.delegations, delegationLimit],
-  );
+  const delegations: BlockchainApiWorker[] = useMemo(() => {
+    const workers: Map<string, BlockchainApiWorker> = new Map();
+    for (const d of data?.delegations || []) {
+      let worker = workers.get(d.worker.id);
+      if (!worker) {
+        worker = d.worker as BlockchainApiWorker;
+        worker.myDelegations = [];
+        workers.set(worker.id, worker);
+      }
+      worker.myDelegations.push(d);
+    }
+    return [...workers.values()].map(worker => new BlockchainApiWorker({ worker }));
+  }, [data?.delegations]);
 
   return {
     isLoading: isSettingsLoading || isLoading,

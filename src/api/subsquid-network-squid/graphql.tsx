@@ -4498,6 +4498,7 @@ export type MyDelegationsQuery = {
     claimableReward: any;
     claimedReward: any;
     deposit: any;
+    locked?: boolean;
     worker: {
       __typename?: 'Worker';
       id: string;
@@ -5005,6 +5006,7 @@ export const MyDelegationsDocument = `
     claimableReward
     claimedReward
     deposit
+    locked
     worker {
       ...WorkerFragment
     }

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
 import { Button, TableBody, TableCell, TableRow } from '@mui/material';
-import Decimal from 'decimal.js';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 

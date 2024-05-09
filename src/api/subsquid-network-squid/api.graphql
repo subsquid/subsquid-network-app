@@ -153,6 +153,7 @@ query myDelegations($address: String!) {
     claimableReward
     claimedReward
     deposit
+    locked
     worker {
       ...WorkerFragment
     }
