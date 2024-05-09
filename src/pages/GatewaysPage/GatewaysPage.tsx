@@ -22,7 +22,7 @@ export function MyGateways() {
   return (
     <Box>
       <NetworkPageTitle
-        title="My gateways"
+        title="My Gateways"
         endAdornment={
           <Stack direction="row" spacing={2}>
             <Button variant="contained" component={Link} to="/gateways/add">

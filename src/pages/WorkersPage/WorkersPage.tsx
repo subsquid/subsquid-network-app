@@ -27,7 +27,7 @@ export function MyWorkers() {
   return (
     <Box>
       <NetworkPageTitle
-        title="My workers"
+        title="My Workers"
         endAdornment={
           <Button variant="contained" disabled={!isConnected} component={Link} to="/workers/add">
             Add worker

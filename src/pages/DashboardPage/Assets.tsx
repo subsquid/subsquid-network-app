@@ -73,7 +73,7 @@ export function MyAssets() {
 
   return (
     <Box>
-      <NetworkPageTitle title="Assets" endAdornment={<ClaimButton />} />
+      <NetworkPageTitle title="My Assets" endAdornment={<ClaimButton />} />
 
       {isLoading ? (
         <Loader />

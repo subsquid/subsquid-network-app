@@ -24,7 +24,7 @@ export function MyDelegations() {
 
   return (
     <Box>
-      <NetworkPageTitle title="Delegations" />
+      <NetworkPageTitle title="My Delegations" />
       {isLoading ? (
         <Loader />
       ) : delegations.length ? (
