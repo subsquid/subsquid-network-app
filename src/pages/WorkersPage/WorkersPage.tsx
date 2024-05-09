@@ -10,7 +10,6 @@ import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';

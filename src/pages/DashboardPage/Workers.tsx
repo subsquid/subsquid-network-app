@@ -3,16 +3,7 @@ import React from 'react';
 import { dateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
-import {
-  Divider,
-  IconButton,
-  Stack,
-  styled,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from '@mui/material';
+import { IconButton, styled, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 

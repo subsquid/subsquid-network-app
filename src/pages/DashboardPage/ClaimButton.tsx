@@ -64,7 +64,6 @@ export function ClaimButton() {
     return {
       label: <SourceWalletOption source={s} />,
       value: s.id,
-      disabled: new Decimal(s.balance).lessThanOrEqualTo(0),
     };
   });
 
@@ -72,7 +71,7 @@ export function ClaimButton() {
     if (isClaimsLoading) return;
     else if (formik.values.source) return;
 
-    const source = sources.find(c => new Decimal(c.balance).greaterThan(0)) || sources?.[0];
+    const source = sources?.[0];
     if (!source) return;
 
     formik.setValues({

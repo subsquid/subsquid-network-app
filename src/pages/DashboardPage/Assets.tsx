@@ -11,9 +11,9 @@ import { CopyToClipboard } from '@components/CopyToClipboard';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
-import { ClaimButton } from '@pages/DashboardPage/ClaimButton';
+
+import { ClaimButton } from './ClaimButton';
 
 export function MyAssets() {
   const { isLoading, assets } = useMyAssets();
