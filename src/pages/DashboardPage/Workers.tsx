@@ -3,7 +3,16 @@ import React from 'react';
 import { dateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
-import { IconButton, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import {
+  Divider,
+  IconButton,
+  Stack,
+  styled,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 
@@ -52,6 +61,19 @@ function TableNavigation({
     </Box>
   );
 }
+
+export const SummaryLabel = styled(Box, {
+  name: 'SummaryLabel',
+})(({ theme }) => ({
+  color: theme.palette.text.primary,
+  flex: 1,
+}));
+export const SummaryValue = styled(Box, {
+  name: 'SummaryValue',
+})(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  flex: 1,
+}));
 
 export function Workers() {
   const navigate = useNavigate();

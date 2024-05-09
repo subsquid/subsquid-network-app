@@ -33,7 +33,7 @@ export function MyDelegations() {
               <TableCell>Worker</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Delegation</TableCell>
-              <TableCell>APR</TableCell>
+              <TableCell>APR, 7d</TableCell>
               <TableCell>Total reward</TableCell>
               <TableCell></TableCell>
             </TableRow>
