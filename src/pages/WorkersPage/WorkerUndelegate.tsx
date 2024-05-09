@@ -22,7 +22,10 @@ export const undelegateSchema = (SQD_TOKEN: string) =>
       .label('Amount')
       .moreThan(0)
       .required('Amount is required')
-      .max(yup.ref('max'), ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, max)} `),
+      .max(
+        yup.ref('max'),
+        ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, new Decimal(max))} `,
+      ),
     max: yup.string().label('Max').required('Max is required'),
   });
 
