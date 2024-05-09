@@ -37,9 +37,9 @@ export function MyWorkers() {
             <TableRow>
               <TableCell>Worker</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Uptime last 24 hours</TableCell>
-              <TableCell>Uptime last 90 days</TableCell>
-              <TableCell>APR</TableCell>
+              <TableCell>Uptime, 24h</TableCell>
+              <TableCell>Uptime, 90d</TableCell>
+              <TableCell>APR, 7d</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>

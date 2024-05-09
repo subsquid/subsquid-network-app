@@ -93,13 +93,13 @@ export function Workers() {
                   query={query}
                   setQuery={setQuery}
                 >
-                  Uptime last 24 hours
+                  Uptime, 24h
                 </SortableHeaderCell>
                 <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
-                  Worker APR
+                  Worker APR, 7d
                 </SortableHeaderCell>
                 <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
-                  Staker APR
+                  Staker APR, 7d
                 </SortableHeaderCell>
                 {/*<SortableHeaderCell*/}
                 {/*  width={70}*/}
