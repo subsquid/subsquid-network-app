@@ -10,6 +10,7 @@ import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
+import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
@@ -42,9 +43,7 @@ export function MyDelegations() {
             {delegations.map(worker => {
               return (
                 <TableRow
-                  onClick={() =>
-                    navigate(`/workers/${worker.peerId}?backPath=/profile/delegations`)
-                  }
+                  onClick={() => navigate(`/workers/${worker.peerId}?backPath=/delegations`)}
                   className="hoverable"
                   key={worker.peerId}
                 >
@@ -78,7 +77,9 @@ export function MyDelegations() {
 export function DelegationsPage() {
   return (
     <CenteredPageWrapper className="wide">
-      <MyDelegations />
+      <ConnectedWalletRequired>
+        <MyDelegations />
+      </ConnectedWalletRequired>
       <Outlet />
     </CenteredPageWrapper>
   );

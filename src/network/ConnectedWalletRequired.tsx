@@ -19,23 +19,21 @@ export function ConnectedWalletRequired({ children }: { children: ReactElement }
 
   if (!isConnected) {
     return (
-      <Card>
-        <Box
-          sx={{
-            minHeight: 100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Box sx={{ textAlign: 'center' }}>
-            <Box sx={{ mb: 2 }}>Connect your wallet to proceed</Box>
-            <Button variant="contained" startIcon={<WalletIcon />} onClick={openConnectModal}>
-              Connect wallet
-            </Button>
-          </Box>
+      <Box
+        sx={{
+          height: 'calc(100vh - 300px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box sx={{ textAlign: 'center' }}>
+          <Box sx={{ mb: 2 }}>Connect your wallet to proceed</Box>
+          <Button variant="contained" startIcon={<WalletIcon />} onClick={openConnectModal}>
+            Connect wallet
+          </Button>
         </Box>
-      </Card>
+      </Box>
     );
   }
 
