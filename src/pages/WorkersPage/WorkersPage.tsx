@@ -44,6 +44,7 @@ export function MyWorkers() {
               <TableCell>Status</TableCell>
               <TableCell>Uptime, 24h</TableCell>
               <TableCell>APR, 7d</TableCell>
+              <TableCell>Delegator APR, 7d</TableCell>
               <TableCell>Total reward</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -64,6 +65,11 @@ export function MyWorkers() {
                   </TableCell>
                   <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
                   <TableCell>{percentFormatter(worker.apr)}</TableCell>
+                  <TableCell>
+                    {worker.delegationCount || worker.stakerApr
+                      ? percentFormatter(worker.stakerApr)
+                      : '-'}
+                  </TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
                   <TableCell>
                     <Box display="flex" justifyContent="flex-end">

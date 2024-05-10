@@ -11,8 +11,6 @@ import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Online } from '@components/Online';
 
-import { UptimeGraph } from './UptimeGraph';
-
 export const WorkerColumnLabel = styled(Box, {
   name: 'WorkerColumnLabel',
 })(() => ({
@@ -65,7 +63,11 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
           <WorkerColumn>
             <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
               <WorkerColumnLabel>Delegator APR</WorkerColumnLabel>
-              <Box>{percentFormatter(worker.stakerApr)}</Box>
+              <Box>
+                {worker.delegationCount || worker.stakerApr
+                  ? percentFormatter(worker.stakerApr)
+                  : '-'}
+              </Box>
             </Stack>
           </WorkerColumn>
           {/*<WorkerColumn sx={{ flex: 2 }}>*/}
