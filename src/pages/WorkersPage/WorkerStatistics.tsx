@@ -63,11 +63,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
           <WorkerColumn>
             <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
               <WorkerColumnLabel>Delegator APR</WorkerColumnLabel>
-              <Box>
-                {worker.delegationCount || worker.stakerApr
-                  ? percentFormatter(worker.stakerApr)
-                  : '-'}
-              </Box>
+              <Box>{worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}</Box>
             </Stack>
           </WorkerColumn>
           {/*<WorkerColumn sx={{ flex: 2 }}>*/}

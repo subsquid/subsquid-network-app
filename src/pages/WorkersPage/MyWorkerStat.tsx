@@ -2,7 +2,6 @@ import React from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Divider, Stack, styled } from '@mui/material';
-import Decimal from 'decimal.js';
 
 import { formatSqd } from '@api/contracts/utils';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
@@ -36,7 +35,7 @@ export const MyWorkerStat = ({ worker }: { worker: BlockchainApiWorker }) => {
         <WorkerColumn>
           <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
             <WorkerColumnLabel>Worker APR</WorkerColumnLabel>
-            <Box>{percentFormatter(worker.apr)}</Box>
+            <Box>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</Box>
           </Stack>
         </WorkerColumn>
         <WorkerColumn>

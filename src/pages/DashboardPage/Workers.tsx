@@ -138,11 +138,9 @@ export function Workers() {
                       <WorkerStatus worker={worker} />
                     </TableCell>
                     <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
-                    <TableCell>{percentFormatter(worker.apr)}</TableCell>
+                    <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
                     <TableCell>
-                      {worker.delegationCount || worker.stakerApr
-                        ? percentFormatter(worker.stakerApr)
-                        : '-'}
+                      {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                     </TableCell>
                     {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
                     <TableCell>{dateFormat(worker.createdAt)}</TableCell>
