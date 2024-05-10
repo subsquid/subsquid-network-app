@@ -139,7 +139,11 @@ export function Workers() {
                     </TableCell>
                     <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
                     <TableCell>{percentFormatter(worker.apr)}</TableCell>
-                    <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
+                    <TableCell>
+                      {worker.delegationCount || worker.stakerApr
+                        ? percentFormatter(worker.stakerApr)
+                        : '-'}
+                    </TableCell>
                     {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
                     <TableCell>{dateFormat(worker.createdAt)}</TableCell>
                     <TableCell>

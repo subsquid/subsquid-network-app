@@ -149,7 +149,7 @@ export function useWorkers({
           case WorkerSortBy.DelegationCapacity:
             return a.totalDelegations.capacity.minus(b.totalDelegations.capacity).toNumber();
           case WorkerSortBy.StakerAPR:
-            return (a.stakerApr || 0) - (b.stakerApr || 0);
+            return (a.stakerApr || 0) - (b.stakerApr || 0) || a.delegationCount - b.delegationCount;
           case WorkerSortBy.WorkerAPR:
             return (a.apr || 0) - (b.apr || 0);
           default:
