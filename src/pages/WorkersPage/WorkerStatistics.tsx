@@ -93,7 +93,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
         </Stack>
       </Card>
 
-      <UptimeGraph worker={worker} />
+      {/* <UptimeGraph worker={worker} /> */}
 
       <WorkerDescTable>
         {/*<WorkerDescRow>*/}
@@ -105,14 +105,20 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
         {/*  <WorkerDescValue></WorkerDescValue>*/}
         {/*</WorkerDescRow>*/}
         <WorkerDescRow>
-          <WorkerDescLabel>Queries, last 24 hours / last 90 days</WorkerDescLabel>
+          <WorkerDescLabel>Uptime, 24 hours / 90 days</WorkerDescLabel>
+          <WorkerDescValue>
+            {percentFormatter(worker.uptime24Hours)} / {percentFormatter(worker.uptime90Days)}
+          </WorkerDescValue>
+        </WorkerDescRow>
+        <WorkerDescRow>
+          <WorkerDescLabel>Queries, 24 hours / 90 days</WorkerDescLabel>
           <WorkerDescValue>
             {numberWithSpacesFormatter(worker.queries24Hours)} /{' '}
             {numberWithSpacesFormatter(worker.queries90Days)}
           </WorkerDescValue>
         </WorkerDescRow>
         <WorkerDescRow>
-          <WorkerDescLabel>Data served, last 24 hours / last 90 days</WorkerDescLabel>
+          <WorkerDescLabel>Data served, 24 hours / 90 days</WorkerDescLabel>
           <WorkerDescValue>
             {bytesFormatter(worker.servedData24Hours)} / {bytesFormatter(worker.servedData90Days)}
           </WorkerDescValue>
