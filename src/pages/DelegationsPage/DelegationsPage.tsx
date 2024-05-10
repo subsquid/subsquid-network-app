@@ -54,7 +54,9 @@ export function MyDelegations() {
                     <WorkerStatus worker={worker} />
                   </TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
-                  <TableCell>{percentFormatter(worker.stakerApr)}</TableCell>
+                  <TableCell>
+                    {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+                  </TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={2} justifyContent="flex-end">
