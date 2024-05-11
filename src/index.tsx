@@ -2,6 +2,7 @@ import React from 'react';
 
 import { info } from '@logger';
 import * as Sentry from '@sentry/react';
+import Decimal from 'decimal.js';
 import { createRoot } from 'react-dom/client';
 import { useNavigate } from 'react-router-dom';
 import { useDisconnect } from 'wagmi';
@@ -9,6 +10,8 @@ import { useDisconnect } from 'wagmi';
 import { queryClient } from '@api/client';
 
 import App from './App';
+
+Decimal.set({ precision: 30, rounding: 3 });
 
 declare global {
   interface process {
