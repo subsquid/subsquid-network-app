@@ -19,7 +19,7 @@ import { TopBanner, useBannerHeight } from '@components/TopBanner';
 import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { MenuIcon } from '@icons/MenuIcon';
 import { UserMenu } from '@layouts/NetworkLayout/UserMenu.tsx';
-import { useSwitchNetwork } from '@network/useSwitchNetwork';
+import { useSwitchSubsquidNetwork } from '@network/useSwitchNetwork';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -258,7 +258,7 @@ export const NetworkLayout = ({
 }: PropsWithChildren<{
   stretchContent?: boolean;
 }>) => {
-  useSwitchNetwork();
+  useSwitchSubsquidNetwork();
 
   const theme = useTheme();
   const narrowLg = useMediaQuery(theme.breakpoints.down('lg'));
