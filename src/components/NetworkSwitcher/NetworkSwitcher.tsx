@@ -14,7 +14,8 @@ const SwitchButton = styled(Button)<{ fill?: string }>(({ theme, fill }) => ({
   width: 'fit-content',
   fontSize: '0.875rem',
   color: fill || theme.palette?.primary?.contrastText,
-  gap: '0.625rem',
+  gap: theme.spacing(1),
+  margin: theme.spacing(0, 1),
 }));
 
 export function NetworkSwitcher({
