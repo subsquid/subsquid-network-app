@@ -16,7 +16,7 @@ const StyledTitle = styled(Box)(({ theme: { spacing } }) => ({
 
 const StyledGraph = styled(Box)(({ theme: { spacing } }) => ({
   display: 'flex',
-  justifyContent: 'space-between',
+  justifyContent: 'space-around',
   marginBottom: spacing(1),
 }));
 
@@ -66,7 +66,7 @@ export const UptimeGraph = ({ worker }: { worker: BlockchainApiFullWorker }) => 
 
   return (
     <Box sx={{ mt: 4 }}>
-      <StyledTitle>{displayedDays} days uptime</StyledTitle>
+      <StyledTitle>Uptime graph</StyledTitle>
       <StyledGraph>
         {data.map(d => (
           <StatusBar key={d.date} dayUptime={d} />

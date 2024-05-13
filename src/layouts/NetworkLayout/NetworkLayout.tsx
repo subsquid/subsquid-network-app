@@ -1,4 +1,6 @@
-import React, { PropsWithChildren, useState } from 'react';
+import '@rainbow-me/rainbowkit/styles.css';
+
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 
 import {
   AppBar as AppBarMaterial,
@@ -12,21 +14,21 @@ import {
 import { alpha } from '@mui/system/colorManipulator';
 import classnames from 'classnames';
 import { Outlet } from 'react-router-dom';
+import { useDisconnect, useNetwork, useWalletClient } from 'wagmi';
 
 import { Logo } from '@components/Logo';
 import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
 import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { MenuIcon } from '@icons/MenuIcon';
-import { UserMenu } from '@layouts/NetworkLayout/UserMenu.tsx';
-import { useSwitchNetwork } from '@network/useSwitchNetwork';
-
-import '@rainbow-me/rainbowkit/styles.css';
+import { useAccount } from '@network/useAccount';
+import { getChainId, getNetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { ColorVariant } from '../../theme';
 
 import { NetworkMenu } from './NetworkMenu';
 import { SyncSquidSnackbar } from './SyncSquidSnackbar';
+import { UserMenu } from './UserMenu';
 
 const APP_BAR_HEIGHT = 52;
 const SIDEBAR_WIDTH = {
@@ -258,7 +260,24 @@ export const NetworkLayout = ({
 }: PropsWithChildren<{
   stretchContent?: boolean;
 }>) => {
-  useSwitchNetwork();
+  const { isConnected } = useAccount();
+  const { isLoading } = useWalletClient();
+  const { chain } = useNetwork();
+  const { disconnect } = useDisconnect();
+  const { network, switchAndReset } = useSubsquidNetwork();
+
+  useEffect(() => {
+    if (!isConnected || isLoading) return;
+
+    if (chain?.id === getChainId(network)) return;
+
+    if (!chain?.unsupported && demoFeaturesEnabled()) {
+      switchAndReset(getNetworkName(chain?.id));
+      return;
+    }
+
+    disconnect();
+  }, [chain, disconnect, isConnected, network, isLoading, switchAndReset]);
 
   const theme = useTheme();
   const narrowLg = useMediaQuery(theme.breakpoints.down('lg'));

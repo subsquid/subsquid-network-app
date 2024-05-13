@@ -1,22 +1,23 @@
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { metaMaskWallet, walletConnectWallet } from '@rainbow-me/rainbowkit/wallets';
 import { configureChains, createConfig } from 'wagmi';
-import { Chain } from 'wagmi';
-import { arbitrumSepolia, hardhat } from 'wagmi/chains';
+import { arbitrumSepolia, arbitrum } from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
-export let CHAIN: Chain = arbitrumSepolia;
-if (process.env.NETWORK === 'hardhat') {
-  CHAIN = {
-    ...hardhat,
-    contracts: {
-      multicall3: {
-        address: process.env.MULTICALL_3_CONTRACT_ADDRESS,
-      } as any,
-    },
-  };
-}
+import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
+
+// export let CHAIN: Chain = arbitrumSepolia;
+// if (process.env.NETWORK === 'hardhat') {
+//   CHAIN = {
+//     ...hardhat,
+//     contracts: {
+//       multicall3: {
+//         address: process.env.MULTICALL_3_CONTRACT_ADDRESS,
+//       } as any,
+//     },
+//   };
+// }
 
 const privateNode = process.env.BLOCK_CHAIN_NODE_ADDRESS;
 
@@ -24,18 +25,15 @@ const {
   chains: configuredChains,
   publicClient,
   webSocketPublicClient,
-} = configureChains(
-  [CHAIN],
-  [
-    privateNode
-      ? jsonRpcProvider({
-          rpc: () => ({
-            http: privateNode,
-          }),
-        })
-      : publicProvider(),
-  ],
-);
+} = configureChains(demoFeaturesEnabled() ? [arbitrumSepolia, arbitrum] : [arbitrumSepolia], [
+  privateNode
+    ? jsonRpcProvider({
+        rpc: () => ({
+          http: privateNode,
+        }),
+      })
+    : publicProvider(),
+]);
 
 const connectors = connectorsForWallets([
   {

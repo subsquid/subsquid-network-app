@@ -36,8 +36,7 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }
           >
             Withdraw
           </LoadingButton>
-        ) : worker.status === WorkerStatus.Active ||
-          worker.status === WorkerStatus.Deregistering ? (
+        ) : (
           <LoadingButton
             loading={isUnregistering}
             disabled={worker.status !== WorkerStatus.Active}
@@ -52,7 +51,7 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }
           >
             Unregister
           </LoadingButton>
-        ) : null}
+        )}
       </Box>
       <BlockchainContractError error={unregisterError || withdrawError} />
     </Box>

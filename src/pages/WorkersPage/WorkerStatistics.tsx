@@ -7,18 +7,23 @@ import {
 } from '@lib/formatters/formatters.ts';
 import { Box, Divider, Stack, styled } from '@mui/material';
 
+import { formatSqd } from '@api/contracts/utils';
 import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
-import { Online } from '@components/Online';
+import { useContracts } from '@network/useContracts';
 
-export const WorkerColumnLabel = styled(Box, {
-  name: 'WorkerColumnLabel',
+import { UptimeGraph } from './UptimeGraph';
+
+export const WorkerDescLabel = styled(Box, {
+  name: 'WorkerDescLabel',
 })(() => ({
+  flex: 1,
   fontWeight: 500,
+  whiteSpace: 'balance',
 }));
 
 export const WorkerColumn = styled(Box, {
-  name: 'WorkerColumnLabel',
+  name: 'WorkerDescLabel',
 })(() => ({
   flex: 1,
 }));
@@ -37,11 +42,7 @@ export const WorkerDescRow = styled(Box, {
   margin: theme.spacing(5, 0),
   lineHeight: 1.4,
 }));
-export const WorkerDescLabel = styled(Box, {
-  name: 'WorkerDescLabel',
-})(() => ({
-  fontWeight: 500,
-}));
+
 export const WorkerDescValue = styled(Box, {
   name: 'WorkerDescValue',
 })(({ theme }) => ({
@@ -51,81 +52,78 @@ export const WorkerDescValue = styled(Box, {
 }));
 
 export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }) => {
+  const { SQD_TOKEN } = useContracts();
+
   return (
     <Box>
-      <Card noShadow title={<Box>Worker statistics</Box>}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          spacing={2}
-          divider={<Divider orientation="vertical" flexItem />}
-        >
-          <WorkerColumn>
-            <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
-              <WorkerColumnLabel>Delegator APR</WorkerColumnLabel>
-              <Box>{worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}</Box>
+      <Stack spacing={4}>
+        <Card noShadow title="Bond">
+          <Stack divider={<Divider orientation="horizontal" flexItem />} spacing={2}>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Worker APR, 7d</WorkerDescLabel>
+              <WorkerDescValue>
+                {worker.apr != null ? percentFormatter(worker.apr) : '-'}
+              </WorkerDescValue>
             </Stack>
-          </WorkerColumn>
-          {/*<WorkerColumn sx={{ flex: 2 }}>*/}
-          {/*  <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>*/}
-          {/*    <WorkerColumnLabel>Delegation capacity</WorkerColumnLabel>*/}
-          {/*    <Box>*/}
-          {/*      <WorkerDelegationCapacity value={worker.totalDelegations} />*/}
-          {/*    </Box>*/}
-          {/*  </Stack>*/}
-          {/*</WorkerColumn>*/}
-          <WorkerColumn>
-            <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
-              <WorkerColumnLabel>Delegators</WorkerColumnLabel>
-              <Box>{worker.delegationCount}</Box>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Bonded</WorkerDescLabel>
+              <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.bond, 2)}</WorkerDescValue>
             </Stack>
-          </WorkerColumn>
-          <WorkerColumn>
-            <Stack alignItems="center" direction="row" justifyContent="center" spacing={1}>
-              <WorkerColumnLabel>Health</WorkerColumnLabel>
-              <Box>
-                <Online online={worker.online} />
-              </Box>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Total rewards</WorkerDescLabel>
+              <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalReward, 2)}</WorkerDescValue>
             </Stack>
-          </WorkerColumn>
-        </Stack>
-      </Card>
+          </Stack>
+        </Card>
+        <Card noShadow title="Delegation">
+          <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
+            <Stack direction="row">
+              <WorkerDescLabel>Delegator APR, 7d</WorkerDescLabel>
+              <WorkerDescValue>
+                {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+              </WorkerDescValue>
+            </Stack>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Delegators</WorkerDescLabel>
+              <WorkerDescValue>{worker.delegationCount}</WorkerDescValue>
+            </Stack>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Total delegated</WorkerDescLabel>
+              <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalDelegation, 2)}</WorkerDescValue>
+            </Stack>
+          </Stack>
+        </Card>
+        <Card noShadow title="Statistics">
+          <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Uptime, 24h / 90d</WorkerDescLabel>
+              <WorkerDescValue>
+                {percentFormatter(worker.uptime24Hours)} / {percentFormatter(worker.uptime90Days)}
+              </WorkerDescValue>
+            </Stack>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Queries, 24h / 90d</WorkerDescLabel>
+              <WorkerDescValue>
+                {numberWithSpacesFormatter(worker.queries24Hours)} /{' '}
+                {numberWithSpacesFormatter(worker.queries90Days)}
+              </WorkerDescValue>
+            </Stack>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Data served, 24h / 90d</WorkerDescLabel>
+              <WorkerDescValue>
+                {bytesFormatter(worker.servedData24Hours)} /{' '}
+                {bytesFormatter(worker.servedData90Days)}
+              </WorkerDescValue>
+            </Stack>
+            <Stack alignItems="center" direction="row" justifyContent="center">
+              <WorkerDescLabel>Data stored</WorkerDescLabel>
+              <WorkerDescValue>{bytesFormatter(worker.storedData)}</WorkerDescValue>
+            </Stack>
+          </Stack>
+        </Card>
+      </Stack>
 
-      {/* <UptimeGraph worker={worker} /> */}
-
-      <WorkerDescTable>
-        {/*<WorkerDescRow>*/}
-        {/*  <WorkerDescLabel>Total worker rewards</WorkerDescLabel>*/}
-        {/*  <WorkerDescValue>{worker.tot}</WorkerDescValue>*/}
-        {/*</WorkerDescRow>*/}
-        {/*<WorkerDescRow>*/}
-        {/*  <WorkerDescLabel>Total delegators rewards</WorkerDescLabel>*/}
-        {/*  <WorkerDescValue></WorkerDescValue>*/}
-        {/*</WorkerDescRow>*/}
-        <WorkerDescRow>
-          <WorkerDescLabel>Uptime, 24 hours / 90 days</WorkerDescLabel>
-          <WorkerDescValue>
-            {percentFormatter(worker.uptime24Hours)} / {percentFormatter(worker.uptime90Days)}
-          </WorkerDescValue>
-        </WorkerDescRow>
-        <WorkerDescRow>
-          <WorkerDescLabel>Queries, 24 hours / 90 days</WorkerDescLabel>
-          <WorkerDescValue>
-            {numberWithSpacesFormatter(worker.queries24Hours)} /{' '}
-            {numberWithSpacesFormatter(worker.queries90Days)}
-          </WorkerDescValue>
-        </WorkerDescRow>
-        <WorkerDescRow>
-          <WorkerDescLabel>Data served, 24 hours / 90 days</WorkerDescLabel>
-          <WorkerDescValue>
-            {bytesFormatter(worker.servedData24Hours)} / {bytesFormatter(worker.servedData90Days)}
-          </WorkerDescValue>
-        </WorkerDescRow>
-        <WorkerDescRow>
-          <WorkerDescLabel>Data stored</WorkerDescLabel>
-          <WorkerDescValue>{bytesFormatter(worker.storedData)}</WorkerDescValue>
-        </WorkerDescRow>
-      </WorkerDescTable>
+      <UptimeGraph worker={worker} />
     </Box>
   );
 };

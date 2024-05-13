@@ -5,17 +5,12 @@ import { Divider, IconButton, Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
-import {
-  BlockchainApiFullWorker,
-  WorkerStatus as BlockchainWorkerStatus,
-} from '@api/subsquid-network-squid';
+import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { EditIcon } from '@icons/EditIcon';
 
-import { WorkerDelegate } from './WorkerDelegate';
 import { WorkerStatus } from './WorkerStatus';
-import { WorkerUndelegate } from './WorkerUndelegate';
 
 export const WorkerDescLabel = styled(Box, {
   name: 'WorkerDescLabel',
@@ -58,12 +53,6 @@ function WorkerTitle({ worker }: { worker: BlockchainApiFullWorker }) {
       <Box sx={{ flex: 1, ml: 1 }}>
         <WorkerStatus worker={worker} />
       </Box>
-      <Stack direction="row" spacing={2}>
-        {worker.status === BlockchainWorkerStatus.Active ? (
-          <WorkerDelegate worker={worker} />
-        ) : null}
-        {worker.myDelegationsTotal.greaterThan(0) ? <WorkerUndelegate worker={worker} /> : null}
-      </Stack>
     </Box>
   );
 }
@@ -89,7 +78,7 @@ export const WorkerCard = ({ worker }: { worker: BlockchainApiFullWorker }) => {
           </Box>
 
           <Divider sx={{ my: 1 }} />
-          <Stack spacing={1} direction="row" justifyContent="space-between">
+          <Stack spacing={1} direction="row">
             {/*<Stack direction="row" spacing={1}>*/}
             {/*  <WorkerDescLabel>Website</WorkerDescLabel>*/}
             {/*  <WorkerDescValue>{worker.website || '-'}</WorkerDescValue>*/}
@@ -105,6 +94,10 @@ export const WorkerCard = ({ worker }: { worker: BlockchainApiFullWorker }) => {
             <Stack direction="row" spacing={1}>
               <WorkerDescLabel>Joined</WorkerDescLabel>
               <WorkerDescValue>{dateFormat(worker.createdAt)}</WorkerDescValue>
+            </Stack>
+            <Stack direction="row" spacing={1}>
+              <WorkerDescLabel>Version</WorkerDescLabel>
+              <WorkerDescValue>{worker.version || '-'}</WorkerDescValue>
             </Stack>
           </Stack>
         </Box>

@@ -9,7 +9,7 @@ export function useContracts(): {
   GATEWAY_REGISTRATION: `0x${string}`;
   SQD_TOKEN: string;
 } {
-  const [network] = useSubsquidNetwork();
+  const { network } = useSubsquidNetwork();
 
   switch (network) {
     case NetworkName.Testnet: {

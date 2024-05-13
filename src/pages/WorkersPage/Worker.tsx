@@ -1,29 +1,29 @@
 import React from 'react';
 
-import { Divider } from '@mui/material';
+import { Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 import { useWorkerByPeerId } from '@api/subsquid-network-squid';
-import { BackButton } from '@components/BackButton';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
-import { CenteredPageWrapper } from '@layouts/NetworkLayout';
+import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { WorkerUnregister } from '@pages/WorkersPage/WorkerUnregister';
 
-import { MyWorkerStat } from './MyWorkerStat';
 import { WorkerCard } from './WorkerCard';
+import { WorkerDelegate } from './WorkerDelegate';
 import { WorkerStatistics } from './WorkerStatistics';
+import { WorkerUndelegate } from './WorkerUndelegate';
 
-const sx = {
-  background: '#000',
-  color: '#fff',
+// const sx = {
+//   background: '#000',
+//   color: '#fff',
 
-  '&:hover': {
-    background: '#333',
-    color: '#fff',
-  },
-};
+//   '&:hover': {
+//     background: '#333',
+//     color: '#fff',
+//   },
+// };
 
 export const Worker = ({ backPath }: { backPath: string }) => {
   const { peerId } = useParams<{ peerId: string }>();
@@ -42,29 +42,27 @@ export const Worker = ({ backPath }: { backPath: string }) => {
 
   return (
     <CenteredPageWrapper className="wide">
-      <Box sx={{ mb: 3 }}>
-        <BackButton sx={sx} path={searchParams.get('backPath') || backPath} />
-      </Box>
+      <NetworkPageTitle
+        backPath={searchParams.get('backPath') || backPath}
+        endAdornment={
+          <Stack direction="row" spacing={2}>
+            <WorkerDelegate worker={worker} />
+            <WorkerUndelegate worker={worker} />
+          </Stack>
+        }
+      />
+
       <Card>
         <WorkerCard worker={worker} />
-
-        {worker.ownedByMe ? (
-          <Box sx={{ mt: 7.5 }}>
-            <MyWorkerStat worker={worker} />
-          </Box>
-        ) : null}
-
-        <Box sx={{ mt: 7.5 }}>
+        <Box sx={{ mt: 5 }}>
           <WorkerStatistics worker={worker} />
         </Box>
-
-        {worker.ownedByMe ? (
-          <>
-            <Divider sx={{ my: 4 }} />
-            <WorkerUnregister worker={worker} />
-          </>
-        ) : null}
       </Card>
+      {worker.ownedByMe ? (
+        <Box mt={2.5}>
+          <WorkerUnregister worker={worker} />
+        </Box>
+      ) : null}
     </CenteredPageWrapper>
   );
 };

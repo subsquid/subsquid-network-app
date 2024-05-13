@@ -30,7 +30,13 @@ export const delegateSchema = (SQD_TOKEN: string) =>
     max: yup.number().label('Max').required('Max is required'),
   });
 
-export function WorkerDelegate({ worker }: { worker: BlockchainApiWorker }) {
+export function WorkerDelegate({
+  worker,
+  disabled,
+}: {
+  worker: BlockchainApiWorker;
+  disabled?: boolean;
+}) {
   const { delegateToWorker, error, isLoading } = useWorkerDelegate();
   const { SQD_TOKEN } = useContracts();
 
@@ -94,7 +100,11 @@ export function WorkerDelegate({ worker }: { worker: BlockchainApiWorker }) {
 
   return (
     <>
-      <Button disabled={!worker.delegationEnabled} onClick={handleOpen} variant="contained">
+      <Button
+        disabled={disabled || !worker.delegationEnabled}
+        onClick={handleOpen}
+        variant="contained"
+      >
         Delegate
       </Button>
       <ContractCallDialog
