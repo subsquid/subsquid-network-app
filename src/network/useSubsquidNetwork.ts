@@ -1,12 +1,8 @@
-import { useState } from 'react';
-
 import { useQueryClient } from '@tanstack/react-query';
 import useLocalStorageState from 'use-local-storage-state';
-import { useSwitchNetwork } from 'wagmi';
+import { arbitrum, arbitrumSepolia } from 'wagmi/chains';
 
 import { localStorageStringSerializer } from '@hooks/useLocalStorageState.ts';
-
-import { getChainId } from './useSwitchNetwork';
 
 export enum NetworkName {
   Testnet = 'testnet',
@@ -27,10 +23,18 @@ export function useSubsquidNetwork() {
 
   const queryClient = useQueryClient();
 
-  const changeAndReset = (network: NetworkName) => {
+  const switchAndReset = (network: NetworkName) => {
     changeApp(network);
     queryClient.clear();
   };
 
-  return { network: validate(app), changeAndReset };
+  return { network: validate(app), switchAndReset };
+}
+
+export function getChainId(network: NetworkName) {
+  return network === NetworkName.Mainnet ? arbitrum.id : arbitrumSepolia.id;
+}
+
+export function getNetworkName(chainId?: number) {
+  return chainId === arbitrum.id ? NetworkName.Mainnet : NetworkName.Testnet;
 }

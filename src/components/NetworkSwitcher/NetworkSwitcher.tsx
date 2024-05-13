@@ -5,8 +5,7 @@ import capitalize from 'lodash-es/capitalize';
 import { useSwitchNetwork } from 'wagmi';
 
 import { SwitchArrowsIcon } from '@icons/SwitchArrowsIcon';
-import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
-import { getChainId } from '@network/useSwitchNetwork';
+import { getChainId, NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
 
 const SwitchButton = styled(Button)<{ fill?: string }>(({ theme, fill }) => ({
   width: 'fit-content',
@@ -24,7 +23,7 @@ export function NetworkSwitcher({
   color?: string;
   hideText?: boolean;
 }) {
-  const { network, changeAndReset } = useSubsquidNetwork();
+  const { network, switchAndReset: changeAndReset } = useSubsquidNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
 
   const inverseNetworkName = (name: string) =>
