@@ -7,6 +7,9 @@ import { useSwitchNetwork } from 'wagmi';
 import { SwitchArrowsIcon } from '@icons/SwitchArrowsIcon';
 import { getChainId, NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
 
+const inverseNetworkName = (name: string) =>
+  name === NetworkName.Mainnet ? NetworkName.Testnet : NetworkName.Mainnet;
+
 const SwitchButton = styled(Button)<{ fill?: string }>(({ theme, fill }) => ({
   width: 'fit-content',
   fontSize: '0.875rem',
@@ -26,11 +29,17 @@ export function NetworkSwitcher({
   const { network, switchAndReset: changeAndReset } = useSubsquidNetwork();
   const { switchNetworkAsync } = useSwitchNetwork();
 
-  const inverseNetworkName = (name: string) =>
-    name === NetworkName.Mainnet ? NetworkName.Testnet : NetworkName.Mainnet;
-
   const handleAppSwitchAsync = async (network: NetworkName) => {
-    await switchNetworkAsync?.(getChainId(network));
+    try {
+      await switchNetworkAsync?.(getChainId(network));
+    } catch (e: any) {
+      if (e.message?.toLowerCase().includes('user rejected the request')) {
+        return;
+      }
+
+      throw e;
+    }
+
     changeAndReset(network);
   };
 
