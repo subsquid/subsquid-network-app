@@ -5,33 +5,26 @@ import capitalize from 'lodash-es/capitalize';
 
 import { BlockchainApiWorker, WorkerStatus as Status } from '@api/subsquid-network-squid';
 
-export const Chip = styled(MaterialChip)(
-  ({
-    theme: {
-      spacing,
-      palette: { error },
-    },
-  }) => ({
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    lineHeight: 1,
-    height: 24,
+export const Chip = styled(MaterialChip)(({ theme: { spacing } }) => ({
+  fontSize: '0.75rem',
+  fontWeight: 500,
+  lineHeight: 1,
+  height: 24,
 
-    [`& .${chipClasses.label}`]: {
-      padding: spacing(0.5, 1),
-    },
+  [`& .${chipClasses.label}`]: {
+    padding: spacing(0.5, 1),
+  },
 
-    [`&.MuiChip-filledError`]: {
-      background: error.main,
-      color: error.contrastText,
-    },
+  [`&.${chipClasses.colorError}`]: {
+    background: '#FFE6C0',
+    color: '#FF6B35',
+  },
 
-    [`&.${chipClasses.colorSuccess}`]: {
-      background: '#E3F7E0',
-      color: '#55AD44',
-    },
-  }),
-);
+  [`&.${chipClasses.colorSuccess}`]: {
+    background: '#E3F7E0',
+    color: '#55AD44',
+  },
+}));
 
 export function workerStatus(worker: BlockchainApiWorker): {
   label: string;
@@ -49,9 +42,9 @@ export function workerStatus(worker: BlockchainApiWorker): {
 
       return { label: 'Online', color: 'success' };
     case Status.Registering:
-      return { label: 'Registration pending', color: 'default' };
+      return { label: 'Registering', color: 'default' };
     case Status.Deregistering:
-      return { label: 'Unregistration pending', color: 'default' };
+      return { label: 'Unregistring', color: 'default' };
     case Status.Deregistered:
       return { label: 'Deregistered', color: 'default' };
   }

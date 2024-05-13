@@ -29,7 +29,13 @@ export const undelegateSchema = (SQD_TOKEN: string) =>
     max: yup.string().label('Max').required('Max is required'),
   });
 
-export function WorkerUndelegate({ worker }: { worker: BlockchainApiWorker }) {
+export function WorkerUndelegate({
+  worker,
+  disabled,
+}: {
+  worker: BlockchainApiWorker;
+  disabled?: boolean;
+}) {
   const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
   const { SQD_TOKEN } = useContracts();
 
@@ -106,7 +112,11 @@ export function WorkerUndelegate({ worker }: { worker: BlockchainApiWorker }) {
   return (
     <>
       <Button
-        disabled={worker.myDelegations.find(w => w?.owner.id === formik.values.source)?.locked}
+        disabled={
+          disabled ||
+          worker.myDelegationsTotal.equals(0) ||
+          !worker.myDelegations.some(w => !w.locked)
+        }
         color="error"
         onClick={handleOpen}
         variant="contained"

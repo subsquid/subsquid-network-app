@@ -57,6 +57,7 @@ fragment WorkerFragment on Worker {
   jailed
   dialOk
   locked
+  version
   owner {
     id
   }
