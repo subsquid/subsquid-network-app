@@ -1,22 +1,21 @@
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { metaMaskWallet, walletConnectWallet } from '@rainbow-me/rainbowkit/wallets';
 import { configureChains, createConfig } from 'wagmi';
-import { Chain } from 'wagmi';
-import { arbitrumSepolia, hardhat } from 'wagmi/chains';
+import { arbitrumSepolia, arbitrum } from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
-export let CHAIN: Chain = arbitrumSepolia;
-if (process.env.NETWORK === 'hardhat') {
-  CHAIN = {
-    ...hardhat,
-    contracts: {
-      multicall3: {
-        address: process.env.MULTICALL_3_CONTRACT_ADDRESS,
-      } as any,
-    },
-  };
-}
+// export let CHAIN: Chain = arbitrumSepolia;
+// if (process.env.NETWORK === 'hardhat') {
+//   CHAIN = {
+//     ...hardhat,
+//     contracts: {
+//       multicall3: {
+//         address: process.env.MULTICALL_3_CONTRACT_ADDRESS,
+//       } as any,
+//     },
+//   };
+// }
 
 const privateNode = process.env.BLOCK_CHAIN_NODE_ADDRESS;
 
@@ -25,7 +24,7 @@ const {
   publicClient,
   webSocketPublicClient,
 } = configureChains(
-  [CHAIN],
+  [arbitrumSepolia, arbitrum],
   [
     privateNode
       ? jsonRpcProvider({

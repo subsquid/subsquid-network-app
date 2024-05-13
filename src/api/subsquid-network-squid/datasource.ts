@@ -1,7 +1,7 @@
 import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 export function useSquidDataSource() {
-  const [network] = useSubsquidNetwork();
+  const { network } = useSubsquidNetwork();
 
   return {
     endpoint:
