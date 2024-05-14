@@ -147,9 +147,6 @@ export const ContentWrapper = styled('div', {
     padding: theme.spacing(7.5, 3),
   },
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(7.5, 2),
-  },
-  [theme.breakpoints.down('xxs')]: {
     padding: theme.spacing(3, 2),
   },
 }));

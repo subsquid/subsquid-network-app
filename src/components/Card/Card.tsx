@@ -12,12 +12,11 @@ export const CardTitle = styled(Box)(({ theme }) => ({
 }));
 
 export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) => ({
-  padding: theme.spacing(3),
-  borderRadius: 8,
+  padding: theme.spacing(2.5, 5),
   boxShadow: `0px 4px 12px 0px #9595953D`,
 
-  [theme.breakpoints.down('xxs')]: {
-    padding: theme.spacing(2),
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2.5),
   },
 
   '&.guideActive': {

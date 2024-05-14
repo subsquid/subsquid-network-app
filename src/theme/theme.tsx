@@ -544,9 +544,10 @@ export const useCreateTheme = (mode: PaletteType) => {
           },
           MuiPaper: {
             styleOverrides: {
-              elevation1: {
+              root: {
                 border: `1px solid ${colors.divider}`,
                 boxShadow: 'none',
+                borderRadius: 8,
               },
             },
           },

@@ -24,10 +24,6 @@ const PageTitleWrapper = styled('div', {
   '& .endAdornment': {
     marginLeft: 'auto',
   },
-
-  [theme.breakpoints.down('xxs')]: {
-    marginBottom: theme.spacing(4),
-  },
 }));
 
 const PageDescription = styled(Typography)(({ theme }) => ({

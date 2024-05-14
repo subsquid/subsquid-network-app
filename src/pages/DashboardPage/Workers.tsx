@@ -77,7 +77,7 @@ export function Workers() {
   const { workers, totalPages, page, isLoading } = useWorkers({
     search: query.search,
     page: query.page,
-    perPage: 20,
+    perPage: 15,
     sortBy: query.sortBy as WorkerSortBy,
     sortDir: query.sortDir as SortDir,
   });
