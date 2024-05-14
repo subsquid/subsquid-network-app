@@ -13,7 +13,7 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
   borderRadius: borderRadius,
   borderSpacing: 0,
   borderCollapse: 'separate',
-  border: `1px solid #e8e8e8`, // FIXME: color should not be hardcoded
+  border: `1px solid ${theme.palette.divider}`,
 
   '& td, & th': {
     background: theme.palette.background.paper,

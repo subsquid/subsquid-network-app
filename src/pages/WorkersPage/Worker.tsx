@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { useWorkerByPeerId } from '@api/subsquid-network-squid';
+import { useWorkerByPeerId, WorkerStatus } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
@@ -54,11 +54,11 @@ export const Worker = ({ backPath }: { backPath: string }) => {
 
       <Card>
         <WorkerCard worker={worker} />
-        <Box sx={{ mt: 5 }}>
+        <Box sx={{ mt: 4 }}>
           <WorkerStatistics worker={worker} />
         </Box>
       </Card>
-      {worker.ownedByMe ? (
+      {worker.ownedByMe && worker.status !== WorkerStatus.Withdrawn ? (
         <Box mt={2.5}>
           <WorkerUnregister worker={worker} />
         </Box>

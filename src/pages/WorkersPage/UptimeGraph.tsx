@@ -20,13 +20,13 @@ const StyledGraph = styled(Box)(({ theme: { spacing } }) => ({
   marginBottom: spacing(1),
 }));
 
-const StyledNotes = styled(Box)(({ theme: { spacing } }) => ({
+const StyledNotes = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   fontSize: '.875rem',
   lineHeight: '1.25rem',
-  opacity: '.8',
-  marginBottom: spacing(2),
+  color: theme.palette.text.secondary,
+  marginBottom: theme.spacing(2),
 }));
 
 const oneDayInMilliseconds = 24 * 60 * 60 * 1000;

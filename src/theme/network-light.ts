@@ -47,7 +47,7 @@ export const NetworkLightTheme = {
     input: '#f2f2f2',
     content: '#f6f8fb',
   },
-  divider: 'rgba(29, 29, 31, 0.1)',
+  divider: '#e8e8e8',
   code: {
     background: '#FBFBFB',
     border: alpha('#1D1D1F', 0.1),

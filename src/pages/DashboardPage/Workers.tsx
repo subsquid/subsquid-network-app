@@ -118,7 +118,7 @@ export function Workers() {
                 {/*  Delegation capacity*/}
                 {/*</SortableHeaderCell>*/}
                 <SortableHeaderCell sort={WorkerSortBy.JoinedAt} query={query} setQuery={setQuery}>
-                  Joined date
+                  Registered
                 </SortableHeaderCell>
                 <TableCell></TableCell>
               </TableRow>

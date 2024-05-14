@@ -15,6 +15,7 @@ const Name = styled(Box, {
 })(({ theme }) => ({
   marginBottom: theme.spacing(0.5),
   fontWeight: 500,
+  whiteSpace: 'nowrap',
 }));
 
 export const WorkerName = ({
@@ -32,7 +33,9 @@ export const WorkerName = ({
         colorDescriminator={worker.peerId}
       />
       <Box>
-        {worker.name ? <Name>{worker.name}</Name> : null}
+        {worker.name ? (
+          <Name>{worker.name.length > 50 ? worker.name.slice(0, 47) + '...' : worker.name}</Name>
+        ) : null}
         <Stack direction="row" spacing={1}>
           <Box>
             <CopyToClipboard
