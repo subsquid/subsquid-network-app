@@ -11,24 +11,27 @@ const borderRadius = 8;
 export const BorderedTable = styled(Table)(({ theme }) => ({
   boxShadow: `0px 4px 12px 0px #9595953D`,
   borderRadius: borderRadius,
+  borderSpacing: 0,
+  borderCollapse: 'separate',
+  border: `1px solid ${theme.palette.divider}`,
 
   '& td, & th': {
     background: theme.palette.background.paper,
     borderBottom: `1px solid ${theme.palette.background.content}`,
-    padding: theme.spacing(2, 2),
+    padding: theme.spacing(2.5, 2),
   },
 
   '& td:first-child, & th:first-child': {
     paddingLeft: theme.spacing(5),
-    [theme.breakpoints.down('md')]: {
-      paddingRight: theme.spacing(2.5),
+    [theme.breakpoints.down('sm')]: {
+      paddingLeft: theme.spacing(2.5),
     },
   },
 
   '& td:last-child, & th:last-child': {
     paddingRight: theme.spacing(5),
-    [theme.breakpoints.down('md')]: {
-      paddingLeft: theme.spacing(2.5),
+    [theme.breakpoints.down('sm')]: {
+      paddingRight: theme.spacing(2.5),
     },
   },
 
@@ -64,7 +67,7 @@ const ClickableStack = styled(Stack)(({ theme }) => ({
   userSelect: 'none',
 }));
 
-export function SortableHeaderCell<S>({
+export function SortableHeaderCell<S extends string>({
   sort,
   children,
   query,
@@ -82,7 +85,8 @@ export function SortableHeaderCell<S>({
     if (query.sortBy === sortBy) {
       setQuery.sortDir(query.sortDir === SortDir.Asc ? SortDir.Desc : SortDir.Asc);
     } else {
-      setQuery.sortBy(sortBy as string);
+      setQuery.sortBy(sortBy);
+      setQuery.sortDir(SortDir.Desc);
     }
   };
 
@@ -91,13 +95,12 @@ export function SortableHeaderCell<S>({
       <ClickableStack
         onClick={handleSortChange(sort)}
         direction="row"
-        alignItems="center"
-        justifyContent="flex-start"
         spacing={1}
+        alignItems="center"
       >
         <Box sx={{ width }}>{children}</Box>
         <Box>
-          <SortIcon query={query as any} value={sort as string} />
+          <SortIcon query={query} value={sort} />
         </Box>
       </ClickableStack>
     </TableCell>

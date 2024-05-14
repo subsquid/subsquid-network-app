@@ -21,7 +21,8 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }
   return (
     <Box>
       <Box sx={{ textAlign: 'right' }}>
-        {worker.status === WorkerStatus.Deregistered ? (
+        {worker.status === WorkerStatus.Deregistered ||
+        worker.status === WorkerStatus.Deregistering ? (
           <LoadingButton
             loading={isWithdrawing}
             onClick={async () => {
@@ -32,7 +33,7 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }
             }}
             disabled={worker.locked}
             variant="contained"
-            color="success"
+            color="error"
           >
             Withdraw
           </LoadingButton>

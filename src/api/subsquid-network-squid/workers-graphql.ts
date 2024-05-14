@@ -76,6 +76,29 @@ export class BlockchainApiWorker {
 
     this.totalReward = new Decimal(this.claimedReward).add(this.claimableReward).toFixed(0);
   }
+
+  canEdit() {
+    if (!this.ownedByMe) return false;
+
+    switch (this.status) {
+      case WorkerStatus.Registering:
+      case WorkerStatus.Active:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  displayStats() {
+    switch (this.status) {
+      case WorkerStatus.Registering:
+      case WorkerStatus.Active:
+      case WorkerStatus.Deregistering:
+        return true;
+      default:
+        return false;
+    }
+  }
 }
 
 // inherit API interface for internal class

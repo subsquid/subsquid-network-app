@@ -548,6 +548,9 @@ export const useCreateTheme = (mode: PaletteType) => {
                 border: `1px solid ${colors.divider}`,
                 boxShadow: 'none',
               },
+              rounded: {
+                borderRadius: 8,
+              },
             },
           },
           MuiDialog: {
