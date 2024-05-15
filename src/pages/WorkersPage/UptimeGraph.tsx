@@ -5,7 +5,7 @@ import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
 import { keyBy } from 'lodash-es';
 
-import { BlockchainApiFullWorker, useWorkerDaysUptimeById } from '@api/subsquid-network-squid';
+import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
 
 import { StatusBar } from './StatusBar';
 
@@ -37,13 +37,11 @@ export const UptimeGraph = ({ worker }: { worker: BlockchainApiFullWorker }) => 
   const w1000 = useMediaQuery(theme.breakpoints.up(1000));
   const w600 = useMediaQuery(theme.breakpoints.up(600));
 
-  const snapshots = useWorkerDaysUptimeById(worker.id);
-
   const displayedDays = w1200 ? 90 : w1000 ? 60 : w600 ? 45 : 30;
 
   const data = useMemo(() => {
     const uptimes = keyBy(
-      snapshots.data.map(s => ({
+      worker.dayUptimes?.map(s => ({
         uptime: s.uptime,
         date: dateFormat(s.timestamp),
       })),
@@ -62,7 +60,7 @@ export const UptimeGraph = ({ worker }: { worker: BlockchainApiFullWorker }) => 
       })
       .reverse()
       .slice(-displayedDays);
-  }, [snapshots.data, displayedDays]);
+  }, [worker.dayUptimes, displayedDays]);
 
   return (
     <Box sx={{ mt: 4 }}>

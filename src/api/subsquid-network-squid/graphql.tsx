@@ -698,6 +698,12 @@ export enum ClaimOrderByInput {
   WorkerIdDesc = 'worker_id_DESC',
   WorkerIdDescNullsFirst = 'worker_id_DESC_NULLS_FIRST',
   WorkerIdDescNullsLast = 'worker_id_DESC_NULLS_LAST',
+  WorkerJailReasonAsc = 'worker_jailReason_ASC',
+  WorkerJailReasonAscNullsFirst = 'worker_jailReason_ASC_NULLS_FIRST',
+  WorkerJailReasonAscNullsLast = 'worker_jailReason_ASC_NULLS_LAST',
+  WorkerJailReasonDesc = 'worker_jailReason_DESC',
+  WorkerJailReasonDescNullsFirst = 'worker_jailReason_DESC_NULLS_FIRST',
+  WorkerJailReasonDescNullsLast = 'worker_jailReason_DESC_NULLS_LAST',
   WorkerJailedAsc = 'worker_jailed_ASC',
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedAscNullsLast = 'worker_jailed_ASC_NULLS_LAST',
@@ -1178,6 +1184,12 @@ export enum DelegationOrderByInput {
   WorkerIdDesc = 'worker_id_DESC',
   WorkerIdDescNullsFirst = 'worker_id_DESC_NULLS_FIRST',
   WorkerIdDescNullsLast = 'worker_id_DESC_NULLS_LAST',
+  WorkerJailReasonAsc = 'worker_jailReason_ASC',
+  WorkerJailReasonAscNullsFirst = 'worker_jailReason_ASC_NULLS_FIRST',
+  WorkerJailReasonAscNullsLast = 'worker_jailReason_ASC_NULLS_LAST',
+  WorkerJailReasonDesc = 'worker_jailReason_DESC',
+  WorkerJailReasonDescNullsFirst = 'worker_jailReason_DESC_NULLS_FIRST',
+  WorkerJailReasonDescNullsLast = 'worker_jailReason_DESC_NULLS_LAST',
   WorkerJailedAsc = 'worker_jailed_ASC',
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedAscNullsLast = 'worker_jailed_ASC_NULLS_LAST',
@@ -3438,12 +3450,14 @@ export type Worker = {
   claimedReward: Scalars['BigInt']['output'];
   claims: Array<Claim>;
   createdAt: Scalars['DateTime']['output'];
+  dayUptimes?: Maybe<Array<WorkerDayUptime>>;
   delegationCount: Scalars['Int']['output'];
   delegations: Array<Delegation>;
   description?: Maybe<Scalars['String']['output']>;
   dialOk?: Maybe<Scalars['Boolean']['output']>;
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
+  jailReason?: Maybe<Scalars['String']['output']>;
   jailed?: Maybe<Scalars['Boolean']['output']>;
   lockEnd?: Maybe<Scalars['Int']['output']>;
   lockStart?: Maybe<Scalars['Int']['output']>;
@@ -3506,6 +3520,12 @@ export type WorkerStatusHistoryArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<WorkerStatusChangeOrderByInput>>;
   where?: InputMaybe<WorkerStatusChangeWhereInput>;
+};
+
+export type WorkerDayUptime = {
+  __typename?: 'WorkerDayUptime';
+  timestamp: Scalars['DateTime']['output'];
+  uptime: Scalars['Float']['output'];
 };
 
 export type WorkerEdge = {
@@ -3575,6 +3595,12 @@ export enum WorkerOrderByInput {
   IdDesc = 'id_DESC',
   IdDescNullsFirst = 'id_DESC_NULLS_FIRST',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  JailReasonAsc = 'jailReason_ASC',
+  JailReasonAscNullsFirst = 'jailReason_ASC_NULLS_FIRST',
+  JailReasonAscNullsLast = 'jailReason_ASC_NULLS_LAST',
+  JailReasonDesc = 'jailReason_DESC',
+  JailReasonDescNullsFirst = 'jailReason_DESC_NULLS_FIRST',
+  JailReasonDescNullsLast = 'jailReason_DESC_NULLS_LAST',
   JailedAsc = 'jailed_ASC',
   JailedAscNullsFirst = 'jailed_ASC_NULLS_FIRST',
   JailedAscNullsLast = 'jailed_ASC_NULLS_LAST',
@@ -3858,6 +3884,12 @@ export enum WorkerRewardOrderByInput {
   WorkerIdDesc = 'worker_id_DESC',
   WorkerIdDescNullsFirst = 'worker_id_DESC_NULLS_FIRST',
   WorkerIdDescNullsLast = 'worker_id_DESC_NULLS_LAST',
+  WorkerJailReasonAsc = 'worker_jailReason_ASC',
+  WorkerJailReasonAscNullsFirst = 'worker_jailReason_ASC_NULLS_FIRST',
+  WorkerJailReasonAscNullsLast = 'worker_jailReason_ASC_NULLS_LAST',
+  WorkerJailReasonDesc = 'worker_jailReason_DESC',
+  WorkerJailReasonDescNullsFirst = 'worker_jailReason_DESC_NULLS_FIRST',
+  WorkerJailReasonDescNullsLast = 'worker_jailReason_DESC_NULLS_LAST',
   WorkerJailedAsc = 'worker_jailed_ASC',
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedAscNullsLast = 'worker_jailed_ASC_NULLS_LAST',
@@ -4195,6 +4227,12 @@ export enum WorkerSnapshotOrderByInput {
   WorkerIdDesc = 'worker_id_DESC',
   WorkerIdDescNullsFirst = 'worker_id_DESC_NULLS_FIRST',
   WorkerIdDescNullsLast = 'worker_id_DESC_NULLS_LAST',
+  WorkerJailReasonAsc = 'worker_jailReason_ASC',
+  WorkerJailReasonAscNullsFirst = 'worker_jailReason_ASC_NULLS_FIRST',
+  WorkerJailReasonAscNullsLast = 'worker_jailReason_ASC_NULLS_LAST',
+  WorkerJailReasonDesc = 'worker_jailReason_DESC',
+  WorkerJailReasonDescNullsFirst = 'worker_jailReason_DESC_NULLS_FIRST',
+  WorkerJailReasonDescNullsLast = 'worker_jailReason_DESC_NULLS_LAST',
   WorkerJailedAsc = 'worker_jailed_ASC',
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedAscNullsLast = 'worker_jailed_ASC_NULLS_LAST',
@@ -4490,6 +4528,12 @@ export enum WorkerStatusChangeOrderByInput {
   WorkerIdDesc = 'worker_id_DESC',
   WorkerIdDescNullsFirst = 'worker_id_DESC_NULLS_FIRST',
   WorkerIdDescNullsLast = 'worker_id_DESC_NULLS_LAST',
+  WorkerJailReasonAsc = 'worker_jailReason_ASC',
+  WorkerJailReasonAscNullsFirst = 'worker_jailReason_ASC_NULLS_FIRST',
+  WorkerJailReasonAscNullsLast = 'worker_jailReason_ASC_NULLS_LAST',
+  WorkerJailReasonDesc = 'worker_jailReason_DESC',
+  WorkerJailReasonDescNullsFirst = 'worker_jailReason_DESC_NULLS_FIRST',
+  WorkerJailReasonDescNullsLast = 'worker_jailReason_DESC_NULLS_LAST',
   WorkerJailedAsc = 'worker_jailed_ASC',
   WorkerJailedAscNullsFirst = 'worker_jailed_ASC_NULLS_FIRST',
   WorkerJailedAscNullsLast = 'worker_jailed_ASC_NULLS_LAST',
@@ -4726,6 +4770,7 @@ export type WorkerWhereInput = {
   createdAt_lte?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_not_eq?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_not_in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  dayUptimes_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   delegationCount_eq?: InputMaybe<Scalars['Int']['input']>;
   delegationCount_gt?: InputMaybe<Scalars['Int']['input']>;
   delegationCount_gte?: InputMaybe<Scalars['Int']['input']>;
@@ -4792,6 +4837,23 @@ export type WorkerWhereInput = {
   id_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
   id_not_startsWith?: InputMaybe<Scalars['String']['input']>;
   id_startsWith?: InputMaybe<Scalars['String']['input']>;
+  jailReason_contains?: InputMaybe<Scalars['String']['input']>;
+  jailReason_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  jailReason_endsWith?: InputMaybe<Scalars['String']['input']>;
+  jailReason_eq?: InputMaybe<Scalars['String']['input']>;
+  jailReason_gt?: InputMaybe<Scalars['String']['input']>;
+  jailReason_gte?: InputMaybe<Scalars['String']['input']>;
+  jailReason_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  jailReason_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  jailReason_lt?: InputMaybe<Scalars['String']['input']>;
+  jailReason_lte?: InputMaybe<Scalars['String']['input']>;
+  jailReason_not_contains?: InputMaybe<Scalars['String']['input']>;
+  jailReason_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  jailReason_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  jailReason_not_eq?: InputMaybe<Scalars['String']['input']>;
+  jailReason_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  jailReason_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  jailReason_startsWith?: InputMaybe<Scalars['String']['input']>;
   jailed_eq?: InputMaybe<Scalars['Boolean']['input']>;
   jailed_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   jailed_not_eq?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5090,6 +5152,7 @@ export type WorkerFullFragmentFragment = {
   servedData24Hours?: any;
   servedData90Days?: any;
   storedData?: any;
+  dayUptimes?: Array<{ __typename?: 'WorkerDayUptime'; timestamp: any; uptime: number }>;
   owner: { __typename?: 'Account'; id: string; type: AccountType };
 };
 
@@ -5172,6 +5235,7 @@ export type WorkerByPeerIdQuery = {
     }>;
     owner: { __typename?: 'Account'; id: string; type: AccountType };
     realOwner: { __typename?: 'Account'; id: string };
+    dayUptimes?: Array<{ __typename?: 'WorkerDayUptime'; timestamp: any; uptime: number }>;
   }>;
 };
 
@@ -5455,6 +5519,10 @@ export const WorkerFullFragmentFragmentDoc = `
   servedData24Hours
   servedData90Days
   storedData
+  dayUptimes {
+    timestamp
+    uptime
+  }
   owner {
     id
     type
