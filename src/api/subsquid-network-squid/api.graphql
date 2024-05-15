@@ -58,6 +58,7 @@ fragment WorkerFragment on Worker {
   dialOk
   locked
   version
+  jailReason
   owner {
     id
   }
@@ -74,6 +75,10 @@ fragment WorkerFullFragment on Worker {
   servedData24Hours
   servedData90Days
   storedData
+  dayUptimes {
+    timestamp
+    uptime
+  }
   owner {
     id
     type
