@@ -5139,6 +5139,7 @@ export type WorkerFragmentFragment = {
   dialOk?: boolean;
   locked?: boolean;
   version?: string;
+  jailReason?: string;
   owner: { __typename?: 'Account'; id: string };
   realOwner: { __typename?: 'Account'; id: string };
 };
@@ -5184,6 +5185,7 @@ export type AllWorkersQuery = {
     dialOk?: boolean;
     locked?: boolean;
     version?: string;
+    jailReason?: string;
     owner: { __typename?: 'Account'; id: string };
     realOwner: { __typename?: 'Account'; id: string };
   }>;
@@ -5220,6 +5222,7 @@ export type WorkerByPeerIdQuery = {
     dialOk?: boolean;
     locked?: boolean;
     version?: string;
+    jailReason?: string;
     queries24Hours?: any;
     queries90Days?: any;
     scannedData24Hours?: any;
@@ -5279,6 +5282,7 @@ export type MyWorkersQuery = {
     dialOk?: boolean;
     locked?: boolean;
     version?: string;
+    jailReason?: string;
     myDelegations: Array<{
       __typename?: 'Delegation';
       deposit: any;
@@ -5341,6 +5345,7 @@ export type MyDelegationsQuery = {
       dialOk?: boolean;
       locked?: boolean;
       version?: string;
+      jailReason?: string;
       owner: { __typename?: 'Account'; id: string };
       realOwner: { __typename?: 'Account'; id: string };
     };
@@ -5502,6 +5507,7 @@ export const WorkerFragmentFragmentDoc = `
   dialOk
   locked
   version
+  jailReason
   owner {
     id
   }

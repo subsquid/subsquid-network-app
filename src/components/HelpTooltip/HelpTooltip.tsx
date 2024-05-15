@@ -28,7 +28,7 @@ export const HelpTooltip = ({
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
       <Box>{children}</Box>
-      <Tooltip title={help}>
+      <Tooltip title={help} placement="top" arrow>
         <HelpOutline sx={{ width: 16, height: 16 }} />
       </Tooltip>
     </Stack>

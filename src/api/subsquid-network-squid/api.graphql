@@ -58,6 +58,7 @@ fragment WorkerFragment on Worker {
   dialOk
   locked
   version
+  jailReason
   owner {
     id
   }
