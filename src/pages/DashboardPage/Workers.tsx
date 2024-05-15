@@ -100,8 +100,8 @@ export function Workers() {
               <TableRow>
                 <TableCell sx={{ minWidth: 275 }}>Worker</TableCell>
                 <TableCell>Status</TableCell>
-                <SortableHeaderCell sort={WorkerSortBy.Uptime24h} query={query} setQuery={setQuery}>
-                  Uptime, 24h
+                <SortableHeaderCell sort={WorkerSortBy.Uptime90d} query={query} setQuery={setQuery}>
+                  Uptime, 90d
                 </SortableHeaderCell>
                 <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
                   Worker APR, 7d
@@ -137,7 +137,7 @@ export function Workers() {
                     <TableCell>
                       <WorkerStatus worker={worker} />
                     </TableCell>
-                    <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
+                    <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
                     <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
                     <TableCell>
                       {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}

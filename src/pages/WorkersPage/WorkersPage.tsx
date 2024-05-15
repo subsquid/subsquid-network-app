@@ -43,8 +43,8 @@ export function MyWorkers() {
               <TableCell width={275}>Worker</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Uptime, 24h</TableCell>
+              <TableCell>Uptime, 90d</TableCell>
               <TableCell>APR, 7d</TableCell>
-              <TableCell>Delegator APR, 7d</TableCell>
               <TableCell>Total reward</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -64,6 +64,7 @@ export function MyWorkers() {
                     <WorkerStatus worker={worker} />
                   </TableCell>
                   <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
+                  <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
                   <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
                   <TableCell>
                     {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
