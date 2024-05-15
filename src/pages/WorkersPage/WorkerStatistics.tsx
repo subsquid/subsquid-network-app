@@ -5,6 +5,7 @@ import {
   bytesFormatter,
   numberWithSpacesFormatter,
   percentFormatter,
+  urlFormatter,
 } from '@lib/formatters/formatters.ts';
 import { Box, Divider, Stack, styled } from '@mui/material';
 
@@ -78,7 +79,13 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
           <Stack direction="row">
             <WorkerDescLabel>Website</WorkerDescLabel>
             <WorkerDescValue>
-              {worker.website ? <a href={worker.website}>{worker.website}</a> : '-'}
+              {worker.website ? (
+                <a href={urlFormatter(worker.website)} target="_blank" rel="noreferrer">
+                  {urlFormatter(worker.website)}
+                </a>
+              ) : (
+                '-'
+              )}
             </WorkerDescValue>
           </Stack>
           <Stack direction="row">
