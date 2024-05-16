@@ -11,10 +11,12 @@ import { Card } from '@components/Card';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
+import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { WalletIcon } from '@icons/WalletIcon';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
+import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { ClaimButton } from './ClaimButton';
 
@@ -23,6 +25,7 @@ export function MyAssets() {
   const { SQD_TOKEN } = useContracts();
   const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const { network } = useSubsquidNetwork();
 
   const data = useMemo(
     () => [
@@ -78,7 +81,12 @@ export function MyAssets() {
 
   return (
     <Box>
-      <NetworkPageTitle title="My Assets" endAdornment={<ClaimButton />} />
+      <NetworkPageTitle
+        title="My Assets"
+        endAdornment={
+          demoFeaturesEnabled() || network === NetworkName.Testnet ? <ClaimButton /> : null
+        }
+      />
 
       {isConnected ? (
         isLoading ? (
