@@ -52,7 +52,7 @@
     "use-element-position": "^1.0.13",
     "use-local-storage-state": "^19.2.0",
     "viem": "^1.21.1",
-    "wagmi": "^1.4.12",
+    "wagmi": "^1.4.13",
     "yup": "^1.4.0"
   },
   "devDependencies": {

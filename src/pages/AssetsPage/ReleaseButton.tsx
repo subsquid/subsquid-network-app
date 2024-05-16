@@ -1,28 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { Button, TableBody, TableCell, TableRow } from '@mui/material';
+import { addressFormatter } from '@lib/formatters/formatters';
+import { Button } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { useClaim } from '@api/contracts/claim';
-import { ClaimType, useMyClaimsAvailable } from '@api/subsquid-network-squid';
+import { fromSqd } from '@api/contracts/utils';
+import { useVesting, useVestingRelease } from '@api/contracts/vesting';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormRow } from '@components/Form';
 import { Loader } from '@components/Loader';
-import { SourceWalletOption } from '@components/SourceWallet';
-import { TableList } from '@components/Table/TableList.tsx';
-import { WorkerName } from '@pages/WorkersPage/WorkerName';
 
 export const claimSchema = yup.object({
   source: yup.string().label('Source').trim().required('Source is required'),
 });
 
-export function ReleaseButton({ vesting }: { vesting: any }) {
-  const { claim, error, isLoading } = useClaim();
+export function ReleaseButton({
+  vesting,
+  disabled,
+}: {
+  vesting: { address: string };
+  disabled?: boolean;
+}) {
+  const { release, error, isLoading } = useVestingRelease({
+    address: vesting.address as `0x${string}`,
+  });
+  const { data, isLoading: isVestingLoading } = useVesting({
+    address: vesting.address as `0x${string}`,
+  });
+
   const formik = useFormik({
     initialValues: {
-      source: '',
+      source: vesting.address,
       amount: 0,
     },
     validationSchema: claimSchema,
@@ -30,13 +40,8 @@ export function ReleaseButton({ vesting }: { vesting: any }) {
     validateOnBlur: true,
     validateOnMount: true,
 
-    onSubmit: async values => {
-      const wallet = sources.find(w => w?.id === values.source);
-      if (!wallet) return;
-
-      const { failedReason } = await claim({
-        wallet,
-      });
+    onSubmit: async () => {
+      const { failedReason } = await release();
 
       if (!failedReason) {
         handleClose();
@@ -45,51 +50,23 @@ export function ReleaseButton({ vesting }: { vesting: any }) {
   });
 
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = (e: React.UIEvent) => {
+    e.stopPropagation();
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
-
-  const {
-    claims,
-    hasClaimsAvailable,
-    sources,
-    isLoading: isClaimsLoading,
-    currentSourceTotalClaimsAvailable,
-  } = useMyClaimsAvailable({
-    source: formik.values.source,
-  });
-
-  const options = sources.map(s => {
-    return {
-      label: <SourceWalletOption source={s} />,
-      value: s.id,
-    };
-  });
-
-  useEffect(() => {
-    if (isClaimsLoading) return;
-    else if (formik.values.source) return;
-
-    const source = sources?.[0];
-    if (!source) return;
-
-    formik.setValues({
-      ...formik.values,
-      source: source.id,
-    });
-  }, [formik, isClaimsLoading, sources]);
 
   return (
     <>
       <Button
-        disabled={!hasClaimsAvailable}
         onClick={handleOpen}
-        color="success"
         variant="contained"
+        disabled={disabled || (fromSqd(data?.releasable).lessThanOrEqualTo(0) && false)}
       >
-        Claim
+        Release
       </Button>
       <ContractCallDialog
-        title="Claim"
+        title="Release"
         open={open}
         onResult={confirmed => {
           if (!confirmed) return handleClose();
@@ -97,20 +74,18 @@ export function ReleaseButton({ vesting }: { vesting: any }) {
           formik.handleSubmit();
         }}
         loading={isLoading}
-        confirmColor="success"
-        disableConfirmButton={currentSourceTotalClaimsAvailable.lessThanOrEqualTo(0)}
       >
-        {isClaimsLoading ? (
+        {isVestingLoading ? (
           <Loader />
         ) : (
           <Form onSubmit={formik.handleSubmit}>
             <FormRow>
               <FormikSelect
                 id="source"
-                disabled={!options.length}
                 showErrorOnlyOfTouched
-                options={options}
+                options={[{ label: addressFormatter(vesting.address), value: vesting.address }]}
                 formik={formik}
+                disabled={true}
               />
             </FormRow>
 

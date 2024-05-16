@@ -1,25 +1,31 @@
 import React from 'react';
 
-import { addressFormatter, percentFormatter } from '@lib/formatters/formatters.ts';
-import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { addressFormatter } from '@lib/formatters/formatters.ts';
+import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-import { formatSqd } from '@api/contracts/utils';
-import { useMyAssets, useMyWorkers } from '@api/subsquid-network-squid';
+import { formatSqd, fromSqd } from '@api/contracts/utils';
+import { useVestings } from '@api/contracts/vesting';
+import { useMyAssets } from '@api/subsquid-network-squid';
+import { Avatar } from '@components/Avatar';
 import { Card } from '@components/Card';
+import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
-import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+
+import { ReleaseButton } from './ReleaseButton';
 
 export function MyVestings() {
   const navigate = useNavigate();
   const { assets, isLoading } = useMyAssets();
+  const { data, isLoading: isVestingsLoading } = useVestings({
+    addresses: assets?.vestings.map(v => v.address as `0x${string}`),
+  });
   const { SQD_TOKEN } = useContracts();
 
-  if (isLoading) return <Loader />;
+  if (isLoading || isVestingsLoading) return <Loader />;
 
   return (
     <Box>
@@ -29,23 +35,41 @@ export function MyVestings() {
           <TableHead>
             <TableRow>
               <TableCell>Vesting</TableCell>
-              <TableCell>Value</TableCell>
+              <TableCell>Total</TableCell>
+              <TableCell>Available</TableCell>
+              <TableCell>Releasable</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {assets.vestings.map(vesting => {
+            {assets.vestings.map((vesting, i) => {
+              const d = data?.[i];
               return (
                 <TableRow
                   onClick={() => navigate(`vestings/${vesting.address}`)}
                   className="hoverable"
                   key={vesting.address}
                 >
-                  <TableCell>{addressFormatter(vesting.address, true)}</TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, vesting.balance)}</TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={2}>
+                      <Avatar
+                        name={vesting.address.slice(2)}
+                        colorDescriminator={vesting.address}
+                      />
+                      <CopyToClipboard
+                        text={vesting.address}
+                        content={addressFormatter(vesting.address, false)}
+                      />
+                    </Stack>
+                  </TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, d?.total)}</TableCell>
+                  <TableCell>
+                    {formatSqd(SQD_TOKEN, fromSqd(d?.total).minus(fromSqd(d?.released)), 8)}
+                  </TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>
                   <TableCell>
                     <Box display="flex" justifyContent="flex-end">
-                      <Button variant="contained">Release</Button>
+                      <ReleaseButton vesting={vesting} />
                     </Box>
                   </TableCell>
                 </TableRow>
