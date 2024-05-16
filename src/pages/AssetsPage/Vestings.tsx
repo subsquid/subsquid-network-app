@@ -1,21 +1,19 @@
 import React from 'react';
 
-import { addressFormatter } from '@lib/formatters/formatters.ts';
-import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContracts } from '@api/contracts/vesting';
 import { useMyAssets } from '@api/subsquid-network-squid';
-import { Avatar } from '@components/Avatar';
 import { Card } from '@components/Card';
-import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
 
 import { ReleaseButton } from './ReleaseButton';
+import { VestingName } from './VestingName';
 
 export function MyVestings() {
   const navigate = useNavigate();
@@ -29,7 +27,7 @@ export function MyVestings() {
 
   return (
     <Box>
-      <NetworkPageTitle title="My vestings" />
+      <NetworkPageTitle title="My Vesting" />
       {assets.vestings.length ? (
         <BorderedTable>
           <TableHead>
@@ -51,16 +49,7 @@ export function MyVestings() {
                   key={vesting.address}
                 >
                   <TableCell>
-                    <Stack direction="row" spacing={2}>
-                      <Avatar
-                        name={vesting.address.slice(2)}
-                        colorDescriminator={vesting.address}
-                      />
-                      <CopyToClipboard
-                        text={vesting.address}
-                        content={addressFormatter(vesting.address, false)}
-                      />
-                    </Stack>
+                    <VestingName vesting={vesting} />
                   </TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>

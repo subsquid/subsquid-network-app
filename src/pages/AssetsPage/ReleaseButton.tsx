@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 
-import { addressFormatter } from '@lib/formatters/formatters';
-import { Button } from '@mui/material';
+import { Button, TableBody, TableCell, TableRow } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { fromSqd } from '@api/contracts/utils';
+import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContract, useVestingContractRelease } from '@api/contracts/vesting';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form, FormikSelect, FormRow } from '@components/Form';
+import { Form } from '@components/Form';
 import { Loader } from '@components/Loader';
+import { TableList } from '@components/Table/TableList';
+import { useContracts } from '@network/useContracts';
+
+import { VestingName } from './VestingName';
 
 export const claimSchema = yup.object({
   source: yup.string().label('Source').trim().required('Source is required'),
@@ -29,6 +32,7 @@ export function ReleaseButton({
   const { data, isLoading: isVestingLoading } = useVestingContract({
     address: vesting.address as `0x${string}`,
   });
+  const { SQD_TOKEN } = useContracts();
 
   const formik = useFormik({
     initialValues: {
@@ -79,15 +83,17 @@ export function ReleaseButton({
           <Loader />
         ) : (
           <Form onSubmit={formik.handleSubmit}>
-            <FormRow>
-              <FormikSelect
-                id="source"
-                showErrorOnlyOfTouched
-                options={[{ label: addressFormatter(vesting.address), value: vesting.address }]}
-                formik={formik}
-                disabled={true}
-              />
-            </FormRow>
+            <TableList>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <VestingName vesting={vesting} />
+                  </TableCell>
+                  <TableCell>Vesting</TableCell>
+                  <TableCell align="right">{formatSqd(SQD_TOKEN, data?.releasable, 8)}</TableCell>
+                </TableRow>
+              </TableBody>
+            </TableList>
 
             <BlockchainContractError error={error} />
           </Form>
