@@ -8,6 +8,7 @@ import { useGatewayByPeerId } from '@api/subsquid-network-squid/gateways-graphql
 import { BackButton } from '@components/BackButton';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
+import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 
 import { GatewayCard } from './GatewayCard';
@@ -21,11 +22,7 @@ export const Gateway = ({ backPath }: { backPath: string }) => {
 
   if (isLoading) return <Loader />;
   else if (!gateway) {
-    return (
-      <Box>
-        Gateway <b>{peerId}</b> not found
-      </Box>
-    );
+    return <NotFound item="gateway" id={peerId} />;
   }
 
   return (

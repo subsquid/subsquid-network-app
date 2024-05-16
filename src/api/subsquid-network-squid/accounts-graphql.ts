@@ -5,7 +5,13 @@ import Decimal from 'decimal.js';
 import { useAccount } from '@network/useAccount';
 
 import { useSquidDataSource } from './datasource';
-import { AccountType, useAccountQuery, useMyAssetsQuery } from './graphql';
+import {
+  AccountType,
+  useAccountQuery,
+  useMyAssetsQuery,
+  useVestingByAddressQuery,
+  VestingFragmentFragment,
+} from './graphql';
 
 export type SourceWallet = {
   id: string;
@@ -112,5 +118,46 @@ export function useMyAssets() {
   return {
     assets,
     isLoading,
+  };
+}
+
+export interface BlockchainApiVesting extends VestingFragmentFragment {}
+
+export class BlockchainApiVesting {
+  constructor(
+    vesting: VestingFragmentFragment,
+    private address?: string,
+  ) {
+    Object.assign(this, vesting);
+  }
+
+  isOwn() {
+    return this.owner?.id === this.address?.toLowerCase();
+  }
+}
+
+export function useVestingByAddress({ address }: { address?: string }) {
+  const datasource = useSquidDataSource();
+  const account = useAccount();
+
+  const { data, isPending } = useVestingByAddressQuery(
+    datasource,
+    {
+      address: address?.toLowerCase() || '',
+    },
+    {
+      select: res => {
+        if (!res.accountById) return undefined;
+        if (res.accountById.type !== AccountType.Vesting) return undefined;
+
+        return new BlockchainApiVesting(res.accountById, account.address);
+      },
+      enabled: !!address,
+    },
+  );
+
+  return {
+    data,
+    isPending,
   };
 }

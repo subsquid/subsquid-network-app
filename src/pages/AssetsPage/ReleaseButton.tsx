@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { fromSqd } from '@api/contracts/utils';
-import { useVesting, useVestingRelease } from '@api/contracts/vesting';
+import { useVestingContract, useVestingContractRelease } from '@api/contracts/vesting';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormRow } from '@components/Form';
@@ -23,10 +23,10 @@ export function ReleaseButton({
   vesting: { address: string };
   disabled?: boolean;
 }) {
-  const { release, error, isLoading } = useVestingRelease({
+  const { release, error, isLoading } = useVestingContractRelease({
     address: vesting.address as `0x${string}`,
   });
-  const { data, isLoading: isVestingLoading } = useVesting({
+  const { data, isLoading: isVestingLoading } = useVestingContract({
     address: vesting.address as `0x${string}`,
   });
 

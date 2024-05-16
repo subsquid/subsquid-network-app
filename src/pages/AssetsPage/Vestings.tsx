@@ -5,7 +5,7 @@ import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/mate
 import { useNavigate } from 'react-router-dom';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';
-import { useVestings } from '@api/contracts/vesting';
+import { useVestingContracts } from '@api/contracts/vesting';
 import { useMyAssets } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
 import { Card } from '@components/Card';
@@ -20,7 +20,7 @@ import { ReleaseButton } from './ReleaseButton';
 export function MyVestings() {
   const navigate = useNavigate();
   const { assets, isLoading } = useMyAssets();
-  const { data, isLoading: isVestingsLoading } = useVestings({
+  const { data, isLoading: isVestingsLoading } = useVestingContracts({
     addresses: assets?.vestings.map(v => v.address as `0x${string}`),
   });
   const { SQD_TOKEN } = useContracts();

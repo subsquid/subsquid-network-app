@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { useWorkerByPeerId, WorkerStatus } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
+import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { WorkerUnregister } from '@pages/WorkersPage/WorkerUnregister';
 
@@ -33,11 +34,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
 
   if (isPending) return <Loader />;
   else if (!worker) {
-    return (
-      <Box>
-        Worker <b>{peerId}</b> not found
-      </Box>
-    );
+    return <NotFound item="worker" id={peerId} />;
   }
 
   return (

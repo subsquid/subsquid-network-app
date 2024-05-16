@@ -5483,6 +5483,29 @@ export type GatewayByPeerIdQuery = {
   };
 };
 
+export type VestingFragmentFragment = {
+  __typename?: 'Account';
+  id: string;
+  type: AccountType;
+  balance: any;
+  owner?: { __typename?: 'Account'; id: string };
+};
+
+export type VestingByAddressQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+}>;
+
+export type VestingByAddressQuery = {
+  __typename?: 'Query';
+  accountById?: {
+    __typename?: 'Account';
+    id: string;
+    type: AccountType;
+    balance: any;
+    owner?: { __typename?: 'Account'; id: string };
+  };
+};
+
 export const WorkerFragmentFragmentDoc = `
     fragment WorkerFragment on Worker {
   id
@@ -5564,6 +5587,16 @@ export const GatewayFragmentFragmentDoc = `
     type
   }
   createdAt
+}
+    `;
+export const VestingFragmentFragmentDoc = `
+    fragment VestingFragment on Account {
+  id
+  type
+  balance
+  owner {
+    id
+  }
 }
     `;
 export const SquidNetworkHeightDocument = `
@@ -5965,6 +5998,33 @@ export const useGatewayByPeerIdQuery = <TData = GatewayByPeerIdQuery, TError = u
       dataSource.endpoint,
       dataSource.fetchParams || {},
       GatewayByPeerIdDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const VestingByAddressDocument = `
+    query vestingByAddress($address: String!) {
+  accountById(id: $address) {
+    ...VestingFragment
+  }
+}
+    ${VestingFragmentFragmentDoc}`;
+
+export const useVestingByAddressQuery = <TData = VestingByAddressQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: VestingByAddressQueryVariables,
+  options?: Omit<UseQueryOptions<VestingByAddressQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<VestingByAddressQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<VestingByAddressQuery, TError, TData>({
+    queryKey: ['vestingByAddress', variables],
+    queryFn: fetcher<VestingByAddressQuery, VestingByAddressQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      VestingByAddressDocument,
       variables,
     ),
     ...options,

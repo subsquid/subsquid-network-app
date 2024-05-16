@@ -10,7 +10,7 @@ import { useContracts } from '@network/useContracts';
 import { errorMessage, WriteContractRes } from './utils';
 import { VESTING_CONTRACT_ABI } from './vesting.abi';
 
-export function useVestings({ addresses }: { addresses?: `0x${string}`[] }) {
+export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[] }) {
   const contracts = useContracts();
   const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
 
@@ -78,8 +78,8 @@ export function useVestings({ addresses }: { addresses?: `0x${string}`[] }) {
   };
 }
 
-export function useVesting({ address }: { address?: `0x${string}` }) {
-  const { data, isLoading } = useVestings({ addresses: address ? [address] : undefined });
+export function useVestingContract({ address }: { address?: `0x${string}` }) {
+  const { data, isLoading } = useVestingContracts({ addresses: address ? [address] : undefined });
 
   return {
     data: data?.[0],
@@ -91,7 +91,7 @@ function unwrapResult<T>(result?: MulticallResult<T>): T | undefined {
   return result?.status === 'success' ? (result.result as T) : undefined;
 }
 
-export function useVestingRelease({ address }: { address?: `0x${string}` }) {
+export function useVestingContractRelease({ address }: { address?: `0x${string}` }) {
   const client = usePublicClient();
   const { setWaitHeight } = useSquidNetworkHeightHooks();
   const [isLoading, setLoading] = useState(false);

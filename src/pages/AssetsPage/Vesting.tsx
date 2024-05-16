@@ -7,10 +7,12 @@ import { Box } from '@mui/system';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';
-import { useVesting } from '@api/contracts/vesting';
+import { useVestingContract } from '@api/contracts/vesting';
+import { useVestingByAddress } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
+import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
 
@@ -49,25 +51,24 @@ export const VestingAddress = styled(Box, {
 
 export function Vesting({ backPath }: { backPath: string }) {
   const { address } = useParams<{ address: `0x${string}` }>();
-  const { data, isLoading } = useVesting({ address });
+  const { data: vestingInfo, isLoading: isVestingInfoLoading } = useVestingContract({ address });
+  const { data: vesting, isPending: isVestingLoading } = useVestingByAddress({ address });
   const { SQD_TOKEN } = useContracts();
 
   const [searchParams] = useSearchParams();
 
+  const isLoading = isVestingLoading || isVestingInfoLoading;
+
   if (isLoading) return <Loader />;
-  else if (!data || !address) {
-    return <Box>Not found</Box>;
+  else if (!vesting || !address) {
+    return <NotFound item="vesting" id={address} />;
   }
 
   return (
     <CenteredPageWrapper className="wide">
       <NetworkPageTitle
         backPath={searchParams.get('backPath') || backPath}
-        endAdornment={
-          <Stack direction="row" spacing={2}>
-            <ReleaseButton vesting={{ address }} />
-          </Stack>
-        }
+        endAdornment={vesting?.isOwn() ? <ReleaseButton vesting={{ address }} /> : null}
       />
       <Card>
         <Stack spacing={3} divider={<Divider orientation="horizontal" flexItem />}>
@@ -83,21 +84,21 @@ export function Vesting({ backPath }: { backPath: string }) {
               </Stack>
               <Stack direction="row">
                 <DescLabel>Balance</DescLabel>
-                <DescValue>{formatSqd(SQD_TOKEN, data.balance, 8)}</DescValue>
+                <DescValue>{formatSqd(SQD_TOKEN, vestingInfo?.balance, 8)}</DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Deposited</DescLabel>
                 <DescValue>
-                  {data.deposited ? formatSqd(SQD_TOKEN, data.deposited, 8) : '-'}
+                  {vestingInfo?.deposited ? formatSqd(SQD_TOKEN, vestingInfo?.deposited, 8) : '-'}
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Releasable</DescLabel>
-                <DescValue>{formatSqd(SQD_TOKEN, data.releasable, 8)}</DescValue>
+                <DescValue>{formatSqd(SQD_TOKEN, vestingInfo?.releasable, 8)}</DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Released</DescLabel>
-                <DescValue>{formatSqd(SQD_TOKEN, data.released, 8)}</DescValue>
+                <DescValue>{formatSqd(SQD_TOKEN, vestingInfo?.released, 8)}</DescValue>
               </Stack>
             </Stack>
           </Box>
@@ -105,15 +106,25 @@ export function Vesting({ backPath }: { backPath: string }) {
             <Stack spacing={2} direction="column">
               <Stack direction="row">
                 <DescLabel>Start</DescLabel>
-                <DescValue>{dateFormat(data.start, 'dateTime')}</DescValue>
+                <DescValue>
+                  {vestingInfo?.start ? dateFormat(vestingInfo?.start, 'dateTime') : '-'}
+                </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>End</DescLabel>
-                <DescValue>{dateFormat(data.end, 'dateTime')}</DescValue>
+                <DescValue>
+                  {vestingInfo?.end ? dateFormat(vestingInfo?.end, 'dateTime') : '-'}
+                </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Initial release</DescLabel>
-                <DescValue>{`${formatSqd(SQD_TOKEN, fromSqd(data.expectedTotal).mul(data.initialRelease / 100), 8)} (${percentFormatter(data.initialRelease)})`}</DescValue>
+                <DescValue>{`${formatSqd(
+                  SQD_TOKEN,
+                  fromSqd(vestingInfo?.expectedTotal)
+                    .mul(vestingInfo?.initialRelease ?? 0)
+                    .div(100),
+                  8,
+                )} (${percentFormatter(vestingInfo?.initialRelease)})`}</DescValue>
               </Stack>
             </Stack>
           </Box>
