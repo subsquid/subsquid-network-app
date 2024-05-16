@@ -64,8 +64,8 @@ export function useVestings({ addresses }: { addresses?: `0x${string}`[] }) {
   return {
     data: data
       ? chunk(data, 8).map(ch => ({
-          start: unwrapResult(ch[0])?.toString(),
-          end: unwrapResult(ch[1])?.toString(),
+          start: Number(unwrapResult(ch[0])) * 1000,
+          end: Number(unwrapResult(ch[1])) * 1000,
           deposited: unwrapResult(ch[2])?.toString(),
           releasable: unwrapResult(ch[3])?.toString(),
           released: unwrapResult(ch[4])?.toString(),

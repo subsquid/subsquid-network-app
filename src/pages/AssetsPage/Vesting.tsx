@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { dateFormat } from '@i18n';
 import { addressFormatter, percentFormatter } from '@lib/formatters/formatters';
 import { Divider, Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
@@ -104,11 +105,11 @@ export function Vesting({ backPath }: { backPath: string }) {
             <Stack spacing={2} direction="column">
               <Stack direction="row">
                 <DescLabel>Start</DescLabel>
-                <DescValue>{data.start || '-'}</DescValue>
+                <DescValue>{dateFormat(data.start, 'dateTime')}</DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>End</DescLabel>
-                <DescValue>{data.end || '-'}</DescValue>
+                <DescValue>{dateFormat(data.end, 'dateTime')}</DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Initial release</DescLabel>

@@ -70,7 +70,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
         <Stack spacing={2} direction="column">
           <Stack direction="row">
             <WorkerDescLabel>Registered</WorkerDescLabel>
-            <WorkerDescValue>{dateFormat(worker.createdAt)}</WorkerDescValue>
+            <WorkerDescValue>{dateFormat(worker.createdAt, 'dateTime')}</WorkerDescValue>
           </Stack>
           <Stack direction="row">
             <WorkerDescLabel>Version</WorkerDescLabel>
