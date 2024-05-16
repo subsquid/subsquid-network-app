@@ -5,8 +5,6 @@ import { arbitrumSepolia, arbitrum } from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
-import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
-
 // export let CHAIN: Chain = arbitrumSepolia;
 // if (process.env.NETWORK === 'hardhat') {
 //   CHAIN = {
@@ -25,15 +23,18 @@ const {
   chains: configuredChains,
   publicClient,
   webSocketPublicClient,
-} = configureChains(demoFeaturesEnabled() ? [arbitrumSepolia, arbitrum] : [arbitrumSepolia], [
-  privateNode
-    ? jsonRpcProvider({
-        rpc: () => ({
-          http: privateNode,
-        }),
-      })
-    : publicProvider(),
-]);
+} = configureChains(
+  [arbitrumSepolia, arbitrum],
+  [
+    privateNode
+      ? jsonRpcProvider({
+          rpc: () => ({
+            http: privateNode,
+          }),
+        })
+      : publicProvider(),
+  ],
+);
 
 const connectors = connectorsForWallets([
   {

@@ -20,7 +20,7 @@ query settings {
 
 ### ACCOUNT ###
 
-query account ($address: String!)  {
+query account($address: String!) {
   accountById(id: $address) {
     id
     type
@@ -86,19 +86,16 @@ fragment WorkerFullFragment on Worker {
 }
 
 query allWorkers {
-  workers(
-    where: {
-      status_eq: ACTIVE
-    }) {
+  workers(where: { status_eq: ACTIVE }) {
     ...WorkerFragment
   }
 }
 
 query workerByPeerId($peerId: String!, $address: String!) {
-  workers(where: {peerId_eq: $peerId}, limit: 1) {
+  workers(where: { peerId_eq: $peerId }, limit: 1) {
     ...WorkerFragment
     ...WorkerFullFragment
-    myDelegations: delegations(where: {realOwner: {id_eq: $address }}) {
+    myDelegations: delegations(where: { realOwner: { id_eq: $address } }) {
       deposit
       locked
       owner {
@@ -117,10 +114,10 @@ query workerDaysUptimeById($id: String!, $from: DateTime!) {
   }
 }
 
-query myWorkers ($address: String!) {
-  workers(orderBy: id_ASC, where: {realOwner: {id_eq: $address}}) {
+query myWorkers($address: String!) {
+  workers(orderBy: id_ASC, where: { realOwner: { id_eq: $address } }) {
     ...WorkerFragment
-    myDelegations: delegations(where: {realOwner: {id_eq: $address }}) {
+    myDelegations: delegations(where: { realOwner: { id_eq: $address } }) {
       deposit
       locked
       owner {
@@ -133,29 +130,30 @@ query myWorkers ($address: String!) {
 }
 
 query myAssets($address: String!) {
-  accounts(where:{id_eq: $address}) {
+  accounts(where: { id_eq: $address }) {
     balance
     owned {
       id
       balance
     }
   }
-  workers(where: {realOwner: {id_eq: $address}}) {
+  workers(where: { realOwner: { id_eq: $address } }) {
     bond
     claimableReward
   }
-  delegations(where: {realOwner: {id_eq: $address},
-    AND: {
-      OR: [{deposit_gt: 0}, {claimableReward_gt: 0}]
-    }}) {
+  delegations(
+    where: {
+      realOwner: { id_eq: $address }
+      AND: { OR: [{ deposit_gt: 0 }, { claimableReward_gt: 0 }] }
+    }
+  ) {
     claimableReward
     deposit
   }
 }
 
-
 query myDelegations($address: String!) {
-  delegations(where:{realOwner:{id_eq:$address}, deposit_gt: 0}) {
+  delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
     claimableReward
     claimedReward
     deposit
@@ -171,7 +169,7 @@ query myDelegations($address: String!) {
 }
 
 query myClaimsAvailable($address: String!) {
-  delegations(where:{ realOwner:{id_eq:$address}, claimableReward_gt: 0 }) {
+  delegations(where: { realOwner: { id_eq: $address }, claimableReward_gt: 0 }) {
     claimableReward
     deposit
     worker {
@@ -184,7 +182,7 @@ query myClaimsAvailable($address: String!) {
       type
     }
   }
-  workers(where:{ realOwner:{id_eq:$address}, claimableReward_gt: 0 }) {
+  workers(where: { realOwner: { id_eq: $address }, claimableReward_gt: 0 }) {
     id
     name
     peerId
@@ -229,13 +227,28 @@ fragment GatewayFragment on Gateway {
 }
 
 query myGateways($address: String!) {
-  gateways(orderBy: id_ASC, where: {owner: {id_eq: $address}, status_eq: REGISTERED}) {
-   ...GatewayFragment
+  gateways(orderBy: id_ASC, where: { owner: { id_eq: $address }, status_eq: REGISTERED }) {
+    ...GatewayFragment
   }
 }
 
 query gatewayByPeerId($peerId: String!) {
   gatewayById(id: $peerId) {
     ...GatewayFragment
+  }
+}
+
+fragment VestingFragment on Account {
+  id
+  type
+  balance
+  owner {
+    id
+  }
+}
+
+query vestingByAddress($address: String!) {
+  accountById(id: $address) {
+    ...VestingFragment
   }
 }

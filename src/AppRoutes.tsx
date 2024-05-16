@@ -2,7 +2,11 @@ import React from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled.ts';
 import { NetworkLayout } from '@layouts/NetworkLayout';
+import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
+import { AssetsPage } from '@pages/AssetsPage/AssetsPage.tsx';
+import { Vesting } from '@pages/AssetsPage/Vesting.tsx';
 import { DashboardPage } from '@pages/DashboardPage/DashboardPage.tsx';
 import { DelegationsPage } from '@pages/DelegationsPage/DelegationsPage.tsx';
 import { AddNewGateway } from '@pages/GatewaysPage/AddNewGateway.tsx';
@@ -18,11 +22,20 @@ import { hideLoader } from './index.tsx';
 export const AppRoutes = () => {
   hideLoader(0);
 
+  const { network } = useSubsquidNetwork();
+
   return (
     <Routes>
-      <Route element={<NetworkLayout />} path="/dashboard">
-        <Route element={<DashboardPage />} index />
-        <Route element={<Worker backPath="/dashboard" />} path="workers/:peerId" />
+      {demoFeaturesEnabled() || network === NetworkName.Testnet ? (
+        <Route element={<NetworkLayout />} path="/dashboard">
+          <Route element={<DashboardPage />} index />
+          <Route element={<Worker backPath="/dashboard" />} path="workers/:peerId" />
+        </Route>
+      ) : null}
+
+      <Route element={<NetworkLayout />} path="/assets">
+        <Route element={<AssetsPage />} index />
+        <Route element={<Vesting backPath="/assets" />} path="vestings/:address" />
       </Route>
       <Route element={<NetworkLayout />} path="/workers">
         <Route element={<WorkersPage />} index />
@@ -39,7 +52,7 @@ export const AppRoutes = () => {
         <Route element={<AddNewGateway />} path="add" />
         <Route element={<Gateway backPath="/gateways" />} path=":peerId" />
       </Route>
-      <Route element={<Navigate to="/dashboard" replace={true} />} path="*" />
+      <Route element={<Navigate to="/assets" replace={true} />} path="*" />
     </Routes>
   );
 };

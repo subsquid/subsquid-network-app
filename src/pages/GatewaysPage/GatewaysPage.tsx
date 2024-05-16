@@ -56,7 +56,7 @@ export function MyGateways() {
                   </TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
-                  <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
+                  <TableCell>{dateFormat(gateway.createdAt, 'dateTime')}</TableCell>
                 </TableRow>
               );
             })}
