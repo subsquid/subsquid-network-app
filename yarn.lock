@@ -3169,7 +3169,7 @@ __metadata:
     viem: "npm:^1.21.1"
     vite: "npm:^5.2.6"
     vite-tsconfig-paths: "npm:^4.3.2"
-    wagmi: "npm:^1.4.12"
+    wagmi: "npm:^1.4.13"
     yup: "npm:^1.4.0"
   languageName: unknown
   linkType: soft
@@ -12290,7 +12290,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wagmi@npm:^1.4.12":
+"wagmi@npm:^1.4.13":
   version: 1.4.13
   resolution: "wagmi@npm:1.4.13"
   dependencies:

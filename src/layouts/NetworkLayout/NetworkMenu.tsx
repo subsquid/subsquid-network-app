@@ -142,6 +142,7 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       {/*/>*/}
 
       <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
+      <Item LeftIcon={AccountIcon} label="Assets" onClick={onItemClick} path="/assets" />
       <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
       <Item LeftIcon={AccountIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
       <Item LeftIcon={DocumentIcon} label="Gateways" onClick={onItemClick} path="/gateways" />

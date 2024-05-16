@@ -3,6 +3,8 @@ import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { NetworkLayout } from '@layouts/NetworkLayout';
+import { AssetsPage } from '@pages/AssetsPage/AssetsPage.tsx';
+import { Vesting } from '@pages/AssetsPage/Vesting.tsx';
 import { DashboardPage } from '@pages/DashboardPage/DashboardPage.tsx';
 import { DelegationsPage } from '@pages/DelegationsPage/DelegationsPage.tsx';
 import { AddNewGateway } from '@pages/GatewaysPage/AddNewGateway.tsx';
@@ -23,6 +25,10 @@ export const AppRoutes = () => {
       <Route element={<NetworkLayout />} path="/dashboard">
         <Route element={<DashboardPage />} index />
         <Route element={<Worker backPath="/dashboard" />} path="workers/:peerId" />
+      </Route>
+      <Route element={<NetworkLayout />} path="/assets">
+        <Route element={<AssetsPage />} index />
+        <Route element={<Vesting backPath="/assets" />} path="vestings/:address" />
       </Route>
       <Route element={<NetworkLayout />} path="/workers">
         <Route element={<WorkersPage />} index />

@@ -1,4 +1,5 @@
 import prettyBytes from 'pretty-bytes';
+import { zeroAddress } from 'viem';
 import { getAddress } from 'viem/utils';
 
 export function percentFormatter(value?: number | string) {
@@ -23,7 +24,9 @@ export function bytesFormatter(val?: number | string) {
   return prettyBytes(Number(val), { maximumFractionDigits: 0 });
 }
 
-export function addressFormatter(val: string, shortify?: boolean) {
+export function addressFormatter(val?: string, shortify?: boolean) {
+  val = val || zeroAddress;
+
   const address = getAddress(val);
   return shortify ? `${address.substring(0, 6)}...${address?.slice(-4)}` : address;
 }
