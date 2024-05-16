@@ -19,7 +19,6 @@ import { useDisconnect, useNetwork, useWalletClient } from 'wagmi';
 import { Logo } from '@components/Logo';
 import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
-import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { MenuIcon } from '@icons/MenuIcon';
 import { useAccount } from '@network/useAccount';
 import { getChainId, getNetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
@@ -268,7 +267,7 @@ export const NetworkLayout = ({
 
     if (chain?.id === getChainId(network)) return;
 
-    if (!chain?.unsupported && demoFeaturesEnabled()) {
+    if (!chain?.unsupported) {
       switchAndReset(getNetworkName(chain?.id));
       return;
     }
@@ -307,7 +306,7 @@ export const NetworkLayout = ({
             ) : null}
           </AppToolbarSidebar>
           <AppToolbarContent />
-          {demoFeaturesEnabled() ? <NetworkSwitcher hideText={isMobile} /> : null}
+          <NetworkSwitcher hideText={isMobile} />
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}
           <UserMenu />

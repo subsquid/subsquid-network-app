@@ -3,12 +3,14 @@ import React, { ForwardedRef, forwardRef } from 'react';
 import { Box, Button, buttonClasses, styled } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
+import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { AccountIcon } from '@icons/AccountIcon';
 import { ComputersIcon } from '@icons/ComputersIcon';
 import { ContactsIcon } from '@icons/ContactsIcon';
 import { DashboardIcon } from '@icons/DashboardIcon';
 import { DocumentIcon } from '@icons/DocumentIcon';
 import { OpenInNewIcon } from '@icons/OpenInNewIcon';
+import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 interface NetworkMenuProps {
   onItemClick: () => void;
@@ -131,6 +133,8 @@ export const Item = forwardRef(
 );
 
 export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
+  const { network } = useSubsquidNetwork();
+
   return (
     <>
       <div style={{ height: '1.125rem' }} />
@@ -141,7 +145,9 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       {/*  path="/network-dashboard"*/}
       {/*/>*/}
 
-      <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
+      {demoFeaturesEnabled() || network === NetworkName.Testnet ? (
+        <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
+      ) : null}
       <Item LeftIcon={AccountIcon} label="Assets" onClick={onItemClick} path="/assets" />
       <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
       <Item LeftIcon={AccountIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
