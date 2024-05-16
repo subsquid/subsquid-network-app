@@ -30,3 +30,10 @@ export function addressFormatter(val?: string, shortify?: boolean) {
   const address = getAddress(val);
   return shortify ? `${address.substring(0, 6)}...${address?.slice(-4)}` : address;
 }
+
+export function urlFormatter(val: string) {
+  val = val.trim().toLowerCase();
+  return val.startsWith('http://') || val.startsWith('https://')
+    ? val
+    : val.replace(/^(?!(?:\w+?:)?\/\/)/, 'https://');
+}
