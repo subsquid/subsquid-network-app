@@ -9,7 +9,7 @@ export enum NetworkName {
   Mainnet = 'mainnet',
 }
 
-const defaultApp = (process.env.DEFAULT_NETWORK as NetworkName) || NetworkName.Testnet;
+const defaultApp = (process.env.DEFAULT_NETWORK as NetworkName) || NetworkName.Mainnet;
 
 function validate(app: NetworkName): NetworkName {
   return Object.values(NetworkName).includes(app) ? (app as NetworkName) : defaultApp;
