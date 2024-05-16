@@ -81,14 +81,8 @@ export function Vesting({ backPath }: { backPath: string }) {
                 </DescValue>
               </Stack>
               <Stack direction="row">
-                <DescLabel>Total</DescLabel>
-                <DescValue>{formatSqd(SQD_TOKEN, data.total, 8)}</DescValue>
-              </Stack>
-              <Stack direction="row">
-                <DescLabel>Available</DescLabel>
-                <DescValue>
-                  {formatSqd(SQD_TOKEN, fromSqd(data.total).minus(fromSqd(data.released)), 8)}
-                </DescValue>
+                <DescLabel>Balance</DescLabel>
+                <DescValue>{formatSqd(SQD_TOKEN, data.balance, 8)}</DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Deposited</DescLabel>
@@ -99,6 +93,10 @@ export function Vesting({ backPath }: { backPath: string }) {
               <Stack direction="row">
                 <DescLabel>Releasable</DescLabel>
                 <DescValue>{formatSqd(SQD_TOKEN, data.releasable, 8)}</DescValue>
+              </Stack>
+              <Stack direction="row">
+                <DescLabel>Released</DescLabel>
+                <DescValue>{formatSqd(SQD_TOKEN, data.released, 8)}</DescValue>
               </Stack>
             </Stack>
           </Box>
@@ -114,7 +112,7 @@ export function Vesting({ backPath }: { backPath: string }) {
               </Stack>
               <Stack direction="row">
                 <DescLabel>Initial release</DescLabel>
-                <DescValue>{`${formatSqd(SQD_TOKEN, fromSqd(data.total).mul(data.initialRelease / 100), 8)} (${percentFormatter(data.initialRelease)})`}</DescValue>
+                <DescValue>{`${formatSqd(SQD_TOKEN, fromSqd(data.expectedTotal).mul(data.initialRelease / 100), 8)} (${percentFormatter(data.initialRelease)})`}</DescValue>
               </Stack>
             </Stack>
           </Box>

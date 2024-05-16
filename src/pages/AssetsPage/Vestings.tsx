@@ -35,9 +35,9 @@ export function MyVestings() {
           <TableHead>
             <TableRow>
               <TableCell>Vesting</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell>Available</TableCell>
+              <TableCell>Balance</TableCell>
               <TableCell>Releasable</TableCell>
+              <TableCell>Released</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
@@ -62,11 +62,9 @@ export function MyVestings() {
                       />
                     </Stack>
                   </TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, d?.total)}</TableCell>
-                  <TableCell>
-                    {formatSqd(SQD_TOKEN, fromSqd(d?.total).minus(fromSqd(d?.released)), 8)}
-                  </TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
                   <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>
+                  <TableCell>{formatSqd(SQD_TOKEN, d?.released)}</TableCell>
                   <TableCell>
                     <Box display="flex" justifyContent="flex-end">
                       <ReleaseButton vesting={vesting} />

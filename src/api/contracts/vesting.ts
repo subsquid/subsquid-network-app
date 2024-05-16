@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { chunk } from 'lodash-es';
 import { MulticallResult } from 'viem';
-import { useContractReads, useContractWrite, usePublicClient } from 'wagmi';
+import { erc20ABI, useContractReads, useContractWrite, usePublicClient } from 'wagmi';
 
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
@@ -41,12 +41,18 @@ export function useVestings({ addresses }: { addresses?: `0x${string}`[] }) {
           args: [contracts.SQD],
         },
         {
-          ...vestingContract,
-          functionName: 'expectedTotalAmount',
+          abi: erc20ABI,
+          address: contracts.SQD,
+          functionName: 'balanceOf',
+          args: [address],
         },
         {
           ...vestingContract,
           functionName: 'immediateReleaseBIP',
+        },
+        {
+          ...vestingContract,
+          functionName: 'expectedTotalAmount',
         },
       ] as const;
     }),
@@ -57,14 +63,15 @@ export function useVestings({ addresses }: { addresses?: `0x${string}`[] }) {
 
   return {
     data: data
-      ? chunk(data, 7).map(ch => ({
+      ? chunk(data, 8).map(ch => ({
           start: unwrapResult(ch[0])?.toString(),
           end: unwrapResult(ch[1])?.toString(),
           deposited: unwrapResult(ch[2])?.toString(),
           releasable: unwrapResult(ch[3])?.toString(),
           released: unwrapResult(ch[4])?.toString(),
-          total: unwrapResult(ch[5])?.toString(),
+          balance: unwrapResult(ch[5])?.toString(),
           initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
+          expectedTotal: unwrapResult(ch[7])?.toString(),
         }))
       : undefined,
     isLoading,
