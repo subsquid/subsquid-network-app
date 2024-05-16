@@ -61,7 +61,7 @@ export function ReleaseButton({
       <Button
         onClick={handleOpen}
         variant="contained"
-        disabled={disabled || (fromSqd(data?.releasable).lessThanOrEqualTo(0) && false)}
+        disabled={disabled || fromSqd(data?.releasable).lessThanOrEqualTo(0)}
       >
         Release
       </Button>
