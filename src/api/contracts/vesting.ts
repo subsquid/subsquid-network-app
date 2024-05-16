@@ -12,7 +12,7 @@ import { VESTING_CONTRACT_ABI } from './vesting.abi';
 
 export function useVestings({ addresses }: { addresses?: `0x${string}`[] }) {
   const contracts = useContracts();
-  const { currentHeight } = useSquidNetworkHeightHooks();
+  const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
 
   const { data, isLoading } = useContractReads({
     contracts: addresses?.flatMap(address => {
@@ -57,7 +57,7 @@ export function useVestings({ addresses }: { addresses?: `0x${string}`[] }) {
       ] as const;
     }),
     allowFailure: true,
-    enabled: !!addresses,
+    enabled: !!addresses && !isHeightLoading,
     blockNumber: currentHeight ? BigInt(currentHeight) : undefined,
   });
 
