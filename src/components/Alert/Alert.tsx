@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 
 import { Alert as MaterialAlert, styled } from '@mui/material';
-import { InternalSnack, SnackbarContentProps, useSnackbar } from 'notistack';
+import { InternalSnack, useSnackbar } from 'notistack';
 
 export const AlertTitle = styled('div', {
   name: 'AlertTitle',

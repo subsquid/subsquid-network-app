@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, IconButton, styled, SxProps, TextField } from '@mui/material';
+import { Box, IconButton, styled, TextField } from '@mui/material';
 import classnames from 'classnames';
 
 import { EditIcon } from '@icons/EditIcon';
@@ -89,9 +89,7 @@ export const ClickableTextField = ({
         }}
         InputProps={{
           endAdornment: onClick ? (
-            <ClickableIconButton onClick={onClick}>
-              {endIcon || <EditIcon />}
-            </ClickableIconButton>
+            <ClickableIconButton onClick={onClick}>{endIcon || <EditIcon />}</ClickableIconButton>
           ) : undefined,
         }}
       />

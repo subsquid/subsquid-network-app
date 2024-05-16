@@ -13,11 +13,7 @@ export function Form({
   sx?: SxProps;
 }>) {
   return (
-    <Box
-      component="form"
-      onSubmit={onSubmit}
-      sx={{ mb: 4, mt: 4, maxWidth, ...sx }}
-    >
+    <Box component="form" onSubmit={onSubmit} sx={{ mb: 4, mt: 4, maxWidth, ...sx }}>
       {children}
     </Box>
   );

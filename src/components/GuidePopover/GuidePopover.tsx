@@ -1,13 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 
-import {
-  Box,
-  Button,
-  Popover,
-  popoverClasses,
-  Stack,
-  styled,
-} from '@mui/material';
+import { Box, Button, Popover, popoverClasses, Stack, styled } from '@mui/material';
 
 const Guide = styled(Popover, {
   name: 'Guide',
@@ -140,10 +133,7 @@ export const GuidePopover = (props: GuidePopoverProps) => {
       anchorReference="anchorPosition"
       anchorPosition={{
         top: position.top - (arrow === 'bottom' ? margin : 0),
-        left:
-          position.left +
-          (arrow === 'left' ? margin : 0) -
-          (arrow === 'right' ? margin : 0),
+        left: position.left + (arrow === 'left' ? margin : 0) - (arrow === 'right' ? margin : 0),
       }}
       elevation={0}
       transformOrigin={{
@@ -159,12 +149,7 @@ export const GuidePopover = (props: GuidePopoverProps) => {
         <GuideTitle>{title}</GuideTitle>
       </GuideProgress>
       {children}
-      <GuideActions
-        spacing={1.5}
-        direction="row"
-        alignItems="center"
-        justifyContent="flex-end"
-      >
+      <GuideActions spacing={1.5} direction="row" alignItems="center" justifyContent="flex-end">
         <GuideButton sx={{ ml: -1 }} variant="text" onClick={skip}>
           Skip tour
         </GuideButton>
