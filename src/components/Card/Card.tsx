@@ -19,11 +19,6 @@ export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) =>
     padding: theme.spacing(2.5),
   },
 
-  '&.guideActive': {
-    position: 'relative',
-    zIndex: theme.zIndex.guide.highlight,
-  },
-
   '&.disabled': {
     padding: theme.spacing(5),
     color: theme.palette.text.secondary,

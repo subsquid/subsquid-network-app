@@ -23,7 +23,6 @@ export const HelpTooltip = ({
   children,
 }: PropsWithChildren<{
   help: React.ReactNode;
-  color?: 'default' | 'black';
 }>) => {
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
