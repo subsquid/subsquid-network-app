@@ -119,13 +119,13 @@ export function useAppReload({
       navigate(to);
     }
 
-    root = createRoot(container);
+    // root = createRoot(container);
     root.render(<App />);
 
     await hideLoader();
   };
 }
 
-let root = createRoot(container);
+const root = createRoot(container);
 root.render(<App />);
 // hideLoader(0);
