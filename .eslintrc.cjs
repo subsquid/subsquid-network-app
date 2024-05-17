@@ -12,7 +12,7 @@ module.exports = {
       jsx: true,
     },
   },
-  plugins: ['@typescript-eslint', 'react', 'prettier'],
+  plugins: ['@typescript-eslint', 'react', 'prettier', 'unused-imports'],
   extends: [
     'plugin:import/errors',
     'plugin:import/warnings',
@@ -37,7 +37,7 @@ module.exports = {
     quotes: ['error', 'single', { allowTemplateLiterals: true }],
     'prettier/prettier': 'error',
     'react/no-unescaped-entities': 'off',
-    'react/jsx-curly-brace-presence': ['error', { props: "never", children: "never" }],
+    'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'never' }],
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/no-unsafe-declaration-merging': 'off',
@@ -79,5 +79,7 @@ module.exports = {
     'import/default': 'off',
     'import/no-named-as-default': 'off',
     'import/no-named-as-default-member': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'unused-imports/no-unused-imports': 'warn',
   },
 };

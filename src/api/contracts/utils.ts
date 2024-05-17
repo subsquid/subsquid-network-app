@@ -5,8 +5,6 @@ import Decimal from 'decimal.js';
 import trimEnd from 'lodash-es/trimEnd';
 import { BaseError as BaseViemError, formatUnits, parseUnits, toHex } from 'viem';
 
-import { useContracts } from '@network/useContracts';
-
 import { SQD_DECIMALS } from './consts';
 
 export type TxResult = { tx: WriteContractResult; error?: never } | { error: string; tx?: never };

@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 
 import { HelpOutline } from '@mui/icons-material';
-import { Box, Stack, styled, Tooltip } from '@mui/material';
+import { Box, Stack, Tooltip } from '@mui/material';
 
 // export const Help = styled(Box)(({ theme, color }) => ({
 //   width: 15,
@@ -23,7 +23,6 @@ export const HelpTooltip = ({
   children,
 }: PropsWithChildren<{
   help: React.ReactNode;
-  color?: 'default' | 'black';
 }>) => {
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
