@@ -2,10 +2,9 @@ import React from 'react';
 
 import { Button, styled, SxProps } from '@mui/material';
 import capitalize from 'lodash-es/capitalize';
-import { useSwitchNetwork } from 'wagmi';
 
 import { SwitchArrowsIcon } from '@icons/SwitchArrowsIcon';
-import { getChainId, NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
+import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
 
 const inverseNetworkName = (name: string) =>
   name === NetworkName.Mainnet ? NetworkName.Testnet : NetworkName.Mainnet;
@@ -27,28 +26,13 @@ export function NetworkSwitcher({
   color?: string;
   hideText?: boolean;
 }) {
-  const { network, switchAndReset: changeAndReset } = useSubsquidNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
-
-  const handleAppSwitchAsync = async (network: NetworkName) => {
-    try {
-      await switchNetworkAsync?.(getChainId(network));
-    } catch (e: any) {
-      if (e.message?.toLowerCase().includes('user rejected the request')) {
-        return;
-      }
-
-      throw e;
-    }
-
-    changeAndReset(network);
-  };
+  const { network, switchAndReset } = useSubsquidNetwork();
 
   return (
     <>
       <SwitchButton
         fill={color}
-        onClick={async () => handleAppSwitchAsync(inverseNetworkName(network))}
+        onClick={async () => switchAndReset(inverseNetworkName(network))}
         sx={sx}
       >
         <SwitchArrowsIcon fill={color} />

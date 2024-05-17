@@ -1,6 +1,6 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 
 import {
   AppBar as AppBarMaterial,
@@ -14,14 +14,11 @@ import {
 import { alpha } from '@mui/system/colorManipulator';
 import classnames from 'classnames';
 import { Outlet } from 'react-router-dom';
-import { useDisconnect, useNetwork, useWalletClient } from 'wagmi';
 
 import { Logo } from '@components/Logo';
 import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
-import { useAccount } from '@network/useAccount';
-import { getChainId, getNetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { ColorVariant } from '../../theme';
 
@@ -256,25 +253,6 @@ export const NetworkLayout = ({
 }: PropsWithChildren<{
   stretchContent?: boolean;
 }>) => {
-  const { isConnected } = useAccount();
-  const { isLoading } = useWalletClient();
-  const { chain } = useNetwork();
-  const { disconnect } = useDisconnect();
-  const { network, switchAndReset } = useSubsquidNetwork();
-
-  useEffect(() => {
-    if (!isConnected || isLoading) return;
-
-    if (chain?.id === getChainId(network)) return;
-
-    if (!chain?.unsupported) {
-      switchAndReset(getNetworkName(chain?.id));
-      return;
-    }
-
-    disconnect();
-  }, [chain, disconnect, isConnected, network, isLoading, switchAndReset]);
-
   const theme = useTheme();
   const narrowLg = useMediaQuery(theme.breakpoints.down('lg'));
   const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
