@@ -21,14 +21,14 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
     padding: theme.spacing(2.5, 2),
   },
 
-  '& td:first-child, & th:first-child': {
+  '& td:first-of-type, & th:first-of-type': {
     paddingLeft: theme.spacing(5),
     [theme.breakpoints.down('sm')]: {
       paddingLeft: theme.spacing(2.5),
     },
   },
 
-  '& td:last-child, & th:last-child': {
+  '& td:last-of-type, & th:last-of-type': {
     paddingRight: theme.spacing(5),
     [theme.breakpoints.down('sm')]: {
       paddingRight: theme.spacing(2.5),
@@ -47,16 +47,16 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
     background: theme.palette.accent.main,
   },
 
-  '& thead th:first-child': { borderTopLeftRadius: borderRadius },
-  '& thead th:last-child': { borderTopRightRadius: borderRadius },
+  '& thead th:first-of-type': { borderTopLeftRadius: borderRadius },
+  '& thead th:last-of-type': { borderTopRightRadius: borderRadius },
 
-  '& tbody tr:last-child td': {
+  '& tbody tr:last-of-type td': {
     borderBottom: 'none',
   },
-  '& tbody tr:last-child td:first-child': {
+  '& tbody tr:last-of-type td:first-of-type': {
     borderBottomLeftRadius: borderRadius,
   },
-  '& tbody tr:last-child td:last-child': {
+  '& tbody tr:last-of-type td:last-of-type': {
     borderBottomRightRadius: borderRadius,
   },
 }));

@@ -167,8 +167,8 @@ export function MyAssets() {
             <TokenBalanceList>
               {data.map(d => {
                 return (
-                  <>
-                    <TokenBalanceItem>
+                  <React.Fragment key={d.name}>
+                    <TokenBalanceItem key={d.name}>
                       <TokenBalanceLabel
                         sx={{ background: d.background, color: d.color }}
                         value={d.name}
@@ -192,7 +192,7 @@ export function MyAssets() {
                         <TokenBalanceValue value={v.balance} />
                       </TokenBalanceItem>
                     ))}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </TokenBalanceList>
