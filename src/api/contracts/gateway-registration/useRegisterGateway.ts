@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { logger } from '@logger';
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { usePublicClient, useWriteContract } from 'wagmi';
 
 import { AccountType } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
@@ -25,17 +25,20 @@ export interface RegisterGatewayRequest extends GetawayMetadata {
 
 function useRegisterGatewayFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.GATEWAY_REGISTRATION,
-    abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
-    functionName: 'register',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ peerId, ...rest }: RegisterGatewayRequest): Promise<TxResult> => {
     logger.debug(`registering gateway via worker contract...`);
 
     try {
-      return { tx: await writeAsync({ args: [peerIdToHex(peerId), encodeGatewayMetadata(rest)] }) };
+      return {
+        tx: await writeContractAsync({
+          address: contracts.GATEWAY_REGISTRATION,
+          abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
+          functionName: 'register',
+          args: [peerIdToHex(peerId), encodeGatewayMetadata(rest)],
+        }),
+      };
     } catch (e: unknown) {
       return {
         error: errorMessage(e),
@@ -46,9 +49,8 @@ function useRegisterGatewayFromWallet() {
 
 function useRegisterGatewayFromVestingContract() {
   const contracts = useContracts();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ peerId, source, ...rest }: RegisterGatewayRequest): Promise<TxResult> => {
     try {
@@ -58,21 +60,16 @@ function useRegisterGatewayFromVestingContract() {
         args: [peerIdToHex(peerId), encodeGatewayMetadata(rest)], // encodeMetadata(rest)
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: source.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.GATEWAY_REGISTRATION, data],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: source.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.GATEWAY_REGISTRATION, data],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
@@ -103,7 +100,11 @@ export function useRegisterGateway() {
       return { success: false, failedReason: error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: tx.hash });
+    if (!client) {
+      return { success: false, failedReason: 'missing client' };
+    }
+
+    const receipt = await client.waitForTransactionReceipt({ hash: tx });
     setWaitHeight(receipt.blockNumber, ['myGateways', { address }]);
     setLoading(false);
     setError(null);

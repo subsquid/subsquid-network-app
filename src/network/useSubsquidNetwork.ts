@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 import useLocalStorageState from 'use-local-storage-state';
-import { useWalletClient, useAccount, useNetwork, useDisconnect, useSwitchNetwork } from 'wagmi';
+import { useWalletClient, useAccount, useDisconnect, useSwitchChain } from 'wagmi';
 import { arbitrum, arbitrumSepolia } from 'wagmi/chains';
 
 import { localStorageStringSerializer } from '@hooks/useLocalStorageState.ts';
@@ -21,9 +21,8 @@ function validate(app: NetworkName): NetworkName {
 export function useSubsquidNetwork() {
   const queryClient = useQueryClient();
   const walletClient = useWalletClient();
-  const { switchNetworkAsync } = useSwitchNetwork({ throwForSwitchChainNotSupported: true });
-  const account = useAccount();
-  const { chain } = useNetwork();
+  const { switchChainAsync } = useSwitchChain();
+  const { isConnected, chain } = useAccount();
   const { disconnect } = useDisconnect();
   const [app, setApp] = useLocalStorageState<NetworkName>('network', {
     serializer: localStorageStringSerializer,
@@ -40,9 +39,9 @@ export function useSubsquidNetwork() {
   );
 
   const switchAndReset = async (network: NetworkName) => {
-    if (account.isConnected) {
+    if (isConnected) {
       try {
-        await switchNetworkAsync?.(getChainId(network));
+        await switchChainAsync?.({ chainId: getChainId(network) });
       } catch (e: unknown) {
         if (e instanceof Error) {
           if (e.message.toLowerCase().includes('user rejected the request')) return;
@@ -58,16 +57,16 @@ export function useSubsquidNetwork() {
   };
 
   useEffect(() => {
-    if (!account.isConnected || walletClient.isLoading) return;
+    if (!isConnected || walletClient.isLoading) return;
     if (chain?.id === getChainId(app)) return;
 
-    if (chain && !chain.unsupported) {
+    if (chain) {
       changeApp(getNetworkName(chain.id));
       return;
     }
 
     disconnect();
-  }, [account, app, chain, disconnect, walletClient, changeApp]);
+  }, [isConnected, chain, app, disconnect, walletClient, changeApp]);
 
   return { network: validate(app), switchAndReset };
 }

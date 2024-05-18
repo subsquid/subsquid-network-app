@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import { logger } from '@logger';
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useWriteContract, useClient } from 'wagmi';
 
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType } from '@api/subsquid-network-squid';
@@ -24,16 +25,15 @@ export interface UnregisterWorkerRequest {
 
 function useUnregisterWorkerFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.WORKER_REGISTRATION,
-    abi: WORKER_REGISTRATION_CONTRACT_ABI,
-    functionName: 'deregister',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ peerId }: { peerId: string }): Promise<TxResult> => {
     try {
       return {
-        tx: await writeAsync({
+        tx: await writeContractAsync({
+          address: contracts.WORKER_REGISTRATION,
+          abi: WORKER_REGISTRATION_CONTRACT_ABI,
+          functionName: 'deregister',
           args: [peerIdToHex(peerId)],
         }),
       };
@@ -45,9 +45,8 @@ function useUnregisterWorkerFromWallet() {
 
 function useUnregisterWorkerFromVestingContract() {
   const contracts = useContracts();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ peerId, source }: UnregisterWorkerRequest): Promise<TxResult> => {
     try {
@@ -57,28 +56,23 @@ function useUnregisterWorkerFromVestingContract() {
         args: [peerIdToHex(peerId)],
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: source.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.WORKER_REGISTRATION, data],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: source.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.WORKER_REGISTRATION, data],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
 }
 
 export function useUnregisterWorker() {
-  const publicClient = usePublicClient();
+  const client = useClient();
   const { address } = useAccount();
   const [isLoading, setLoading] = useState(false);
   const { setWaitHeight } = useSquidNetworkHeightHooks();
@@ -102,7 +96,7 @@ export function useUnregisterWorker() {
       return { success: false, failedReason: error };
     }
 
-    const receipt = await publicClient.waitForTransactionReceipt({ hash: tx.hash });
+    const receipt = await waitForTransactionReceipt(client!, { hash: tx });
     setWaitHeight(receipt.blockNumber, ['myWorkers', { address }]);
     setLoading(false);
     setError(null);

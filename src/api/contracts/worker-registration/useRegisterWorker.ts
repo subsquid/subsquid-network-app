@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { logger } from '@logger';
 import Decimal from 'decimal.js';
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useWriteContract, usePublicClient, useClient } from 'wagmi';
 
 import { useApproveSqd } from '@api/contracts/sqd';
 import {
@@ -32,18 +33,21 @@ function useRegisterFromWallet() {
   const publicClient = usePublicClient();
   const [approveSqd] = useApproveSqd();
 
-  const { writeAsync } = useContractWrite({
-    address: contracts.WORKER_REGISTRATION,
-    abi: WORKER_REGISTRATION_CONTRACT_ABI,
-    functionName: 'register',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   const tryCallRegistrationContract = async ({
     peerId,
     ...rest
   }: AddWorkerRequest): Promise<TxResult> => {
     try {
-      return { tx: await writeAsync({ args: [peerIdToHex(peerId), encodeWorkerMetadata(rest)] }) };
+      return {
+        tx: await writeContractAsync({
+          address: contracts.WORKER_REGISTRATION,
+          abi: WORKER_REGISTRATION_CONTRACT_ABI,
+          functionName: 'register',
+          args: [peerIdToHex(peerId), encodeWorkerMetadata(rest)],
+        }),
+      };
     } catch (e: unknown) {
       return {
         error: errorMessage(e),
@@ -57,7 +61,7 @@ function useRegisterFromWallet() {
     const res = await tryCallRegistrationContract(req);
     // Try to approve SQD
     if (isApproveRequiredError(res.error)) {
-      const bond = await publicClient.readContract({
+      const bond = await publicClient!.readContract({
         address: contracts.WORKER_REGISTRATION,
         abi: WORKER_REGISTRATION_CONTRACT_ABI,
         functionName: 'bondAmount',
@@ -83,12 +87,12 @@ function useRegisterFromWallet() {
 function useRegisterWorkerFromVestingContract() {
   const contracts = useContracts();
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ peerId, source, ...rest }: AddWorkerRequest): Promise<TxResult> => {
     try {
-      const bond = await publicClient.readContract({
+      const bond = await publicClient!.readContract({
         address: contracts.WORKER_REGISTRATION,
         abi: WORKER_REGISTRATION_CONTRACT_ABI,
         functionName: 'bondAmount',
@@ -100,28 +104,23 @@ function useRegisterWorkerFromVestingContract() {
         args: [peerIdToHex(peerId), encodeWorkerMetadata(rest)],
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: source.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.WORKER_REGISTRATION, data, bond],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: source.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.WORKER_REGISTRATION, data, bond],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
 }
 
 export function useRegisterWorker() {
-  const client = usePublicClient();
+  const client = useClient();
   const { address } = useAccount();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
@@ -145,7 +144,7 @@ export function useRegisterWorker() {
       return { success: false, failedReason: error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: tx.hash });
+    const receipt = await waitForTransactionReceipt(client!, { hash: tx });
     setWaitHeight(receipt.blockNumber, ['myWorkers', { address }]);
     setLoading(false);
     setError(null);
