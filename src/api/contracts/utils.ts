@@ -1,13 +1,13 @@
 import { numberWithSpacesFormatter } from '@lib/formatters/formatters.ts';
-import { WriteContractResult } from '@wagmi/core';
 import bs58 from 'bs58';
 import Decimal from 'decimal.js';
 import trimEnd from 'lodash-es/trimEnd';
 import { BaseError as BaseViemError, formatUnits, parseUnits, toHex } from 'viem';
+import { WriteContractData } from 'wagmi/query';
 
 import { SQD_DECIMALS } from './consts';
 
-export type TxResult = { tx: WriteContractResult; error?: never } | { error: string; tx?: never };
+export type TxResult = { tx: WriteContractData; error?: never } | { error: string; tx?: never };
 
 export type WriteContractRes =
   | { success: true; failedReason?: never }

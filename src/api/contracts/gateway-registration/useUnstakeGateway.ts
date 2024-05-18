@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { useWriteContract, usePublicClient } from 'wagmi';
 
 import { AccountType } from '@api/subsquid-network-squid';
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
@@ -20,16 +20,16 @@ type UnstakeGatewayRequest = {
 
 function useUnstakeFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.GATEWAY_REGISTRATION,
-    abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
-    functionName: 'unstake',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
-  return async (req: UnstakeGatewayRequest): Promise<TxResult> => {
+  return async ({}: UnstakeGatewayRequest): Promise<TxResult> => {
     try {
       return {
-        tx: await writeAsync({}),
+        tx: await writeContractAsync({
+          address: contracts.GATEWAY_REGISTRATION,
+          abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
+          functionName: 'unstake',
+        }),
       };
     } catch (e) {
       return { error: errorMessage(e) };
@@ -39,9 +39,8 @@ function useUnstakeFromWallet() {
 
 function useUnstakeFromVestingContract() {
   const contracts = useContracts();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ gateway }: UnstakeGatewayRequest): Promise<TxResult> => {
     try {
@@ -50,21 +49,16 @@ function useUnstakeFromVestingContract() {
         functionName: 'unstake',
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: gateway.owner.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.GATEWAY_REGISTRATION, data],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: gateway.owner.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.GATEWAY_REGISTRATION, data],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
@@ -94,7 +88,11 @@ export function useUnstakeGateway() {
       return { success: false, failedReason: res.error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: res.tx.hash });
+    if (!client) {
+      return { success: false, failedReason: 'missing client' };
+    }
+
+    const receipt = await client.waitForTransactionReceipt({ hash: res.tx });
     setWaitHeight(receipt.blockNumber, []);
 
     setLoading(false);
