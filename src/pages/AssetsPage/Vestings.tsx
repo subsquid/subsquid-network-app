@@ -23,12 +23,12 @@ export function MyVestings() {
   });
   const { SQD_TOKEN } = useContracts();
 
-  if (isLoading || isVestingsLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle title="My Vesting" />
-      {assets.vestings.length ? (
+      {isLoading || isVestingsLoading ? (
+        <Loader />
+      ) : assets.vestings.length ? (
         <BorderedTable>
           <TableHead>
             <TableRow>

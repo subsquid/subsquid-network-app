@@ -73,7 +73,7 @@ export function useSquidNetworkHeightHooks() {
     isLoading,
     isWaiting: heightHooks.length > 0,
     waitHeight: maxWaitedHook,
-    currentHeight: currentHeight ? String(currentHeight) : undefined,
+    currentHeight: currentHeight ? String(currentHeight) : '0',
     setWaitHeight,
   };
 }

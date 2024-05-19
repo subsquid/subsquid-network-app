@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { chunk } from 'lodash-es';
 import { erc20Abi, MulticallResponse } from 'viem';
@@ -15,7 +15,7 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
   const contracts = useContracts();
   const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
 
-  const { data, isRefetching, isLoading } = useReadContracts({
+  const { data: res } = useReadContracts({
     contracts: addresses?.flatMap(address => {
       const vestingContract = { abi: VESTING_CONTRACT_ABI, address } as const;
       return [
@@ -58,26 +58,44 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
       ] as const;
     }),
     allowFailure: true,
-    // blockNumber: BigInt(currentHeight || 0), // FIXME: uncomment to keep read in sync with squid, now always `isLoading` on height change
+    blockNumber: BigInt(currentHeight),
     query: {
       enabled: !!addresses && !isHeightLoading,
     },
   });
 
+  const data = useRef<
+    | {
+        start?: number;
+        end?: number;
+        deposited?: string | undefined;
+        releasable?: string | undefined;
+        released?: string | undefined;
+        balance?: string | undefined;
+        initialRelease?: number;
+        expectedTotal?: string | undefined;
+      }[]
+    | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (res?.some(r => r.status === 'success')) {
+      data.current = chunk(res, 8).map(ch => ({
+        start: Number(unwrapResult(ch[0])) * 1000,
+        end: Number(unwrapResult(ch[1])) * 1000,
+        deposited: unwrapResult(ch[2])?.toString(),
+        releasable: unwrapResult(ch[3])?.toString(),
+        released: unwrapResult(ch[4])?.toString(),
+        balance: unwrapResult(ch[5])?.toString(),
+        initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
+        expectedTotal: unwrapResult(ch[7])?.toString(),
+      }));
+    }
+  }, [res]);
+
   return {
-    data: data
-      ? chunk(data, 8).map(ch => ({
-          start: Number(unwrapResult(ch[0])) * 1000,
-          end: Number(unwrapResult(ch[1])) * 1000,
-          deposited: unwrapResult(ch[2])?.toString(),
-          releasable: unwrapResult(ch[3])?.toString(),
-          released: unwrapResult(ch[4])?.toString(),
-          balance: unwrapResult(ch[5])?.toString(),
-          initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
-          expectedTotal: unwrapResult(ch[7])?.toString(),
-        }))
-      : undefined,
-    isLoading: isLoading && !isRefetching,
+    data: data.current,
+    isLoading: !data.current,
   };
 }
 

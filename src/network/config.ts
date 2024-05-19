@@ -16,5 +16,24 @@ import { arbitrumSepolia, arbitrum } from 'wagmi/chains';
 export const wagmiConfig = getDefaultConfig({
   appName: 'Subsquid Network',
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
-  chains: [arbitrumSepolia, arbitrum],
+  chains: [
+    {
+      ...arbitrumSepolia,
+      rpcUrls: {
+        default: {
+          http: ['https://arbitrum-sepolia.public.blastapi.io'],
+          webSocket: ['wss://arbitrum-sepolia.public.blastapi.io'],
+        },
+      },
+    },
+    {
+      ...arbitrum,
+      rpcUrls: {
+        default: {
+          http: ['https://arbitrum-one.public.blastapi.io'],
+          webSocket: ['wss://arbitrum-one.public.blastapi.io'],
+        },
+      },
+    },
+  ],
 });
