@@ -9,11 +9,11 @@ import { SortIcon } from '@components/SortIcon';
 const borderRadius = 8;
 
 export const BorderedTable = styled(Table)(({ theme }) => ({
-  boxShadow: `0px 4px 12px 0px #9595953D`,
+  // boxShadow: `0px 4px 12px 0px #9595953D`,
   borderRadius: borderRadius,
   borderSpacing: 0,
   borderCollapse: 'separate',
-  border: `1px solid ${theme.palette.divider}`,
+  // border: `1px solid ${theme.palette.divider}`,
 
   '& td, & th': {
     background: theme.palette.background.paper,

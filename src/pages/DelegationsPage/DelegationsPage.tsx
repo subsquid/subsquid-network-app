@@ -28,47 +28,49 @@ export function MyDelegations() {
       {isLoading ? (
         <Loader />
       ) : delegations.length ? (
-        <BorderedTable>
-          <TableHead>
-            <TableRow>
-              <TableCell width={275}>Worker</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Delegation</TableCell>
-              <TableCell>APR, 7d</TableCell>
-              <TableCell>Total reward</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {delegations.map(worker => {
-              return (
-                <TableRow
-                  onClick={() => navigate(`/workers/${worker.peerId}?backPath=/delegations`)}
-                  className="hoverable"
-                  key={worker.peerId}
-                >
-                  <TableCell>
-                    <WorkerName worker={worker} />
-                  </TableCell>
-                  <TableCell>
-                    <WorkerStatus worker={worker} />
-                  </TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
-                  <TableCell>
-                    {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                  </TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={2} justifyContent="flex-end">
-                      <WorkerDelegate worker={worker} />
-                      <WorkerUndelegate worker={worker} />
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </BorderedTable>
+        <Card noPadding>
+          <BorderedTable>
+            <TableHead>
+              <TableRow>
+                <TableCell width={275}>Worker</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Delegation</TableCell>
+                <TableCell>APR, 7d</TableCell>
+                <TableCell>Total reward</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {delegations.map(worker => {
+                return (
+                  <TableRow
+                    onClick={() => navigate(`/workers/${worker.peerId}?backPath=/delegations`)}
+                    className="hoverable"
+                    key={worker.peerId}
+                  >
+                    <TableCell>
+                      <WorkerName worker={worker} />
+                    </TableCell>
+                    <TableCell>
+                      <WorkerStatus worker={worker} />
+                    </TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
+                    <TableCell>
+                      {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+                    </TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={2} justifyContent="flex-end">
+                        <WorkerDelegate worker={worker} />
+                        <WorkerUndelegate worker={worker} />
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </BorderedTable>
+        </Card>
       ) : (
         <Card sx={{ textAlign: 'center' }}>No items to show</Card>
       )}

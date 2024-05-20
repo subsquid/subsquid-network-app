@@ -23,47 +23,49 @@ export function MyVestings() {
   });
   const { SQD_TOKEN } = useContracts();
 
-  if (isLoading || isVestingsLoading) return <Loader />;
-
   return (
     <Box>
       <NetworkPageTitle title="My Vesting" />
-      {assets.vestings.length ? (
-        <BorderedTable>
-          <TableHead>
-            <TableRow>
-              <TableCell>Vesting</TableCell>
-              <TableCell>Balance</TableCell>
-              <TableCell>Releasable</TableCell>
-              <TableCell>Released</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {assets.vestings.map((vesting, i) => {
-              const d = data?.[i];
-              return (
-                <TableRow
-                  onClick={() => navigate(`vestings/${vesting.address}`)}
-                  className="hoverable"
-                  key={vesting.address}
-                >
-                  <TableCell>
-                    <VestingName vesting={vesting} />
-                  </TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, d?.released)}</TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-end">
-                      <ReleaseButton vesting={vesting} />
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </BorderedTable>
+      {isLoading || isVestingsLoading ? (
+        <Loader />
+      ) : assets.vestings.length ? (
+        <Card noPadding>
+          <BorderedTable>
+            <TableHead>
+              <TableRow>
+                <TableCell>Vesting</TableCell>
+                <TableCell>Balance</TableCell>
+                <TableCell>Releasable</TableCell>
+                <TableCell>Released</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {assets.vestings.map((vesting, i) => {
+                const d = data?.[i];
+                return (
+                  <TableRow
+                    onClick={() => navigate(`vestings/${vesting.address}`)}
+                    className="hoverable"
+                    key={vesting.address}
+                  >
+                    <TableCell>
+                      <VestingName vesting={vesting} />
+                    </TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, d?.released)}</TableCell>
+                    <TableCell>
+                      <Box display="flex" justifyContent="flex-end">
+                        <ReleaseButton vesting={vesting} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </BorderedTable>
+        </Card>
       ) : (
         <Card sx={{ textAlign: 'center' }}>No items to show</Card>
       )}

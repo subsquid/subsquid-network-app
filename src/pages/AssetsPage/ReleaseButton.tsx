@@ -26,9 +26,7 @@ export function ReleaseButton({
   vesting: { address: string };
   disabled?: boolean;
 }) {
-  const { release, error, isLoading } = useVestingContractRelease({
-    address: vesting.address as `0x${string}`,
-  });
+  const { release, error, isLoading } = useVestingContractRelease();
   const { data, isLoading: isVestingLoading } = useVestingContract({
     address: vesting.address as `0x${string}`,
   });
@@ -45,7 +43,9 @@ export function ReleaseButton({
     validateOnMount: true,
 
     onSubmit: async () => {
-      const { failedReason } = await release();
+      const { failedReason } = await release({
+        address: vesting.address as `0x${string}`,
+      });
 
       if (!failedReason) {
         handleClose();

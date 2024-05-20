@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { logger } from '@logger';
 import Decimal from 'decimal.js';
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useWriteContract, usePublicClient, useClient } from 'wagmi';
 
 import { useApproveSqd } from '@api/contracts/sqd';
 import {
@@ -28,17 +29,20 @@ type WorkerDepositRequest = {
 
 function useDelegateFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.STAKING,
-    abi: STAKING_CONTRACT_ABI,
-    functionName: 'deposit',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   const [approveSqd] = useApproveSqd();
 
   const tryCallContract = async ({ worker, amount }: WorkerDepositRequest) => {
     try {
-      return { tx: await writeAsync({ args: [BigInt(worker.id), amount] }) };
+      return {
+        tx: await writeContractAsync({
+          address: contracts.STAKING,
+          abi: STAKING_CONTRACT_ABI,
+          functionName: 'deposit',
+          args: [BigInt(worker.id), amount],
+        }),
+      };
     } catch (e) {
       return { error: errorMessage(e) };
     }
@@ -68,10 +72,9 @@ function useDelegateFromWallet() {
 }
 
 function useDepositFromVestingContract() {
-  const publicClient = usePublicClient();
   const contracts = useContracts();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ worker, amount, wallet }: WorkerDepositRequest): Promise<TxResult> => {
     try {
@@ -81,28 +84,23 @@ function useDepositFromVestingContract() {
         args: [BigInt(worker.id), amount],
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: wallet.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.STAKING, data, amount],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: wallet.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.STAKING, data, amount],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
 }
 
 export function useWorkerDelegate() {
-  const client = usePublicClient();
+  const client = useClient();
   const { setWaitHeight } = useSquidNetworkHeightHooks();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +127,7 @@ export function useWorkerDelegate() {
       return { success: false, failedReason: res.error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: res.tx.hash });
+    const receipt = await waitForTransactionReceipt(client!, { hash: res.tx });
     setWaitHeight(receipt.blockNumber, []);
 
     setLoading(false);
@@ -146,15 +144,18 @@ export function useWorkerDelegate() {
 
 function useUndelegateFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.STAKING,
-    abi: STAKING_CONTRACT_ABI,
-    functionName: 'withdraw',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ worker, amount }: WorkerDepositRequest): Promise<TxResult> => {
     try {
-      return { tx: await writeAsync({ args: [BigInt(worker.id), amount] }) };
+      return {
+        tx: await writeContractAsync({
+          address: contracts.STAKING,
+          abi: STAKING_CONTRACT_ABI,
+          functionName: 'withdraw',
+          args: [BigInt(worker.id), amount],
+        }),
+      };
     } catch (e) {
       return { error: errorMessage(e) };
     }
@@ -163,9 +164,8 @@ function useUndelegateFromWallet() {
 
 function useUndelegateFromVestingContract() {
   const contracts = useContracts();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ worker, amount, wallet }: WorkerDepositRequest): Promise<TxResult> => {
     try {
@@ -175,21 +175,16 @@ function useUndelegateFromVestingContract() {
         args: [BigInt(worker.id), amount],
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: wallet.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.STAKING, data, amount],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: wallet.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.STAKING, data, amount],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
@@ -223,7 +218,7 @@ export function useWorkerUndelegate() {
       return { success: false, failedReason: res.error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: res.tx.hash });
+    const receipt = await waitForTransactionReceipt(client!, { hash: res.tx });
     setWaitHeight(receipt.blockNumber, []);
 
     setLoading(false);

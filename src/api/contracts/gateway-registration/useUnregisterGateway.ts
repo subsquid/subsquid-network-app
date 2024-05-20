@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { logger } from '@logger';
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { useWriteContract, usePublicClient } from 'wagmi';
 
 import { AccountType } from '@api/subsquid-network-squid';
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
@@ -21,17 +21,20 @@ export interface UnregisterGatewayRequest {
 
 function useUnregisterGatewayFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.GATEWAY_REGISTRATION,
-    abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
-    functionName: 'unregister',
-  });
+  const { writeContractAsync } = useWriteContract();
 
   return async ({ gateway }: UnregisterGatewayRequest): Promise<TxResult> => {
     logger.debug(`unregistering gateway via worker contract...`);
 
     try {
-      return { tx: await writeAsync({ args: [peerIdToHex(gateway.id)] }) };
+      return {
+        tx: await writeContractAsync({
+          address: contracts.GATEWAY_REGISTRATION,
+          abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
+          functionName: 'unregister',
+          args: [peerIdToHex(gateway.id)],
+        }),
+      };
     } catch (e: unknown) {
       return {
         error: errorMessage(e),
@@ -42,9 +45,8 @@ function useUnregisterGatewayFromWallet() {
 
 function useUnregisterGatewayFromVestingContract() {
   const contracts = useContracts();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract();
 
   return async ({ gateway }: UnregisterGatewayRequest): Promise<TxResult> => {
     try {
@@ -54,21 +56,16 @@ function useUnregisterGatewayFromVestingContract() {
         args: [peerIdToHex(gateway.id)],
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: gateway.owner.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.GATEWAY_REGISTRATION, data],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: gateway.owner.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.GATEWAY_REGISTRATION, data],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
@@ -99,7 +96,11 @@ export function useUnregisterGateway() {
       return { success: false, failedReason: error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: tx.hash });
+    if (!client) {
+      return { success: false, failedReason: 'missing client' };
+    }
+
+    const receipt = await client.waitForTransactionReceipt({ hash: tx });
     setWaitHeight(receipt.blockNumber, ['myGateways', { address }]);
     setLoading(false);
     setError(null);

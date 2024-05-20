@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { logger } from '@logger';
 import Decimal from 'decimal.js';
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { usePublicClient, useWriteContract } from 'wagmi';
 
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
@@ -27,11 +27,7 @@ type StakeGatewayRequest = {
 
 function useStakeFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.GATEWAY_REGISTRATION,
-    abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
-    functionName: 'stake',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   const [approveSqd] = useApproveSqd();
 
@@ -42,7 +38,10 @@ function useStakeFromWallet() {
   }: StakeGatewayRequest) => {
     try {
       return {
-        tx: await writeAsync({
+        tx: await writeContractAsync({
+          address: contracts.GATEWAY_REGISTRATION,
+          abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
+          functionName: 'stake',
           args: [toSqd(amount), BigInt(durationBlocks), autoExtension],
         }),
       };
@@ -76,9 +75,8 @@ function useStakeFromWallet() {
 
 function useStakeFromVestingContract() {
   const contracts = useContracts();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({
     amount,
@@ -93,21 +91,16 @@ function useStakeFromVestingContract() {
         args: [toSqd(amount), BigInt(durationBlocks), autoExtension],
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: wallet.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.GATEWAY_REGISTRATION, data, toSqd(amount)],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: wallet.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.GATEWAY_REGISTRATION, data, toSqd(amount)],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
@@ -137,7 +130,11 @@ export function useStakeGateway() {
       return { success: false, failedReason: res.error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: res.tx.hash });
+    if (!client) {
+      return { success: false, failedReason: 'missing client' };
+    }
+
+    const receipt = await client.waitForTransactionReceipt({ hash: res.tx });
     setWaitHeight(receipt.blockNumber, []);
 
     setLoading(false);

@@ -1,20 +1,18 @@
 import { logger } from '@logger';
-import { WriteContractResult } from '@wagmi/core';
 import Decimal from 'decimal.js';
-import { erc20ABI, useContractWrite, usePublicClient } from 'wagmi';
+import { erc20Abi } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useWriteContract, useClient } from 'wagmi';
+import { WriteContractData } from 'wagmi/query';
 
 import { useContracts } from '@network/useContracts.ts';
 
 import { errorMessage, WriteContractRes } from './utils';
 
 export function useApproveSqd() {
-  const client = usePublicClient();
+  const client = useClient();
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.SQD,
-    abi: erc20ABI,
-    functionName: 'approve',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   async function approve({
     contractAddress,
@@ -23,10 +21,13 @@ export function useApproveSqd() {
     contractAddress: `0x${string}`;
     amount: Decimal;
   }): Promise<WriteContractRes> {
-    let tx: WriteContractResult;
+    let tx: WriteContractData;
     logger.debug(`approving SQD to ${contracts.WORKER_REGISTRATION}...`);
     try {
-      tx = await writeAsync({
+      tx = await writeContractAsync({
+        address: contracts.SQD,
+        abi: erc20Abi,
+        functionName: 'approve',
         args: [contractAddress, BigInt(amount.toFixed(0))],
       });
     } catch (e) {
@@ -40,9 +41,9 @@ export function useApproveSqd() {
       return { success: false, failedReason: 'unknown error' };
     }
 
-    logger.debug(`waiting confirm of SQD approving tx ${tx.hash}`);
-    await client.waitForTransactionReceipt({ hash: tx.hash });
-    logger.info(`SQD approved, tx ${tx.hash}, completed!`);
+    logger.debug(`waiting confirm of SQD approving tx ${tx}`);
+    await waitForTransactionReceipt(client!, { hash: tx });
+    logger.info(`SQD approved, tx ${tx}, completed!`);
 
     return { success: true };
   }

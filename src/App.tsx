@@ -5,11 +5,11 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SnackbarProvider } from 'notistack';
 import { BrowserRouter } from 'react-router-dom';
-import { WagmiConfig } from 'wagmi';
+import { WagmiProvider } from 'wagmi';
 
 import { queryClient } from '@api/client';
 import { Alert } from '@components/Alert';
-import { chains, wagmiConfig } from '@network/config';
+import { wagmiConfig } from '@network/config';
 
 import { AppRoutes } from './AppRoutes';
 import { useCreateTheme, useThemeState } from './theme';
@@ -19,10 +19,10 @@ function App() {
   const theme = useCreateTheme(themeName);
 
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
-          <RainbowKitProvider modalSize="compact" chains={chains}>
+          <RainbowKitProvider modalSize="compact">
             <SnackbarProvider
               hideIconVariant
               preventDuplicate
@@ -40,7 +40,7 @@ function App() {
           </RainbowKitProvider>
         </ThemeProvider>
       </QueryClientProvider>
-    </WagmiConfig>
+    </WagmiProvider>
   );
 }
 

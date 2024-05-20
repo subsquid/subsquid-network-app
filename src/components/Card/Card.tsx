@@ -14,15 +14,20 @@ export const CardTitle = styled(Box)(({ theme }) => ({
 export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) => ({
   padding: theme.spacing(2.5, 5),
   boxShadow: `0px 4px 12px 0px #9595953D`,
+  overflowX: 'auto',
+  scrollbarWidth: 'thin',
 
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(2.5),
   },
 
   '&.disabled': {
-    padding: theme.spacing(5),
     color: theme.palette.text.secondary,
     textAlign: 'center',
+  },
+
+  '&.noPadding': {
+    padding: 0,
   },
 
   '&.noShadow': {
@@ -34,14 +39,21 @@ export const Card = ({
   children,
   title,
   noShadow,
+  noPadding,
   sx,
-}: PropsWithChildren<{ noShadow?: boolean; title?: React.ReactNode; sx?: SxProps }>) => {
+}: PropsWithChildren<{
+  noShadow?: boolean;
+  title?: React.ReactNode;
+  sx?: SxProps;
+  noPadding?: boolean;
+}>) => {
   return (
     <Box>
       {title ? <CardTitle>{title}</CardTitle> : null}
       <CardWrapper
         className={classNames({
           noShadow,
+          noPadding,
         })}
         sx={sx}
       >

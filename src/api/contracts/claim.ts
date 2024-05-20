@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 import { encodeFunctionData } from 'viem';
-import { useContractWrite, usePublicClient, useWalletClient } from 'wagmi';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useWriteContract, useClient } from 'wagmi';
 
 import { REWARD_TREASURY_CONTRACT_ABI } from '@api/contracts/reaward-treasury.abi';
 import { errorMessage, TxResult, WriteContractRes } from '@api/contracts/utils';
@@ -17,16 +18,15 @@ export type ClaimRequest = {
 
 function useClaimFromWallet() {
   const contracts = useContracts();
-  const { writeAsync } = useContractWrite({
-    address: contracts.REWARD_TREASURY,
-    abi: REWARD_TREASURY_CONTRACT_ABI,
-    functionName: 'claimFor',
-  });
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ wallet }: ClaimRequest): Promise<TxResult> => {
     try {
       return {
-        tx: await writeAsync({
+        tx: await writeContractAsync({
+          address: contracts.REWARD_TREASURY,
+          abi: REWARD_TREASURY_CONTRACT_ABI,
+          functionName: 'claimFor',
           args: [contracts.REWARD_DISTRIBUTION, wallet.id as `0x${string}`],
         }),
       };
@@ -38,9 +38,8 @@ function useClaimFromWallet() {
 
 function useClaimFromVestingContract() {
   const contracts = useContracts();
-  const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
   const { address: account } = useAccount();
+  const { writeContractAsync } = useWriteContract({});
 
   return async ({ wallet }: ClaimRequest): Promise<TxResult> => {
     try {
@@ -50,28 +49,23 @@ function useClaimFromVestingContract() {
         args: [contracts.REWARD_DISTRIBUTION, account as `0x${string}`],
       });
 
-      const { request } = await publicClient.simulateContract({
-        account,
-        address: wallet.id as `0x${string}`,
-        abi: VESTING_CONTRACT_ABI,
-        functionName: 'execute',
-        args: [contracts.REWARD_TREASURY, data],
-      });
-
-      const tx = await walletClient?.writeContract(request);
-      if (!tx) {
-        return { error: 'unknown error' };
-      }
-
-      return { tx: { hash: tx } };
-    } catch (e: any) {
+      return {
+        tx: await writeContractAsync({
+          account,
+          address: wallet.id as `0x${string}`,
+          abi: VESTING_CONTRACT_ABI,
+          functionName: 'execute',
+          args: [contracts.REWARD_TREASURY, data],
+        }),
+      };
+    } catch (e: unknown) {
       return { error: errorMessage(e) };
     }
   };
 }
 
 export function useClaim() {
-  const client = usePublicClient();
+  const client = useClient();
   const { setWaitHeight } = useSquidNetworkHeightHooks();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +88,7 @@ export function useClaim() {
       return { success: false, failedReason: res.error };
     }
 
-    const receipt = await client.waitForTransactionReceipt({ hash: res.tx.hash });
+    const receipt = await waitForTransactionReceipt(client!, { hash: res.tx });
     setWaitHeight(receipt.blockNumber, []);
 
     setLoading(false);

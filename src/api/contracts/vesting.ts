@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { chunk } from 'lodash-es';
-import { MulticallResult } from 'viem';
-import { erc20ABI, useContractReads, useContractWrite, usePublicClient } from 'wagmi';
+import { erc20Abi, MulticallResponse } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useReadContracts, useWriteContract, useClient } from 'wagmi';
 
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
@@ -14,7 +15,7 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
   const contracts = useContracts();
   const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
 
-  const { data, isLoading } = useContractReads({
+  const { data: res } = useReadContracts({
     contracts: addresses?.flatMap(address => {
       const vestingContract = { abi: VESTING_CONTRACT_ABI, address } as const;
       return [
@@ -41,7 +42,7 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
           args: [contracts.SQD],
         },
         {
-          abi: erc20ABI,
+          abi: erc20Abi,
           address: contracts.SQD,
           functionName: 'balanceOf',
           args: [address],
@@ -57,24 +58,44 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
       ] as const;
     }),
     allowFailure: true,
-    enabled: !!addresses && !isHeightLoading,
-    blockNumber: currentHeight ? BigInt(currentHeight) : undefined,
+    blockNumber: BigInt(currentHeight),
+    query: {
+      enabled: !!addresses && !isHeightLoading,
+    },
   });
 
+  const data = useRef<
+    | {
+        start?: number;
+        end?: number;
+        deposited?: string | undefined;
+        releasable?: string | undefined;
+        released?: string | undefined;
+        balance?: string | undefined;
+        initialRelease?: number;
+        expectedTotal?: string | undefined;
+      }[]
+    | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (res?.some(r => r.status === 'success')) {
+      data.current = chunk(res, 8).map(ch => ({
+        start: Number(unwrapResult(ch[0])) * 1000,
+        end: Number(unwrapResult(ch[1])) * 1000,
+        deposited: unwrapResult(ch[2])?.toString(),
+        releasable: unwrapResult(ch[3])?.toString(),
+        released: unwrapResult(ch[4])?.toString(),
+        balance: unwrapResult(ch[5])?.toString(),
+        initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
+        expectedTotal: unwrapResult(ch[7])?.toString(),
+      }));
+    }
+  }, [res]);
+
   return {
-    data: data
-      ? chunk(data, 8).map(ch => ({
-          start: Number(unwrapResult(ch[0])) * 1000,
-          end: Number(unwrapResult(ch[1])) * 1000,
-          deposited: unwrapResult(ch[2])?.toString(),
-          releasable: unwrapResult(ch[3])?.toString(),
-          released: unwrapResult(ch[4])?.toString(),
-          balance: unwrapResult(ch[5])?.toString(),
-          initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
-          expectedTotal: unwrapResult(ch[7])?.toString(),
-        }))
-      : undefined,
-    isLoading,
+    data: data.current,
+    isLoading: !data.current,
   };
 }
 
@@ -87,31 +108,31 @@ export function useVestingContract({ address }: { address?: `0x${string}` }) {
   };
 }
 
-function unwrapResult<T>(result?: MulticallResult<T>): T | undefined {
+function unwrapResult<T>(result?: MulticallResponse<T>): T | undefined {
   return result?.status === 'success' ? (result.result as T) : undefined;
 }
 
-export function useVestingContractRelease({ address }: { address?: `0x${string}` }) {
-  const client = usePublicClient();
+export function useVestingContractRelease() {
+  const client = useClient();
   const { setWaitHeight } = useSquidNetworkHeightHooks();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { SQD } = useContracts();
 
-  const { writeAsync } = useContractWrite({
-    abi: VESTING_CONTRACT_ABI,
-    functionName: 'release',
-    args: [SQD],
-    address,
-  });
+  const { writeContractAsync } = useWriteContract({});
 
-  const release = async (): Promise<WriteContractRes> => {
+  const release = async ({ address }: { address: `0x${string}` }): Promise<WriteContractRes> => {
     setLoading(true);
 
     try {
-      const tx = await writeAsync();
+      const hash = await writeContractAsync({
+        abi: VESTING_CONTRACT_ABI,
+        functionName: 'release',
+        args: [SQD],
+        address,
+      });
 
-      const receipt = await client.waitForTransactionReceipt(tx);
+      const receipt = await waitForTransactionReceipt(client!, { hash });
       setWaitHeight(receipt.blockNumber, []);
 
       return { success: true };
