@@ -95,65 +95,85 @@ export function Workers() {
         <Loader />
       ) : workers.length ? (
         <>
-          <BorderedTable>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ minWidth: 275 }}>Worker</TableCell>
-                <TableCell>Status</TableCell>
-                <SortableHeaderCell sort={WorkerSortBy.Uptime90d} query={query} setQuery={setQuery}>
-                  Uptime, 90d
-                </SortableHeaderCell>
-                <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
-                  Worker APR, 7d
-                </SortableHeaderCell>
-                <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
-                  Delegator APR, 7d
-                </SortableHeaderCell>
-                {/*<SortableHeaderCell*/}
-                {/*  width={70}*/}
-                {/*  sort={WorkerSortBy.DelegationCapacity}*/}
-                {/*  query={query}*/}
-                {/*  setQuery={setQuery}*/}
-                {/*>*/}
-                {/*  Delegation capacity*/}
-                {/*</SortableHeaderCell>*/}
-                <SortableHeaderCell sort={WorkerSortBy.JoinedAt} query={query} setQuery={setQuery}>
-                  Registered
-                </SortableHeaderCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {workers.map(worker => {
-                return (
-                  <TableRow
-                    onClick={() => navigate(`/workers/${worker.peerId}?backPath=/dashboard`)}
-                    className="hoverable"
-                    key={worker.peerId}
+          <Card noPadding>
+            <BorderedTable>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ minWidth: 275 }}>Worker</TableCell>
+                  <TableCell>Status</TableCell>
+                  <SortableHeaderCell
+                    sort={WorkerSortBy.Uptime90d}
+                    query={query}
+                    setQuery={setQuery}
                   >
-                    <TableCell>
-                      <WorkerName worker={worker} />
-                    </TableCell>
-                    <TableCell>
-                      <WorkerStatus worker={worker} />
-                    </TableCell>
-                    <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
-                    <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
-                    <TableCell>
-                      {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                    </TableCell>
-                    {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
-                    <TableCell>{dateFormat(worker.createdAt)}</TableCell>
-                    <TableCell>
-                      <Box display="flex" justifyContent="flex-end">
-                        <WorkerDelegate worker={worker} />
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </BorderedTable>
+                    Uptime, 90d
+                  </SortableHeaderCell>
+                  <SortableHeaderCell
+                    sort={WorkerSortBy.WorkerAPR}
+                    query={query}
+                    setQuery={setQuery}
+                  >
+                    Worker APR, 7d
+                  </SortableHeaderCell>
+                  <SortableHeaderCell
+                    sort={WorkerSortBy.StakerAPR}
+                    query={query}
+                    setQuery={setQuery}
+                  >
+                    Delegator APR, 7d
+                  </SortableHeaderCell>
+                  {/*<SortableHeaderCell*/}
+                  {/*  width={70}*/}
+                  {/*  sort={WorkerSortBy.DelegationCapacity}*/}
+                  {/*  query={query}*/}
+                  {/*  setQuery={setQuery}*/}
+                  {/*>*/}
+                  {/*  Delegation capacity*/}
+                  {/*</SortableHeaderCell>*/}
+                  <SortableHeaderCell
+                    sort={WorkerSortBy.JoinedAt}
+                    query={query}
+                    setQuery={setQuery}
+                  >
+                    Registered
+                  </SortableHeaderCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {workers.map(worker => {
+                  return (
+                    <TableRow
+                      onClick={() => navigate(`/workers/${worker.peerId}?backPath=/dashboard`)}
+                      className="hoverable"
+                      key={worker.peerId}
+                    >
+                      <TableCell>
+                        <WorkerName worker={worker} />
+                      </TableCell>
+                      <TableCell>
+                        <WorkerStatus worker={worker} />
+                      </TableCell>
+                      <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                      <TableCell>
+                        {worker.apr != null ? percentFormatter(worker.apr) : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+                      </TableCell>
+                      {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
+                      <TableCell>{dateFormat(worker.createdAt)}</TableCell>
+                      <TableCell>
+                        <Box display="flex" justifyContent="flex-end">
+                          <WorkerDelegate worker={worker} />
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </BorderedTable>
+          </Card>
           <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
         </>
       ) : (

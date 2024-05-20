@@ -37,49 +37,48 @@ export function MyWorkers() {
       {isLoading ? (
         <Loader />
       ) : data.length ? (
-        <BorderedTable>
-          <TableHead>
-            <TableRow>
-              <TableCell width={275}>Worker</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Uptime, 24h</TableCell>
-              <TableCell>Uptime, 90d</TableCell>
-              <TableCell>APR, 7d</TableCell>
-              <TableCell>Total reward</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map(worker => {
-              return (
-                <TableRow
-                  onClick={() => navigate(`/workers/${worker.peerId}`)}
-                  className="hoverable"
-                  key={worker.peerId}
-                >
-                  <TableCell>
-                    <WorkerName worker={worker} />
-                  </TableCell>
-                  <TableCell>
-                    <WorkerStatus worker={worker} />
-                  </TableCell>
-                  <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
-                  <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
-                  <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
-                  <TableCell>
-                    {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                  </TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-end">
-                      <WorkerDelegate worker={worker} />
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </BorderedTable>
+        <Card noPadding>
+          <BorderedTable>
+            <TableHead>
+              <TableRow>
+                <TableCell width={275}>Worker</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Uptime, 24h</TableCell>
+                <TableCell>Uptime, 90d</TableCell>
+                <TableCell>APR, 7d</TableCell>
+                <TableCell>Total reward</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.map(worker => {
+                return (
+                  <TableRow
+                    onClick={() => navigate(`/workers/${worker.peerId}`)}
+                    className="hoverable"
+                    key={worker.peerId}
+                  >
+                    <TableCell>
+                      <WorkerName worker={worker} />
+                    </TableCell>
+                    <TableCell>
+                      <WorkerStatus worker={worker} />
+                    </TableCell>
+                    <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
+                    <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                    <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
+                    <TableCell>
+                      <Box display="flex" justifyContent="flex-end">
+                        <WorkerDelegate worker={worker} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </BorderedTable>
+        </Card>
       ) : (
         <Card sx={{ textAlign: 'center' }}>No items to show</Card>
       )}

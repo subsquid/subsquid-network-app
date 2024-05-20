@@ -34,34 +34,36 @@ export function MyGateways() {
       {isLoading ? (
         <Loader />
       ) : data.length ? (
-        <BorderedTable>
-          <TableHead>
-            <TableRow>
-              <TableCell>Gateway</TableCell>
-              <TableCell>Pending lock</TableCell>
-              <TableCell>Locked</TableCell>
-              <TableCell>Created</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map(gateway => {
-              return (
-                <TableRow
-                  onClick={() => navigate(`/gateways/${gateway.id}`)}
-                  className="hoverable"
-                  key={gateway.id}
-                >
-                  <TableCell>
-                    <GatewayName gateway={gateway} />
-                  </TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
-                  <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
-                  <TableCell>{dateFormat(gateway.createdAt, 'dateTime')}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </BorderedTable>
+        <Card noPadding>
+          <BorderedTable>
+            <TableHead>
+              <TableRow>
+                <TableCell>Gateway</TableCell>
+                <TableCell>Pending lock</TableCell>
+                <TableCell>Locked</TableCell>
+                <TableCell>Created</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.map(gateway => {
+                return (
+                  <TableRow
+                    onClick={() => navigate(`/gateways/${gateway.id}`)}
+                    className="hoverable"
+                    key={gateway.id}
+                  >
+                    <TableCell>
+                      <GatewayName gateway={gateway} />
+                    </TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, gateway.pendingStaked)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, gateway.totalStaked)}</TableCell>
+                    <TableCell>{dateFormat(gateway.createdAt, 'dateTime')}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </BorderedTable>
+        </Card>
       ) : (
         <Card sx={{ textAlign: 'center' }}>No items to show</Card>
       )}
