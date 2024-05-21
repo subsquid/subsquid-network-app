@@ -60,7 +60,7 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     allowFailure: true,
     blockNumber: BigInt(currentHeight),
     query: {
-      enabled: !isHeightLoading,
+      enabled: !isHeightLoading && !!addresses.length,
     },
   });
 
@@ -79,9 +79,7 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
   >(undefined);
 
   useEffect(() => {
-    if (addresses.length === 0) {
-      data.current = [];
-    } else if (res?.some(r => r.status === 'success')) {
+    if (res?.some(r => r.status === 'success')) {
       data.current = chunk(res, 8).map(ch => ({
         start: Number(unwrapResult(ch[0])) * 1000,
         end: Number(unwrapResult(ch[1])) * 1000,
@@ -93,12 +91,17 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
         expectedTotal: unwrapResult(ch[7])?.toString(),
       }));
     }
-  }, [addresses.length, res]);
+  }, [res]);
 
-  return {
-    data: data.current,
-    isLoading: !data.current,
-  };
+  return addresses.length
+    ? {
+        data: data.current,
+        isLoading: !data.current,
+      }
+    : {
+        data: [],
+        isLoading: false,
+      };
 }
 
 export function useVestingContract({ address }: { address?: `0x${string}` }) {

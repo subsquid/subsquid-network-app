@@ -13,11 +13,9 @@ export function AssetsPage() {
   return (
     <CenteredPageWrapper className="wide">
       <ConnectedWalletRequired>
-        <Box>
-          <MyAssets />
-          <Box sx={{ height: 64 }} />
-          <MyVestings />
-        </Box>
+        <MyAssets />
+        <Box sx={{ height: 64 }} />
+        <MyVestings />
       </ConnectedWalletRequired>
       <Outlet />
     </CenteredPageWrapper>

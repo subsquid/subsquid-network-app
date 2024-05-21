@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
 import { Box, Button, styled } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
@@ -12,7 +12,7 @@ export const ConnectButton = styled(Button, {
   color: theme.palette.info.contrastText,
 }));
 
-export function ConnectedWalletRequired({ children }: { children: React.ReactNode[] }) {
+export function ConnectedWalletRequired({ children }: PropsWithChildren) {
   const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
 
