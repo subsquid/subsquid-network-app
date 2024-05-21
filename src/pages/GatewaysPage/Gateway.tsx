@@ -9,6 +9,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { useGatewayByPeerId } from '@api/subsquid-network-squid/gateways-graphql';
 import { BackButton } from '@components/BackButton';
 import { Card } from '@components/Card';
+import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
 import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
@@ -62,16 +63,30 @@ export const Gateway = ({ backPath }: { backPath: string }) => {
               <Stack direction="row">
                 <DescLabel>Endpoint URL</DescLabel>
                 <DescValue>
-                  {gateway.endpointUrl ? urlFormatter(gateway.endpointUrl) : '-'}
+                  {gateway.endpointUrl ? (
+                    <CopyToClipboard text={urlFormatter(gateway.endpointUrl)} />
+                  ) : (
+                    '-'
+                  )}
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Website</DescLabel>
-                <DescValue>{gateway.website ? urlFormatter(gateway.website) : '-'}</DescValue>
+                <DescValue>
+                  {gateway.website ? (
+                    <a href={urlFormatter(gateway.website)} target="_blank" rel="noreferrer">
+                      {urlFormatter(gateway.website)}
+                    </a>
+                  ) : (
+                    '-'
+                  )}
+                </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Contact</DescLabel>
-                <DescValue>{gateway.email || '-'}</DescValue>
+                <DescValue>
+                  {gateway.email ? <CopyToClipboard text={gateway.email} /> : '-'}
+                </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Description</DescLabel>

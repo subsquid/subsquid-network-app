@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { encodeFunctionData } from 'viem';
 import { useWriteContract, usePublicClient } from 'wagmi';
 
-import { AccountType } from '@api/subsquid-network-squid';
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
+import { AccountType, GatewayStakeFragmentFragment } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
@@ -15,7 +14,7 @@ import { VESTING_CONTRACT_ABI } from '../vesting.abi';
 import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';
 
 type UnstakeGatewayRequest = {
-  gateway: BlockchainGateway;
+  operator: GatewayStakeFragmentFragment;
 };
 
 function useUnstakeFromWallet() {
@@ -42,7 +41,7 @@ function useUnstakeFromVestingContract() {
   const { address: account } = useAccount();
   const { writeContractAsync } = useWriteContract({});
 
-  return async ({ gateway }: UnstakeGatewayRequest): Promise<TxResult> => {
+  return async ({ operator }: UnstakeGatewayRequest): Promise<TxResult> => {
     try {
       const data = encodeFunctionData({
         abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
@@ -52,7 +51,7 @@ function useUnstakeFromVestingContract() {
       return {
         tx: await writeContractAsync({
           account,
-          address: gateway.owner.id as `0x${string}`,
+          address: operator.account.id as `0x${string}`,
           abi: VESTING_CONTRACT_ABI,
           functionName: 'execute',
           args: [contracts.GATEWAY_REGISTRATION, data],
@@ -77,7 +76,7 @@ export function useUnstakeGateway() {
     setLoading(true);
 
     const res =
-      req.gateway.owner.type === AccountType.User
+      req.operator.account.type === AccountType.User
         ? await unstakeFromWallet(req)
         : await unstakeFromVestingContract(req);
 

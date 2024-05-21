@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Chip, IconButton, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
+import { IconButton, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
@@ -9,6 +9,8 @@ import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { shortPeerId } from '@components/PeerId';
 import { EditIcon } from '@icons/EditIcon';
+
+import { GatewayStatus } from './GatewayStatus';
 
 export const PeerIdRow = styled(Box, {
   name: 'PeerIdRow',
@@ -62,11 +64,7 @@ export const GatewayCard = ({ gateway }: { gateway: BlockchainGateway }) => {
             content={isMobile ? shortPeerId(gateway.id) : gateway.id}
           />
         </PeerIdRow>
-        {gateway.endpointUrl ? (
-          <Chip variant="filled" color="success" label="Public" size="small" />
-        ) : (
-          <Chip variant="filled" color="default" label="Private" size="small" />
-        )}
+        <GatewayStatus gateway={gateway} />
       </Box>
     </Stack>
   );
