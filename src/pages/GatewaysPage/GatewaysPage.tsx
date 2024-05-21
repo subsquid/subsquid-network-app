@@ -10,6 +10,7 @@ import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
 import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
+import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
 import { GatewayName } from '@pages/GatewaysPage/GatewayName';
 
@@ -124,9 +125,11 @@ export function MyGateways() {
 export function GatewaysPage() {
   return (
     <CenteredPageWrapper className="wide">
-      <MyStakes />
-      <Box sx={{ height: 64 }} />
-      <MyGateways />
+      <ConnectedWalletRequired>
+        <MyStakes />
+        <Box sx={{ height: 64 }} />
+        <MyGateways />
+      </ConnectedWalletRequired>
       <Outlet />
     </CenteredPageWrapper>
   );
