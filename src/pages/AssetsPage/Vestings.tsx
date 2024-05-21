@@ -19,7 +19,7 @@ export function MyVestings() {
   const navigate = useNavigate();
   const { assets, isLoading } = useMyAssets();
   const { data, isLoading: isVestingsLoading } = useVestingContracts({
-    addresses: assets?.vestings.map(v => v.address as `0x${string}`),
+    addresses: assets.vestings.map(v => v.address as `0x${string}`),
   });
   const { SQD_TOKEN } = useContracts();
 
