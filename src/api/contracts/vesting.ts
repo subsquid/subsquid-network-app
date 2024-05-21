@@ -11,12 +11,12 @@ import { useContracts } from '@network/useContracts';
 import { errorMessage, WriteContractRes } from './utils';
 import { VESTING_CONTRACT_ABI } from './vesting.abi';
 
-export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[] }) {
+export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] }) {
   const contracts = useContracts();
   const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
 
   const { data: res } = useReadContracts({
-    contracts: addresses?.flatMap(address => {
+    contracts: addresses.flatMap(address => {
       const vestingContract = { abi: VESTING_CONTRACT_ABI, address } as const;
       return [
         {
@@ -60,7 +60,7 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
     allowFailure: true,
     blockNumber: BigInt(currentHeight),
     query: {
-      enabled: !!addresses && !isHeightLoading,
+      enabled: !isHeightLoading,
     },
   });
 
@@ -79,7 +79,9 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
   >(undefined);
 
   useEffect(() => {
-    if (res?.some(r => r.status === 'success')) {
+    if (addresses.length === 0) {
+      data.current = [];
+    } else if (res?.some(r => r.status === 'success')) {
       data.current = chunk(res, 8).map(ch => ({
         start: Number(unwrapResult(ch[0])) * 1000,
         end: Number(unwrapResult(ch[1])) * 1000,
@@ -91,7 +93,7 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
         expectedTotal: unwrapResult(ch[7])?.toString(),
       }));
     }
-  }, [res]);
+  }, [addresses.length, res]);
 
   return {
     data: data.current,
@@ -100,7 +102,7 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
 }
 
 export function useVestingContract({ address }: { address?: `0x${string}` }) {
-  const { data, isLoading } = useVestingContracts({ addresses: address ? [address] : undefined });
+  const { data, isLoading } = useVestingContracts({ addresses: address ? [address] : [] });
 
   return {
     data: data?.[0],
