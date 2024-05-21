@@ -13,9 +13,10 @@ import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
-import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+
+import { WorkerUnregister } from './WorkerUnregister';
 
 export function MyWorkers() {
   const navigate = useNavigate();
@@ -70,7 +71,7 @@ export function MyWorkers() {
                     <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
-                        <WorkerDelegate worker={worker} />
+                        <WorkerUnregister worker={worker} />
                       </Box>
                     </TableCell>
                   </TableRow>

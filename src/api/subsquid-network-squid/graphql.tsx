@@ -5140,7 +5140,7 @@ export type WorkerFragmentFragment = {
   locked?: boolean;
   version?: string;
   jailReason?: string;
-  owner: { __typename?: 'Account'; id: string };
+  owner: { __typename?: 'Account'; id: string; type: AccountType };
   realOwner: { __typename?: 'Account'; id: string };
 };
 
@@ -5186,7 +5186,7 @@ export type AllWorkersQuery = {
     locked?: boolean;
     version?: string;
     jailReason?: string;
-    owner: { __typename?: 'Account'; id: string };
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
     realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
@@ -5289,7 +5289,7 @@ export type MyWorkersQuery = {
       locked?: boolean;
       owner: { __typename?: 'Account'; id: string; type: AccountType; balance: any };
     }>;
-    owner: { __typename?: 'Account'; id: string };
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
     realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
@@ -5346,7 +5346,7 @@ export type MyDelegationsQuery = {
       locked?: boolean;
       version?: string;
       jailReason?: string;
-      owner: { __typename?: 'Account'; id: string };
+      owner: { __typename?: 'Account'; id: string; type: AccountType };
       realOwner: { __typename?: 'Account'; id: string };
     };
     owner: { __typename?: 'Account'; id: string; type: AccountType };
@@ -5386,24 +5386,6 @@ export type GatewayFragmentFragment = {
   endpointUrl?: string;
   website?: string;
   createdAt: any;
-  operator?: {
-    __typename?: 'GatewayOperator';
-    autoExtension: boolean;
-    stake?: {
-      __typename?: 'GatewayStake';
-      amount: any;
-      locked: boolean;
-      lockStart: number;
-      lockEnd: number;
-    };
-    pendingStake?: {
-      __typename?: 'GatewayStake';
-      amount: any;
-      locked: boolean;
-      lockStart: number;
-      lockEnd: number;
-    };
-  };
   owner?: { __typename?: 'Account'; id: string; type: AccountType };
 };
 
@@ -5423,24 +5405,6 @@ export type MyGatewaysQuery = {
     endpointUrl?: string;
     website?: string;
     createdAt: any;
-    operator?: {
-      __typename?: 'GatewayOperator';
-      autoExtension: boolean;
-      stake?: {
-        __typename?: 'GatewayStake';
-        amount: any;
-        locked: boolean;
-        lockStart: number;
-        lockEnd: number;
-      };
-      pendingStake?: {
-        __typename?: 'GatewayStake';
-        amount: any;
-        locked: boolean;
-        lockStart: number;
-        lockEnd: number;
-      };
-    };
     owner?: { __typename?: 'Account'; id: string; type: AccountType };
   }>;
 };
@@ -5461,26 +5425,55 @@ export type GatewayByPeerIdQuery = {
     endpointUrl?: string;
     website?: string;
     createdAt: any;
-    operator?: {
-      __typename?: 'GatewayOperator';
-      autoExtension: boolean;
-      stake?: {
-        __typename?: 'GatewayStake';
-        amount: any;
-        locked: boolean;
-        lockStart: number;
-        lockEnd: number;
-      };
-      pendingStake?: {
-        __typename?: 'GatewayStake';
-        amount: any;
-        locked: boolean;
-        lockStart: number;
-        lockEnd: number;
-      };
-    };
     owner?: { __typename?: 'Account'; id: string; type: AccountType };
   };
+};
+
+export type GatewayStakeFragmentFragment = {
+  __typename?: 'GatewayOperator';
+  autoExtension: boolean;
+  account: { __typename?: 'Account'; id: string; type: AccountType };
+  stake?: {
+    __typename?: 'GatewayStake';
+    amount: any;
+    locked: boolean;
+    lockStart: number;
+    lockEnd: number;
+  };
+  pendingStake?: {
+    __typename?: 'GatewayStake';
+    amount: any;
+    locked: boolean;
+    lockStart: number;
+    lockEnd: number;
+  };
+};
+
+export type MyGatewayStakesQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+}>;
+
+export type MyGatewayStakesQuery = {
+  __typename?: 'Query';
+  gatewayOperators: Array<{
+    __typename?: 'GatewayOperator';
+    autoExtension: boolean;
+    account: { __typename?: 'Account'; id: string; type: AccountType };
+    stake?: {
+      __typename?: 'GatewayStake';
+      amount: any;
+      locked: boolean;
+      lockStart: number;
+      lockEnd: number;
+    };
+    pendingStake?: {
+      __typename?: 'GatewayStake';
+      amount: any;
+      locked: boolean;
+      lockStart: number;
+      lockEnd: number;
+    };
+  }>;
 };
 
 export type VestingFragmentFragment = {
@@ -5533,6 +5526,7 @@ export const WorkerFragmentFragmentDoc = `
   jailReason
   owner {
     id
+    type
   }
   realOwner {
     id
@@ -5567,26 +5561,32 @@ export const GatewayFragmentFragmentDoc = `
   email
   endpointUrl
   website
-  operator {
-    autoExtension
-    stake {
-      amount
-      locked
-      lockStart
-      lockEnd
-    }
-    pendingStake {
-      amount
-      locked
-      lockStart
-      lockEnd
-    }
-  }
   owner {
     id
     type
   }
   createdAt
+}
+    `;
+export const GatewayStakeFragmentFragmentDoc = `
+    fragment GatewayStakeFragment on GatewayOperator {
+  account {
+    id
+    type
+  }
+  autoExtension
+  stake {
+    amount
+    locked
+    lockStart
+    lockEnd
+  }
+  pendingStake {
+    amount
+    locked
+    lockStart
+    lockEnd
+  }
 }
     `;
 export const VestingFragmentFragmentDoc = `
@@ -5998,6 +5998,35 @@ export const useGatewayByPeerIdQuery = <TData = GatewayByPeerIdQuery, TError = u
       dataSource.endpoint,
       dataSource.fetchParams || {},
       GatewayByPeerIdDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const MyGatewayStakesDocument = `
+    query myGatewayStakes($address: String!) {
+  gatewayOperators(
+    where: {account: {id_eq: $address, OR: {owner: {id_eq: $address}}}}
+  ) {
+    ...GatewayStakeFragment
+  }
+}
+    ${GatewayStakeFragmentFragmentDoc}`;
+
+export const useMyGatewayStakesQuery = <TData = MyGatewayStakesQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: MyGatewayStakesQueryVariables,
+  options?: Omit<UseQueryOptions<MyGatewayStakesQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<MyGatewayStakesQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<MyGatewayStakesQuery, TError, TData>({
+    queryKey: ['myGatewayStakes', variables],
+    queryFn: fetcher<MyGatewayStakesQuery, MyGatewayStakesQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      MyGatewayStakesDocument,
       variables,
     ),
     ...options,

@@ -70,7 +70,7 @@ function WorkerForm({ worker }: { worker: BlockchainApiFullWorker }) {
         <BlockchainContractError error={error} />
         <Box>
           <LoadingButton disabled={isUpdating} variant="contained" type="submit">
-            Update
+            Apply
           </LoadingButton>
         </Box>
       </Card>

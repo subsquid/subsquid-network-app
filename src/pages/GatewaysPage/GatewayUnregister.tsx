@@ -22,7 +22,9 @@ export function GatewayUnregister({ gateway }: { gateway: BlockchainGateway }) {
     <Box>
       <LoadingButton
         loading={isUnregistering}
-        onClick={async () => {
+        onClick={async e => {
+          e.stopPropagation();
+
           const { failedReason } = await unregisterGateway({ gateway });
 
           if (!failedReason) {

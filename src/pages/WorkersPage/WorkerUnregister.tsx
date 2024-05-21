@@ -5,10 +5,10 @@ import { Box } from '@mui/material';
 
 import { useUnregisterWorker } from '@api/contracts/worker-registration/useUnregisterWorker';
 import { useWithdrawWorker } from '@api/contracts/worker-registration/useWithdrawWorker';
-import { BlockchainApiFullWorker, WorkerStatus } from '@api/subsquid-network-squid';
+import { BlockchainApiWorker, WorkerStatus } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 
-export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }) {
+export function WorkerUnregister({ worker }: { worker: BlockchainApiWorker }) {
   const {
     unregisterWorker,
     error: unregisterError,
@@ -21,17 +21,17 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }
   return (
     <Box>
       <Box sx={{ textAlign: 'right' }}>
-        {worker.status === WorkerStatus.Deregistered ||
-        worker.status === WorkerStatus.Deregistering ? (
+        {!worker.canUnregister() ? (
           <LoadingButton
             loading={isWithdrawing}
-            onClick={async () => {
+            onClick={async e => {
+              e.stopPropagation();
               await withdrawWorker({
                 peerId: worker.peerId,
                 source: worker.owner,
               });
             }}
-            disabled={worker.locked}
+            disabled={!worker.canWithdraw()}
             variant="contained"
             color="error"
           >
@@ -41,7 +41,8 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiFullWorker }
           <LoadingButton
             loading={isUnregistering}
             disabled={worker.status !== WorkerStatus.Active}
-            onClick={async () => {
+            onClick={async e => {
+              e.stopPropagation();
               await unregisterWorker({
                 peerId: worker.peerId,
                 source: worker.owner,

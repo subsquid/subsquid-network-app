@@ -1,13 +1,15 @@
 import React, { useMemo, useState } from 'react';
 
 import { Button } from '@mui/material';
-import Decimal from 'decimal.js';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { useUnstakeGateway } from '@api/contracts/gateway-registration/useUnstakeGateway';
-import { useMySources } from '@api/subsquid-network-squid';
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
+import {
+  AccountType,
+  GatewayStakeFragmentFragment,
+  useMySources,
+} from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormRow } from '@components/Form';
@@ -24,7 +26,7 @@ export const stakeSchema = yup.object({
   //   .max(yup.ref('max'), ({ max }) => `Amount should be less than ${formatSqd(max)} `),
 });
 
-export function GatewayUnstake({ gateway }: { gateway: BlockchainGateway }) {
+export function GatewayUnstake({ operator }: { operator?: GatewayStakeFragmentFragment }) {
   const { unstakeFromGateway, error, isLoading } = useUnstakeGateway();
 
   const [open, setOpen] = useState(false);
@@ -41,22 +43,20 @@ export function GatewayUnstake({ gateway }: { gateway: BlockchainGateway }) {
         label: (
           <SourceWalletOption
             source={{
-              id: gateway.owner.id,
-              type: gateway.owner.type,
-              balance: gateway.totalStaked,
+              id: operator?.account.id || '',
+              type: operator?.account.type || AccountType.User,
+              balance: operator?.stake?.amount,
             }}
           />
         ),
-        value: gateway.owner.id,
-        disabled: new Decimal(gateway.totalStaked).lessThanOrEqualTo(0),
+        value: operator?.account.id || '',
       },
     ];
-  }, [gateway]);
+  }, [operator]);
 
   const formik = useFormik({
     initialValues: {
-      source: gateway.owner.id,
-      max: Number(gateway.totalStaked),
+      source: operator?.account.id,
     },
     validationSchema: stakeSchema,
     validateOnChange: true,
@@ -65,11 +65,9 @@ export function GatewayUnstake({ gateway }: { gateway: BlockchainGateway }) {
 
     onSubmit: async values => {
       const wallet = sources.find(w => w?.id === values.source);
-      if (!wallet) return;
+      if (!wallet || !operator) return;
 
-      const { failedReason } = await unstakeFromGateway({
-        gateway,
-      });
+      const { failedReason } = await unstakeFromGateway({ operator });
 
       if (!failedReason) {
         handleClose();
@@ -80,9 +78,13 @@ export function GatewayUnstake({ gateway }: { gateway: BlockchainGateway }) {
   return (
     <>
       <Button
-        disabled={gateway.operator?.stake?.locked || gateway.operator?.pendingStake?.locked}
+        disabled={
+          (!operator?.stake && !operator?.pendingStake) ||
+          operator.stake?.locked ||
+          operator.pendingStake?.locked
+        }
         variant="contained"
-        color="primary"
+        color="error"
         onClick={handleOpen}
       >
         Unlock

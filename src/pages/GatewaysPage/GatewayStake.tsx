@@ -7,7 +7,7 @@ import * as yup from 'yup';
 
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
 import { formatSqd, fromSqd } from '@api/contracts/utils';
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
+import { AccountType } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
@@ -38,7 +38,7 @@ export const stakeSchema = (SQD_TOKEN: string) =>
       .required('Lock min blocks is required'),
   });
 
-export function GatewayStake({ gateway }: { gateway: BlockchainGateway }) {
+export function GatewayStake() {
   const { stakeToGateway, error, isLoading } = useStakeGateway();
   const { SQD_TOKEN } = useContracts();
 
@@ -52,7 +52,7 @@ export function GatewayStake({ gateway }: { gateway: BlockchainGateway }) {
     isPending: isSourceLoading,
   } = useMySourceOptions({
     enabled: open,
-    sourceDisabled: s => new Decimal(s.balance).lessThanOrEqualTo(0),
+    sourceDisabled: s => s.type === AccountType.Vesting,
   });
 
   const formik = useFormik({
@@ -73,7 +73,6 @@ export function GatewayStake({ gateway }: { gateway: BlockchainGateway }) {
       if (!wallet) return;
 
       const { failedReason } = await stakeToGateway({
-        gateway,
         amount: values.amount,
         durationBlocks: values.durationBlocks,
         autoExtension: values.autoExtension,

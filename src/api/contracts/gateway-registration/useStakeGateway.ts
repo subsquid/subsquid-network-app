@@ -18,7 +18,6 @@ import { VESTING_CONTRACT_ABI } from '../vesting.abi';
 import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';
 
 type StakeGatewayRequest = {
-  gateway: BlockchainGateway;
   amount: number;
   durationBlocks: number;
   autoExtension: boolean;

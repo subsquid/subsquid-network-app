@@ -61,6 +61,7 @@ fragment WorkerFragment on Worker {
   jailReason
   owner {
     id
+    type
   }
   realOwner {
     id
@@ -204,21 +205,6 @@ fragment GatewayFragment on Gateway {
   email
   endpointUrl
   website
-  operator {
-    autoExtension
-    stake {
-      amount
-      locked
-      lockStart
-      lockEnd
-    }
-    pendingStake {
-      amount
-      locked
-      lockStart
-      lockEnd
-    }
-  }
   owner {
     id
     type
@@ -235,6 +221,32 @@ query myGateways($address: String!) {
 query gatewayByPeerId($peerId: String!) {
   gatewayById(id: $peerId) {
     ...GatewayFragment
+  }
+}
+
+fragment GatewayStakeFragment on GatewayOperator {
+  account {
+    id
+    type
+  }
+  autoExtension
+  stake {
+    amount
+    locked
+    lockStart
+    lockEnd
+  }
+  pendingStake {
+    amount
+    locked
+    lockStart
+    lockEnd
+  }
+}
+
+query myGatewayStakes($address: String!) {
+  gatewayOperators(where: {account: {id_eq: $address, OR: {owner: {id_eq: $address}}}}) {
+    ...GatewayStakeFragment
   }
 }
 

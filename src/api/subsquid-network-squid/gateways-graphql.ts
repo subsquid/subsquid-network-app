@@ -1,7 +1,12 @@
 import { useSquidDataSource } from '@api/subsquid-network-squid/datasource';
 import { useAccount } from '@network/useAccount';
 
-import { GatewayFragmentFragment, useGatewayByPeerIdQuery, useMyGatewaysQuery } from './graphql';
+import {
+  GatewayFragmentFragment,
+  useGatewayByPeerIdQuery,
+  useMyGatewaysQuery,
+  useMyGatewayStakesQuery,
+} from './graphql';
 
 // inherit API interface for internal class
 export interface BlockchainGateway extends GatewayFragmentFragment {
@@ -10,14 +15,10 @@ export interface BlockchainGateway extends GatewayFragmentFragment {
 
 export class BlockchainGateway {
   ownedByMe?: boolean;
-  totalStaked: string = '0';
-  pendingStaked: string = '0';
 
   constructor({ gateway, address }: { gateway: GatewayFragmentFragment; address?: `0x${string}` }) {
     Object.assign(this, {
       ...gateway,
-      totalStaked: String(gateway.operator?.stake?.amount || 0),
-      pendingStaked: String(gateway.operator?.pendingStake?.amount || 0),
       createdAt: new Date(),
       ownedByMe: gateway?.owner?.id === address,
     });
@@ -80,5 +81,29 @@ export function useGatewayByPeerId(peerId?: string) {
   return {
     data,
     isLoading: enabled ? isLoading : false,
+  };
+}
+
+export function useMyGatewayStakes() {
+  const datasource = useSquidDataSource();
+  const { address } = useAccount();
+
+  const enabled = !!address;
+  const { data, isLoading } = useMyGatewayStakesQuery(
+    datasource,
+    {
+      address: address || '',
+    },
+    {
+      select: res => {
+        return res.gatewayOperators[0];
+      },
+      enabled,
+    },
+  );
+
+  return {
+    data: data,
+    isLoading: enabled && isLoading,
   };
 }
