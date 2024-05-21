@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { Divider } from '@mui/material';
+import { dateFormat } from '@i18n';
+import { urlFormatter } from '@lib/formatters/formatters';
+import { Divider, Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
 import { useParams, useSearchParams } from 'react-router-dom';
 
@@ -13,6 +15,24 @@ import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 
 import { GatewayCard } from './GatewayCard';
 import { GatewayUnregister } from './GatewayUnregister';
+
+export const DescLabel = styled(Box, {
+  name: 'DescLabel',
+})(({ theme }) => ({
+  flex: 0.5,
+  color: theme.palette.text.secondary,
+  whiteSpace: 'balance',
+  maxWidth: theme.spacing(25),
+  fontSize: '1rem',
+}));
+
+export const DescValue = styled(Box, {
+  name: 'DescValue',
+})(({ theme }) => ({
+  flex: 1,
+  marginLeft: theme.spacing(2),
+  overflowWrap: 'anywhere',
+}));
 
 export const Gateway = ({ backPath }: { backPath: string }) => {
   const { peerId } = useParams<{ peerId: string }>();
@@ -32,11 +52,38 @@ export const Gateway = ({ backPath }: { backPath: string }) => {
       </Box>
       <Card>
         <GatewayCard gateway={gateway} />
-        <Divider sx={{ my: 4 }} />
-        <Box sx={{ textAlign: 'right' }}>
-          <GatewayUnregister gateway={gateway} />
-        </Box>
+        <Stack mt={4} spacing={3} divider={<Divider orientation="horizontal" flexItem />}>
+          <Box>
+            <Stack spacing={2} direction="column">
+              <Stack direction="row">
+                <DescLabel>Registered</DescLabel>
+                <DescValue>{dateFormat(gateway.createdAt, 'dateTime')}</DescValue>
+              </Stack>
+              <Stack direction="row">
+                <DescLabel>Endpoint URL</DescLabel>
+                <DescValue>
+                  {gateway.endpointUrl ? urlFormatter(gateway.endpointUrl) : '-'}
+                </DescValue>
+              </Stack>
+              <Stack direction="row">
+                <DescLabel>Website</DescLabel>
+                <DescValue>{gateway.website ? urlFormatter(gateway.website) : '-'}</DescValue>
+              </Stack>
+              <Stack direction="row">
+                <DescLabel>Contact</DescLabel>
+                <DescValue>{gateway.email || '-'}</DescValue>
+              </Stack>
+              <Stack direction="row">
+                <DescLabel>Description</DescLabel>
+                <DescValue>{gateway.description || '-'}</DescValue>
+              </Stack>
+            </Stack>
+          </Box>
+        </Stack>
       </Card>
+      <Box mt={2.5} display="flex" justifyContent="flex-end">
+        <GatewayUnregister gateway={gateway} />
+      </Box>
     </CenteredPageWrapper>
   );
 };

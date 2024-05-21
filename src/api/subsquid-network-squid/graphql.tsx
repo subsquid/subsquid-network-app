@@ -5140,7 +5140,7 @@ export type WorkerFragmentFragment = {
   locked?: boolean;
   version?: string;
   jailReason?: string;
-  owner: { __typename?: 'Account'; id: string };
+  owner: { __typename?: 'Account'; id: string; type: AccountType };
   realOwner: { __typename?: 'Account'; id: string };
 };
 
@@ -5186,7 +5186,7 @@ export type AllWorkersQuery = {
     locked?: boolean;
     version?: string;
     jailReason?: string;
-    owner: { __typename?: 'Account'; id: string };
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
     realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
@@ -5289,7 +5289,7 @@ export type MyWorkersQuery = {
       locked?: boolean;
       owner: { __typename?: 'Account'; id: string; type: AccountType; balance: any };
     }>;
-    owner: { __typename?: 'Account'; id: string };
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
     realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
@@ -5346,7 +5346,7 @@ export type MyDelegationsQuery = {
       locked?: boolean;
       version?: string;
       jailReason?: string;
-      owner: { __typename?: 'Account'; id: string };
+      owner: { __typename?: 'Account'; id: string; type: AccountType };
       realOwner: { __typename?: 'Account'; id: string };
     };
     owner: { __typename?: 'Account'; id: string; type: AccountType };
@@ -5533,6 +5533,7 @@ export const WorkerFragmentFragmentDoc = `
   jailReason
   owner {
     id
+    type
   }
   realOwner {
     id

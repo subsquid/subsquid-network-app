@@ -89,6 +89,23 @@ export class BlockchainApiWorker {
     }
   }
 
+  canUnregister() {
+    if (!this.ownedByMe) return false;
+
+    switch (this.status) {
+      case WorkerStatus.Deregistering:
+      case WorkerStatus.Deregistered:
+      case WorkerStatus.Withdrawn:
+        return false;
+      default:
+        return true;
+    }
+  }
+
+  canWithdraw() {
+    return this.status === WorkerStatus.Deregistered && !this.locked;
+  }
+
   displayStats() {
     switch (this.status) {
       case WorkerStatus.Registering:

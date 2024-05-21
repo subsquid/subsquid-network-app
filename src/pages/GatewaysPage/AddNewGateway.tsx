@@ -148,12 +148,12 @@ export function AddNewGateway() {
           ) : null}
 
           <BlockchainContractError error={error} />
-          <Box>
-            <LoadingButton disabled={isRegistering} variant="contained" type="submit">
-              Register
-            </LoadingButton>
-          </Box>
         </Card>
+        <Box mt={2.5} justifyContent="flex-end" display="flex">
+          <LoadingButton disabled={isRegistering} variant="contained" type="submit">
+            Register
+          </LoadingButton>
+        </Box>
       </Form>
     </CenteredPageWrapper>
   );

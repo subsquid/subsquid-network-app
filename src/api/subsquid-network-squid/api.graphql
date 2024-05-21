@@ -61,6 +61,7 @@ fragment WorkerFragment on Worker {
   jailReason
   owner {
     id
+    type
   }
   realOwner {
     id
