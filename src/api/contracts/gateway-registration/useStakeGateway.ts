@@ -6,7 +6,6 @@ import { encodeFunctionData } from 'viem';
 import { usePublicClient, useWriteContract } from 'wagmi';
 
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';

@@ -53,6 +53,7 @@ export function useSubsquidNetwork() {
     }
 
     changeApp(network);
+    // eslint-disable-next-line no-console
     console.log('switched to ' + network);
   };
 

@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { useWorkerDelegate } from '@api/contracts/staking';
-import { formatSqd, humanReadableSqd, toSqd } from '@api/contracts/utils';
+import { formatSqd, fromSqd, toSqd } from '@api/contracts/utils';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
@@ -59,8 +59,8 @@ export function WorkerDelegate({
   const formik = useFormik({
     initialValues: {
       source: '',
-      amount: '0',
-      max: '0',
+      amount: 0,
+      max: 0,
     },
     validationSchema: delegateSchema(SQD_TOKEN),
     validateOnChange: true,
@@ -94,7 +94,7 @@ export function WorkerDelegate({
     formik.setValues({
       ...formik.values,
       source: source.id,
-      max: humanReadableSqd(source.balance),
+      max: fromSqd(source.balance).toNumber(),
     });
   }, [formik, isSourceLoading, sources]);
 
@@ -133,7 +133,7 @@ export function WorkerDelegate({
                   if (!wallet) return;
 
                   formik.setFieldValue('source', wallet.id);
-                  formik.setFieldValue('max', humanReadableSqd(wallet.balance));
+                  formik.setFieldValue('max', fromSqd(wallet.balance).toNumber());
                 }}
               />
             </FormRow>

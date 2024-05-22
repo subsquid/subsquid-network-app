@@ -47,7 +47,7 @@ export function useMySources({ enabled }: { enabled?: boolean } = {}) {
       : [wallet, ...wallet.owned].map(a => ({
           type: a.type,
           id: a.id,
-          balance: a.balance as string,
+          balance: a.balance,
         }));
   }, [address, wallet]);
 

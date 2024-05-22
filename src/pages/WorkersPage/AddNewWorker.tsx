@@ -6,7 +6,7 @@ import Decimal from 'decimal.js';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 
-import { fromSqd } from '@api/contracts/utils.ts';
+import { fromSqd } from '@api/contracts/utils';
 import { useRegisterWorker } from '@api/contracts/worker-registration/useRegisterWorker';
 import { useMySources } from '@api/subsquid-network-squid';
 import { useNetworkSettings } from '@api/subsquid-network-squid/settings-graphql';
