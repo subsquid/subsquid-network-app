@@ -79,7 +79,9 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
   >(undefined);
 
   useEffect(() => {
-    if (res?.some(r => r.status === 'success')) {
+    if (addresses.length === 0) {
+      data.current = [];
+    } else if (res?.some(r => r.status === 'success')) {
       data.current = chunk(res, 8).map(ch => ({
         start: Number(unwrapResult(ch[0])) * 1000,
         end: Number(unwrapResult(ch[1])) * 1000,
@@ -91,7 +93,7 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
         expectedTotal: unwrapResult(ch[7])?.toString(),
       }));
     }
-  }, [res]);
+  }, [addresses.length, res]);
 
   return addresses.length
     ? {
