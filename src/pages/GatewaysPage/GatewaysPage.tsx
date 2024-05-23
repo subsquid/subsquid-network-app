@@ -44,7 +44,7 @@ export function MyStakes() {
                   {data?.pendingStake ? formatSqd(SQD_TOKEN, data?.pendingStake?.amount) : '-'}
                 </TableCell>
                 <TableCell>
-                  {data?.pendingStake ? formatSqd(SQD_TOKEN, data?.stake?.amount) : '-'}
+                  {data?.stake ? formatSqd(SQD_TOKEN, data?.stake?.amount) : '-'}
                 </TableCell>
                 <TableCell>
                   <Box display="flex" justifyContent="flex-end">
