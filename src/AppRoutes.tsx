@@ -26,33 +26,37 @@ export const AppRoutes = () => {
 
   return (
     <Routes>
-      {demoFeaturesEnabled() || network === NetworkName.Testnet ? (
-        <Route element={<NetworkLayout />} path="/dashboard">
-          <Route element={<DashboardPage />} index />
-          <Route element={<Worker backPath="/dashboard" />} path="workers/:peerId" />
-        </Route>
-      ) : null}
+      <Route element={<NetworkLayout />} path="/">
+        <Route element={<Navigate to="/assets" replace={true} />} index />
+        {demoFeaturesEnabled() || network === NetworkName.Testnet ? (
+          <Route path="/dashboard">
+            <Route element={<DashboardPage />} index />
+            <Route element={<Worker backPath="/dashboard" />} path="workers/:peerId" />
+          </Route>
+        ) : null}
 
-      <Route element={<NetworkLayout />} path="/assets">
-        <Route element={<AssetsPage />} index />
-        <Route element={<Vesting backPath="/assets" />} path="vestings/:address" />
+        <Route path="/assets">
+          <Route element={<AssetsPage />} index />
+          <Route element={<Vesting backPath="/assets" />} path="vestings/:address" />
+        </Route>
+
+        <Route path="/workers">
+          <Route element={<WorkersPage />} index />
+          <Route element={<AddNewWorker />} path="add" />
+          <Route element={<Worker backPath="/workers" />} path=":peerId" />
+          <Route element={<WorkerEdit />} path=":peerId/edit" />
+        </Route>
+        <Route path="/delegations">
+          <Route element={<DelegationsPage />} index />
+          <Route element={<Worker backPath="/delegations" />} path="workers/:peerId" />
+        </Route>
+        <Route path="/gateways">
+          <Route element={<GatewaysPage />} index />
+          <Route element={<AddNewGateway />} path="add" />
+          <Route element={<Gateway backPath="/gateways" />} path=":peerId" />
+        </Route>
+        <Route element={<Navigate to="/assets" replace={true} />} path="*" />
       </Route>
-      <Route element={<NetworkLayout />} path="/workers">
-        <Route element={<WorkersPage />} index />
-        <Route element={<AddNewWorker />} path="add" />
-        <Route element={<Worker backPath="/workers" />} path=":peerId" />
-        <Route element={<WorkerEdit />} path=":peerId/edit" />
-      </Route>
-      <Route element={<NetworkLayout />} path="/delegations">
-        <Route element={<DelegationsPage />} index />
-        <Route element={<Worker backPath="/delegations" />} path="workers/:peerId" />
-      </Route>
-      <Route element={<NetworkLayout />} path="/gateways">
-        <Route element={<GatewaysPage />} index />
-        <Route element={<AddNewGateway />} path="add" />
-        <Route element={<Gateway backPath="/gateways" />} path=":peerId" />
-      </Route>
-      <Route element={<Navigate to="/assets" replace={true} />} path="*" />
     </Routes>
   );
 };

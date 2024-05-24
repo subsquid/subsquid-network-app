@@ -34,7 +34,7 @@ export function WorkerDelegate({
   worker,
   disabled,
 }: {
-  worker: BlockchainApiWorker;
+  worker?: BlockchainApiWorker;
   disabled?: boolean;
 }) {
   const { delegateToWorker, error, isLoading } = useWorkerDelegate();
@@ -69,7 +69,7 @@ export function WorkerDelegate({
 
     onSubmit: async values => {
       const wallet = sources.find(w => w?.id === values.source);
-      if (!wallet) return;
+      if (!wallet || !worker) return;
 
       const { failedReason } = await delegateToWorker({
         worker,
@@ -101,7 +101,7 @@ export function WorkerDelegate({
   return (
     <>
       <Button
-        disabled={disabled || !worker.delegationEnabled}
+        disabled={disabled || !worker?.delegationEnabled}
         onClick={handleOpen}
         variant="contained"
       >

@@ -32,11 +32,6 @@ export const Worker = ({ backPath }: { backPath: string }) => {
 
   const [searchParams] = useSearchParams();
 
-  if (isPending) return <Loader />;
-  else if (!worker) {
-    return <NotFound item="worker" id={peerId} />;
-  }
-
   return (
     <CenteredPageWrapper className="wide">
       <NetworkPageTitle
@@ -49,17 +44,25 @@ export const Worker = ({ backPath }: { backPath: string }) => {
         }
       />
 
-      <Card>
-        <WorkerCard worker={worker} />
-        <Box sx={{ mt: 4 }}>
-          <WorkerStatistics worker={worker} />
-        </Box>
-      </Card>
-      {worker.ownedByMe && worker.status !== WorkerStatus.Withdrawn ? (
-        <Box mt={2.5}>
-          <WorkerUnregister worker={worker} />
-        </Box>
-      ) : null}
+      {isPending ? (
+        <Loader />
+      ) : !worker ? (
+        <NotFound item="worker" id={peerId} />
+      ) : (
+        <>
+          <Card>
+            <WorkerCard worker={worker} />
+            <Box sx={{ mt: 4 }}>
+              <WorkerStatistics worker={worker} />
+            </Box>
+          </Card>
+          {worker.ownedByMe && worker.status !== WorkerStatus.Withdrawn ? (
+            <Box mt={2.5}>
+              <WorkerUnregister worker={worker} />
+            </Box>
+          ) : null}
+        </>
+      )}
     </CenteredPageWrapper>
   );
 };
