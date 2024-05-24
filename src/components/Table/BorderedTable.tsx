@@ -44,7 +44,7 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
 
   '& tr.hoverable:hover td, & tr.hovered td': {
     cursor: 'pointer',
-    background: theme.palette.accent.main,
+    background: theme.palette.action.hover,
   },
 
   '& thead th:first-of-type': { borderTopLeftRadius: borderRadius },

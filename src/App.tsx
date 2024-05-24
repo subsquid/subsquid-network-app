@@ -12,17 +12,18 @@ import { Alert } from '@components/Alert';
 import { wagmiConfig } from '@network/config';
 
 import { AppRoutes } from './AppRoutes';
-import { useCreateTheme, useThemeState } from './theme';
+import { useCreateRainbowKitTheme, useCreateTheme, useThemeState } from './theme';
 
 function App() {
   const [themeName] = useThemeState();
   const theme = useCreateTheme(themeName);
+  const rainbowkitTheme = useCreateRainbowKitTheme(themeName);
 
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
-          <RainbowKitProvider modalSize="compact">
+          <RainbowKitProvider modalSize="compact" theme={rainbowkitTheme}>
             <SnackbarProvider
               hideIconVariant
               preventDuplicate
