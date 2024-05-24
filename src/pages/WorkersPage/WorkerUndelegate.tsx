@@ -33,7 +33,7 @@ export function WorkerUndelegate({
   worker,
   disabled,
 }: {
-  worker: BlockchainApiWorker;
+  worker?: BlockchainApiWorker;
   disabled?: boolean;
 }) {
   const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
@@ -48,7 +48,7 @@ export function WorkerUndelegate({
 
   const options = useMemo(
     () =>
-      (worker.myDelegations || [])
+      (worker?.myDelegations || [])
         .filter(s => !new Decimal(s.deposit).isZero())
         .map(s => {
           return {
@@ -64,7 +64,7 @@ export function WorkerUndelegate({
             value: s.owner.id,
           };
         }),
-    [worker.myDelegations],
+    [worker?.myDelegations],
   );
 
   const formik = useFormik({
@@ -79,8 +79,8 @@ export function WorkerUndelegate({
     validateOnMount: true,
 
     onSubmit: async values => {
-      const wallet = worker.myDelegations.find(w => w?.owner.id === values.source);
-      if (!wallet) return;
+      const wallet = worker?.myDelegations.find(w => w?.owner.id === values.source);
+      if (!wallet || !worker) return;
 
       const { failedReason } = await undelegateFromWorker({
         worker,
@@ -99,7 +99,7 @@ export function WorkerUndelegate({
   useEffect(() => {
     if (formik.values.source) return;
 
-    const source = worker.myDelegations.filter(s => !new Decimal(s.deposit).isZero())?.[0];
+    const source = worker?.myDelegations.filter(s => !new Decimal(s.deposit).isZero())?.[0];
     if (!source) return;
 
     formik.setValues({
@@ -107,15 +107,15 @@ export function WorkerUndelegate({
       source: source.owner.id,
       max: humanReadableSqd(source.deposit),
     });
-  }, [formik, worker.myDelegations]);
+  }, [formik, worker?.myDelegations]);
 
   return (
     <>
       <Button
         disabled={
           disabled ||
-          worker.myDelegationsTotal.equals(0) ||
-          !worker.myDelegations.some(w => !w.locked)
+          worker?.myDelegationsTotal.equals(0) ||
+          !worker?.myDelegations.some(w => !w.locked)
         }
         color="error"
         onClick={handleOpen}
@@ -143,7 +143,7 @@ export function WorkerUndelegate({
               id="source"
               formik={formik}
               onChange={e => {
-                const wallet = worker.myDelegations.find(s => s.owner.id === e.target.value);
+                const wallet = worker?.myDelegations.find(s => s.owner.id === e.target.value);
                 if (!wallet) return;
 
                 formik.setFieldValue('source', wallet.owner.id);

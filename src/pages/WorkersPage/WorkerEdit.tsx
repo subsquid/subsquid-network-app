@@ -11,7 +11,9 @@ import { BlockchainContractError } from '@components/BlockchainContractError';
 import { Card } from '@components/Card';
 import { Form, FormikTextInput, FormRow } from '@components/Form';
 import { Loader } from '@components/Loader';
+import { NotFound } from '@components/NotFound';
 import { NetworkPageTitle, CenteredPageWrapper } from '@layouts/NetworkLayout';
+import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { editWorkerSchema } from '@pages/WorkersPage/worker-schema';
 
 function WorkerForm({ worker }: { worker: BlockchainApiFullWorker }) {
@@ -82,19 +84,18 @@ export function WorkerEdit() {
   const { peerId } = useParams<{ peerId: string }>();
   const { data: worker, isPending } = useWorkerByPeerId(peerId);
 
-  if (isPending) return <Loader />;
-  else if (!worker || !worker.ownedByMe) {
-    return (
-      <Box>
-        Worker <b>{peerId}</b> not found
-      </Box>
-    );
-  }
-
   return (
     <CenteredPageWrapper>
-      <NetworkPageTitle backPath={`/workers/${peerId}`} title="Edit worker" />
-      <WorkerForm worker={worker} />
+      <ConnectedWalletRequired>
+        <NetworkPageTitle backPath={`/workers/${peerId}`} title="Edit worker" />
+        {isPending ? (
+          <Loader />
+        ) : !worker || !worker.ownedByMe ? (
+          <NotFound id={peerId} item="worker" />
+        ) : (
+          <WorkerForm worker={worker} />
+        )}
+      </ConnectedWalletRequired>
     </CenteredPageWrapper>
   );
 }
