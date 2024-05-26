@@ -69,10 +69,7 @@ export function useSubsquidNetwork() {
     disconnect();
   }, [isConnected, chain, app, disconnect, walletClient, changeApp]);
 
-  return {
-    network: NetworkName.Testnet, // validate(app),
-    switchAndReset,
-  };
+  return { network: validate(app), switchAndReset };
 }
 
 export function getChainId(network: NetworkName) {

@@ -18,7 +18,6 @@ import { Outlet } from 'react-router-dom';
 import { Logo } from '@components/Logo';
 import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
-import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled.ts';
 import { MenuIcon } from '@icons/MenuIcon';
 
 import { ColorVariant } from '../../theme';
@@ -285,7 +284,7 @@ export const NetworkLayout = ({
             ) : null}
           </AppToolbarSidebar>
           <AppToolbarContent />
-          {demoFeaturesEnabled() ? <NetworkSwitcher hideText={isMobile} /> : null}
+          <NetworkSwitcher hideText={isMobile} />
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}
           <UserMenu />
