@@ -135,6 +135,8 @@ export const Item = forwardRef(
 export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
   const { network } = useSubsquidNetwork();
 
+  const showMenu = demoFeaturesEnabled() || network === NetworkName.Testnet;
+
   return (
     <>
       <div style={{ height: '1.125rem' }} />
@@ -145,13 +147,22 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       {/*  path="/network-dashboard"*/}
       {/*/>*/}
 
-      {demoFeaturesEnabled() || network === NetworkName.Testnet ? (
+      {showMenu ? (
         <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
       ) : null}
       <Item LeftIcon={AccountIcon} label="Assets" onClick={onItemClick} path="/assets" />
-      <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
-      <Item LeftIcon={AccountIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
-      <Item LeftIcon={DocumentIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
+      {showMenu ? (
+        <>
+          <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
+          <Item
+            LeftIcon={AccountIcon}
+            label="Delegations"
+            onClick={onItemClick}
+            path="/delegations"
+          />
+          <Item LeftIcon={DocumentIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
+        </>
+      ) : null}
 
       <div style={{ flex: 1 }} />
 
