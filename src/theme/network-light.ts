@@ -2,7 +2,7 @@ import { alpha } from '@mui/system/colorManipulator';
 
 export const NetworkLightTheme = {
   primary: {
-    main: '#000000',
+    main: '#2c2c2c',
     light: '#333333',
     contrastText: '#fff',
   },
