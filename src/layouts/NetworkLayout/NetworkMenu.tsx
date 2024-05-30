@@ -4,14 +4,12 @@ import { Box, Button, buttonClasses, styled } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useIsWorkerOperator } from '@api/subsquid-network-squid';
-import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { AccountIcon } from '@icons/AccountIcon';
 import { ComputersIcon } from '@icons/ComputersIcon';
 import { ContactsIcon } from '@icons/ContactsIcon';
 import { DashboardIcon } from '@icons/DashboardIcon';
 import { DocumentIcon } from '@icons/DocumentIcon';
 import { OpenInNewIcon } from '@icons/OpenInNewIcon';
-import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
 import { useWorkersChatUrl } from '@network/useWorkersChat';
 
 interface NetworkMenuProps {
@@ -135,38 +133,18 @@ export const Item = forwardRef(
 );
 
 export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
-  const { network } = useSubsquidNetwork();
   const { isWorkerOperator } = useIsWorkerOperator();
   const workersChatUrl = useWorkersChatUrl();
-
-  const showMenu = demoFeaturesEnabled() || network === NetworkName.Testnet;
 
   return (
     <>
       <div style={{ height: '1.125rem' }} />
-      {/*<Item*/}
-      {/*  LeftIcon={DashboardIcon}*/}
-      {/*  label="Dashboard"*/}
-      {/*  onClick={onItemClick}*/}
-      {/*  path="/network-dashboard"*/}
-      {/*/>*/}
 
-      {showMenu ? (
-        <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
-      ) : null}
+      <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
       <Item LeftIcon={AccountIcon} label="Assets" onClick={onItemClick} path="/assets" />
-      {showMenu ? (
-        <>
-          <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
-          <Item
-            LeftIcon={AccountIcon}
-            label="Delegations"
-            onClick={onItemClick}
-            path="/delegations"
-          />
-          <Item LeftIcon={DocumentIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
-        </>
-      ) : null}
+      <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
+      <Item LeftIcon={AccountIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
+      <Item LeftIcon={DocumentIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
 
       <div style={{ flex: 1 }} />
 
