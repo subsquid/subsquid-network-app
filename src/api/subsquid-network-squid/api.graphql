@@ -130,6 +130,12 @@ query myWorkers($address: String!) {
   }
 }
 
+query myWorkersCount($address: String!) {
+  workersConnection(orderBy: id_ASC, where: { realOwner: { id_eq: $address } }) {
+    totalCount
+  }
+}
+
 query myAssets($address: String!) {
   accounts(where: { id_eq: $address }) {
     balance
@@ -245,7 +251,7 @@ fragment GatewayStakeFragment on GatewayOperator {
 }
 
 query myGatewayStakes($address: String!) {
-  gatewayOperators(where: {account: {id_eq: $address, OR: {owner: {id_eq: $address}}}}) {
+  gatewayOperators(where: { account: { id_eq: $address, OR: { owner: { id_eq: $address } } } }) {
     ...GatewayStakeFragment
   }
 }

@@ -15,6 +15,12 @@ export default defineConfig({
       process.env.DISCORD_API_URL || 'https://discord.com/invite/subsquid',
     ),
     'process.env.DOCS_API_URL': encode(process.env.DOCS_API_URL || 'https://docs.subsquid.io'),
+    'process.env.TESTNET_WORKERS_CHAT_URL': encode(
+      process.env.TESTNET_WORKERS_CHAT_URL || 'https://t.me/+vzY6TbX38kxkOTFi',
+    ),
+    'process.env.MAINNET_WORKERS_CHAT_URL': encode(
+      process.env.MAINNET_WORKERS_CHAT_URL || 'https://t.me/SubsquidMainnetOperators',
+    ),
 
     'process.env.TESTNET_SQUID_API_URL': encode(
       process.env.TESTNET_SQUID_API_URL || 'http://localhost:4350',

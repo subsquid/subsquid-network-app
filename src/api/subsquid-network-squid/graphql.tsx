@@ -5294,6 +5294,15 @@ export type MyWorkersQuery = {
   }>;
 };
 
+export type MyWorkersCountQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+}>;
+
+export type MyWorkersCountQuery = {
+  __typename?: 'Query';
+  workersConnection: { __typename?: 'WorkersConnection'; totalCount: number };
+};
+
 export type MyAssetsQueryVariables = Exact<{
   address: Scalars['String']['input'];
 }>;
@@ -5816,6 +5825,33 @@ export const useMyWorkersQuery = <TData = MyWorkersQuery, TError = unknown>(
       dataSource.endpoint,
       dataSource.fetchParams || {},
       MyWorkersDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const MyWorkersCountDocument = `
+    query myWorkersCount($address: String!) {
+  workersConnection(orderBy: id_ASC, where: {realOwner: {id_eq: $address}}) {
+    totalCount
+  }
+}
+    `;
+
+export const useMyWorkersCountQuery = <TData = MyWorkersCountQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: MyWorkersCountQueryVariables,
+  options?: Omit<UseQueryOptions<MyWorkersCountQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<MyWorkersCountQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<MyWorkersCountQuery, TError, TData>({
+    queryKey: ['myWorkersCount', variables],
+    queryFn: fetcher<MyWorkersCountQuery, MyWorkersCountQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      MyWorkersCountDocument,
       variables,
     ),
     ...options,

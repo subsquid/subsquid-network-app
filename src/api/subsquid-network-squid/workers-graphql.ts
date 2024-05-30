@@ -13,6 +13,7 @@ import {
   useAllWorkersQuery,
   useMyClaimsAvailableQuery,
   useMyDelegationsQuery,
+  useMyWorkersCountQuery,
   useMyWorkersQuery,
   useWorkerByPeerIdQuery,
   useWorkerDaysUptimeByIdQuery,
@@ -401,5 +402,26 @@ export function useMyDelegations() {
   return {
     isLoading: isSettingsLoading || isLoading,
     delegations,
+  };
+}
+
+export function useIsWorkerOperator() {
+  const { address } = useAccount();
+  const datasource = useSquidDataSource();
+  const { data, isLoading } = useMyWorkersCountQuery(
+    datasource,
+    {
+      address: address || '',
+    },
+    {
+      select: res => {
+        return !!res.workersConnection.totalCount;
+      },
+    },
+  );
+
+  return {
+    isLoading: isLoading,
+    isWorkerOperator: data ?? false,
   };
 }
