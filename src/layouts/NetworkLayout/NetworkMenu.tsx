@@ -3,6 +3,7 @@ import React, { ForwardedRef, forwardRef } from 'react';
 import { Box, Button, buttonClasses, styled } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
+import { useIsWorkerOperator } from '@api/subsquid-network-squid';
 import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { AccountIcon } from '@icons/AccountIcon';
 import { ComputersIcon } from '@icons/ComputersIcon';
@@ -11,6 +12,7 @@ import { DashboardIcon } from '@icons/DashboardIcon';
 import { DocumentIcon } from '@icons/DocumentIcon';
 import { OpenInNewIcon } from '@icons/OpenInNewIcon';
 import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { useWorkersChatUrl } from '@network/useWorkersChat';
 
 interface NetworkMenuProps {
   onItemClick: () => void;
@@ -134,6 +136,8 @@ export const Item = forwardRef(
 
 export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
   const { network } = useSubsquidNetwork();
+  const { isWorkerOperator } = useIsWorkerOperator();
+  const workersChatUrl = useWorkersChatUrl();
 
   const showMenu = demoFeaturesEnabled() || network === NetworkName.Testnet;
 
@@ -173,9 +177,18 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       {/*  LeftIcon={DocumentIcon}*/}
       {/*  RightIcon={OpenInNewIcon}*/}
       {/*/>*/}
+      {isWorkerOperator ? (
+        <Item
+          label="Operators chat"
+          path={workersChatUrl || '/null'}
+          target="_blank"
+          LeftIcon={ContactsIcon}
+          RightIcon={OpenInNewIcon}
+        />
+      ) : null}
       <Item
-        label="Contact"
-        path={process.env.DISCORD_API_URL || ''}
+        label="Community chat"
+        path={process.env.DISCORD_API_URL || '/null'}
         target="_blank"
         LeftIcon={ContactsIcon}
         RightIcon={OpenInNewIcon}
