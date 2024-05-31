@@ -31,7 +31,7 @@ export const LogoSecondary = styled(Box, {
   name: 'LogoSecondary',
 })(({ theme }) => ({
   fontSize: '16px',
-  fontWeight: 400,
+  fontWeight: 500,
   lineHeight: 1,
   letterSpacing: '0 em',
   marginLeft: theme.spacing(0.5),
