@@ -13,7 +13,6 @@ import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
-import { useSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { ClaimButton } from './ClaimButton';
 
@@ -101,7 +100,6 @@ export function MyAssets() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
   const { isLoading, assets } = useMyAssets();
-  const { network } = useSubsquidNetwork();
 
   const data = useMemo(
     () => [

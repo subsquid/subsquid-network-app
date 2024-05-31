@@ -1,4 +1,4 @@
-import { NetworkName, useSubsquidNetwork } from './useSubsquidNetwork.ts';
+import { NetworkName, getSubsquidNetwork } from './useSubsquidNetwork.ts';
 
 export function useContracts(): {
   SQD: `0x${string}`;
@@ -9,10 +9,10 @@ export function useContracts(): {
   GATEWAY_REGISTRATION: `0x${string}`;
   SQD_TOKEN: string;
 } {
-  const { network } = useSubsquidNetwork();
+  const network = getSubsquidNetwork();
 
   switch (network) {
-    case NetworkName.Testnet: {
+    case NetworkName.Tethys: {
       return {
         SQD: `0x24f9C46d86c064a6FA2a568F918fe62fC6917B3c`,
         WORKER_REGISTRATION: `0xCD8e983F8c4202B0085825Cf21833927D1e2b6Dc`,

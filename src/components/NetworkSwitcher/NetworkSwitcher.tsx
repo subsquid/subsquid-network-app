@@ -1,13 +1,9 @@
-import React from 'react';
+import { Button, styled } from '@mui/material';
 
-import { Button, styled, SxProps } from '@mui/material';
-import capitalize from 'lodash-es/capitalize';
-
-import { SwitchArrowsIcon } from '@icons/SwitchArrowsIcon';
-import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
+import { NetworkName } from '@network/useSubsquidNetwork.ts';
 
 const inverseNetworkName = (name: string) =>
-  name === NetworkName.Mainnet ? NetworkName.Testnet : NetworkName.Mainnet;
+  name === NetworkName.Mainnet ? NetworkName.Tethys : NetworkName.Mainnet;
 
 const SwitchButton = styled(Button)<{ fill?: string }>(({ theme, fill }) => ({
   width: 'fit-content',
@@ -17,27 +13,27 @@ const SwitchButton = styled(Button)<{ fill?: string }>(({ theme, fill }) => ({
   margin: theme.spacing(0, 1),
 }));
 
-export function NetworkSwitcher({
-  sx,
-  color,
-  hideText = false,
-}: {
-  sx?: SxProps;
-  color?: string;
-  hideText?: boolean;
-}) {
-  const { network, switchAndReset } = useSubsquidNetwork();
+// export function NetworkSwitcher({
+//   sx,
+//   color,
+//   hideText = false,
+// }: {
+//   sx?: SxProps;
+//   color?: string;
+//   hideText?: boolean;
+// }) {
+//   const { network, switchAndReset } = getSubsquidNetwork();
 
-  return (
-    <>
-      <SwitchButton
-        fill={color}
-        onClick={async () => switchAndReset(inverseNetworkName(network))}
-        sx={sx}
-      >
-        <SwitchArrowsIcon fill={color} />
-        {hideText ? null : `Switch to ${capitalize(inverseNetworkName(network))}`}
-      </SwitchButton>
-    </>
-  );
-}
+//   return (
+//     <>
+//       <SwitchButton
+//         fill={color}
+//         onClick={async () => switchAndReset(inverseNetworkName(network))}
+//         sx={sx}
+//       >
+//         <SwitchArrowsIcon fill={color} />
+//         {hideText ? null : `Switch to ${capitalize(inverseNetworkName(network))}`}
+//       </SwitchButton>
+//     </>
+//   );
+// }

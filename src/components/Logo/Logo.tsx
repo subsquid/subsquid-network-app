@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
 import { upperFirst } from 'lodash-es';
 
-import { useSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 export const LogoWrapper = styled('div', {
   name: 'LogoWrapper',
@@ -31,7 +31,7 @@ export const LogoSecondary = styled(Box, {
   name: 'LogoSecondary',
 })(({ theme }) => ({
   fontSize: '16px',
-  fontWeight: 400,
+  fontWeight: 500,
   lineHeight: 1,
   letterSpacing: '0 em',
   marginLeft: theme.spacing(0.5),
@@ -43,7 +43,7 @@ export function Logo({ color = '#fff' }: { color?: string }) {
   const narrow = useMediaQuery(theme.breakpoints.down('lg'));
   const size = 32;
 
-  const { network } = useSubsquidNetwork();
+  const network = getSubsquidNetwork();
 
   return (
     <LogoWrapper>

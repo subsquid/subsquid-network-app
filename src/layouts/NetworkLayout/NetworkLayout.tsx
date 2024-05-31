@@ -1,6 +1,6 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 
 import {
   AppBar as AppBarMaterial,
@@ -14,11 +14,14 @@ import {
 import { alpha } from '@mui/system/colorManipulator';
 import classnames from 'classnames';
 import { Outlet } from 'react-router-dom';
+import { useDisconnect, useWalletClient } from 'wagmi';
 
 import { Logo } from '@components/Logo';
-import { NetworkSwitcher } from '@components/NetworkSwitcher';
+// import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
+import { useAccount } from '@network/useAccount';
+import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { ColorVariant } from '../../theme';
 
@@ -260,6 +263,18 @@ export const NetworkLayout = ({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const walletClient = useWalletClient();
+  const { isConnected, chain } = useAccount();
+  const { disconnect } = useDisconnect();
+  const network = getSubsquidNetwork();
+
+  useEffect(() => {
+    if (!isConnected || walletClient.isLoading) return;
+    if (chain?.id === getChainId(network)) return;
+
+    disconnect();
+  }, [isConnected, chain, disconnect, walletClient, network]);
+
   const centeredSx = {
     alignSelf: stretchContent ? 'stretch' : 'flex-start',
   };
@@ -284,7 +299,7 @@ export const NetworkLayout = ({
             ) : null}
           </AppToolbarSidebar>
           <AppToolbarContent />
-          <NetworkSwitcher hideText={isMobile} />
+          {/* <NetworkSwitcher hideText={isMobile} /> */}
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}
           <UserMenu />

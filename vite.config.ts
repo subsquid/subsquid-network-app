@@ -34,7 +34,7 @@ export default defineConfig({
     'process.env.MULTICALL_3_CONTRACT_ADDRESS': encode(
       process.env.MULTICALL_3_CONTRACT_ADDRESS || '',
     ),
-    'process.env.DEFAULT_NETWORK': encode(process.env.DEFAULT_NETWORK || 'mainnet'),
+    'process.env.NETWORK': encode(process.env.NETWORK || 'mainnet'),
     'process.env.SENTRY_DSN': encode(process.env.SENTRY_DSN || ''),
   },
   plugins: [tsconfigPaths(), react(), splitVendorChunkPlugin()],

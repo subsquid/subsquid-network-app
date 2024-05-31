@@ -7,7 +7,7 @@ import { useAppReload } from '../../index.tsx';
 import { BasicMenuItem } from './BasicMenuItem';
 
 export function LogoutMenuItem() {
-  const reload = useAppReload({ clearStorage: true, to: '/' });
+  const reload = useAppReload({ to: '/' });
 
   return <BasicMenuItem LeftIcon={LogoutIcon} label="Disconnect" onClick={() => reload()} />;
 }
