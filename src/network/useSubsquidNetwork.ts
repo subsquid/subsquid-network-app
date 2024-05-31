@@ -1,7 +1,7 @@
 import { arbitrum, arbitrumSepolia } from 'wagmi/chains';
 
 export enum NetworkName {
-  Testnet = 'testnet',
+  Tethys = 'tethys',
   Mainnet = 'mainnet',
 }
 
@@ -20,5 +20,5 @@ export function getChainId(network: NetworkName) {
 }
 
 export function getNetworkName(chainId: number) {
-  return chainId === arbitrum.id ? NetworkName.Mainnet : NetworkName.Testnet;
+  return chainId === arbitrum.id ? NetworkName.Mainnet : NetworkName.Tethys;
 }

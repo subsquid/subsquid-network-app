@@ -1,13 +1,9 @@
-import React from 'react';
+import { Button, styled } from '@mui/material';
 
-import { Button, styled, SxProps } from '@mui/material';
-import capitalize from 'lodash-es/capitalize';
-
-import { SwitchArrowsIcon } from '@icons/SwitchArrowsIcon';
-import { NetworkName, getSubsquidNetwork } from '@network/useSubsquidNetwork.ts';
+import { NetworkName } from '@network/useSubsquidNetwork.ts';
 
 const inverseNetworkName = (name: string) =>
-  name === NetworkName.Mainnet ? NetworkName.Testnet : NetworkName.Mainnet;
+  name === NetworkName.Mainnet ? NetworkName.Tethys : NetworkName.Mainnet;
 
 const SwitchButton = styled(Button)<{ fill?: string }>(({ theme, fill }) => ({
   width: 'fit-content',
