@@ -11,10 +11,9 @@ import { Card } from '@components/Card';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
-import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
-import { NetworkName, useSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { useSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { ClaimButton } from './ClaimButton';
 
@@ -148,12 +147,7 @@ export function MyAssets() {
 
   return (
     <Box>
-      <NetworkPageTitle
-        title="My Assets"
-        endAdornment={
-          demoFeaturesEnabled() || network === NetworkName.Testnet ? <ClaimButton /> : null
-        }
-      />
+      <NetworkPageTitle title="My Assets" endAdornment={<ClaimButton />} />
 
       {isLoading ? (
         <Loader />
