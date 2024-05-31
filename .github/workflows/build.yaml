@@ -60,6 +60,9 @@ jobs:
 
       - run: yarn install --immutable
 
+      # Check compile errors before build
+      - run: yarn tsc
+
       - run: yarn build
         env:
           APP_ENV: ${{ steps.env.outputs.app_env }}
