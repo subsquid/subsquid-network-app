@@ -16,7 +16,7 @@ import classnames from 'classnames';
 import { Outlet } from 'react-router-dom';
 
 import { Logo } from '@components/Logo';
-import { NetworkSwitcher } from '@components/NetworkSwitcher';
+// import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
 
@@ -284,7 +284,7 @@ export const NetworkLayout = ({
             ) : null}
           </AppToolbarSidebar>
           <AppToolbarContent />
-          <NetworkSwitcher hideText={isMobile} />
+          {/* <NetworkSwitcher hideText={isMobile} /> */}
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}
           <UserMenu />

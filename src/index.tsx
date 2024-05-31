@@ -20,8 +20,7 @@ declare global {
       DOCS_API_URL: string;
       DISABLE_DEMO_FEATURES: string;
 
-      /** NETWORK **/
-      DEFAULT_NETWORK: string;
+      NETWORK: string;
       SQUID_API_URL: string;
       WALLET_CONNECT_PROJECT_ID: string;
       BLOCK_CHAIN_NODE_ADDRESS: string;
