@@ -288,6 +288,9 @@ export const useCreateTheme = (mode: PaletteType) => {
                   width: '100% !important',
                 },
               },
+              '*': {
+                fontVariantLigatures: 'none',
+              },
             },
           },
           MuiAvatar: {
