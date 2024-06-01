@@ -153,11 +153,11 @@ export function useWorkers({
   sortBy: WorkerSortBy;
   sortDir: SortDir;
 }) {
-  const datasource = useSquidDataSource();
+  const dataSource = useSquidDataSource();
   const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
 
-  const { data, isPending } = useAllWorkersQuery(datasource, {});
+  const { data, isPending } = useAllWorkersQuery(dataSource, {});
 
   const filteredData = useMemo(() => {
     const filtered = (data?.workers || [])
@@ -183,15 +183,17 @@ export function useWorkers({
 
         switch (sortBy) {
           case WorkerSortBy.Uptime90d:
-            return (a.uptime90Days || 0) - (b.uptime90Days || 0);
+            return (a.uptime90Days ?? -1) - (b.uptime90Days ?? -1);
           case WorkerSortBy.Uptime24h:
-            return (a.uptime24Hours || 0) - (b.uptime24Hours || 0);
+            return (a.uptime24Hours ?? -1) - (b.uptime24Hours ?? -1);
           case WorkerSortBy.DelegationCapacity:
             return a.totalDelegations.capacity.minus(b.totalDelegations.capacity).toNumber();
           case WorkerSortBy.StakerAPR:
-            return (a.stakerApr || 0) - (b.stakerApr || 0) || a.delegationCount - b.delegationCount;
+            return (
+              (a.stakerApr ?? -1) - (b.stakerApr ?? -1) || a.delegationCount - b.delegationCount
+            );
           case WorkerSortBy.WorkerAPR:
-            return (a.apr || 0) - (b.apr || 0);
+            return (a.apr ?? -1) - (b.apr ?? -1);
           default:
             return a.createdAt.valueOf() - b.createdAt.valueOf();
         }
