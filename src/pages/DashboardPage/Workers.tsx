@@ -3,7 +3,6 @@ import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import { IconButton, styled, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Box } from '@mui/system';
-import { useNavigate } from 'react-router-dom';
 
 import { SortDir, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
@@ -66,7 +65,6 @@ export const SummaryValue = styled(Box, {
 }));
 
 export function Workers() {
-  const navigate = useNavigate();
   const [query, setQuery] = useLocationState({
     page: new Location.Number(1),
     search: new Location.String(''),
@@ -143,13 +141,12 @@ export function Workers() {
               <TableBody>
                 {workers.map(worker => {
                   return (
-                    <TableRow
-                      onClick={() => navigate(`/workers/${worker.peerId}?backPath=/dashboard`)}
-                      className="hoverable"
-                      key={worker.peerId}
-                    >
+                    <TableRow className="hoverable" key={worker.peerId}>
                       <TableCell>
-                        <WorkerName worker={worker} />
+                        <WorkerName
+                          worker={worker}
+                          to={`/workers/${worker.peerId}?backPath=/dashboard`}
+                        />
                       </TableCell>
                       <TableCell>
                         <WorkerStatus worker={worker} />

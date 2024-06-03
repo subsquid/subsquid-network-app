@@ -1,7 +1,6 @@
-import React from 'react';
-
 import { Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
+import { Link } from 'react-router-dom';
 
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
@@ -20,10 +19,12 @@ const Name = styled(Box, {
 
 export const WorkerName = ({
   worker,
+  to,
 }: {
   worker: Pick<BlockchainApiWorker, 'name' | 'peerId' | 'online'> & {
     totalDelegations?: BlockchainApiWorker['totalDelegations'];
   };
+  to?: string;
 }) => {
   return (
     <Stack spacing={2} direction="row">
@@ -40,7 +41,11 @@ export const WorkerName = ({
           <Box>
             <CopyToClipboard
               text={worker.peerId}
-              content={<PeerIdShort>{shortPeerId(worker.peerId)}</PeerIdShort>}
+              content={
+                <PeerIdShort>
+                  <Link to={to || ''}>{shortPeerId(worker.peerId)}</Link>
+                </PeerIdShort>
+              }
             />
           </Box>
           {/*{worker.totalDelegations ? (*/}

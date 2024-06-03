@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { dateFormat } from '@i18n';
 import { addressFormatter, percentFormatter } from '@lib/formatters/formatters';
 import { Divider, Stack, styled } from '@mui/material';
@@ -44,8 +42,7 @@ export const Title = styled(Box)(({ theme }) => ({
 
 export const VestingAddress = styled(Box, {
   name: 'VestingAddress',
-})(({ theme }) => ({
-  color: theme.palette.importantLink.main,
+})(({}) => ({
   overflowWrap: 'anywhere',
 }));
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 import { formatSqd } from '@api/contracts/utils';
 import { useMyWorkers } from '@api/subsquid-network-squid';
@@ -19,8 +19,6 @@ import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerUnregister } from './WorkerUnregister';
 
 export function MyWorkers() {
-  const navigate = useNavigate();
-
   const { data, isLoading } = useMyWorkers();
   const { isConnected } = useAccount();
   const { SQD_TOKEN } = useContracts();
@@ -54,13 +52,9 @@ export function MyWorkers() {
             <TableBody>
               {data.map(worker => {
                 return (
-                  <TableRow
-                    onClick={() => navigate(`/workers/${worker.peerId}`)}
-                    className="hoverable"
-                    key={worker.peerId}
-                  >
+                  <TableRow className="hoverable" key={worker.peerId}>
                     <TableCell>
-                      <WorkerName worker={worker} />
+                      <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
                     </TableCell>
                     <TableCell>
                       <WorkerStatus worker={worker} />
