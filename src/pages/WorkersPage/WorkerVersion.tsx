@@ -1,8 +1,14 @@
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, styled } from '@mui/material';
 import { satisfies } from 'semver';
 
 import { BlockchainApiWorker, useNetworkSettings } from '@api/subsquid-network-squid';
 import { WarningIcon } from '@icons/WarningIcon';
+
+export const WorkerVersionName = styled(Box, {
+  name: 'WorkerVersionName',
+})(() => ({
+  whiteSpace: 'nowrap',
+}));
 
 export const WorkerVersion = ({ worker }: { worker: Pick<BlockchainApiWorker, 'version'> }) => {
   const { minimalWorkerVersion, recommendedWorkerVersion } = useNetworkSettings();
@@ -11,7 +17,7 @@ export const WorkerVersion = ({ worker }: { worker: Pick<BlockchainApiWorker, 'v
     <>
       {worker.version ? (
         <Stack spacing={1} direction="row" alignItems="center">
-          <Box>{worker.version}</Box>
+          <WorkerVersionName>{worker.version}</WorkerVersionName>
           {!satisfies(worker.version, recommendedWorkerVersion) ? (
             !satisfies(worker.version, minimalWorkerVersion) ? (
               <WarningIcon color="error" />

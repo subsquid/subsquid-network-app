@@ -13,5 +13,4 @@ export const PeerIdShort = styled(Box, {
   name: 'PeerIdShort',
 })(() => ({
   minWidth: 90,
-  opacity: 0.8,
 }));
