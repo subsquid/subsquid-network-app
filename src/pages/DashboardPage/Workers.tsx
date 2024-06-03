@@ -141,7 +141,7 @@ export function Workers() {
               <TableBody>
                 {workers.map(worker => {
                   return (
-                    <TableRow className="hoverable" key={worker.peerId}>
+                    <TableRow key={worker.peerId}>
                       <TableCell>
                         <WorkerName
                           worker={worker}
