@@ -53,7 +53,7 @@ export const GatewayCard = ({ gateway }: { gateway: BlockchainGateway }) => {
       <Avatar
         variant="circular"
         name={gateway.name || gateway.id}
-        colorDescriminator={gateway.id}
+        colorDiscriminator={gateway.id}
         size={100}
       />
       <Box sx={{ flex: 1 }}>

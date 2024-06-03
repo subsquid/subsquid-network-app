@@ -35,7 +35,7 @@ export function MyDelegations() {
                 <TableCell width={275}>Worker</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Delegation</TableCell>
-                <TableCell>APR, 7d</TableCell>
+                <TableCell>APR</TableCell>
                 <TableCell>Total reward</TableCell>
                 <TableCell></TableCell>
               </TableRow>

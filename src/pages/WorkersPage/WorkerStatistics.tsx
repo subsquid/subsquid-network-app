@@ -110,7 +110,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Bond</Title>
             <Stack spacing={2}>
               <Stack direction="row">
-                <WorkerDescLabel>Worker APR, 7d</WorkerDescLabel>
+                <WorkerDescLabel>Worker APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.apr != null ? percentFormatter(worker.apr) : '-'}
                 </WorkerDescValue>
@@ -130,7 +130,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Delegation</Title>
             <Stack spacing={2}>
               <Stack direction="row">
-                <WorkerDescLabel>Delegator APR, 7d</WorkerDescLabel>
+                <WorkerDescLabel>Delegator APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                 </WorkerDescValue>

@@ -17,7 +17,7 @@ const Name = styled(Box, {
 export function VestingName({ vesting }: { vesting: { address: string } }) {
   return (
     <Stack direction="row" spacing={2}>
-      <Avatar name={vesting.address.slice(2)} colorDescriminator={vesting.address} />
+      <Avatar name={vesting.address.slice(2)} colorDiscriminator={vesting.address} />
       <Box>
         <Name>Vesting contract</Name>
         <Box sx={{ opacity: 0.8 }}>

@@ -30,7 +30,7 @@ export const WorkerName = ({
       <Avatar
         // online={!!worker.online}
         name={worker.name || worker.peerId}
-        colorDescriminator={worker.peerId}
+        colorDiscriminator={worker.peerId}
       />
       <Box>
         {worker.name ? (

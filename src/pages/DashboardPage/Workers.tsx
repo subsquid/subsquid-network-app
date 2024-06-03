@@ -113,14 +113,14 @@ export function Workers() {
                     query={query}
                     setQuery={setQuery}
                   >
-                    Worker APR, 7d
+                    Worker APR
                   </SortableHeaderCell>
                   <SortableHeaderCell
                     sort={WorkerSortBy.StakerAPR}
                     query={query}
                     setQuery={setQuery}
                   >
-                    Delegator APR, 7d
+                    Delegator APR
                   </SortableHeaderCell>
                   {/*<SortableHeaderCell*/}
                   {/*  width={70}*/}
