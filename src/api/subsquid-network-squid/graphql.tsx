@@ -906,10 +906,12 @@ export type ClaimsConnection = {
 
 export type Commitment = {
   __typename?: 'Commitment';
-  from: Scalars['Int']['output'];
+  from: Scalars['DateTime']['output'];
+  fromBlock: Scalars['Int']['output'];
   id: Scalars['String']['output'];
   recipients: Array<CommitmentRecipient>;
-  to: Scalars['Int']['output'];
+  to: Scalars['DateTime']['output'];
+  toBlock: Scalars['Int']['output'];
 };
 
 export type CommitmentEdge = {
@@ -919,6 +921,12 @@ export type CommitmentEdge = {
 };
 
 export enum CommitmentOrderByInput {
+  FromBlockAsc = 'fromBlock_ASC',
+  FromBlockAscNullsFirst = 'fromBlock_ASC_NULLS_FIRST',
+  FromBlockAscNullsLast = 'fromBlock_ASC_NULLS_LAST',
+  FromBlockDesc = 'fromBlock_DESC',
+  FromBlockDescNullsFirst = 'fromBlock_DESC_NULLS_FIRST',
+  FromBlockDescNullsLast = 'fromBlock_DESC_NULLS_LAST',
   FromAsc = 'from_ASC',
   FromAscNullsFirst = 'from_ASC_NULLS_FIRST',
   FromAscNullsLast = 'from_ASC_NULLS_LAST',
@@ -931,6 +939,12 @@ export enum CommitmentOrderByInput {
   IdDesc = 'id_DESC',
   IdDescNullsFirst = 'id_DESC_NULLS_FIRST',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  ToBlockAsc = 'toBlock_ASC',
+  ToBlockAscNullsFirst = 'toBlock_ASC_NULLS_FIRST',
+  ToBlockAscNullsLast = 'toBlock_ASC_NULLS_LAST',
+  ToBlockDesc = 'toBlock_DESC',
+  ToBlockDescNullsFirst = 'toBlock_DESC_NULLS_FIRST',
+  ToBlockDescNullsLast = 'toBlock_DESC_NULLS_LAST',
   ToAsc = 'to_ASC',
   ToAscNullsFirst = 'to_ASC_NULLS_FIRST',
   ToAscNullsLast = 'to_ASC_NULLS_LAST',
@@ -951,15 +965,24 @@ export type CommitmentRecipient = {
 export type CommitmentWhereInput = {
   AND?: InputMaybe<Array<CommitmentWhereInput>>;
   OR?: InputMaybe<Array<CommitmentWhereInput>>;
-  from_eq?: InputMaybe<Scalars['Int']['input']>;
-  from_gt?: InputMaybe<Scalars['Int']['input']>;
-  from_gte?: InputMaybe<Scalars['Int']['input']>;
-  from_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  fromBlock_eq?: InputMaybe<Scalars['Int']['input']>;
+  fromBlock_gt?: InputMaybe<Scalars['Int']['input']>;
+  fromBlock_gte?: InputMaybe<Scalars['Int']['input']>;
+  fromBlock_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  fromBlock_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  fromBlock_lt?: InputMaybe<Scalars['Int']['input']>;
+  fromBlock_lte?: InputMaybe<Scalars['Int']['input']>;
+  fromBlock_not_eq?: InputMaybe<Scalars['Int']['input']>;
+  fromBlock_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  from_eq?: InputMaybe<Scalars['DateTime']['input']>;
+  from_gt?: InputMaybe<Scalars['DateTime']['input']>;
+  from_gte?: InputMaybe<Scalars['DateTime']['input']>;
+  from_in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   from_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  from_lt?: InputMaybe<Scalars['Int']['input']>;
-  from_lte?: InputMaybe<Scalars['Int']['input']>;
-  from_not_eq?: InputMaybe<Scalars['Int']['input']>;
-  from_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  from_lt?: InputMaybe<Scalars['DateTime']['input']>;
+  from_lte?: InputMaybe<Scalars['DateTime']['input']>;
+  from_not_eq?: InputMaybe<Scalars['DateTime']['input']>;
+  from_not_in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   id_contains?: InputMaybe<Scalars['String']['input']>;
   id_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
   id_endsWith?: InputMaybe<Scalars['String']['input']>;
@@ -978,15 +1001,24 @@ export type CommitmentWhereInput = {
   id_not_startsWith?: InputMaybe<Scalars['String']['input']>;
   id_startsWith?: InputMaybe<Scalars['String']['input']>;
   recipients_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  to_eq?: InputMaybe<Scalars['Int']['input']>;
-  to_gt?: InputMaybe<Scalars['Int']['input']>;
-  to_gte?: InputMaybe<Scalars['Int']['input']>;
-  to_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  toBlock_eq?: InputMaybe<Scalars['Int']['input']>;
+  toBlock_gt?: InputMaybe<Scalars['Int']['input']>;
+  toBlock_gte?: InputMaybe<Scalars['Int']['input']>;
+  toBlock_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  toBlock_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  toBlock_lt?: InputMaybe<Scalars['Int']['input']>;
+  toBlock_lte?: InputMaybe<Scalars['Int']['input']>;
+  toBlock_not_eq?: InputMaybe<Scalars['Int']['input']>;
+  toBlock_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  to_eq?: InputMaybe<Scalars['DateTime']['input']>;
+  to_gt?: InputMaybe<Scalars['DateTime']['input']>;
+  to_gte?: InputMaybe<Scalars['DateTime']['input']>;
+  to_in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   to_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  to_lt?: InputMaybe<Scalars['Int']['input']>;
-  to_lte?: InputMaybe<Scalars['Int']['input']>;
-  to_not_eq?: InputMaybe<Scalars['Int']['input']>;
-  to_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  to_lt?: InputMaybe<Scalars['DateTime']['input']>;
+  to_lte?: InputMaybe<Scalars['DateTime']['input']>;
+  to_not_eq?: InputMaybe<Scalars['DateTime']['input']>;
+  to_not_in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
 };
 
 export type CommitmentsConnection = {
@@ -3008,6 +3040,8 @@ export type Settings = {
   delegationLimitCoefficient: Scalars['Float']['output'];
   epochLength?: Maybe<Scalars['Int']['output']>;
   id: Scalars['String']['output'];
+  minimalWorkerVersion?: Maybe<Scalars['String']['output']>;
+  recommendedWorkerVersion?: Maybe<Scalars['String']['output']>;
 };
 
 export type SettingsConnection = {
@@ -3048,6 +3082,18 @@ export enum SettingsOrderByInput {
   IdDesc = 'id_DESC',
   IdDescNullsFirst = 'id_DESC_NULLS_FIRST',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
+  MinimalWorkerVersionAsc = 'minimalWorkerVersion_ASC',
+  MinimalWorkerVersionAscNullsFirst = 'minimalWorkerVersion_ASC_NULLS_FIRST',
+  MinimalWorkerVersionAscNullsLast = 'minimalWorkerVersion_ASC_NULLS_LAST',
+  MinimalWorkerVersionDesc = 'minimalWorkerVersion_DESC',
+  MinimalWorkerVersionDescNullsFirst = 'minimalWorkerVersion_DESC_NULLS_FIRST',
+  MinimalWorkerVersionDescNullsLast = 'minimalWorkerVersion_DESC_NULLS_LAST',
+  RecommendedWorkerVersionAsc = 'recommendedWorkerVersion_ASC',
+  RecommendedWorkerVersionAscNullsFirst = 'recommendedWorkerVersion_ASC_NULLS_FIRST',
+  RecommendedWorkerVersionAscNullsLast = 'recommendedWorkerVersion_ASC_NULLS_LAST',
+  RecommendedWorkerVersionDesc = 'recommendedWorkerVersion_DESC',
+  RecommendedWorkerVersionDescNullsFirst = 'recommendedWorkerVersion_DESC_NULLS_FIRST',
+  RecommendedWorkerVersionDescNullsLast = 'recommendedWorkerVersion_DESC_NULLS_LAST',
 }
 
 export type SettingsWhereInput = {
@@ -3097,6 +3143,40 @@ export type SettingsWhereInput = {
   id_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
   id_not_startsWith?: InputMaybe<Scalars['String']['input']>;
   id_startsWith?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_contains?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_endsWith?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_eq?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_gt?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_gte?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  minimalWorkerVersion_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  minimalWorkerVersion_lt?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_lte?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_not_contains?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_not_eq?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  minimalWorkerVersion_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  minimalWorkerVersion_startsWith?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_contains?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_endsWith?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_eq?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_gt?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_gte?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  recommendedWorkerVersion_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  recommendedWorkerVersion_lt?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_lte?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_not_contains?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_not_endsWith?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_not_eq?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  recommendedWorkerVersion_not_startsWith?: InputMaybe<Scalars['String']['input']>;
+  recommendedWorkerVersion_startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SquidStatus = {
@@ -5095,6 +5175,8 @@ export type SettingsQuery = {
         id: string;
         bondAmount?: any;
         delegationLimitCoefficient: number;
+        minimalWorkerVersion?: string;
+        recommendedWorkerVersion?: string;
       };
     }>;
   };
@@ -5643,6 +5725,8 @@ export const SettingsDocument = `
         id
         bondAmount
         delegationLimitCoefficient
+        minimalWorkerVersion
+        recommendedWorkerVersion
       }
     }
   }

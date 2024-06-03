@@ -15,6 +15,7 @@ import { CopyToClipboard } from '@components/CopyToClipboard';
 import { useContracts } from '@network/useContracts';
 
 import { UptimeGraph } from './UptimeGraph';
+import { WorkerVersion } from './WorkerVersion';
 
 export const WorkerDescLabel = styled(Box, {
   name: 'WorkerDescLabel',
@@ -74,7 +75,9 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
           </Stack>
           <Stack direction="row">
             <WorkerDescLabel>Version</WorkerDescLabel>
-            <WorkerDescValue>{worker.version || '-'}</WorkerDescValue>
+            <WorkerDescValue>
+              <WorkerVersion worker={worker} />
+            </WorkerDescValue>
           </Stack>
           <Stack direction="row">
             <WorkerDescLabel>Website</WorkerDescLabel>

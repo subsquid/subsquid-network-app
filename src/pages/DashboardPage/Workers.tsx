@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { dateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
@@ -15,6 +13,7 @@ import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTab
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerVersion } from '@pages/WorkersPage/WorkerVersion';
 
 import { WorkerDelegate } from '../WorkersPage/WorkerDelegate';
 import { WorkerName } from '../WorkersPage/WorkerName';
@@ -101,6 +100,7 @@ export function Workers() {
                 <TableRow>
                   <TableCell sx={{ minWidth: 275 }}>Worker</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Version</TableCell>
                   <SortableHeaderCell
                     sort={WorkerSortBy.Uptime90d}
                     query={query}
@@ -153,6 +153,9 @@ export function Workers() {
                       </TableCell>
                       <TableCell>
                         <WorkerStatus worker={worker} />
+                      </TableCell>
+                      <TableCell>
+                        <WorkerVersion worker={worker} />
                       </TableCell>
                       <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
                       <TableCell>
