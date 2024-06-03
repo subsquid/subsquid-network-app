@@ -217,6 +217,11 @@ fragment GatewayFragment on Gateway {
     id
     type
   }
+  operator {
+    stake {
+      locked
+    }
+  }
   createdAt
 }
 

@@ -5,6 +5,7 @@ import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 import { formatSqd } from '@api/contracts/utils';
+import { useMySources } from '@api/subsquid-network-squid';
 import { useMyGateways, useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -22,6 +23,7 @@ import { GatewayUnstake } from './GatewayUnstake';
 
 export function MyStakes() {
   const { data, isLoading } = useMyGatewayStakes();
+  const { sources } = useMySources();
   const { SQD_TOKEN } = useContracts();
 
   return (
@@ -93,7 +95,7 @@ export function MyGateways() {
             <TableHead>
               <TableRow>
                 <TableCell>Gateway</TableCell>
-                <TableCell>Type</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell>Created</TableCell>
                 <TableCell></TableCell>
               </TableRow>

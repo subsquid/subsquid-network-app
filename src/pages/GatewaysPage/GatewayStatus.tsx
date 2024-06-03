@@ -26,10 +26,10 @@ export const Chip = styled(MaterialChip)(({ theme: { spacing } }) => ({
 export function GatewayStatus({ gateway }: { gateway: BlockchainGateway }) {
   return (
     <>
-      {gateway.endpointUrl ? (
-        <Chip color="success" label="Public" />
+      {gateway.operator?.stake?.locked ? (
+        <Chip color="success" label="Active" />
       ) : (
-        <Chip color="default" label="Private" />
+        <Chip color="default" label="Idle" />
       )}
     </>
   );
