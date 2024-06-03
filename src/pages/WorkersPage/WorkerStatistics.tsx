@@ -15,6 +15,7 @@ import { CopyToClipboard } from '@components/CopyToClipboard';
 import { useContracts } from '@network/useContracts';
 
 import { UptimeGraph } from './UptimeGraph';
+import { WorkerVersion } from './WorkerVersion';
 
 export const WorkerDescLabel = styled(Box, {
   name: 'WorkerDescLabel',
@@ -74,7 +75,9 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
           </Stack>
           <Stack direction="row">
             <WorkerDescLabel>Version</WorkerDescLabel>
-            <WorkerDescValue>{worker.version || '-'}</WorkerDescValue>
+            <WorkerDescValue>
+              <WorkerVersion worker={worker} />
+            </WorkerDescValue>
           </Stack>
           <Stack direction="row">
             <WorkerDescLabel>Website</WorkerDescLabel>
@@ -107,7 +110,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Bond</Title>
             <Stack spacing={2}>
               <Stack direction="row">
-                <WorkerDescLabel>Worker APR, 7d</WorkerDescLabel>
+                <WorkerDescLabel>Worker APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.apr != null ? percentFormatter(worker.apr) : '-'}
                 </WorkerDescValue>
@@ -127,7 +130,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Delegation</Title>
             <Stack spacing={2}>
               <Stack direction="row">
-                <WorkerDescLabel>Delegator APR, 7d</WorkerDescLabel>
+                <WorkerDescLabel>Delegator APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                 </WorkerDescValue>

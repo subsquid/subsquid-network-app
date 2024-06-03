@@ -1,8 +1,6 @@
-import React from 'react';
-
 import { dateFormat } from '@i18n';
 import { addressFormatter, percentFormatter } from '@lib/formatters/formatters';
-import { Divider, Stack, styled } from '@mui/material';
+import { Divider, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useParams, useSearchParams } from 'react-router-dom';
 
@@ -44,12 +42,14 @@ export const Title = styled(Box)(({ theme }) => ({
 
 export const VestingAddress = styled(Box, {
   name: 'VestingAddress',
-})(({ theme }) => ({
-  color: theme.palette.importantLink.main,
+})(({}) => ({
   overflowWrap: 'anywhere',
 }));
 
 export function Vesting({ backPath }: { backPath: string }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
+
   const { address } = useParams<{ address: `0x${string}` }>();
   const { data: vestingInfo, isLoading: isVestingInfoLoading } = useVestingContract({ address });
   const { data: vesting, isPending: isVestingLoading } = useVestingByAddress({ address });
@@ -78,7 +78,7 @@ export function Vesting({ backPath }: { backPath: string }) {
                 <DescLabel>Contract</DescLabel>
                 <DescValue>
                   <VestingAddress>
-                    <CopyToClipboard text={address} content={addressFormatter(address)} />
+                    <CopyToClipboard text={address} content={addressFormatter(address, isMobile)} />
                   </VestingAddress>
                 </DescValue>
               </Stack>

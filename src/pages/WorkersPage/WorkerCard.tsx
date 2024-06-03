@@ -17,7 +17,6 @@ export const PeerIdRow = styled(Box, {
 })(({ theme }) => ({
   marginTop: theme.spacing(0.5),
   marginBottom: theme.spacing(1.5),
-  color: theme.palette.importantLink.main,
   fontSize: '0.875rem',
   overflowWrap: 'anywhere',
 }));
@@ -46,7 +45,7 @@ export const WorkerCard = ({ worker }: { worker: BlockchainApiFullWorker }) => {
       <Avatar
         variant="circular"
         name={worker.name || worker.peerId}
-        colorDescriminator={worker.peerId}
+        colorDiscriminator={worker.peerId}
         size={100}
       />
       <Box sx={{ flex: 1 }}>

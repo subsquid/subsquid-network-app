@@ -1,7 +1,4 @@
-import React from 'react';
-
 import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContracts } from '@api/contracts/vesting';
@@ -16,7 +13,6 @@ import { ReleaseButton } from './ReleaseButton';
 import { VestingName } from './VestingName';
 
 export function MyVestings() {
-  const navigate = useNavigate();
   const { assets, isLoading } = useMyAssets();
   const { data, isLoading: isVestingsLoading } = useVestingContracts({
     addresses: assets.vestings.map(v => v.address as `0x${string}`),
@@ -44,13 +40,9 @@ export function MyVestings() {
               {assets.vestings.map((vesting, i) => {
                 const d = data?.[i];
                 return (
-                  <TableRow
-                    onClick={() => navigate(`vestings/${vesting.address}`)}
-                    className="hoverable"
-                    key={vesting.address}
-                  >
+                  <TableRow className="hoverable" key={vesting.address}>
                     <TableCell>
-                      <VestingName vesting={vesting} />
+                      <VestingName vesting={vesting} to={`vestings/${vesting.address}`} />
                     </TableCell>
                     <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
                     <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>

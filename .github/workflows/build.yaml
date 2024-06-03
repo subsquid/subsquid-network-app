@@ -44,13 +44,13 @@ jobs:
           echo "::set-output name=tag::$(git rev-parse --short HEAD)"
           if [ "$REF" = "refs/heads/main" ]; then
               echo "::set-output name=app_env::prod"
-              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
-              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/v/v2/graphql"
+              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/graphql"
+              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/graphql"
               echo "::set-output name=enable_demo_features::false"
           else
               echo "::set-output name=app_env::dev"
               echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet/v/v1/graphql"
-              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/v/v2/graphql"
+              echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet/v/v3/graphql"
               echo "::set-output name=enable_demo_features::true"
           fi
           if [ "$NETWORK" = "mainnet" ]; then

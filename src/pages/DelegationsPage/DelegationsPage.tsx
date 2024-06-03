@@ -1,8 +1,6 @@
-import React from 'react';
-
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import { formatSqd } from '@api/contracts/utils';
 import { useMyDelegations } from '@api/subsquid-network-squid';
@@ -18,7 +16,6 @@ import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 
 export function MyDelegations() {
-  const navigate = useNavigate();
   const { delegations, isLoading } = useMyDelegations();
   const { SQD_TOKEN } = useContracts();
 
@@ -35,7 +32,7 @@ export function MyDelegations() {
                 <TableCell width={275}>Worker</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Delegation</TableCell>
-                <TableCell>APR, 7d</TableCell>
+                <TableCell>APR</TableCell>
                 <TableCell>Total reward</TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -43,13 +40,12 @@ export function MyDelegations() {
             <TableBody>
               {delegations.map(worker => {
                 return (
-                  <TableRow
-                    onClick={() => navigate(`/workers/${worker.peerId}?backPath=/delegations`)}
-                    className="hoverable"
-                    key={worker.peerId}
-                  >
+                  <TableRow className="hoverable" key={worker.peerId}>
                     <TableCell>
-                      <WorkerName worker={worker} />
+                      <WorkerName
+                        worker={worker}
+                        to={`/workers/${worker.peerId}?backPath=/delegations`}
+                      />
                     </TableCell>
                     <TableCell>
                       <WorkerStatus worker={worker} />

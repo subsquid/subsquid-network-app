@@ -13,6 +13,8 @@ query settings {
         id
         bondAmount
         delegationLimitCoefficient
+        minimalWorkerVersion
+        recommendedWorkerVersion
       }
     }
   }

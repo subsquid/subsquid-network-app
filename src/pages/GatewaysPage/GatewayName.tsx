@@ -18,7 +18,7 @@ const Name = styled(Box, {
 export const GatewayName = ({ gateway }: { gateway: BlockchainGateway }) => {
   return (
     <Stack spacing={2} direction="row">
-      <Avatar colorDescriminator={gateway.id} name={gateway.name || gateway.id} />
+      <Avatar colorDiscriminator={gateway.id} name={gateway.name || gateway.id} />
       <Box>
         {gateway.name ? <Name>{gateway.name}</Name> : null}
         <Stack direction="row" spacing={1}>

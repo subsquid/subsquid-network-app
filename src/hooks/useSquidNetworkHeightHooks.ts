@@ -15,6 +15,7 @@ export function useSquidNetworkHeightHooks() {
   const [heightHooksRaw, setHeightHooksRaw] = useLocalStorageState<string>('squid_height_hooks', {
     defaultValue: '[]',
     serializer: localStorageStringSerializer,
+    storageSync: false,
   });
   const { data, isLoading } = useSquidNetworkHeightQuery(
     dataSource,
@@ -45,6 +46,7 @@ export function useSquidNetworkHeightHooks() {
         height: Number(height),
         invalidateQueries: invalidateQueries,
       });
+      heightHooks.splice(0, heightHooks.length - 10);
 
       setHeightHooksRaw(JSON.stringify(heightHooks));
     };
@@ -56,17 +58,15 @@ export function useSquidNetworkHeightHooks() {
 
     const topInvalidate = ready.map(hook => hook.invalidateQueries);
     logger.debug(`Executing hooks for ${ready.map(h => h.height).join(`, `)} heights`);
+    setHeightHooksRaw(JSON.stringify(notReady));
+
     Promise.all(
       topInvalidate.map(invalidate => {
         return queryClient.invalidateQueries({ queryKey: invalidate });
       }),
-    )
-      .catch(e => {
-        logger.error(e);
-      })
-      .finally(() => {
-        setHeightHooksRaw(JSON.stringify(notReady));
-      });
+    ).catch(e => {
+      logger.error(e);
+    });
   }, [currentHeight, heightHooks, queryClient, setHeightHooksRaw]);
 
   return {

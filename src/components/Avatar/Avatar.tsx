@@ -32,20 +32,20 @@ function stringToColor(string: string) {
 
 export const Avatar = ({
   name,
-  colorDescriminator = name,
+  colorDiscriminator = name,
   size = 44,
   variant,
   // online,
 }: {
   name: string;
-  colorDescriminator?: string;
+  colorDiscriminator?: string;
   // online?: boolean;
   size?: number;
   variant?: 'circular' | 'rounded' | 'square';
 }) => {
   const color = useMemo(() => {
-    return stringToColor(colorDescriminator);
-  }, [colorDescriminator]);
+    return stringToColor(colorDiscriminator);
+  }, [colorDiscriminator]);
 
   return (
     <Box position="relative">
