@@ -14,11 +14,12 @@ import {
 import { alpha } from '@mui/system/colorManipulator';
 import classnames from 'classnames';
 import { Outlet } from 'react-router-dom';
-import { useDisconnect, useWalletClient } from 'wagmi';
+import { useDisconnect, useWalletClient, useBlockNumber } from 'wagmi';
 
 import { Logo } from '@components/Logo';
 // import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { TopBanner, useBannerHeight } from '@components/TopBanner';
+import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks';
 import { MenuIcon } from '@icons/MenuIcon';
 import { useAccount } from '@network/useAccount';
 import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
@@ -268,12 +269,25 @@ export const NetworkLayout = ({
   const { disconnect } = useDisconnect();
   const network = getSubsquidNetwork();
 
+  const { data: chainHeight } = useBlockNumber();
+  const {
+    currentHeight: squidHeight,
+    waitHeight: waitSquidHeight,
+    setWaitHeight,
+  } = useSquidNetworkHeightHooks();
+
   useEffect(() => {
     if (!isConnected || walletClient.isLoading) return;
     if (chain?.id === getChainId(network)) return;
 
     disconnect();
   }, [isConnected, chain, disconnect, walletClient, network]);
+
+  useEffect(() => {
+    if (chainHeight && BigInt(squidHeight) < chainHeight && waitSquidHeight < chainHeight) {
+      setWaitHeight(chainHeight);
+    }
+  }, [chainHeight, setWaitHeight, squidHeight, waitSquidHeight]);
 
   const centeredSx = {
     alignSelf: stretchContent ? 'stretch' : 'flex-start',

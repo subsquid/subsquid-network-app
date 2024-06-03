@@ -41,6 +41,10 @@ export function useSquidNetworkHeightHooks() {
 
   const setWaitHeight = useMemo(() => {
     return (height: bigint | string, invalidateQueries: unknown[] = []) => {
+      if (heightHooks.length > 10) {
+        heightHooks.splice(0, heightHooks.length - 10);
+      }
+
       heightHooks.push({
         height: Number(height),
         invalidateQueries: invalidateQueries,
