@@ -171,13 +171,13 @@ export function MyAssets() {
                     </TokenBalanceItem>
 
                     {d.vestings?.map(v => (
-                      <TokenBalanceItem key={d.name + '-' + v.address} sx={{ ml: 2.5 }}>
+                      <TokenBalanceItem key={d.name + '-' + v.id} sx={{ ml: 2.5 }}>
                         <TokenBalanceLabel
                           sx={{ background: d.background, color: d.color }}
                           value={
                             <CopyToClipboard
-                              text={v.address}
-                              content={addressFormatter(v.address, true)}
+                              text={v.id}
+                              content={addressFormatter(v.id, true)}
                             ></CopyToClipboard>
                           }
                         />

@@ -68,7 +68,7 @@ export function Vesting({ backPath }: { backPath: string }) {
     <CenteredPageWrapper className="wide">
       <NetworkPageTitle
         backPath={searchParams.get('backPath') || backPath}
-        endAdornment={vesting?.isOwn() ? <ReleaseButton vesting={{ address }} /> : null}
+        endAdornment={vesting?.isOwn() ? <ReleaseButton vesting={vesting} /> : null}
       />
       <Card>
         <Stack spacing={3} divider={<Divider orientation="horizontal" flexItem />}>

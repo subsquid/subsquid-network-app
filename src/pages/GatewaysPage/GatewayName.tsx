@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
+import { Link } from 'react-router-dom';
 
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
 import { Avatar } from '@components/Avatar';
@@ -15,7 +16,7 @@ const Name = styled(Box, {
   fontWeight: 500,
 }));
 
-export const GatewayName = ({ gateway }: { gateway: BlockchainGateway }) => {
+export const GatewayName = ({ gateway, to }: { gateway: BlockchainGateway; to?: string }) => {
   return (
     <Stack spacing={2} direction="row">
       <Avatar colorDiscriminator={gateway.id} name={gateway.name || gateway.id} />
@@ -25,7 +26,11 @@ export const GatewayName = ({ gateway }: { gateway: BlockchainGateway }) => {
           <Box>
             <CopyToClipboard
               text={gateway.id}
-              content={<PeerIdShort>{shortPeerId(gateway.id)}</PeerIdShort>}
+              content={
+                <PeerIdShort>
+                  <Link to={to || ''}>{shortPeerId(gateway.id)}</Link>
+                </PeerIdShort>
+              }
             />
           </Box>
         </Stack>

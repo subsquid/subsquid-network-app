@@ -10,12 +10,12 @@ import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
 
 import { ReleaseButton } from './ReleaseButton';
-import { VestingName } from './VestingName';
+import { SourceWalletName } from './VestingName';
 
 export function MyVestings() {
   const { assets, isLoading } = useMyAssets();
   const { data, isLoading: isVestingsLoading } = useVestingContracts({
-    addresses: assets.vestings.map(v => v.address as `0x${string}`),
+    addresses: assets.vestings.map(v => v.id as `0x${string}`),
   });
   const { SQD_TOKEN } = useContracts();
 
@@ -40,9 +40,9 @@ export function MyVestings() {
               {assets.vestings.map((vesting, i) => {
                 const d = data?.[i];
                 return (
-                  <TableRow className="hoverable" key={vesting.address}>
+                  <TableRow className="hoverable" key={vesting.id}>
                     <TableCell>
-                      <VestingName vesting={vesting} to={`vestings/${vesting.address}`} />
+                      <SourceWalletName source={vesting} to={`vestings/${vesting.id}`} />
                     </TableCell>
                     <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
                     <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>

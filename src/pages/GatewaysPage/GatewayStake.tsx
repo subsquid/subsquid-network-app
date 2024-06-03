@@ -7,7 +7,6 @@ import * as yup from 'yup';
 
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
 import { formatSqd, fromSqd } from '@api/contracts/utils';
-import { AccountType } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
@@ -52,7 +51,7 @@ export function GatewayStake() {
     isPending: isSourceLoading,
   } = useMySourceOptions({
     enabled: open,
-    sourceDisabled: s => s.type === AccountType.Vesting,
+    sourceDisabled: s => s.balance === '0',
   });
 
   const formik = useFormik({
@@ -125,7 +124,6 @@ export function GatewayStake() {
                 id="source"
                 showErrorOnlyOfTouched
                 options={options}
-                disabled
                 formik={formik}
                 onChange={e => {
                   const wallet = sources.find(w => w?.id === e.target.value);
