@@ -34,7 +34,7 @@ export const WorkerName = ({
       />
       <Box>
         {worker.name ? (
-          <Name>{worker.name.length > 50 ? worker.name.slice(0, 47) + '...' : worker.name}</Name>
+          <Name>{worker.name.length > 40 ? worker.name.slice(0, 37) + '...' : worker.name}</Name>
         ) : null}
         <Stack direction="row" spacing={1}>
           <Box>
