@@ -96,7 +96,7 @@ export function useMyGatewayStakes() {
     },
     {
       select: res => {
-        return res.gatewayOperators[0];
+        return res.gatewayOperators.filter(o => o.pendingStake || o.stake);
       },
       enabled,
     },

@@ -16,6 +16,9 @@ import {
 export type SourceWallet = {
   id: string;
   type: AccountType;
+};
+
+export type SourceWalletWithBalance = SourceWallet & {
   balance: string;
 };
 
@@ -35,7 +38,7 @@ export function useMySources({ enabled }: { enabled?: boolean } = {}) {
 
   const wallet = data?.accountById;
 
-  const res = useMemo((): SourceWallet[] => {
+  const res = useMemo((): SourceWalletWithBalance[] => {
     return !wallet
       ? [
           {
@@ -85,14 +88,18 @@ export function useMyAssets() {
     let bonded = new Decimal(0);
     let claimable = new Decimal(0);
     let delegated = new Decimal(0);
-    const vestings: { address: string; balance: string }[] = [];
+    const vestings: SourceWalletWithBalance[] = [];
 
     for (const a of accounts) {
       balance = balance.add(a.balance);
 
       for (const o of a.owned) {
         locked = locked.add(o.balance);
-        vestings.push({ address: o.id, balance: new Decimal(o.balance).toFixed(0) });
+        vestings.push({
+          id: o.id,
+          type: AccountType.Vesting,
+          balance: new Decimal(o.balance).toFixed(0),
+        });
       }
     }
     for (const w of workers) {

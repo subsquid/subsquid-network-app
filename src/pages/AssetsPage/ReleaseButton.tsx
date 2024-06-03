@@ -6,6 +6,7 @@ import * as yup from 'yup';
 
 import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContract, useVestingContractRelease } from '@api/contracts/vesting';
+import { SourceWallet } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form } from '@components/Form';
@@ -13,7 +14,7 @@ import { Loader } from '@components/Loader';
 import { TableList } from '@components/Table/TableList';
 import { useContracts } from '@network/useContracts';
 
-import { VestingName } from './VestingName';
+import { SourceWalletName } from './VestingName';
 
 export const claimSchema = yup.object({
   source: yup.string().label('Source').trim().required('Source is required'),
@@ -23,18 +24,18 @@ export function ReleaseButton({
   vesting,
   disabled,
 }: {
-  vesting: { address: string };
+  vesting: SourceWallet;
   disabled?: boolean;
 }) {
   const { release, error, isLoading } = useVestingContractRelease();
   const { data, isLoading: isVestingLoading } = useVestingContract({
-    address: vesting.address as `0x${string}`,
+    address: vesting.id as `0x${string}`,
   });
   const { SQD_TOKEN } = useContracts();
 
   const formik = useFormik({
     initialValues: {
-      source: vesting.address,
+      source: vesting.id,
       amount: 0,
     },
     validationSchema: claimSchema,
@@ -44,7 +45,7 @@ export function ReleaseButton({
 
     onSubmit: async () => {
       const { failedReason } = await release({
-        address: vesting.address as `0x${string}`,
+        address: vesting.id as `0x${string}`,
       });
 
       if (!failedReason) {
@@ -87,7 +88,7 @@ export function ReleaseButton({
               <TableBody>
                 <TableRow>
                   <TableCell>
-                    <VestingName vesting={vesting} />
+                    <SourceWalletName source={vesting} />
                   </TableCell>
                   <TableCell>Vesting</TableCell>
                   <TableCell align="right">{formatSqd(SQD_TOKEN, data?.releasable, 8)}</TableCell>

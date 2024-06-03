@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { SourceWallet, useMySources } from '@api/subsquid-network-squid';
+import { SourceWalletWithBalance, useMySources } from '@api/subsquid-network-squid';
 
 import { SourceWalletOption } from './SourceWalletOption';
 
 export function useMySourceOptions({
   enabled = true,
   sourceDisabled,
-}: { enabled?: boolean; sourceDisabled?: (w: SourceWallet) => boolean } = {}) {
+}: { enabled?: boolean; sourceDisabled?: (w: SourceWalletWithBalance) => boolean } = {}) {
   const { sources, isPending } = useMySources({ enabled });
 
   const options = sources.map(s => {

@@ -5478,6 +5478,10 @@ export type GatewayFragmentFragment = {
   website?: string;
   createdAt: any;
   owner?: { __typename?: 'Account'; id: string; type: AccountType };
+  operator?: {
+    __typename?: 'GatewayOperator';
+    stake?: { __typename?: 'GatewayStake'; locked: boolean };
+  };
 };
 
 export type MyGatewaysQueryVariables = Exact<{
@@ -5497,6 +5501,10 @@ export type MyGatewaysQuery = {
     website?: string;
     createdAt: any;
     owner?: { __typename?: 'Account'; id: string; type: AccountType };
+    operator?: {
+      __typename?: 'GatewayOperator';
+      stake?: { __typename?: 'GatewayStake'; locked: boolean };
+    };
   }>;
 };
 
@@ -5517,6 +5525,10 @@ export type GatewayByPeerIdQuery = {
     website?: string;
     createdAt: any;
     owner?: { __typename?: 'Account'; id: string; type: AccountType };
+    operator?: {
+      __typename?: 'GatewayOperator';
+      stake?: { __typename?: 'GatewayStake'; locked: boolean };
+    };
   };
 };
 
@@ -5655,6 +5667,11 @@ export const GatewayFragmentFragmentDoc = `
   owner {
     id
     type
+  }
+  operator {
+    stake {
+      locked
+    }
   }
   createdAt
 }

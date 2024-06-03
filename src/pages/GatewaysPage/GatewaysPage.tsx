@@ -5,6 +5,7 @@ import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 import { formatSqd } from '@api/contracts/utils';
+import { useMySources } from '@api/subsquid-network-squid';
 import { useMyGateways, useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -12,6 +13,7 @@ import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
+import { SourceWalletName } from '@pages/AssetsPage/VestingName';
 import { GatewayName } from '@pages/GatewaysPage/GatewayName';
 
 import { GatewayStake } from './GatewayStake';
@@ -21,40 +23,49 @@ import { GatewayUnstake } from './GatewayUnstake';
 
 export function MyStakes() {
   const { data, isLoading } = useMyGatewayStakes();
+  const { sources } = useMySources();
   const { SQD_TOKEN } = useContracts();
 
   return (
     <Box>
-      <NetworkPageTitle title="My Stakes" endAdornment={<GatewayStake />} />
+      <NetworkPageTitle title="My Locks" endAdornment={<GatewayStake />} />
       {isLoading ? (
         <Loader />
-      ) : (
+      ) : data?.length ? (
         <Card noPadding>
           <BorderedTable>
             <TableHead>
               <TableRow>
+                <TableCell>Operator</TableCell>
                 <TableCell>Pending</TableCell>
                 <TableCell>Active</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow key={data?.account.id}>
-                <TableCell>
-                  {data?.pendingStake ? formatSqd(SQD_TOKEN, data?.pendingStake?.amount) : '-'}
-                </TableCell>
-                <TableCell>
-                  {data?.stake ? formatSqd(SQD_TOKEN, data?.stake?.amount) : '-'}
-                </TableCell>
-                <TableCell>
-                  <Box display="flex" justifyContent="flex-end">
-                    <GatewayUnstake operator={data} />
-                  </Box>
-                </TableCell>
-              </TableRow>
+              {data?.map((o, i) => {
+                return (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <SourceWalletName source={o.account} />
+                    </TableCell>
+                    <TableCell>
+                      {o.pendingStake ? formatSqd(SQD_TOKEN, o.pendingStake?.amount) : '-'}
+                    </TableCell>
+                    <TableCell>{o.stake ? formatSqd(SQD_TOKEN, o.stake?.amount) : '-'}</TableCell>
+                    <TableCell>
+                      <Box display="flex" justifyContent="flex-end">
+                        <GatewayUnstake operator={o} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </BorderedTable>
         </Card>
+      ) : (
+        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
       )}
     </Box>
   );
@@ -84,7 +95,7 @@ export function MyGateways() {
             <TableHead>
               <TableRow>
                 <TableCell>Gateway</TableCell>
-                <TableCell>Type</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell>Created</TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -92,13 +103,9 @@ export function MyGateways() {
             <TableBody>
               {data.map(gateway => {
                 return (
-                  <TableRow
-                    onClick={() => navigate(`/gateways/${gateway.id}`)}
-                    className="hoverable"
-                    key={gateway.id}
-                  >
+                  <TableRow className="hoverable" key={gateway.id}>
                     <TableCell>
-                      <GatewayName gateway={gateway} />
+                      <GatewayName gateway={gateway} to={`/gateways/${gateway.id}`} />
                     </TableCell>
                     <TableCell>
                       <GatewayStatus gateway={gateway} />

@@ -1,10 +1,8 @@
-import React from 'react';
-
 import { addressFormatter } from '@lib/formatters/formatters';
 import { Box, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
 
 import { formatSqd } from '@api/contracts/utils';
-import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
+import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
 import { useContracts } from '@network/useContracts';
 
 const SourceWalletOptionWrapper = styled(Box, {
@@ -35,7 +33,7 @@ const SourceWalletBalance = styled(Stack, {
   textAlign: 'right',
 }));
 
-export const SourceWalletOption = ({ source }: { source: SourceWallet }) => {
+export const SourceWalletOption = ({ source }: { source: SourceWalletWithBalance }) => {
   const { SQD_TOKEN } = useContracts();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

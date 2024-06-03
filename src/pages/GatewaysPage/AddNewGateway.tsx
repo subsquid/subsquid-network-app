@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 
 import { useRegisterGateway } from '@api/contracts/gateway-registration/useRegisterGateway';
-import { AccountType, useMySources } from '@api/subsquid-network-squid';
+import { useMySources } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { Card } from '@components/Card';
 import { Form, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
@@ -81,13 +81,11 @@ function AddGatewayForm() {
             <FormRow>
               <FormikSelect
                 id="source"
-                disabled
                 showErrorOnlyOfTouched
                 options={sources.map(s => {
                   return {
                     label: <SourceWalletOption source={s} />,
                     value: s.id,
-                    disabled: s.type === AccountType.Vesting,
                   };
                 })}
                 formik={formik}

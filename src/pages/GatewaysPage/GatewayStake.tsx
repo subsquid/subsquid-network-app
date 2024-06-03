@@ -7,7 +7,7 @@ import * as yup from 'yup';
 
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
 import { formatSqd, fromSqd } from '@api/contracts/utils';
-import { AccountType } from '@api/subsquid-network-squid';
+import { useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
@@ -38,7 +38,8 @@ export const stakeSchema = (SQD_TOKEN: string) =>
       .required('Lock min blocks is required'),
   });
 
-export function GatewayStake() {
+export function GatewayStake({ disabled }: { disabled?: boolean }) {
+  const { data } = useMyGatewayStakes();
   const { stakeToGateway, error, isLoading } = useStakeGateway();
   const { SQD_TOKEN } = useContracts();
 
@@ -52,7 +53,7 @@ export function GatewayStake() {
     isPending: isSourceLoading,
   } = useMySourceOptions({
     enabled: open,
-    sourceDisabled: s => s.type === AccountType.Vesting,
+    sourceDisabled: s => s.balance === '0',
   });
 
   const formik = useFormik({
@@ -90,7 +91,11 @@ export function GatewayStake() {
     else if (formik.values.source) return;
 
     const source =
-      sources.find(c => new Decimal(c.balance).greaterThanOrEqualTo(0)) || sources?.[0];
+      sources.find(
+        s =>
+          new Decimal(s.balance).greaterThanOrEqualTo(0) &&
+          !!data?.some(o => o.account.id === s.id),
+      ) || sources?.[0];
     if (!source) return;
 
     formik.setValues({
@@ -98,15 +103,19 @@ export function GatewayStake() {
       source: source.id,
       max: fromSqd(source.balance).toNumber(),
     });
-  }, [formik, isSourceLoading, sources]);
+  }, [data, formik, isSourceLoading, sources]);
 
   return (
     <>
-      <Button onClick={handleOpen} variant="contained">
-        Get CU
+      <Button
+        onClick={handleOpen}
+        variant="contained"
+        disabled={disabled || data?.length === sources.length}
+      >
+        Add lock
       </Button>
       <ContractCallDialog
-        title="Lock your tSQD to get Compute Units"
+        title="Lock"
         open={open}
         onResult={confirmed => {
           if (!confirmed) return handleClose();
@@ -114,7 +123,7 @@ export function GatewayStake() {
           formik.handleSubmit();
         }}
         loading={isLoading}
-        confirmButtonText="Get CU"
+        confirmButtonText="Lock"
       >
         {isSourceLoading ? (
           <Loader />
@@ -125,7 +134,6 @@ export function GatewayStake() {
                 id="source"
                 showErrorOnlyOfTouched
                 options={options}
-                disabled
                 formik={formik}
                 onChange={e => {
                   const wallet = sources.find(w => w?.id === e.target.value);
