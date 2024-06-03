@@ -274,6 +274,7 @@ export const NetworkLayout = ({
     currentHeight: squidHeight,
     waitHeight: waitSquidHeight,
     setWaitHeight,
+    isLoading,
   } = useSquidNetworkHeightHooks();
 
   useEffect(() => {
@@ -284,10 +285,11 @@ export const NetworkLayout = ({
   }, [isConnected, chain, disconnect, walletClient, network]);
 
   useEffect(() => {
+    if (isLoading) return;
     if (chainHeight && BigInt(squidHeight) < chainHeight && waitSquidHeight < chainHeight) {
       setWaitHeight(chainHeight);
     }
-  }, [chainHeight, setWaitHeight, squidHeight, waitSquidHeight]);
+  }, [chainHeight, isLoading, setWaitHeight, squidHeight, waitSquidHeight]);
 
   const centeredSx = {
     alignSelf: stretchContent ? 'stretch' : 'flex-start',
