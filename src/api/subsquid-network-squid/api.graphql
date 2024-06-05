@@ -40,18 +40,16 @@ query account($address: String!) {
 fragment WorkerFragment on Worker {
   id
   name
-  email
   peerId
-  website
   status
   createdAt
-  description
   bond
   claimableReward
   claimedReward
   uptime24Hours
   uptime90Days
   totalDelegation
+  capedDelegation
   delegationCount
   apr
   stakerApr
@@ -71,6 +69,10 @@ fragment WorkerFragment on Worker {
 }
 
 fragment WorkerFullFragment on Worker {
+  totalDelegationRewards
+  website
+  email
+  description
   queries24Hours
   queries90Days
   scannedData24Hours

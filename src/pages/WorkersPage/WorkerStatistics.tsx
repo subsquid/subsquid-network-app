@@ -110,17 +110,17 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Bond</Title>
             <Stack spacing={2}>
               <Stack direction="row">
+                <WorkerDescLabel>Bonded</WorkerDescLabel>
+                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.bond, 8)}</WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
                 <WorkerDescLabel>Worker APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.apr != null ? percentFormatter(worker.apr) : '-'}
                 </WorkerDescValue>
               </Stack>
               <Stack direction="row">
-                <WorkerDescLabel>Bonded</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.bond, 8)}</WorkerDescValue>
-              </Stack>
-              <Stack direction="row">
-                <WorkerDescLabel>Total rewards</WorkerDescLabel>
+                <WorkerDescLabel>Total reward</WorkerDescLabel>
                 <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalReward, 8)}</WorkerDescValue>
               </Stack>
             </Stack>
@@ -130,18 +130,28 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Delegation</Title>
             <Stack spacing={2}>
               <Stack direction="row">
+                <WorkerDescLabel>Delegators</WorkerDescLabel>
+                <WorkerDescValue>{worker.delegationCount}</WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
+                <WorkerDescLabel>Total delegation</WorkerDescLabel>
+                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalDelegation, 8)}</WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
+                <WorkerDescLabel>Delegation capacity</WorkerDescLabel>
+                <WorkerDescValue>{percentFormatter(worker.utilizedPercent)}</WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
                 <WorkerDescLabel>Delegator APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                 </WorkerDescValue>
               </Stack>
               <Stack direction="row">
-                <WorkerDescLabel>Delegators</WorkerDescLabel>
-                <WorkerDescValue>{worker.delegationCount}</WorkerDescValue>
-              </Stack>
-              <Stack direction="row">
-                <WorkerDescLabel>Total delegated</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalDelegation, 8)}</WorkerDescValue>
+                <WorkerDescLabel>Total reward</WorkerDescLabel>
+                <WorkerDescValue>
+                  {formatSqd(SQD_TOKEN, worker.totalDelegationRewards, 8)}
+                </WorkerDescValue>
               </Stack>
             </Stack>
           </Box>

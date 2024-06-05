@@ -96,7 +96,9 @@ export function Workers() {
             <BorderedTable>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ minWidth: 275 }}>Worker</TableCell>
+                  <TableCell className="pinned" sx={{ minWidth: 240 }}>
+                    Worker
+                  </TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Version</TableCell>
                   <SortableHeaderCell
@@ -120,14 +122,13 @@ export function Workers() {
                   >
                     Delegator APR
                   </SortableHeaderCell>
-                  {/*<SortableHeaderCell*/}
-                  {/*  width={70}*/}
-                  {/*  sort={WorkerSortBy.DelegationCapacity}*/}
-                  {/*  query={query}*/}
-                  {/*  setQuery={setQuery}*/}
-                  {/*>*/}
-                  {/*  Delegation capacity*/}
-                  {/*</SortableHeaderCell>*/}
+                  <SortableHeaderCell
+                    sort={WorkerSortBy.DelegationCapacity}
+                    query={query}
+                    setQuery={setQuery}
+                  >
+                    Delegation capacity
+                  </SortableHeaderCell>
                   <SortableHeaderCell
                     sort={WorkerSortBy.JoinedAt}
                     query={query}
@@ -135,14 +136,14 @@ export function Workers() {
                   >
                     Registered
                   </SortableHeaderCell>
-                  <TableCell></TableCell>
+                  <TableCell className="pinned"></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {workers.map(worker => {
                   return (
                     <TableRow key={worker.peerId}>
-                      <TableCell>
+                      <TableCell className="pinned">
                         <WorkerName
                           worker={worker}
                           to={`/workers/${worker.peerId}?backPath=/dashboard`}
@@ -162,8 +163,9 @@ export function Workers() {
                         {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                       </TableCell>
                       {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
+                      <TableCell>{percentFormatter(worker.utilizedPercent)}</TableCell>
                       <TableCell>{dateFormat(worker.createdAt)}</TableCell>
-                      <TableCell>
+                      <TableCell className="pinned">
                         <Box display="flex" justifyContent="flex-end">
                           <WorkerDelegate worker={worker} />
                         </Box>

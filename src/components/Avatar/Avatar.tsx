@@ -49,7 +49,10 @@ export const Avatar = ({
 
   return (
     <Box position="relative">
-      <MaterialAvatar variant={variant} sx={{ bgcolor: color, width: size, height: size }}>
+      <MaterialAvatar
+        variant={variant}
+        sx={{ bgcolor: color, width: size, height: size, color: 'white' }}
+      >
         {name.slice(0, 2).toUpperCase()}
       </MaterialAvatar>
       {/*{typeof online !== 'undefined' ? <Online Component={OnlineOnTop} online={online} /> : null}*/}

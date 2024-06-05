@@ -103,7 +103,7 @@ export function MyGateways() {
             <TableBody>
               {data.map(gateway => {
                 return (
-                  <TableRow className="hoverable" key={gateway.id}>
+                  <TableRow key={gateway.id}>
                     <TableCell>
                       <GatewayName gateway={gateway} to={`/gateways/${gateway.id}`} />
                     </TableCell>

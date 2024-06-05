@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { logger } from '@logger';
 import Decimal from 'decimal.js';
 import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
-import { useWriteContract, usePublicClient, useClient } from 'wagmi';
+import { useWriteContract, usePublicClient, useClient, useReadContract } from 'wagmi';
 
 import { useApproveSqd } from '@api/contracts/sqd';
 import {
@@ -19,6 +19,7 @@ import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
+import { SOFT_CAP_ABI } from './soft-cap.abi';
 import { STAKING_CONTRACT_ABI } from './staking.abi';
 
 type WorkerDepositRequest = {
@@ -230,5 +231,31 @@ export function useWorkerUndelegate() {
     undelegateFromWorker,
     isLoading,
     error,
+  };
+}
+
+export function useCapedStake({ workerId }: { workerId?: string }) {
+  const contracts = useContracts();
+  const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
+
+  const { data, isLoading } = useReadContract({
+    address: contracts.SOFT_CAP,
+    abi: SOFT_CAP_ABI,
+    functionName: 'capedStake',
+    args: [BigInt(workerId || -1)],
+    blockNumber: BigInt(currentHeight),
+    query: {
+      enabled: !!workerId && !isHeightLoading,
+    },
+  });
+
+  const res = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!isLoading) res.current = data?.toString();
+  }, [data, isLoading]);
+
+  return {
+    data: res.current,
+    isLoading: !res.current,
   };
 }

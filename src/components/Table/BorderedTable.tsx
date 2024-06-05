@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, SyntheticEvent } from 'react';
 
-import { Stack, styled, Table, TableCell } from '@mui/material';
+import { Stack, styled, Table, TableCell, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
 
 import { SortDir } from '@api/subsquid-network-squid';
@@ -35,6 +35,23 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
     },
   },
 
+  '& td:last-of-type.pinned, & th:last-of-type.pinned': {
+    boxShadow: '0px 0px 0px 0px rgba(0, 0, 0, 0.1)',
+    position: 'sticky',
+    right: 0,
+    [theme.breakpoints.down('sm')]: {
+      position: 'relative',
+    },
+  },
+
+  '& td:first-of-type.pinned, & th:first-of-type.pinned': {
+    position: 'sticky',
+    left: 0,
+    [theme.breakpoints.down('sm')]: {
+      position: 'relative',
+    },
+  },
+
   '& th': {
     color: theme.palette.text.secondary,
     fontWeight: 'normal',
@@ -66,17 +83,31 @@ const ClickableStack = styled(Stack)(({ theme }) => ({
   userSelect: 'none',
 }));
 
+export function HeaderCell({
+  help,
+  children,
+}: PropsWithChildren<{
+  width?: string | number;
+  help?: React.ReactNode;
+}>) {
+  return (
+    <Tooltip title={help} arrow placement="top">
+      <TableCell>{children}</TableCell>
+    </Tooltip>
+  );
+}
+
 export function SortableHeaderCell<S extends string>({
   sort,
   children,
   query,
-  width,
   setQuery,
+  help,
 }: PropsWithChildren<{
   sort: S;
-  width?: string | number;
   query: { sortBy: string; sortDir: string };
   setQuery: { sortBy: (v: string) => unknown; sortDir: (v: string) => unknown };
+  help?: React.ReactNode;
 }>) {
   const handleSortChange = (sortBy: S) => (e: SyntheticEvent) => {
     e.preventDefault();
@@ -90,18 +121,18 @@ export function SortableHeaderCell<S extends string>({
   };
 
   return (
-    <TableCell>
+    <HeaderCell help={help}>
       <ClickableStack
         onClick={handleSortChange(sort)}
         direction="row"
         spacing={1}
         alignItems="center"
       >
-        <Box sx={{ width }}>{children}</Box>
+        <Box>{children}</Box>
         <Box>
           <SortIcon query={query} value={sort} />
         </Box>
       </ClickableStack>
-    </TableCell>
+    </HeaderCell>
   );
 }

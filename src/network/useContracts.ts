@@ -7,6 +7,7 @@ export function useContracts(): {
   REWARD_TREASURY: `0x${string}`;
   REWARD_DISTRIBUTION: `0x${string}`;
   GATEWAY_REGISTRATION: `0x${string}`;
+  SOFT_CAP: `0x${string}`;
   SQD_TOKEN: string;
 } {
   const network = getSubsquidNetwork();
@@ -20,6 +21,7 @@ export function useContracts(): {
         REWARD_TREASURY: `0x785136e611E15D532C36502AaBdfE8E35008c7ca`,
         REWARD_DISTRIBUTION: `0x68f9fE3504652360afF430dF198E1Cb7B2dCfD57`,
         GATEWAY_REGISTRATION: `0xAB46F688AbA4FcD1920F21E9BD16B229316D8b0a`,
+        SOFT_CAP: `0x52f31c9c019f840A9C0e74F66ACc95455B254BeA`,
         SQD_TOKEN: 'tSQD',
       };
     }
@@ -31,6 +33,7 @@ export function useContracts(): {
         REWARD_TREASURY: `0x237abf43bc51fd5c50d0d598a1a4c26e56a8a2a0`,
         REWARD_DISTRIBUTION: `0x4de282bD18aE4987B3070F4D5eF8c80756362AEa`,
         GATEWAY_REGISTRATION: `0x8a90a1ce5fa8cf71de9e6f76b7d3c0b72feb8c4b`,
+        SOFT_CAP: `0xde29d5215c28036ce56091ea91038c94c84c87d0`,
         SQD_TOKEN: 'SQD',
       };
     }

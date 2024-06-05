@@ -650,6 +650,12 @@ export enum ClaimOrderByInput {
   WorkerBondDesc = 'worker_bond_DESC',
   WorkerBondDescNullsFirst = 'worker_bond_DESC_NULLS_FIRST',
   WorkerBondDescNullsLast = 'worker_bond_DESC_NULLS_LAST',
+  WorkerCapedDelegationAsc = 'worker_capedDelegation_ASC',
+  WorkerCapedDelegationAscNullsFirst = 'worker_capedDelegation_ASC_NULLS_FIRST',
+  WorkerCapedDelegationAscNullsLast = 'worker_capedDelegation_ASC_NULLS_LAST',
+  WorkerCapedDelegationDesc = 'worker_capedDelegation_DESC',
+  WorkerCapedDelegationDescNullsFirst = 'worker_capedDelegation_DESC_NULLS_FIRST',
+  WorkerCapedDelegationDescNullsLast = 'worker_capedDelegation_DESC_NULLS_LAST',
   WorkerClaimableRewardAsc = 'worker_claimableReward_ASC',
   WorkerClaimableRewardAscNullsFirst = 'worker_claimableReward_ASC_NULLS_FIRST',
   WorkerClaimableRewardAscNullsLast = 'worker_claimableReward_ASC_NULLS_LAST',
@@ -800,6 +806,12 @@ export enum ClaimOrderByInput {
   WorkerStoredDataDesc = 'worker_storedData_DESC',
   WorkerStoredDataDescNullsFirst = 'worker_storedData_DESC_NULLS_FIRST',
   WorkerStoredDataDescNullsLast = 'worker_storedData_DESC_NULLS_LAST',
+  WorkerTotalDelegationRewardsAsc = 'worker_totalDelegationRewards_ASC',
+  WorkerTotalDelegationRewardsAscNullsFirst = 'worker_totalDelegationRewards_ASC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsAscNullsLast = 'worker_totalDelegationRewards_ASC_NULLS_LAST',
+  WorkerTotalDelegationRewardsDesc = 'worker_totalDelegationRewards_DESC',
+  WorkerTotalDelegationRewardsDescNullsFirst = 'worker_totalDelegationRewards_DESC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsDescNullsLast = 'worker_totalDelegationRewards_DESC_NULLS_LAST',
   WorkerTotalDelegationAsc = 'worker_totalDelegation_ASC',
   WorkerTotalDelegationAscNullsFirst = 'worker_totalDelegation_ASC_NULLS_FIRST',
   WorkerTotalDelegationAscNullsLast = 'worker_totalDelegation_ASC_NULLS_LAST',
@@ -1168,6 +1180,12 @@ export enum DelegationOrderByInput {
   WorkerBondDesc = 'worker_bond_DESC',
   WorkerBondDescNullsFirst = 'worker_bond_DESC_NULLS_FIRST',
   WorkerBondDescNullsLast = 'worker_bond_DESC_NULLS_LAST',
+  WorkerCapedDelegationAsc = 'worker_capedDelegation_ASC',
+  WorkerCapedDelegationAscNullsFirst = 'worker_capedDelegation_ASC_NULLS_FIRST',
+  WorkerCapedDelegationAscNullsLast = 'worker_capedDelegation_ASC_NULLS_LAST',
+  WorkerCapedDelegationDesc = 'worker_capedDelegation_DESC',
+  WorkerCapedDelegationDescNullsFirst = 'worker_capedDelegation_DESC_NULLS_FIRST',
+  WorkerCapedDelegationDescNullsLast = 'worker_capedDelegation_DESC_NULLS_LAST',
   WorkerClaimableRewardAsc = 'worker_claimableReward_ASC',
   WorkerClaimableRewardAscNullsFirst = 'worker_claimableReward_ASC_NULLS_FIRST',
   WorkerClaimableRewardAscNullsLast = 'worker_claimableReward_ASC_NULLS_LAST',
@@ -1318,6 +1336,12 @@ export enum DelegationOrderByInput {
   WorkerStoredDataDesc = 'worker_storedData_DESC',
   WorkerStoredDataDescNullsFirst = 'worker_storedData_DESC_NULLS_FIRST',
   WorkerStoredDataDescNullsLast = 'worker_storedData_DESC_NULLS_LAST',
+  WorkerTotalDelegationRewardsAsc = 'worker_totalDelegationRewards_ASC',
+  WorkerTotalDelegationRewardsAscNullsFirst = 'worker_totalDelegationRewards_ASC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsAscNullsLast = 'worker_totalDelegationRewards_ASC_NULLS_LAST',
+  WorkerTotalDelegationRewardsDesc = 'worker_totalDelegationRewards_DESC',
+  WorkerTotalDelegationRewardsDescNullsFirst = 'worker_totalDelegationRewards_DESC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsDescNullsLast = 'worker_totalDelegationRewards_DESC_NULLS_LAST',
   WorkerTotalDelegationAsc = 'worker_totalDelegation_ASC',
   WorkerTotalDelegationAscNullsFirst = 'worker_totalDelegation_ASC_NULLS_FIRST',
   WorkerTotalDelegationAscNullsLast = 'worker_totalDelegation_ASC_NULLS_LAST',
@@ -3526,6 +3550,7 @@ export type Worker = {
   __typename?: 'Worker';
   apr?: Maybe<Scalars['Float']['output']>;
   bond: Scalars['BigInt']['output'];
+  capedDelegation: Scalars['BigInt']['output'];
   claimableReward: Scalars['BigInt']['output'];
   claimedReward: Scalars['BigInt']['output'];
   claims: Array<Claim>;
@@ -3561,6 +3586,7 @@ export type Worker = {
   statusHistory: Array<WorkerStatusChange>;
   storedData?: Maybe<Scalars['BigInt']['output']>;
   totalDelegation: Scalars['BigInt']['output'];
+  totalDelegationRewards: Scalars['BigInt']['output'];
   uptime24Hours?: Maybe<Scalars['Float']['output']>;
   uptime90Days?: Maybe<Scalars['Float']['output']>;
   version?: Maybe<Scalars['String']['output']>;
@@ -3627,6 +3653,12 @@ export enum WorkerOrderByInput {
   BondDesc = 'bond_DESC',
   BondDescNullsFirst = 'bond_DESC_NULLS_FIRST',
   BondDescNullsLast = 'bond_DESC_NULLS_LAST',
+  CapedDelegationAsc = 'capedDelegation_ASC',
+  CapedDelegationAscNullsFirst = 'capedDelegation_ASC_NULLS_FIRST',
+  CapedDelegationAscNullsLast = 'capedDelegation_ASC_NULLS_LAST',
+  CapedDelegationDesc = 'capedDelegation_DESC',
+  CapedDelegationDescNullsFirst = 'capedDelegation_DESC_NULLS_FIRST',
+  CapedDelegationDescNullsLast = 'capedDelegation_DESC_NULLS_LAST',
   ClaimableRewardAsc = 'claimableReward_ASC',
   ClaimableRewardAscNullsFirst = 'claimableReward_ASC_NULLS_FIRST',
   ClaimableRewardAscNullsLast = 'claimableReward_ASC_NULLS_LAST',
@@ -3825,6 +3857,12 @@ export enum WorkerOrderByInput {
   StoredDataDesc = 'storedData_DESC',
   StoredDataDescNullsFirst = 'storedData_DESC_NULLS_FIRST',
   StoredDataDescNullsLast = 'storedData_DESC_NULLS_LAST',
+  TotalDelegationRewardsAsc = 'totalDelegationRewards_ASC',
+  TotalDelegationRewardsAscNullsFirst = 'totalDelegationRewards_ASC_NULLS_FIRST',
+  TotalDelegationRewardsAscNullsLast = 'totalDelegationRewards_ASC_NULLS_LAST',
+  TotalDelegationRewardsDesc = 'totalDelegationRewards_DESC',
+  TotalDelegationRewardsDescNullsFirst = 'totalDelegationRewards_DESC_NULLS_FIRST',
+  TotalDelegationRewardsDescNullsLast = 'totalDelegationRewards_DESC_NULLS_LAST',
   TotalDelegationAsc = 'totalDelegation_ASC',
   TotalDelegationAscNullsFirst = 'totalDelegation_ASC_NULLS_FIRST',
   TotalDelegationAscNullsLast = 'totalDelegation_ASC_NULLS_LAST',
@@ -3916,6 +3954,12 @@ export enum WorkerRewardOrderByInput {
   WorkerBondDesc = 'worker_bond_DESC',
   WorkerBondDescNullsFirst = 'worker_bond_DESC_NULLS_FIRST',
   WorkerBondDescNullsLast = 'worker_bond_DESC_NULLS_LAST',
+  WorkerCapedDelegationAsc = 'worker_capedDelegation_ASC',
+  WorkerCapedDelegationAscNullsFirst = 'worker_capedDelegation_ASC_NULLS_FIRST',
+  WorkerCapedDelegationAscNullsLast = 'worker_capedDelegation_ASC_NULLS_LAST',
+  WorkerCapedDelegationDesc = 'worker_capedDelegation_DESC',
+  WorkerCapedDelegationDescNullsFirst = 'worker_capedDelegation_DESC_NULLS_FIRST',
+  WorkerCapedDelegationDescNullsLast = 'worker_capedDelegation_DESC_NULLS_LAST',
   WorkerClaimableRewardAsc = 'worker_claimableReward_ASC',
   WorkerClaimableRewardAscNullsFirst = 'worker_claimableReward_ASC_NULLS_FIRST',
   WorkerClaimableRewardAscNullsLast = 'worker_claimableReward_ASC_NULLS_LAST',
@@ -4066,6 +4110,12 @@ export enum WorkerRewardOrderByInput {
   WorkerStoredDataDesc = 'worker_storedData_DESC',
   WorkerStoredDataDescNullsFirst = 'worker_storedData_DESC_NULLS_FIRST',
   WorkerStoredDataDescNullsLast = 'worker_storedData_DESC_NULLS_LAST',
+  WorkerTotalDelegationRewardsAsc = 'worker_totalDelegationRewards_ASC',
+  WorkerTotalDelegationRewardsAscNullsFirst = 'worker_totalDelegationRewards_ASC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsAscNullsLast = 'worker_totalDelegationRewards_ASC_NULLS_LAST',
+  WorkerTotalDelegationRewardsDesc = 'worker_totalDelegationRewards_DESC',
+  WorkerTotalDelegationRewardsDescNullsFirst = 'worker_totalDelegationRewards_DESC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsDescNullsLast = 'worker_totalDelegationRewards_DESC_NULLS_LAST',
   WorkerTotalDelegationAsc = 'worker_totalDelegation_ASC',
   WorkerTotalDelegationAscNullsFirst = 'worker_totalDelegation_ASC_NULLS_FIRST',
   WorkerTotalDelegationAscNullsLast = 'worker_totalDelegation_ASC_NULLS_LAST',
@@ -4259,6 +4309,12 @@ export enum WorkerSnapshotOrderByInput {
   WorkerBondDesc = 'worker_bond_DESC',
   WorkerBondDescNullsFirst = 'worker_bond_DESC_NULLS_FIRST',
   WorkerBondDescNullsLast = 'worker_bond_DESC_NULLS_LAST',
+  WorkerCapedDelegationAsc = 'worker_capedDelegation_ASC',
+  WorkerCapedDelegationAscNullsFirst = 'worker_capedDelegation_ASC_NULLS_FIRST',
+  WorkerCapedDelegationAscNullsLast = 'worker_capedDelegation_ASC_NULLS_LAST',
+  WorkerCapedDelegationDesc = 'worker_capedDelegation_DESC',
+  WorkerCapedDelegationDescNullsFirst = 'worker_capedDelegation_DESC_NULLS_FIRST',
+  WorkerCapedDelegationDescNullsLast = 'worker_capedDelegation_DESC_NULLS_LAST',
   WorkerClaimableRewardAsc = 'worker_claimableReward_ASC',
   WorkerClaimableRewardAscNullsFirst = 'worker_claimableReward_ASC_NULLS_FIRST',
   WorkerClaimableRewardAscNullsLast = 'worker_claimableReward_ASC_NULLS_LAST',
@@ -4409,6 +4465,12 @@ export enum WorkerSnapshotOrderByInput {
   WorkerStoredDataDesc = 'worker_storedData_DESC',
   WorkerStoredDataDescNullsFirst = 'worker_storedData_DESC_NULLS_FIRST',
   WorkerStoredDataDescNullsLast = 'worker_storedData_DESC_NULLS_LAST',
+  WorkerTotalDelegationRewardsAsc = 'worker_totalDelegationRewards_ASC',
+  WorkerTotalDelegationRewardsAscNullsFirst = 'worker_totalDelegationRewards_ASC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsAscNullsLast = 'worker_totalDelegationRewards_ASC_NULLS_LAST',
+  WorkerTotalDelegationRewardsDesc = 'worker_totalDelegationRewards_DESC',
+  WorkerTotalDelegationRewardsDescNullsFirst = 'worker_totalDelegationRewards_DESC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsDescNullsLast = 'worker_totalDelegationRewards_DESC_NULLS_LAST',
   WorkerTotalDelegationAsc = 'worker_totalDelegation_ASC',
   WorkerTotalDelegationAscNullsFirst = 'worker_totalDelegation_ASC_NULLS_FIRST',
   WorkerTotalDelegationAscNullsLast = 'worker_totalDelegation_ASC_NULLS_LAST',
@@ -4560,6 +4622,12 @@ export enum WorkerStatusChangeOrderByInput {
   WorkerBondDesc = 'worker_bond_DESC',
   WorkerBondDescNullsFirst = 'worker_bond_DESC_NULLS_FIRST',
   WorkerBondDescNullsLast = 'worker_bond_DESC_NULLS_LAST',
+  WorkerCapedDelegationAsc = 'worker_capedDelegation_ASC',
+  WorkerCapedDelegationAscNullsFirst = 'worker_capedDelegation_ASC_NULLS_FIRST',
+  WorkerCapedDelegationAscNullsLast = 'worker_capedDelegation_ASC_NULLS_LAST',
+  WorkerCapedDelegationDesc = 'worker_capedDelegation_DESC',
+  WorkerCapedDelegationDescNullsFirst = 'worker_capedDelegation_DESC_NULLS_FIRST',
+  WorkerCapedDelegationDescNullsLast = 'worker_capedDelegation_DESC_NULLS_LAST',
   WorkerClaimableRewardAsc = 'worker_claimableReward_ASC',
   WorkerClaimableRewardAscNullsFirst = 'worker_claimableReward_ASC_NULLS_FIRST',
   WorkerClaimableRewardAscNullsLast = 'worker_claimableReward_ASC_NULLS_LAST',
@@ -4710,6 +4778,12 @@ export enum WorkerStatusChangeOrderByInput {
   WorkerStoredDataDesc = 'worker_storedData_DESC',
   WorkerStoredDataDescNullsFirst = 'worker_storedData_DESC_NULLS_FIRST',
   WorkerStoredDataDescNullsLast = 'worker_storedData_DESC_NULLS_LAST',
+  WorkerTotalDelegationRewardsAsc = 'worker_totalDelegationRewards_ASC',
+  WorkerTotalDelegationRewardsAscNullsFirst = 'worker_totalDelegationRewards_ASC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsAscNullsLast = 'worker_totalDelegationRewards_ASC_NULLS_LAST',
+  WorkerTotalDelegationRewardsDesc = 'worker_totalDelegationRewards_DESC',
+  WorkerTotalDelegationRewardsDescNullsFirst = 'worker_totalDelegationRewards_DESC_NULLS_FIRST',
+  WorkerTotalDelegationRewardsDescNullsLast = 'worker_totalDelegationRewards_DESC_NULLS_LAST',
   WorkerTotalDelegationAsc = 'worker_totalDelegation_ASC',
   WorkerTotalDelegationAscNullsFirst = 'worker_totalDelegation_ASC_NULLS_FIRST',
   WorkerTotalDelegationAscNullsLast = 'worker_totalDelegation_ASC_NULLS_LAST',
@@ -4820,6 +4894,15 @@ export type WorkerWhereInput = {
   bond_lte?: InputMaybe<Scalars['BigInt']['input']>;
   bond_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
   bond_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  capedDelegation_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  capedDelegation_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  capedDelegation_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  capedDelegation_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  capedDelegation_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  capedDelegation_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  capedDelegation_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  capedDelegation_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  capedDelegation_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   claimableReward_eq?: InputMaybe<Scalars['BigInt']['input']>;
   claimableReward_gt?: InputMaybe<Scalars['BigInt']['input']>;
   claimableReward_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -5085,6 +5168,15 @@ export type WorkerWhereInput = {
   storedData_lte?: InputMaybe<Scalars['BigInt']['input']>;
   storedData_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
   storedData_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  totalDelegationRewards_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  totalDelegationRewards_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  totalDelegationRewards_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  totalDelegationRewards_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  totalDelegationRewards_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  totalDelegationRewards_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  totalDelegationRewards_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  totalDelegationRewards_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  totalDelegationRewards_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   totalDelegation_eq?: InputMaybe<Scalars['BigInt']['input']>;
   totalDelegation_gt?: InputMaybe<Scalars['BigInt']['input']>;
   totalDelegation_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -5201,18 +5293,16 @@ export type WorkerFragmentFragment = {
   __typename?: 'Worker';
   id: string;
   name?: string;
-  email?: string;
   peerId: string;
-  website?: string;
   status: WorkerStatus;
   createdAt: any;
-  description?: string;
   bond: any;
   claimableReward: any;
   claimedReward: any;
   uptime24Hours?: number;
   uptime90Days?: number;
   totalDelegation: any;
+  capedDelegation: any;
   delegationCount: number;
   apr?: number;
   stakerApr?: number;
@@ -5228,6 +5318,10 @@ export type WorkerFragmentFragment = {
 
 export type WorkerFullFragmentFragment = {
   __typename?: 'Worker';
+  totalDelegationRewards: any;
+  website?: string;
+  email?: string;
+  description?: string;
   queries24Hours?: any;
   queries90Days?: any;
   scannedData24Hours?: any;
@@ -5247,18 +5341,16 @@ export type AllWorkersQuery = {
     __typename?: 'Worker';
     id: string;
     name?: string;
-    email?: string;
     peerId: string;
-    website?: string;
     status: WorkerStatus;
     createdAt: any;
-    description?: string;
     bond: any;
     claimableReward: any;
     claimedReward: any;
     uptime24Hours?: number;
     uptime90Days?: number;
     totalDelegation: any;
+    capedDelegation: any;
     delegationCount: number;
     apr?: number;
     stakerApr?: number;
@@ -5284,18 +5376,16 @@ export type WorkerByPeerIdQuery = {
     __typename?: 'Worker';
     id: string;
     name?: string;
-    email?: string;
     peerId: string;
-    website?: string;
     status: WorkerStatus;
     createdAt: any;
-    description?: string;
     bond: any;
     claimableReward: any;
     claimedReward: any;
     uptime24Hours?: number;
     uptime90Days?: number;
     totalDelegation: any;
+    capedDelegation: any;
     delegationCount: number;
     apr?: number;
     stakerApr?: number;
@@ -5305,6 +5395,10 @@ export type WorkerByPeerIdQuery = {
     locked?: boolean;
     version?: string;
     jailReason?: string;
+    totalDelegationRewards: any;
+    website?: string;
+    email?: string;
+    description?: string;
     queries24Hours?: any;
     queries90Days?: any;
     scannedData24Hours?: any;
@@ -5344,18 +5438,16 @@ export type MyWorkersQuery = {
     __typename?: 'Worker';
     id: string;
     name?: string;
-    email?: string;
     peerId: string;
-    website?: string;
     status: WorkerStatus;
     createdAt: any;
-    description?: string;
     bond: any;
     claimableReward: any;
     claimedReward: any;
     uptime24Hours?: number;
     uptime90Days?: number;
     totalDelegation: any;
+    capedDelegation: any;
     delegationCount: number;
     apr?: number;
     stakerApr?: number;
@@ -5416,18 +5508,16 @@ export type MyDelegationsQuery = {
       __typename?: 'Worker';
       id: string;
       name?: string;
-      email?: string;
       peerId: string;
-      website?: string;
       status: WorkerStatus;
       createdAt: any;
-      description?: string;
       bond: any;
       claimableReward: any;
       claimedReward: any;
       uptime24Hours?: number;
       uptime90Days?: number;
       totalDelegation: any;
+      capedDelegation: any;
       delegationCount: number;
       apr?: number;
       stakerApr?: number;
@@ -5606,18 +5696,16 @@ export const WorkerFragmentFragmentDoc = `
     fragment WorkerFragment on Worker {
   id
   name
-  email
   peerId
-  website
   status
   createdAt
-  description
   bond
   claimableReward
   claimedReward
   uptime24Hours
   uptime90Days
   totalDelegation
+  capedDelegation
   delegationCount
   apr
   stakerApr
@@ -5638,6 +5726,10 @@ export const WorkerFragmentFragmentDoc = `
     `;
 export const WorkerFullFragmentFragmentDoc = `
     fragment WorkerFullFragment on Worker {
+  totalDelegationRewards
+  website
+  email
+  description
   queries24Hours
   queries90Days
   scannedData24Hours

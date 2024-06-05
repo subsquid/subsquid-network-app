@@ -28,17 +28,17 @@ export interface BlockchainApiWorker extends WorkerFragmentFragment {}
 
 export class BlockchainApiWorker {
   ownedByMe?: boolean;
-  totalDelegations: {
-    limit: Decimal;
-    total: Decimal;
-    capacity: Decimal;
-    utilizedPercent: Decimal;
-  } = {
-    limit: new Decimal(0),
-    total: new Decimal(0),
-    capacity: new Decimal(0),
-    utilizedPercent: new Decimal(0),
-  };
+  // totalDelegations: {
+  //   limit: Decimal;
+  //   total: Decimal;
+  //   capacity: Decimal;
+  // } = {
+  //   limit: new Decimal(0),
+  //   total: new Decimal(0),
+  //   capacity: new Decimal(0),
+  //   utilizedPercent: new Decimal(0),
+  // };
+  utilizedPercent?: number;
   delegationEnabled: boolean = false;
   myDelegations: {
     owner: { id: string; type: AccountType };
@@ -75,6 +75,16 @@ export class BlockchainApiWorker {
     );
 
     this.totalReward = new Decimal(this.claimedReward).add(this.claimableReward).toFixed(0);
+
+    if (this.totalDelegation && this.bond) {
+      const up = new Decimal(this.totalDelegation) // (total / (bond / 3)) * (caped / total)
+        .div(this.bond)
+        .mul(3)
+        .div(this.capedDelegation)
+        .mul(this.totalDelegation)
+        .mul(100);
+      this.utilizedPercent = up.isNaN() ? 0 : up.toNumber();
+    }
   }
 
   canEdit() {
@@ -187,7 +197,7 @@ export function useWorkers({
           case WorkerSortBy.Uptime24h:
             return (a.uptime24Hours ?? -1) - (b.uptime24Hours ?? -1);
           case WorkerSortBy.DelegationCapacity:
-            return a.totalDelegations.capacity.minus(b.totalDelegations.capacity).toNumber();
+            return (a.utilizedPercent ?? -1) - (b.utilizedPercent ?? -1);
           case WorkerSortBy.StakerAPR:
             return (
               (a.stakerApr ?? -1) - (b.stakerApr ?? -1) || a.delegationCount - b.delegationCount

@@ -44,7 +44,7 @@ export function MyWorkers() {
                 <TableCell>Status</TableCell>
                 <TableCell>Uptime, 24h</TableCell>
                 <TableCell>Uptime, 90d</TableCell>
-                <TableCell>APR</TableCell>
+                <TableCell>Worker APR</TableCell>
                 <TableCell>Total reward</TableCell>
                 <TableCell></TableCell>
               </TableRow>

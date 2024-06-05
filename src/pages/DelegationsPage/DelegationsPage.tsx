@@ -29,19 +29,22 @@ export function MyDelegations() {
           <BorderedTable>
             <TableHead>
               <TableRow>
-                <TableCell width={275}>Worker</TableCell>
+                <TableCell className="pinned" width={240}>
+                  Worker
+                </TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Delegation</TableCell>
-                <TableCell>APR</TableCell>
+                <TableCell>Delegator APR</TableCell>
+                <TableCell>Delegation capacity</TableCell>
+                <TableCell>My Delegation</TableCell>
                 <TableCell>Total reward</TableCell>
-                <TableCell></TableCell>
+                <TableCell className="pinned"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {delegations.map(worker => {
                 return (
-                  <TableRow className="hoverable" key={worker.peerId}>
-                    <TableCell>
+                  <TableRow key={worker.peerId}>
+                    <TableCell className="pinned">
                       <WorkerName
                         worker={worker}
                         to={`/workers/${worker.peerId}?backPath=/delegations`}
@@ -50,12 +53,13 @@ export function MyDelegations() {
                     <TableCell>
                       <WorkerStatus worker={worker} />
                     </TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
                     <TableCell>
                       {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                     </TableCell>
+                    <TableCell>{percentFormatter(worker.utilizedPercent)}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
                     <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
-                    <TableCell>
+                    <TableCell className="pinned">
                       <Stack direction="row" spacing={2} justifyContent="flex-end">
                         <WorkerDelegate worker={worker} />
                         <WorkerUndelegate worker={worker} />

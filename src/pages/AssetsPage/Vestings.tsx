@@ -31,8 +31,8 @@ export function MyVestings() {
               <TableRow>
                 <TableCell>Vesting</TableCell>
                 <TableCell>Balance</TableCell>
+                <TableCell>Deposited</TableCell>
                 <TableCell>Releasable</TableCell>
-                <TableCell>Released</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
@@ -40,13 +40,13 @@ export function MyVestings() {
               {assets.vestings.map((vesting, i) => {
                 const d = data?.[i];
                 return (
-                  <TableRow className="hoverable" key={vesting.id}>
+                  <TableRow key={vesting.id}>
                     <TableCell>
                       <SourceWalletName source={vesting} to={`vestings/${vesting.id}`} />
                     </TableCell>
                     <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
+                    <TableCell>{formatSqd(SQD_TOKEN, d?.deposited)}</TableCell>
                     <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, d?.released)}</TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
                         <ReleaseButton vesting={vesting} />
