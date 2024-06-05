@@ -5990,7 +5990,10 @@ export const useWorkerDaysUptimeByIdQuery = <TData = WorkerDaysUptimeByIdQuery, 
 
 export const MyWorkersDocument = `
     query myWorkers($address: String!) {
-  workers(orderBy: id_ASC, where: {realOwner: {id_eq: $address}}) {
+  workers(
+    orderBy: id_ASC
+    where: {realOwner: {id_eq: $address}, status_not_eq: WITHDRAWN}
+  ) {
     ...WorkerFragment
     myDelegations: delegations(where: {realOwner: {id_eq: $address}}) {
       deposit
