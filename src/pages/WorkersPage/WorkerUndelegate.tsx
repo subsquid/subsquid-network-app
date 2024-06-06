@@ -68,7 +68,7 @@ export function WorkerUndelegate({
   const formik = useFormik({
     initialValues: {
       source: '',
-      amount: '0',
+      amount: '',
       max: '0',
     },
     validationSchema: undelegateSchema,
@@ -166,6 +166,7 @@ export function WorkerUndelegate({
               id="amount"
               label="Amount"
               formik={formik}
+              autoComplete="off"
               InputProps={{
                 endAdornment: (
                   <Chip

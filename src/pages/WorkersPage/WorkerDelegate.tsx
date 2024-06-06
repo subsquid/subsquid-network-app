@@ -150,6 +150,7 @@ export function WorkerDelegate({
                 label="Amount"
                 formik={formik}
                 showErrorOnlyOfTouched
+                autoComplete="off"
                 InputProps={{
                   endAdornment: (
                     <Chip

@@ -144,6 +144,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
                 label="Amount"
                 formik={formik}
                 showErrorOnlyOfTouched
+                autoComplete="off"
                 InputProps={{
                   endAdornment: (
                     <Chip
