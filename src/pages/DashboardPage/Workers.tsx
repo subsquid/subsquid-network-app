@@ -163,7 +163,7 @@ export function Workers() {
                         {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                       </TableCell>
                       {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
-                      <TableCell>{percentFormatter(worker.utilizedPercent)}</TableCell>
+                      <TableCell>{percentFormatter(worker.delegationCapacity)} </TableCell>
                       <TableCell>{dateFormat(worker.createdAt)}</TableCell>
                       <TableCell className="pinned">
                         <Box display="flex" justifyContent="flex-end">

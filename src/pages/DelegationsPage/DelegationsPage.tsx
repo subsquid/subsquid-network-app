@@ -1,8 +1,12 @@
-import { percentFormatter } from '@lib/formatters/formatters.ts';
+import { useMemo } from 'react';
+
+import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
+import { fromSqd } from '@lib/network';
 import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import BigNumber from 'bignumber.js';
+import { keyBy, mapValues } from 'lodash-es';
 import { Outlet } from 'react-router-dom';
 
-import { formatSqd } from '@api/contracts/utils';
 import { useMyDelegations } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -18,6 +22,25 @@ import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 export function MyDelegations() {
   const { delegations, isLoading } = useMyDelegations();
   const { SQD_TOKEN } = useContracts();
+
+  const groupedDelegations = useMemo(() => {
+    return mapValues(
+      keyBy(delegations, w => w.id),
+      w => {
+        return w.myDelegations.reduce(
+          (s, d) => {
+            s.deposit = s.deposit.plus(d.deposit);
+            s.reward = s.reward.plus(d.claimedReward).plus(d.claimableReward);
+            return s;
+          },
+          {
+            deposit: new BigNumber(0),
+            reward: new BigNumber(0),
+          },
+        );
+      },
+    );
+  }, [delegations]);
 
   return (
     <Box>
@@ -56,9 +79,13 @@ export function MyDelegations() {
                     <TableCell>
                       {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                     </TableCell>
-                    <TableCell>{percentFormatter(worker.utilizedPercent)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
+                    <TableCell>{percentFormatter(worker.delegationCapacity)}</TableCell>
+                    <TableCell>
+                      {tokenFormatter(fromSqd(groupedDelegations[worker.id].deposit), SQD_TOKEN)}
+                    </TableCell>
+                    <TableCell>
+                      {tokenFormatter(fromSqd(groupedDelegations[worker.id].reward), SQD_TOKEN)}
+                    </TableCell>
                     <TableCell className="pinned">
                       <Stack direction="row" spacing={2} justifyContent="flex-end">
                         <WorkerDelegate worker={worker} />

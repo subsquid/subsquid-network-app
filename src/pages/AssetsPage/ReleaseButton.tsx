@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
+import { tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network';
 import { Button, TableBody, TableCell, TableRow } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContract, useVestingContractRelease } from '@api/contracts/vesting';
 import { SourceWallet } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
@@ -66,7 +67,7 @@ export function ReleaseButton({
       <Button
         onClick={handleOpen}
         variant="contained"
-        disabled={disabled || fromSqd(data?.releasable).lessThanOrEqualTo(0)}
+        disabled={disabled || fromSqd(data?.releasable).lte(0)}
       >
         Release
       </Button>
@@ -91,7 +92,9 @@ export function ReleaseButton({
                     <SourceWalletName source={vesting} />
                   </TableCell>
                   <TableCell>Vesting</TableCell>
-                  <TableCell align="right">{formatSqd(SQD_TOKEN, data?.releasable, 8)}</TableCell>
+                  <TableCell align="right">
+                    {tokenFormatter(fromSqd(data?.releasable), SQD_TOKEN, 8)}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </TableList>

@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { percentFormatter } from '@lib/formatters/formatters.ts';
+import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
+import { fromSqd } from '@lib/network';
 import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
 
-import { formatSqd } from '@api/contracts/utils';
 import { useMyWorkers } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -62,7 +62,7 @@ export function MyWorkers() {
                     <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
                     <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
                     <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, worker.totalReward)}</TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(worker.totalReward), SQD_TOKEN)}</TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
                         <WorkerUnregister worker={worker} />

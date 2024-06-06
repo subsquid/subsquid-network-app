@@ -1,5 +1,7 @@
 ### COMMON ###
 
+scalar BigInt
+
 query squidNetworkHeight {
   squidStatus {
     height

@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { dateFormat } from '@i18n';
+import { tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network';
 import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
-import { formatSqd } from '@api/contracts/utils';
-import { useMySources } from '@api/subsquid-network-squid';
 import { useMyGateways, useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -23,7 +23,6 @@ import { GatewayUnstake } from './GatewayUnstake';
 
 export function MyStakes() {
   const { data, isLoading } = useMyGatewayStakes();
-  const { sources } = useMySources();
   const { SQD_TOKEN } = useContracts();
 
   return (
@@ -50,9 +49,13 @@ export function MyStakes() {
                       <SourceWalletName source={o.account} />
                     </TableCell>
                     <TableCell>
-                      {o.pendingStake ? formatSqd(SQD_TOKEN, o.pendingStake?.amount) : '-'}
+                      {o.pendingStake
+                        ? tokenFormatter(fromSqd(o.pendingStake?.amount), SQD_TOKEN)
+                        : '-'}
                     </TableCell>
-                    <TableCell>{o.stake ? formatSqd(SQD_TOKEN, o.stake?.amount) : '-'}</TableCell>
+                    <TableCell>
+                      {o.stake ? tokenFormatter(fromSqd(o.stake?.amount), SQD_TOKEN) : '-'}
+                    </TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
                         <GatewayUnstake operator={o} />
@@ -72,7 +75,6 @@ export function MyStakes() {
 }
 
 export function MyGateways() {
-  const navigate = useNavigate();
   const { data, isLoading } = useMyGateways();
 
   return (

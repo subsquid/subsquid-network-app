@@ -1,17 +1,19 @@
 import { useState } from 'react';
 
+import { peerIdToHex } from '@lib/network';
 import { logger } from '@logger';
 import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, useClient } from 'wagmi';
 
-import { errorMessage, peerIdToHex, TxResult, WriteContractRes } from '@api/contracts/utils';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { UnregisterWorkerRequest } from '@api/contracts/worker-registration/useUnregisterWorker';
 import { AccountType } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
+
+import { TxResult, errorMessage, WriteContractRes } from '../utils';
 
 import { WORKER_REGISTRATION_CONTRACT_ABI } from './WorkerRegistration.abi';
 

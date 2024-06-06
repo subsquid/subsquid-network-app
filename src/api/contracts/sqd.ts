@@ -1,5 +1,5 @@
 import { logger } from '@logger';
-import Decimal from 'decimal.js';
+import BigNumber from 'bignumber.js';
 import { erc20Abi } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, useClient } from 'wagmi';
@@ -7,7 +7,7 @@ import { WriteContractData } from 'wagmi/query';
 
 import { useContracts } from '@network/useContracts.ts';
 
-import { errorMessage, WriteContractRes } from './utils';
+import { WriteContractRes, errorMessage } from './utils';
 
 export function useApproveSqd() {
   const client = useClient();
@@ -19,7 +19,7 @@ export function useApproveSqd() {
     amount,
   }: {
     contractAddress: `0x${string}`;
-    amount: Decimal;
+    amount: BigNumber;
   }): Promise<WriteContractRes> {
     let tx: WriteContractData;
     logger.debug(`approving SQD to ${contracts.WORKER_REGISTRATION}...`);

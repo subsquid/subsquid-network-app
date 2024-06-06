@@ -43,8 +43,8 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
-  BigInt: { input: any; output: any };
-  DateTime: { input: any; output: any };
+  BigInt: { input: string; output: string };
+  DateTime: { input: string; output: string };
 };
 
 export type Account = {
@@ -5265,7 +5265,7 @@ export type SettingsQuery = {
       node: {
         __typename?: 'Settings';
         id: string;
-        bondAmount?: any;
+        bondAmount?: string;
         delegationLimitCoefficient: number;
         minimalWorkerVersion?: string;
         recommendedWorkerVersion?: string;
@@ -5284,8 +5284,8 @@ export type AccountQuery = {
     __typename?: 'Account';
     id: string;
     type: AccountType;
-    balance: any;
-    owned: Array<{ __typename?: 'Account'; id: string; type: AccountType; balance: any }>;
+    balance: string;
+    owned: Array<{ __typename?: 'Account'; id: string; type: AccountType; balance: string }>;
   };
 };
 
@@ -5295,14 +5295,14 @@ export type WorkerFragmentFragment = {
   name?: string;
   peerId: string;
   status: WorkerStatus;
-  createdAt: any;
-  bond: any;
-  claimableReward: any;
-  claimedReward: any;
+  createdAt: string;
+  bond: string;
+  claimableReward: string;
+  claimedReward: string;
   uptime24Hours?: number;
   uptime90Days?: number;
-  totalDelegation: any;
-  capedDelegation: any;
+  totalDelegation: string;
+  capedDelegation: string;
   delegationCount: number;
   apr?: number;
   stakerApr?: number;
@@ -5318,18 +5318,18 @@ export type WorkerFragmentFragment = {
 
 export type WorkerFullFragmentFragment = {
   __typename?: 'Worker';
-  totalDelegationRewards: any;
+  totalDelegationRewards: string;
   website?: string;
   email?: string;
   description?: string;
-  queries24Hours?: any;
-  queries90Days?: any;
-  scannedData24Hours?: any;
-  scannedData90Days?: any;
-  servedData24Hours?: any;
-  servedData90Days?: any;
-  storedData?: any;
-  dayUptimes?: Array<{ __typename?: 'WorkerDayUptime'; timestamp: any; uptime: number }>;
+  queries24Hours?: string;
+  queries90Days?: string;
+  scannedData24Hours?: string;
+  scannedData90Days?: string;
+  servedData24Hours?: string;
+  servedData90Days?: string;
+  storedData?: string;
+  dayUptimes?: Array<{ __typename?: 'WorkerDayUptime'; timestamp: string; uptime: number }>;
   owner: { __typename?: 'Account'; id: string; type: AccountType };
 };
 
@@ -5343,14 +5343,14 @@ export type AllWorkersQuery = {
     name?: string;
     peerId: string;
     status: WorkerStatus;
-    createdAt: any;
-    bond: any;
-    claimableReward: any;
-    claimedReward: any;
+    createdAt: string;
+    bond: string;
+    claimableReward: string;
+    claimedReward: string;
     uptime24Hours?: number;
     uptime90Days?: number;
-    totalDelegation: any;
-    capedDelegation: any;
+    totalDelegation: string;
+    capedDelegation: string;
     delegationCount: number;
     apr?: number;
     stakerApr?: number;
@@ -5378,14 +5378,14 @@ export type WorkerByPeerIdQuery = {
     name?: string;
     peerId: string;
     status: WorkerStatus;
-    createdAt: any;
-    bond: any;
-    claimableReward: any;
-    claimedReward: any;
+    createdAt: string;
+    bond: string;
+    claimableReward: string;
+    claimedReward: string;
     uptime24Hours?: number;
     uptime90Days?: number;
-    totalDelegation: any;
-    capedDelegation: any;
+    totalDelegation: string;
+    capedDelegation: string;
     delegationCount: number;
     apr?: number;
     stakerApr?: number;
@@ -5395,26 +5395,26 @@ export type WorkerByPeerIdQuery = {
     locked?: boolean;
     version?: string;
     jailReason?: string;
-    totalDelegationRewards: any;
+    totalDelegationRewards: string;
     website?: string;
     email?: string;
     description?: string;
-    queries24Hours?: any;
-    queries90Days?: any;
-    scannedData24Hours?: any;
-    scannedData90Days?: any;
-    servedData24Hours?: any;
-    servedData90Days?: any;
-    storedData?: any;
+    queries24Hours?: string;
+    queries90Days?: string;
+    scannedData24Hours?: string;
+    scannedData90Days?: string;
+    servedData24Hours?: string;
+    servedData90Days?: string;
+    storedData?: string;
     myDelegations: Array<{
       __typename?: 'Delegation';
-      deposit: any;
+      deposit: string;
       locked?: boolean;
-      owner: { __typename?: 'Account'; id: string; type: AccountType; balance: any };
+      owner: { __typename?: 'Account'; id: string; type: AccountType; balance: string };
     }>;
     owner: { __typename?: 'Account'; id: string; type: AccountType };
     realOwner: { __typename?: 'Account'; id: string };
-    dayUptimes?: Array<{ __typename?: 'WorkerDayUptime'; timestamp: any; uptime: number }>;
+    dayUptimes?: Array<{ __typename?: 'WorkerDayUptime'; timestamp: string; uptime: number }>;
   }>;
 };
 
@@ -5425,7 +5425,11 @@ export type WorkerDaysUptimeByIdQueryVariables = Exact<{
 
 export type WorkerDaysUptimeByIdQuery = {
   __typename?: 'Query';
-  workerSnapshotsByDay: Array<{ __typename?: 'WorkerSnapshotDay'; timestamp: any; uptime: number }>;
+  workerSnapshotsByDay: Array<{
+    __typename?: 'WorkerSnapshotDay';
+    timestamp: string;
+    uptime: number;
+  }>;
 };
 
 export type MyWorkersQueryVariables = Exact<{
@@ -5440,14 +5444,14 @@ export type MyWorkersQuery = {
     name?: string;
     peerId: string;
     status: WorkerStatus;
-    createdAt: any;
-    bond: any;
-    claimableReward: any;
-    claimedReward: any;
+    createdAt: string;
+    bond: string;
+    claimableReward: string;
+    claimedReward: string;
     uptime24Hours?: number;
     uptime90Days?: number;
-    totalDelegation: any;
-    capedDelegation: any;
+    totalDelegation: string;
+    capedDelegation: string;
     delegationCount: number;
     apr?: number;
     stakerApr?: number;
@@ -5459,9 +5463,9 @@ export type MyWorkersQuery = {
     jailReason?: string;
     myDelegations: Array<{
       __typename?: 'Delegation';
-      deposit: any;
+      deposit: string;
       locked?: boolean;
-      owner: { __typename?: 'Account'; id: string; type: AccountType; balance: any };
+      owner: { __typename?: 'Account'; id: string; type: AccountType; balance: string };
     }>;
     owner: { __typename?: 'Account'; id: string; type: AccountType };
     realOwner: { __typename?: 'Account'; id: string };
@@ -5485,11 +5489,11 @@ export type MyAssetsQuery = {
   __typename?: 'Query';
   accounts: Array<{
     __typename?: 'Account';
-    balance: any;
-    owned: Array<{ __typename?: 'Account'; id: string; balance: any }>;
+    balance: string;
+    owned: Array<{ __typename?: 'Account'; id: string; balance: string }>;
   }>;
-  workers: Array<{ __typename?: 'Worker'; bond: any; claimableReward: any }>;
-  delegations: Array<{ __typename?: 'Delegation'; claimableReward: any; deposit: any }>;
+  workers: Array<{ __typename?: 'Worker'; bond: string; claimableReward: string }>;
+  delegations: Array<{ __typename?: 'Delegation'; claimableReward: string; deposit: string }>;
 };
 
 export type MyDelegationsQueryVariables = Exact<{
@@ -5500,9 +5504,9 @@ export type MyDelegationsQuery = {
   __typename?: 'Query';
   delegations: Array<{
     __typename?: 'Delegation';
-    claimableReward: any;
-    claimedReward: any;
-    deposit: any;
+    claimableReward: string;
+    claimedReward: string;
+    deposit: string;
     locked?: boolean;
     worker: {
       __typename?: 'Worker';
@@ -5510,14 +5514,14 @@ export type MyDelegationsQuery = {
       name?: string;
       peerId: string;
       status: WorkerStatus;
-      createdAt: any;
-      bond: any;
-      claimableReward: any;
-      claimedReward: any;
+      createdAt: string;
+      bond: string;
+      claimableReward: string;
+      claimedReward: string;
       uptime24Hours?: number;
       uptime90Days?: number;
-      totalDelegation: any;
-      capedDelegation: any;
+      totalDelegation: string;
+      capedDelegation: string;
       delegationCount: number;
       apr?: number;
       stakerApr?: number;
@@ -5542,8 +5546,8 @@ export type MyClaimsAvailableQuery = {
   __typename?: 'Query';
   delegations: Array<{
     __typename?: 'Delegation';
-    claimableReward: any;
-    deposit: any;
+    claimableReward: string;
+    deposit: string;
     worker: { __typename?: 'Worker'; id: string; name?: string; peerId: string };
     owner: { __typename?: 'Account'; id: string; type: AccountType };
   }>;
@@ -5552,7 +5556,7 @@ export type MyClaimsAvailableQuery = {
     id: string;
     name?: string;
     peerId: string;
-    claimableReward: any;
+    claimableReward: string;
     owner: { __typename?: 'Account'; id: string; type: AccountType };
   }>;
 };
@@ -5566,7 +5570,7 @@ export type GatewayFragmentFragment = {
   email?: string;
   endpointUrl?: string;
   website?: string;
-  createdAt: any;
+  createdAt: string;
   owner?: { __typename?: 'Account'; id: string; type: AccountType };
   operator?: {
     __typename?: 'GatewayOperator';
@@ -5589,7 +5593,7 @@ export type MyGatewaysQuery = {
     email?: string;
     endpointUrl?: string;
     website?: string;
-    createdAt: any;
+    createdAt: string;
     owner?: { __typename?: 'Account'; id: string; type: AccountType };
     operator?: {
       __typename?: 'GatewayOperator';
@@ -5613,7 +5617,7 @@ export type GatewayByPeerIdQuery = {
     email?: string;
     endpointUrl?: string;
     website?: string;
-    createdAt: any;
+    createdAt: string;
     owner?: { __typename?: 'Account'; id: string; type: AccountType };
     operator?: {
       __typename?: 'GatewayOperator';
@@ -5628,14 +5632,14 @@ export type GatewayStakeFragmentFragment = {
   account: { __typename?: 'Account'; id: string; type: AccountType };
   stake?: {
     __typename?: 'GatewayStake';
-    amount: any;
+    amount: string;
     locked: boolean;
     lockStart: number;
     lockEnd: number;
   };
   pendingStake?: {
     __typename?: 'GatewayStake';
-    amount: any;
+    amount: string;
     locked: boolean;
     lockStart: number;
     lockEnd: number;
@@ -5654,14 +5658,14 @@ export type MyGatewayStakesQuery = {
     account: { __typename?: 'Account'; id: string; type: AccountType };
     stake?: {
       __typename?: 'GatewayStake';
-      amount: any;
+      amount: string;
       locked: boolean;
       lockStart: number;
       lockEnd: number;
     };
     pendingStake?: {
       __typename?: 'GatewayStake';
-      amount: any;
+      amount: string;
       locked: boolean;
       lockStart: number;
       lockEnd: number;
@@ -5673,7 +5677,7 @@ export type VestingFragmentFragment = {
   __typename?: 'Account';
   id: string;
   type: AccountType;
-  balance: any;
+  balance: string;
   owner?: { __typename?: 'Account'; id: string };
 };
 
@@ -5687,7 +5691,7 @@ export type VestingByAddressQuery = {
     __typename?: 'Account';
     id: string;
     type: AccountType;
-    balance: any;
+    balance: string;
     owner?: { __typename?: 'Account'; id: string };
   };
 };

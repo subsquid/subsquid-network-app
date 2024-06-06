@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
+import { tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network/utils';
 import { Box, Button, TableBody, TableCell, TableRow } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { useClaim } from '@api/contracts/claim';
-import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { ClaimType, useMyClaimsAvailable, useMySources } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
@@ -109,7 +110,7 @@ export function ClaimButton() {
         }}
         loading={isLoading}
         confirmColor="success"
-        disableConfirmButton={currentSourceTotalClaimsAvailable.lessThanOrEqualTo(0)}
+        disableConfirmButton={currentSourceTotalClaimsAvailable.lte(0)}
       >
         {isClaimsLoading ? (
           <Loader />
@@ -143,7 +144,7 @@ export function ClaimButton() {
                           {w.type === ClaimType.Worker ? 'Worker reward' : 'Delegation reward'}
                         </TableCell>
                         <TableCell align="right">
-                          {formatSqd(SQD_TOKEN, w.claimableReward)}
+                          {tokenFormatter(fromSqd(w.claimableReward), SQD_TOKEN)}
                         </TableCell>
                       </TableRow>
                     );

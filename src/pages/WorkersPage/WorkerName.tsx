@@ -21,7 +21,7 @@ export const WorkerName = ({
   worker,
   to,
 }: {
-  worker: Pick<BlockchainApiWorker, 'name' | 'peerId' | 'online' | 'utilizedPercent'>;
+  worker: Pick<BlockchainApiWorker, 'name' | 'peerId' | 'online'>;
   to?: string;
 }) => {
   return (
@@ -43,7 +43,7 @@ export const WorkerName = ({
               text={worker.peerId}
               content={
                 <PeerIdShort>
-                  <Link to={to || ''}>{shortPeerId(worker.peerId)}</Link>
+                  <Link to={to || '#'}>{shortPeerId(worker.peerId)}</Link>
                 </PeerIdShort>
               }
             />

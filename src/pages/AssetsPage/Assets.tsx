@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 
-import { addressFormatter } from '@lib/formatters/formatters';
+import { addressFormatter, tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network/utils';
 import { Box, Chip, Stack, styled, SxProps, Theme, useMediaQuery, useTheme } from '@mui/material';
-import Decimal from 'decimal.js';
+import BigNumber from 'bignumber.js';
 import { Cell, Pie, PieChart } from 'recharts';
 
-import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useMyAssets } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { CopyToClipboard } from '@components/CopyToClipboard';
@@ -35,18 +35,18 @@ function TokenBalanceLabel({ value, sx }: { value: React.ReactNode; sx?: SxProps
   return <Chip sx={{ ...sx }} label={value} />;
 }
 
-function TokenBalanceValue({ value, decimals }: { value: string | Decimal; decimals?: number }) {
+function TokenBalanceValue({ value, decimals }: { value: BigNumber; decimals?: number }) {
   const { SQD_TOKEN } = useContracts();
 
-  return <Box sx={{ fontWeight: 500 }}>{formatSqd(SQD_TOKEN, value, decimals ?? 4)}</Box>;
+  return <Box sx={{ fontWeight: 500 }}>{tokenFormatter(value, SQD_TOKEN, decimals)}</Box>;
 }
 
 function TotalBalance({
   data,
   total,
 }: {
-  data: { name: string; balance: Decimal; background: string }[];
-  total: string | Decimal;
+  data: { name: string; balance: BigNumber; background: string }[];
+  total: BigNumber;
 }) {
   const { SQD_TOKEN } = useContracts();
 
@@ -89,7 +89,9 @@ function TotalBalance({
       >
         <Box sx={{ textAlign: 'center', width: '100%' }}>
           <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
-          <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>{formatSqd(SQD_TOKEN, total, 4)}</Box>
+          <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
+            {tokenFormatter(total, SQD_TOKEN, 4)}
+          </Box>
         </Box>
       </Box>
     </Box>
@@ -166,7 +168,7 @@ export function MyAssets() {
                         value={d.name}
                       />
                       <HelpTooltip help={d.help}>
-                        <TokenBalanceValue value={d.balance} />
+                        <TokenBalanceValue value={d.balance} decimals={8} />
                       </HelpTooltip>
                     </TokenBalanceItem>
 
@@ -181,14 +183,14 @@ export function MyAssets() {
                             ></CopyToClipboard>
                           }
                         />
-                        <TokenBalanceValue value={v.balance} />
+                        <TokenBalanceValue value={fromSqd(v.balance)} decimals={8} />
                       </TokenBalanceItem>
                     ))}
                   </React.Fragment>
                 );
               })}
             </TokenBalanceList>
-            <TotalBalance data={data} total={assets.total} />
+            <TotalBalance data={data} total={fromSqd(assets.total)} />
           </Stack>
         </Card>
       )}

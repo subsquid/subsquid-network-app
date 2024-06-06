@@ -1,6 +1,7 @@
+import { tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network/utils';
 import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 
-import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContracts } from '@api/contracts/vesting';
 import { useMyAssets } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
@@ -44,9 +45,9 @@ export function MyVestings() {
                     <TableCell>
                       <SourceWalletName source={vesting} to={`vestings/${vesting.id}`} />
                     </TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, d?.deposited)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(d?.balance), SQD_TOKEN)}</TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(d?.deposited), SQD_TOKEN)}</TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(d?.releasable), SQD_TOKEN)}</TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
                         <ReleaseButton vesting={vesting} />

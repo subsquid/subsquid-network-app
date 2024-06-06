@@ -38,6 +38,7 @@
       "@apps": ["src/apps/apps"],
       "@apps/*": ["src/apps/*"],
       "@network/*": ["src/network/*"],
+      "@schema": ["src/schema"],
     }
   },
   "include": [

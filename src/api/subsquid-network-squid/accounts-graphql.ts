@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import Decimal from 'decimal.js';
+import BigNumber from 'bignumber.js';
 
 import { useAccount } from '@network/useAccount';
 
@@ -83,32 +83,32 @@ export function useMyAssets() {
     const delegations = data?.delegations || [];
     const workers = data?.workers || [];
 
-    let balance = new Decimal(0);
-    let locked = new Decimal(0);
-    let bonded = new Decimal(0);
-    let claimable = new Decimal(0);
-    let delegated = new Decimal(0);
+    let balance = BigNumber(0);
+    let locked = BigNumber(0);
+    let bonded = BigNumber(0);
+    let claimable = BigNumber(0);
+    let delegated = BigNumber(0);
     const vestings: SourceWalletWithBalance[] = [];
 
     for (const a of accounts) {
-      balance = balance.add(a.balance);
+      balance = balance.plus(a.balance);
 
       for (const o of a.owned) {
-        locked = locked.add(o.balance);
+        locked = locked.plus(o.balance);
         vestings.push({
           id: o.id,
           type: AccountType.Vesting,
-          balance: new Decimal(o.balance).toFixed(0),
+          balance: BigNumber(o.balance).toFixed(0),
         });
       }
     }
     for (const w of workers) {
-      bonded = bonded.add(w.bond);
-      claimable = claimable.add(w.claimableReward);
+      bonded = bonded.plus(w.bond);
+      claimable = claimable.plus(w.claimableReward);
     }
     for (const d of delegations) {
-      claimable = claimable.add(d.claimableReward);
-      delegated = delegated.add(d.deposit);
+      claimable = claimable.plus(d.claimableReward);
+      delegated = delegated.plus(d.deposit);
     }
 
     return {
@@ -118,7 +118,7 @@ export function useMyAssets() {
       claimable: claimable.toFixed(0),
       delegated: delegated.toFixed(0),
       vestings,
-      total: balance.add(locked).add(bonded).add(claimable).add(delegated).toFixed(0),
+      total: balance.plus(locked).plus(bonded).plus(claimable).plus(delegated).toFixed(0),
     };
   }, [data]);
 

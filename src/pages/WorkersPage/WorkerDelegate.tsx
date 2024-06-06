@@ -1,34 +1,33 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, Chip } from '@mui/material';
-import Decimal from 'decimal.js';
+import { percentFormatter } from '@lib/formatters/formatters';
+import { fromSqd, toSqd } from '@lib/network/utils';
+import { Box, Button, Chip, Stack } from '@mui/material';
+import * as yup from '@schema';
+import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
-import * as yup from 'yup';
+import { useDebounce } from 'use-debounce';
 
-import { useWorkerDelegate } from '@api/contracts/staking';
-import { formatSqd, fromSqd, humanReadableSqd, toSqd } from '@api/contracts/utils';
+import { useCapedStakeAfterDelegation, useWorkerDelegate } from '@api/contracts/staking';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
+import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
-import { useContracts } from '@network/useContracts';
 
-export const delegateSchema = (SQD_TOKEN: string) =>
-  yup.object({
-    source: yup.string().label('Source').trim().required('Source is required'),
-    amount: yup
-      .number()
-      .label('Amount')
-      .moreThan(0)
-      .required('Amount is required')
-      .max(
-        yup.ref('max'),
-        ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, new Decimal(max))} `,
-      ),
-    max: yup.number().label('Max').required('Max is required'),
-  });
+export const delegateSchema = yup.object({
+  source: yup.string().label('Source').trim().required().typeError('${path} is invalid'),
+  amount: yup
+    .decimal()
+    .label('Amount')
+    .required()
+    .positive()
+    .max(yup.ref('max'))
+    .typeError('${path} is invalid'),
+  max: yup.string().label('Max').required().typeError('${path} is invalid'),
+});
 
 export function WorkerDelegate({
   worker,
@@ -38,7 +37,6 @@ export function WorkerDelegate({
   disabled?: boolean;
 }) {
   const { delegateToWorker, error, isLoading } = useWorkerDelegate();
-  const { SQD_TOKEN } = useContracts();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (event: React.UIEvent) => {
@@ -53,16 +51,16 @@ export function WorkerDelegate({
     isPending: isSourceLoading,
   } = useMySourceOptions({
     enabled: open,
-    sourceDisabled: s => new Decimal(s.balance).lessThanOrEqualTo(0),
+    sourceDisabled: s => BigNumber(s.balance).lte(0),
   });
 
   const formik = useFormik({
     initialValues: {
       source: '',
-      amount: '0',
+      amount: '',
       max: '0',
     },
-    validationSchema: delegateSchema(SQD_TOKEN),
+    validationSchema: delegateSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
@@ -83,18 +81,27 @@ export function WorkerDelegate({
     },
   });
 
+  const [delegation] = useDebounce(formik.values.amount, 400);
+  const {
+    data: { delegationCapacity },
+    isPending: isCapedDelegationLoading,
+  } = useCapedStakeAfterDelegation({
+    workerId: worker?.id || '',
+    amount: toSqd(delegation),
+    enabled: open && !!worker,
+  });
+
   useEffect(() => {
     if (isSourceLoading) return;
     else if (formik.values.source) return;
 
-    const source =
-      sources.find(c => new Decimal(c.balance).greaterThanOrEqualTo(0)) || sources?.[0];
+    const source = sources.find(c => fromSqd(c.balance).gte(0)) || sources?.[0];
     if (!source) return;
 
     formik.setValues({
       ...formik.values,
       source: source.id,
-      max: humanReadableSqd(source.balance),
+      max: fromSqd(source.balance).toFixed(),
     });
   }, [formik, isSourceLoading, sources]);
 
@@ -133,7 +140,7 @@ export function WorkerDelegate({
                   if (!wallet) return;
 
                   formik.setFieldValue('source', wallet.id);
-                  formik.setFieldValue('max', fromSqd(wallet.balance).toFixed(18));
+                  formik.setFieldValue('max', fromSqd(wallet.balance).toFixed());
                 }}
               />
             </FormRow>
@@ -160,6 +167,14 @@ export function WorkerDelegate({
                 }}
               />
             </FormRow>
+            <Stack direction="row" justifyContent="space-between" alignContent="center">
+              <Box>Delegation capacity</Box>
+              <Stack direction="row">
+                {isCapedDelegationLoading ? '-' : percentFormatter(delegationCapacity)}
+                <HelpTooltip help="Lower factor leads to lower APR" />
+              </Stack>
+            </Stack>
+
             <BlockchainContractError error={error} />
           </Form>
         )}

@@ -1,22 +1,4 @@
-import React from 'react';
-
-import {
-  Box,
-  CircularProgress,
-  circularProgressClasses,
-  Stack,
-  styled,
-  TableBody,
-  TableCell,
-  TableRow,
-} from '@mui/material';
-import { bindHover, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import HoverPopover from 'material-ui-popup-state/HoverPopover';
-
-import { formatSqd } from '@api/contracts/utils';
-import { BlockchainApiWorker } from '@api/subsquid-network-squid';
-import { PopoverContent, PopoverTable } from '@components/Popover';
-import { useContracts } from '@network/useContracts';
+import { Box, CircularProgress, circularProgressClasses, styled } from '@mui/material';
 
 const WorkerCapacityValue = styled(Box, {
   name: 'WorkerCapacityValue',

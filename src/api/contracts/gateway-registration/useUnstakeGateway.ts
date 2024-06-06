@@ -8,7 +8,7 @@ import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
-import { errorMessage, TxResult, WriteContractRes } from '../utils';
+import { TxResult, errorMessage, WriteContractRes } from '../utils';
 import { VESTING_CONTRACT_ABI } from '../vesting.abi';
 
 import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';

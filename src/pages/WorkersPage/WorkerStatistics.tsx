@@ -5,11 +5,12 @@ import {
   bytesFormatter,
   numberWithSpacesFormatter,
   percentFormatter,
+  tokenFormatter,
   urlFormatter,
 } from '@lib/formatters/formatters.ts';
+import { fromSqd } from '@lib/network';
 import { Box, Divider, Stack, styled } from '@mui/material';
 
-import { formatSqd } from '@api/contracts/utils';
 import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { useContracts } from '@network/useContracts';
@@ -111,7 +112,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Stack spacing={2}>
               <Stack direction="row">
                 <WorkerDescLabel>Bonded</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.bond, 8)}</WorkerDescValue>
+                <WorkerDescValue>{tokenFormatter(fromSqd(worker.bond), SQD_TOKEN)}</WorkerDescValue>
               </Stack>
               <Stack direction="row">
                 <WorkerDescLabel>Worker APR</WorkerDescLabel>
@@ -121,7 +122,9 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
               </Stack>
               <Stack direction="row">
                 <WorkerDescLabel>Total reward</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalReward, 8)}</WorkerDescValue>
+                <WorkerDescValue>
+                  {tokenFormatter(fromSqd(worker.totalReward), SQD_TOKEN)}
+                </WorkerDescValue>
               </Stack>
             </Stack>
           </Box>
@@ -135,11 +138,13 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
               </Stack>
               <Stack direction="row">
                 <WorkerDescLabel>Total delegation</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalDelegation, 8)}</WorkerDescValue>
+                <WorkerDescValue>
+                  {tokenFormatter(fromSqd(worker.totalDelegation), SQD_TOKEN)}
+                </WorkerDescValue>
               </Stack>
               <Stack direction="row">
                 <WorkerDescLabel>Delegation capacity</WorkerDescLabel>
-                <WorkerDescValue>{percentFormatter(worker.utilizedPercent)}</WorkerDescValue>
+                <WorkerDescValue>{percentFormatter(worker.delegationCapacity)}</WorkerDescValue>
               </Stack>
               <Stack direction="row">
                 <WorkerDescLabel>Delegator APR</WorkerDescLabel>
@@ -150,7 +155,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
               <Stack direction="row">
                 <WorkerDescLabel>Total reward</WorkerDescLabel>
                 <WorkerDescValue>
-                  {formatSqd(SQD_TOKEN, worker.totalDelegationRewards, 8)}
+                  {tokenFormatter(fromSqd(worker.totalReward), SQD_TOKEN)}
                 </WorkerDescValue>
               </Stack>
             </Stack>

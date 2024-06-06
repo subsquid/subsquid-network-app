@@ -45,7 +45,7 @@ export function GatewayUnstake({ operator }: { operator?: GatewayStakeFragmentFr
             source={{
               id: operator?.account.id || '',
               type: operator?.account.type || AccountType.User,
-              balance: operator?.stake?.amount,
+              balance: operator?.stake?.amount || '0',
             }}
           />
         ),

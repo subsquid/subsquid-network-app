@@ -13,7 +13,7 @@
     "preview": "vite preview --outDir build --host 127.0.0.1 --port 3005",
     "upg": "yarn upgrade-interactive",
     "prepare": "husky install",
-    "codegen": "graphql-codegen --config src/api/subsquid-network-squid/graphql.config.js"
+    "codegen": "graphql-codegen --config src/api/subsquid-network-squid/graphql.config.ts"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix"
@@ -30,12 +30,12 @@
     "@types/ms": "^0.7.34",
     "axios": "^1.6.8",
     "base58-universal": "^2.0.0",
+    "bignumber.js": "^9.1.2",
     "bs58": "^5.0.0",
     "buffer": "^6.0.3",
     "classnames": "^2.5.1",
     "country-list": "^2.3.0",
     "date-fns": "^3.6.0",
-    "decimal.js": "^10.4.3",
     "ethers": "^6.11.1",
     "formik": "^2.4.5",
     "graphql": "^16.8.1",
@@ -51,6 +51,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "recharts": "^2.12.3",
     "semver": "^7.6.2",
+    "use-debounce": "^10.0.1",
     "use-element-position": "^1.0.13",
     "use-local-storage-state": "^19.2.0",
     "viem": "^2.10.9",

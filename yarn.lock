@@ -3370,12 +3370,12 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.2.1"
     axios: "npm:^1.6.8"
     base58-universal: "npm:^2.0.0"
+    bignumber.js: "npm:^9.1.2"
     bs58: "npm:^5.0.0"
     buffer: "npm:^6.0.3"
     classnames: "npm:^2.5.1"
     country-list: "npm:^2.3.0"
     date-fns: "npm:^3.6.0"
-    decimal.js: "npm:^10.4.3"
     dotenv: "npm:^16.4.5"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
@@ -3406,6 +3406,7 @@ __metadata:
     recharts: "npm:^2.12.3"
     semver: "npm:^7.6.2"
     typescript: "npm:^5.4.3"
+    use-debounce: "npm:^10.0.1"
     use-element-position: "npm:^1.0.13"
     use-local-storage-state: "npm:^19.2.0"
     viem: "npm:^2.10.9"
@@ -5008,6 +5009,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bignumber.js@npm:^9.1.2":
+  version: 9.1.2
+  resolution: "bignumber.js@npm:9.1.2"
+  checksum: 10c0/e17786545433f3110b868725c449fa9625366a6e675cd70eb39b60938d6adbd0158cb4b3ad4f306ce817165d37e63f4aa3098ba4110db1d9a3b9f66abfbaf10d
+  languageName: node
+  linkType: hard
+
 "binary-extensions@npm:^2.0.0":
   version: 2.3.0
   resolution: "binary-extensions@npm:2.3.0"
@@ -5931,13 +5939,6 @@ __metadata:
   version: 2.5.1
   resolution: "decimal.js-light@npm:2.5.1"
   checksum: 10c0/4fd33f535aac9e5bd832796831b65d9ec7914ad129c7437b3ab991b0c2eaaa5a57e654e6174c4a17f1b3895ea366f0c1ab4955cdcdf7cfdcf3ad5a58b456c020
-  languageName: node
-  linkType: hard
-
-"decimal.js@npm:^10.4.3":
-  version: 10.4.3
-  resolution: "decimal.js@npm:10.4.3"
-  checksum: 10c0/6d60206689ff0911f0ce968d40f163304a6c1bc739927758e6efc7921cfa630130388966f16bf6ef6b838cb33679fbe8e7a78a2f3c478afce841fd55ac8fb8ee
   languageName: node
   linkType: hard
 
@@ -12341,6 +12342,15 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/6666cd62e13053d03e453b5199037cb8f6475a8f55afd664ff488bd8f2ee2ede4da3b220dd7e60f5ecd4926133364fbf4b1aed463eeb8203e7c5be3b1533b59b
+  languageName: node
+  linkType: hard
+
+"use-debounce@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "use-debounce@npm:10.0.1"
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 10c0/377a11814a708f5c392f465cbbe2d119a8a2635c8226cc5e30eba397c4436f8e8234385d069467b369d105ed0d3be733c6a08d8ae1004017c6d6f58f4d4c24d8
   languageName: node
   linkType: hard
 

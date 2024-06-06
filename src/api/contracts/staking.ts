@@ -1,18 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { calculateDelegationCapacity } from '@lib/network';
 import { logger } from '@logger';
-import Decimal from 'decimal.js';
+import BigNumber from 'bignumber.js';
 import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
-import { useWriteContract, usePublicClient, useClient, useReadContract } from 'wagmi';
+import {
+  useWriteContract,
+  usePublicClient,
+  useClient,
+  useReadContract,
+  useReadContracts,
+} from 'wagmi';
 
 import { useApproveSqd } from '@api/contracts/sqd';
-import {
-  errorMessage,
-  isApproveRequiredError,
-  TxResult,
-  WriteContractRes,
-} from '@api/contracts/utils';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType, BlockchainApiWorker, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
@@ -21,10 +22,11 @@ import { useContracts } from '@network/useContracts.ts';
 
 import { SOFT_CAP_ABI } from './soft-cap.abi';
 import { STAKING_CONTRACT_ABI } from './staking.abi';
+import { errorMessage, TxResult, isApproveRequiredError, WriteContractRes } from './utils';
 
 type WorkerDepositRequest = {
   worker: BlockchainApiWorker;
-  amount: bigint;
+  amount: string;
   wallet: Pick<SourceWallet, 'id' | 'type'>;
 };
 
@@ -41,7 +43,7 @@ function useDelegateFromWallet() {
           address: contracts.STAKING,
           abi: STAKING_CONTRACT_ABI,
           functionName: 'deposit',
-          args: [BigInt(worker.id), amount],
+          args: [BigInt(worker.id), BigInt(amount)],
         }),
       };
     } catch (e) {
@@ -57,7 +59,7 @@ function useDelegateFromWallet() {
     if (isApproveRequiredError(res.error)) {
       const approveRes = await approveSqd({
         contractAddress: contracts.STAKING,
-        amount: new Decimal(req.amount.toString()),
+        amount: BigNumber(req.amount.toString()),
       });
       if (!approveRes.success) {
         return { error: approveRes.failedReason };
@@ -82,7 +84,7 @@ function useDepositFromVestingContract() {
       const data = encodeFunctionData({
         abi: STAKING_CONTRACT_ABI,
         functionName: 'deposit',
-        args: [BigInt(worker.id), amount],
+        args: [BigInt(worker.id), BigInt(amount)],
       });
 
       return {
@@ -91,7 +93,7 @@ function useDepositFromVestingContract() {
           address: wallet.id as `0x${string}`,
           abi: VESTING_CONTRACT_ABI,
           functionName: 'execute',
-          args: [contracts.STAKING, data, amount],
+          args: [contracts.STAKING, data, BigInt(amount)],
         }),
       };
     } catch (e: unknown) {
@@ -154,7 +156,7 @@ function useUndelegateFromWallet() {
           address: contracts.STAKING,
           abi: STAKING_CONTRACT_ABI,
           functionName: 'withdraw',
-          args: [BigInt(worker.id), amount],
+          args: [BigInt(worker.id), BigInt(amount)],
         }),
       };
     } catch (e) {
@@ -173,7 +175,7 @@ function useUndelegateFromVestingContract() {
       const data = encodeFunctionData({
         abi: STAKING_CONTRACT_ABI,
         functionName: 'withdraw',
-        args: [BigInt(worker.id), amount],
+        args: [BigInt(worker.id), BigInt(amount)],
       });
 
       return {
@@ -182,7 +184,7 @@ function useUndelegateFromVestingContract() {
           address: wallet.id as `0x${string}`,
           abi: VESTING_CONTRACT_ABI,
           functionName: 'execute',
-          args: [contracts.STAKING, data, amount],
+          args: [contracts.STAKING, data, BigInt(amount)],
         }),
       };
     } catch (e: unknown) {
@@ -257,5 +259,74 @@ export function useCapedStake({ workerId }: { workerId?: string }) {
   return {
     data: res.current,
     isLoading: !res.current,
+  };
+}
+
+export function useCapedStakeAfterDelegation({
+  workerId,
+  amount,
+  undelegate,
+  enabled,
+}: {
+  workerId: string;
+  amount: string;
+  undelegate?: boolean;
+  enabled?: boolean;
+}) {
+  const contracts = useContracts();
+
+  const { data, isPending } = useReadContracts({
+    contracts: [
+      {
+        address: contracts.SOFT_CAP,
+        abi: SOFT_CAP_ABI,
+        functionName: 'capedStakeAfterDelegation',
+        args: [BigInt(workerId), BigInt(amount || 0n) * (undelegate ? -1n : 1n)],
+      },
+      {
+        address: contracts.STAKING,
+        abi: STAKING_CONTRACT_ABI,
+        functionName: 'delegated',
+        args: [BigInt(workerId)],
+      },
+    ],
+    allowFailure: false,
+    query: {
+      enabled: !!workerId && enabled !== false,
+      select: res => {
+        return {
+          capedDelegation: res[0].toString(),
+          totalDelegation: res[1].toString(),
+        };
+      },
+    },
+  });
+
+  const res = useMemo(() => {
+    const capedDelegation = data?.capedDelegation || '0';
+
+    let td = BigNumber(data?.totalDelegation || '0');
+    if (undelegate) {
+      td = td.minus(amount);
+    } else {
+      td = td.plus(amount);
+    }
+    const totalDelegation = td.lt(0) ? '0' : td.toFixed();
+
+    const delegationCapacity = calculateDelegationCapacity({
+      capedDelegation,
+      totalDelegation,
+    });
+
+    return {
+      capedDelegation,
+      totalDelegation,
+      delegationCapacity,
+    };
+  }, [amount, data?.capedDelegation, data?.totalDelegation, undelegate]);
+
+  return {
+    data: res,
+    isPending: isPending,
   };
 }

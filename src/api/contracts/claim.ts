@@ -5,12 +5,13 @@ import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, useClient } from 'wagmi';
 
 import { REWARD_TREASURY_CONTRACT_ABI } from '@api/contracts/reaward-treasury.abi';
-import { errorMessage, TxResult, WriteContractRes } from '@api/contracts/utils';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount.ts';
 import { useContracts } from '@network/useContracts.ts';
+
+import { TxResult, errorMessage, WriteContractRes } from './utils';
 
 export type ClaimRequest = {
   wallet: SourceWallet;
