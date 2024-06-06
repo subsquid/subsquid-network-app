@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { peerIdToHex } from '@lib/network';
 import { logger } from '@logger';
-import BigNumber from 'bignumber.js';
 import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, usePublicClient, useClient } from 'wagmi';
@@ -65,7 +64,7 @@ function useRegisterFromWallet() {
 
       const approveRes = await approveSqd({
         contractAddress: contracts.WORKER_REGISTRATION,
-        amount: BigNumber(bond.toString()),
+        amount: bond.toString(),
       });
       if (!approveRes.success) {
         return { error: approveRes.failedReason };

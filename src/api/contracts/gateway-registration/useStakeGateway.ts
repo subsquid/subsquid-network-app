@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
-import { fromSqd } from '@lib/network';
 import { logger } from '@logger';
-import BigNumber from 'bignumber.js';
 import { encodeFunctionData } from 'viem';
 import { usePublicClient, useWriteContract } from 'wagmi';
 
@@ -57,7 +55,7 @@ function useStakeFromWallet() {
     if (isApproveRequiredError(res.error)) {
       const approveRes = await approveSqd({
         contractAddress: contracts.GATEWAY_REGISTRATION,
-        amount: BigNumber(fromSqd(req.amount).toString()),
+        amount: req.amount,
       });
       if (!approveRes.success) {
         return { error: approveRes.failedReason };

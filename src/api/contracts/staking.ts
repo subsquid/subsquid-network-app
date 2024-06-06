@@ -59,7 +59,7 @@ function useDelegateFromWallet() {
     if (isApproveRequiredError(res.error)) {
       const approveRes = await approveSqd({
         contractAddress: contracts.STAKING,
-        amount: BigNumber(req.amount.toString()),
+        amount: req.amount,
       });
       if (!approveRes.success) {
         return { error: approveRes.failedReason };
