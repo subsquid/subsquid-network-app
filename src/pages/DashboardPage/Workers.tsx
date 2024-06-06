@@ -68,7 +68,7 @@ export function Workers() {
   const [query, setQuery] = useLocationState({
     page: new Location.Number(1),
     search: new Location.String(''),
-    sortBy: new Location.Enum<WorkerSortBy>(WorkerSortBy.JoinedAt),
+    sortBy: new Location.Enum<WorkerSortBy>(WorkerSortBy.StakerAPR),
     sortDir: new Location.Enum<SortDir>(SortDir.Desc),
   });
   const { workers, totalPages, page, isLoading } = useWorkers({
