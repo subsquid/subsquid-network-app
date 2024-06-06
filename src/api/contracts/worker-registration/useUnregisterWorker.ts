@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { peerIdToHex } from '@lib/network';
 import { logger } from '@logger';
 import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
@@ -11,7 +12,7 @@ import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
-import { errorMessage, peerIdToHex, TxResult, WriteContractRes } from '../utils';
+import { TxResult, errorMessage, WriteContractRes } from '../utils';
 
 import { WORKER_REGISTRATION_CONTRACT_ABI } from './WorkerRegistration.abi';
 

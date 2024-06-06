@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { logger } from '@logger';
-import Decimal from 'decimal.js';
 import { encodeFunctionData } from 'viem';
 import { usePublicClient, useWriteContract } from 'wagmi';
 
@@ -11,13 +10,13 @@ import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
 import { useApproveSqd } from '../sqd';
-import { errorMessage, isApproveRequiredError, toSqd, TxResult, WriteContractRes } from '../utils';
+import { errorMessage, TxResult, isApproveRequiredError, WriteContractRes } from '../utils';
 import { VESTING_CONTRACT_ABI } from '../vesting.abi';
 
 import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';
 
 type StakeGatewayRequest = {
-  amount: number;
+  amount: string;
   durationBlocks: number;
   autoExtension: boolean;
   wallet: SourceWallet;
@@ -40,7 +39,7 @@ function useStakeFromWallet() {
           address: contracts.GATEWAY_REGISTRATION,
           abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
           functionName: 'stake',
-          args: [toSqd(amount), BigInt(durationBlocks), autoExtension],
+          args: [BigInt(amount), BigInt(durationBlocks), autoExtension],
         }),
       };
     } catch (e) {
@@ -56,7 +55,7 @@ function useStakeFromWallet() {
     if (isApproveRequiredError(res.error)) {
       const approveRes = await approveSqd({
         contractAddress: contracts.GATEWAY_REGISTRATION,
-        amount: new Decimal(toSqd(req.amount).toString()),
+        amount: req.amount,
       });
       if (!approveRes.success) {
         return { error: approveRes.failedReason };
@@ -86,7 +85,7 @@ function useStakeFromVestingContract() {
       const data = encodeFunctionData({
         abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
         functionName: 'stake',
-        args: [toSqd(amount), BigInt(durationBlocks), autoExtension],
+        args: [BigInt(amount), BigInt(durationBlocks), autoExtension],
       });
 
       return {
@@ -95,7 +94,7 @@ function useStakeFromVestingContract() {
           address: wallet.id as `0x${string}`,
           abi: VESTING_CONTRACT_ABI,
           functionName: 'execute',
-          args: [contracts.GATEWAY_REGISTRATION, data, toSqd(amount)],
+          args: [contracts.GATEWAY_REGISTRATION, data, BigInt(amount)],
         }),
       };
     } catch (e: unknown) {

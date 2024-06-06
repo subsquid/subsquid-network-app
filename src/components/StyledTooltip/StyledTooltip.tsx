@@ -6,7 +6,7 @@ export const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
-    borderRadius: 8,
+    borderRadius: 6,
     color: theme.palette.text.default,
   },
 }));

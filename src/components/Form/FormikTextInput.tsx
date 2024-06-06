@@ -45,6 +45,7 @@ export function FormikTextInput({
   InputProps,
   error,
   sx,
+  autoComplete,
   onFocus,
   onBlur,
   showErrorOnlyOfTouched = false,
@@ -64,6 +65,7 @@ export function FormikTextInput({
   type?: 'text' | 'password';
   sx?: SxProps;
   InputProps?: Partial<StandardInputProps>;
+  autoComplete?: string;
   onFocus?: () => unknown;
   onBlur?: () => unknown;
 }) {
@@ -98,6 +100,7 @@ export function FormikTextInput({
       error={Boolean(actualError)}
       sx={sx}
       helperText={actualError || helperText}
+      autoComplete={autoComplete}
       InputProps={
         InputProps || {
           endAdornment:

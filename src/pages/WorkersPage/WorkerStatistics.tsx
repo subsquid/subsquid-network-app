@@ -5,11 +5,12 @@ import {
   bytesFormatter,
   numberWithSpacesFormatter,
   percentFormatter,
+  tokenFormatter,
   urlFormatter,
 } from '@lib/formatters/formatters.ts';
+import { fromSqd } from '@lib/network';
 import { Box, Divider, Stack, styled } from '@mui/material';
 
-import { formatSqd } from '@api/contracts/utils';
 import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { useContracts } from '@network/useContracts';
@@ -110,18 +111,20 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Bond</Title>
             <Stack spacing={2}>
               <Stack direction="row">
+                <WorkerDescLabel>Bonded</WorkerDescLabel>
+                <WorkerDescValue>{tokenFormatter(fromSqd(worker.bond), SQD_TOKEN)}</WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
                 <WorkerDescLabel>Worker APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.apr != null ? percentFormatter(worker.apr) : '-'}
                 </WorkerDescValue>
               </Stack>
               <Stack direction="row">
-                <WorkerDescLabel>Bonded</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.bond, 8)}</WorkerDescValue>
-              </Stack>
-              <Stack direction="row">
-                <WorkerDescLabel>Total rewards</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalReward, 8)}</WorkerDescValue>
+                <WorkerDescLabel>Total reward</WorkerDescLabel>
+                <WorkerDescValue>
+                  {tokenFormatter(fromSqd(worker.totalReward), SQD_TOKEN)}
+                </WorkerDescValue>
               </Stack>
             </Stack>
           </Box>
@@ -130,18 +133,30 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
             <Title>Delegation</Title>
             <Stack spacing={2}>
               <Stack direction="row">
+                <WorkerDescLabel>Delegators</WorkerDescLabel>
+                <WorkerDescValue>{worker.delegationCount}</WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
+                <WorkerDescLabel>Total delegation</WorkerDescLabel>
+                <WorkerDescValue>
+                  {tokenFormatter(fromSqd(worker.totalDelegation), SQD_TOKEN)}
+                </WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
+                <WorkerDescLabel>Delegation capacity</WorkerDescLabel>
+                <WorkerDescValue>{percentFormatter(worker.delegationCapacity)}</WorkerDescValue>
+              </Stack>
+              <Stack direction="row">
                 <WorkerDescLabel>Delegator APR</WorkerDescLabel>
                 <WorkerDescValue>
                   {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                 </WorkerDescValue>
               </Stack>
               <Stack direction="row">
-                <WorkerDescLabel>Delegators</WorkerDescLabel>
-                <WorkerDescValue>{worker.delegationCount}</WorkerDescValue>
-              </Stack>
-              <Stack direction="row">
-                <WorkerDescLabel>Total delegated</WorkerDescLabel>
-                <WorkerDescValue>{formatSqd(SQD_TOKEN, worker.totalDelegation, 8)}</WorkerDescValue>
+                <WorkerDescLabel>Total reward</WorkerDescLabel>
+                <WorkerDescValue>
+                  {tokenFormatter(fromSqd(worker.totalReward), SQD_TOKEN)}
+                </WorkerDescValue>
               </Stack>
             </Stack>
           </Box>

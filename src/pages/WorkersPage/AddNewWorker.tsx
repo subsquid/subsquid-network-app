@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
+import { fromSqd } from '@lib/network/utils';
 import { LoadingButton } from '@mui/lab';
 import { Box } from '@mui/material';
-import Decimal from 'decimal.js';
+import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import useLocalStorageState from 'use-local-storage-state';
 
-import { fromSqd } from '@api/contracts/utils';
 import { useRegisterWorker } from '@api/contracts/worker-registration/useRegisterWorker';
 import { useMySources } from '@api/subsquid-network-squid';
 import { useNetworkSettings } from '@api/subsquid-network-squid/settings-graphql';
@@ -105,8 +105,7 @@ function AddWorkerForm() {
     else if (formik.values.source) return;
     else if (isSettingsLoading) return;
 
-    const source =
-      sources.find(c => fromSqd(c.balance).greaterThanOrEqualTo(bondAmount)) || sources[0];
+    const source = sources.find(c => fromSqd(c.balance).gte(bondAmount)) || sources[0];
     if (!source) return;
 
     formik.setValues({
@@ -132,7 +131,7 @@ function AddWorkerForm() {
                     return {
                       label: <SourceWalletOption source={s} />,
                       value: s.id,
-                      disabled: new Decimal(s.balance).lessThan(bondAmount),
+                      disabled: BigNumber(s.balance).lt(bondAmount),
                     };
                   })}
                   formik={formik}

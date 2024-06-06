@@ -1,33 +1,32 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { Button, Chip } from '@mui/material';
-import Decimal from 'decimal.js';
+import { percentFormatter } from '@lib/formatters/formatters';
+import { fromSqd, toSqd } from '@lib/network';
+import { Box, Button, Chip, Stack } from '@mui/material';
+import * as yup from '@schema';
+import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
-import * as yup from 'yup';
+import { useDebounce } from 'use-debounce';
 
-import { useWorkerUndelegate } from '@api/contracts/staking';
-import { formatSqd, humanReadableSqd, toSqd } from '@api/contracts/utils';
+import { useCapedStakeAfterDelegation, useWorkerUndelegate } from '@api/contracts/staking';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
+import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
-import { useContracts } from '@network/useContracts';
 
-export const undelegateSchema = (SQD_TOKEN: string) =>
-  yup.object({
-    source: yup.string().label('Source').trim().required('Source is required'),
-    amount: yup
-      .number()
-      .label('Amount')
-      .moreThan(0)
-      .required('Amount is required')
-      .max(
-        yup.ref('max'),
-        ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, new Decimal(max))} `,
-      ),
-    max: yup.string().label('Max').required('Max is required'),
-  });
+export const undelegateSchema = yup.object({
+  source: yup.string().label('Source').trim().required().typeError('${path} is invalid'),
+  amount: yup
+    .decimal()
+    .label('Amount')
+    .required()
+    .positive()
+    .max(yup.ref('max'))
+    .typeError('${path} is invalid'),
+  max: yup.string().label('Max').required().typeError('${path} is invalid'),
+});
 
 export function WorkerUndelegate({
   worker,
@@ -37,7 +36,6 @@ export function WorkerUndelegate({
   disabled?: boolean;
 }) {
   const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
-  const { SQD_TOKEN } = useContracts();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (e: React.UIEvent) => {
@@ -49,7 +47,7 @@ export function WorkerUndelegate({
   const options = useMemo(
     () =>
       (worker?.myDelegations || [])
-        .filter(s => !new Decimal(s.deposit).isZero())
+        .filter(s => !BigNumber(s.deposit).isZero())
         .map(s => {
           return {
             label: (
@@ -70,10 +68,10 @@ export function WorkerUndelegate({
   const formik = useFormik({
     initialValues: {
       source: '',
-      amount: '0',
+      amount: '',
       max: '0',
     },
-    validationSchema: undelegateSchema(SQD_TOKEN),
+    validationSchema: undelegateSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
@@ -96,27 +94,38 @@ export function WorkerUndelegate({
     },
   });
 
+  const [delegation] = useDebounce(formik.values.amount, 400);
+  const {
+    data: { delegationCapacity },
+    isPending: isCapedDelegationLoading,
+  } = useCapedStakeAfterDelegation({
+    workerId: worker?.id || '',
+    amount: toSqd(delegation),
+    undelegate: true,
+    enabled: open && !!worker,
+  });
+
   useEffect(() => {
     if (formik.values.source) return;
 
-    const source = worker?.myDelegations.filter(s => !new Decimal(s.deposit).isZero())?.[0];
+    const source = worker?.myDelegations.filter(s => !BigNumber(s.deposit).isZero())?.[0];
     if (!source) return;
 
     formik.setValues({
       ...formik.values,
       source: source.owner.id,
-      max: humanReadableSqd(source.deposit),
+      max: fromSqd(source.deposit).toFixed(),
     });
   }, [formik, worker?.myDelegations]);
+
+  const canUndelegate = useMemo(() => {
+    return !!worker?.myDelegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
+  }, [worker?.myDelegations]);
 
   return (
     <>
       <Button
-        disabled={
-          disabled ||
-          worker?.myDelegationsTotal.equals(0) ||
-          !worker?.myDelegations.some(w => !w.locked)
-        }
+        disabled={disabled || !canUndelegate}
         color="error"
         onClick={handleOpen}
         variant="contained"
@@ -147,7 +156,7 @@ export function WorkerUndelegate({
                 if (!wallet) return;
 
                 formik.setFieldValue('source', wallet.owner.id);
-                formik.setFieldValue('max', humanReadableSqd(wallet.deposit));
+                formik.setFieldValue('max', fromSqd(wallet.deposit).toFixed());
               }}
             />
           </FormRow>
@@ -157,6 +166,7 @@ export function WorkerUndelegate({
               id="amount"
               label="Amount"
               formik={formik}
+              autoComplete="off"
               InputProps={{
                 endAdornment: (
                   <Chip
@@ -174,6 +184,13 @@ export function WorkerUndelegate({
               }}
             />
           </FormRow>
+          <Stack direction="row" justifyContent="space-between" alignContent="center">
+            <Box>Delegation capacity</Box>
+            <Stack direction="row">
+              {isCapedDelegationLoading ? '-' : percentFormatter(delegationCapacity)}
+              <HelpTooltip help="Lower factor leads to lower APR" />
+            </Stack>
+          </Stack>
           <BlockchainContractError error={error} />
         </Form>
       </ContractCallDialog>

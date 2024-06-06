@@ -1,6 +1,7 @@
+import { tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network/utils';
 import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 
-import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContracts } from '@api/contracts/vesting';
 import { useMyAssets } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
@@ -31,8 +32,8 @@ export function MyVestings() {
               <TableRow>
                 <TableCell>Vesting</TableCell>
                 <TableCell>Balance</TableCell>
+                <TableCell>Deposited</TableCell>
                 <TableCell>Releasable</TableCell>
-                <TableCell>Released</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
@@ -40,13 +41,13 @@ export function MyVestings() {
               {assets.vestings.map((vesting, i) => {
                 const d = data?.[i];
                 return (
-                  <TableRow className="hoverable" key={vesting.id}>
+                  <TableRow key={vesting.id}>
                     <TableCell>
                       <SourceWalletName source={vesting} to={`vestings/${vesting.id}`} />
                     </TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, fromSqd(d?.balance))}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, d?.releasable)}</TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, d?.released)}</TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(d?.balance), SQD_TOKEN)}</TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(d?.deposited), SQD_TOKEN)}</TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(d?.releasable), SQD_TOKEN)}</TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
                         <ReleaseButton vesting={vesting} />

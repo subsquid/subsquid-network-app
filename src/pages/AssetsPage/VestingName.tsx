@@ -22,7 +22,7 @@ export function SourceWalletName({ source, to }: { source: SourceWallet; to?: st
       <Avatar name={source.id.slice(2)} colorDiscriminator={source.id} />
       <Box>
         <Name>{source.type === AccountType.Vesting ? 'Vesting contract' : 'Wallet'}</Name>
-        <Box sx={{ opacity: 0.8 }}>
+        <Box>
           <CopyToClipboard
             text={source.id}
             content={<Link to={to || '#'}>{addressFormatter(source.id, true)}</Link>}

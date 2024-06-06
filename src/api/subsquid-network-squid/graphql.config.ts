@@ -1,6 +1,7 @@
 #!/usr/bin/node
 
 import 'dotenv/config';
+import { CodegenConfig } from '@graphql-codegen/cli';
 
 export default {
   overwrite: true,
@@ -29,7 +30,11 @@ export default {
       config: {
         maybeValue: 'T',
         avoidOptionals: false,
+        scalars: {
+          BigInt: 'string',
+          DateTime: 'string',
+        },
       },
     },
   },
-};
+} satisfies CodegenConfig;

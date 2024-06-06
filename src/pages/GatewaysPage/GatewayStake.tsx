@@ -1,47 +1,42 @@
 import React, { useEffect, useState } from 'react';
 
+import { fromSqd, toSqd } from '@lib/network/utils';
 import { Button, Chip } from '@mui/material';
-import Decimal from 'decimal.js';
+import * as yup from '@schema';
+import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
-import * as yup from 'yup';
 
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
-import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
-import { useContracts } from '@network/useContracts';
 
 const MIN_BLOCKS_LOCK = 1000;
 
-export const stakeSchema = (SQD_TOKEN: string) =>
-  yup.object({
-    source: yup.string().label('Source').trim().required('Source is required'),
-    amount: yup
-      .number()
-      .label('Amount')
-      .moreThan(0)
-      .required('Amount is required')
-      .max(
-        yup.ref('max'),
-        ({ max }) => `Amount should be less than ${formatSqd(SQD_TOKEN, new Decimal(max))} `,
-      ),
-    max: yup.number().label('Max').required('Max is required'),
-    autoExtension: yup.boolean().label('Auto extend').default(true),
-    durationBlocks: yup
-      .number()
-      .label('Locked blocks duration')
-      .min(MIN_BLOCKS_LOCK, ({ min }) => `Tokens must be locked at least ${min} blocks`)
-      .required('Lock min blocks is required'),
-  });
+export const stakeSchema = yup.object({
+  source: yup.string().label('Source').trim().required('Source is required'),
+  amount: yup
+    .decimal()
+    .label('Amount')
+    .required()
+    .positive()
+    .max(yup.ref('max'))
+    .typeError('${path} is invalid'),
+  max: yup.string().label('Max').required().typeError('${path} is invalid'),
+  autoExtension: yup.boolean().label('Auto extend').default(true),
+  durationBlocks: yup
+    .number()
+    .label('Locked blocks duration')
+    .min(MIN_BLOCKS_LOCK, ({ min }) => `Tokens must be locked at least ${min} blocks`)
+    .required('Lock min blocks is required'),
+});
 
 export function GatewayStake({ disabled }: { disabled?: boolean }) {
   const { data } = useMyGatewayStakes();
   const { stakeToGateway, error, isLoading } = useStakeGateway();
-  const { SQD_TOKEN } = useContracts();
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -64,7 +59,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
       autoExtension: false,
       durationBlocks: MIN_BLOCKS_LOCK,
     },
-    validationSchema: stakeSchema(SQD_TOKEN),
+    validationSchema: stakeSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
@@ -74,7 +69,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
       if (!wallet) return;
 
       const { failedReason } = await stakeToGateway({
-        amount: values.amount,
+        amount: toSqd(values.amount),
         durationBlocks: values.durationBlocks,
         autoExtension: values.autoExtension,
         wallet,
@@ -91,11 +86,8 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
     else if (formik.values.source) return;
 
     const source =
-      sources.find(
-        s =>
-          new Decimal(s.balance).greaterThanOrEqualTo(0) &&
-          !!data?.some(o => o.account.id === s.id),
-      ) || sources?.[0];
+      sources.find(s => BigNumber(s.balance).gte(0) && !!data?.some(o => o.account.id === s.id)) ||
+      sources?.[0];
     if (!source) return;
 
     formik.setValues({
@@ -152,6 +144,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
                 label="Amount"
                 formik={formik}
                 showErrorOnlyOfTouched
+                autoComplete="off"
                 InputProps={{
                   endAdornment: (
                     <Chip

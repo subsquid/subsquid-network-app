@@ -1,5 +1,7 @@
 ### COMMON ###
 
+scalar BigInt
+
 query squidNetworkHeight {
   squidStatus {
     height
@@ -40,18 +42,16 @@ query account($address: String!) {
 fragment WorkerFragment on Worker {
   id
   name
-  email
   peerId
-  website
   status
   createdAt
-  description
   bond
   claimableReward
   claimedReward
   uptime24Hours
   uptime90Days
   totalDelegation
+  capedDelegation
   delegationCount
   apr
   stakerApr
@@ -71,6 +71,10 @@ fragment WorkerFragment on Worker {
 }
 
 fragment WorkerFullFragment on Worker {
+  totalDelegationRewards
+  website
+  email
+  description
   queries24Hours
   queries90Days
   scannedData24Hours
@@ -118,7 +122,7 @@ query workerDaysUptimeById($id: String!, $from: DateTime!) {
 }
 
 query myWorkers($address: String!) {
-  workers(orderBy: id_ASC, where: { realOwner: { id_eq: $address } }) {
+  workers(orderBy: id_ASC, where: { realOwner: { id_eq: $address }, status_not_eq: WITHDRAWN }) {
     ...WorkerFragment
     myDelegations: delegations(where: { realOwner: { id_eq: $address } }) {
       deposit

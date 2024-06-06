@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
-import Decimal from 'decimal.js';
+import { calculateDelegationCapacity } from '@lib/network';
+import BigNumber from 'bignumber.js';
 import { groupBy, mapValues, values } from 'lodash-es';
 
-import { fromSqd } from '@api/contracts/utils';
 import { useAccount } from '@network/useAccount.ts';
 
 import { useSquidDataSource } from './datasource';
@@ -24,21 +24,13 @@ import {
 import { useNetworkSettings } from './settings-graphql';
 
 // inherit API interface for internal class
-export interface BlockchainApiWorker extends WorkerFragmentFragment {}
+export interface BlockchainApiWorker extends Omit<WorkerFragmentFragment, 'createdAt'> {
+  createdAt: Date;
+}
 
 export class BlockchainApiWorker {
   ownedByMe?: boolean;
-  totalDelegations: {
-    limit: Decimal;
-    total: Decimal;
-    capacity: Decimal;
-    utilizedPercent: Decimal;
-  } = {
-    limit: new Decimal(0),
-    total: new Decimal(0),
-    capacity: new Decimal(0),
-    utilizedPercent: new Decimal(0),
-  };
+  delegationCapacity?: number;
   delegationEnabled: boolean = false;
   myDelegations: {
     owner: { id: string; type: AccountType };
@@ -47,34 +39,36 @@ export class BlockchainApiWorker {
     claimableReward: string;
     claimedReward: string;
   }[] = [];
-  myDelegationsTotal: Decimal;
-  myDelegationsRewardsTotal: Decimal;
   totalReward: string;
+  // myDelegationsTotal: BigNumber;
+  // myDelegationsRewardsTotal: BigNumber;
 
   constructor({ worker, address }: { worker: WorkerFragmentFragment; address?: `0x${string}` }) {
-    const totalDelegation = fromSqd(worker.totalDelegation);
-
     Object.assign(this, {
       ...worker,
       createdAt: new Date(worker.createdAt),
-      totalDelegations: {
-        total: totalDelegation,
-      },
       delegationEnabled: worker.status === WorkerStatus.Active,
       ownedByMe: worker.realOwner?.id === address,
     });
 
-    this.myDelegationsTotal = this.myDelegations.reduce(
-      (t, r) => t.add(fromSqd(r.deposit)),
-      new Decimal(0),
-    );
+    // this.myDelegationsTotal = this.myDelegations.reduce(
+    //   (t, r) => t.plus(fromSqd(r.deposit)),
+    //   BigNumber(0),
+    // );
 
-    this.myDelegationsRewardsTotal = this.myDelegations.reduce(
-      (t, r) => t.add(fromSqd(r.claimableReward)).add(fromSqd(r.claimedReward)),
-      new Decimal(0),
-    );
+    // this.myDelegationsRewardsTotal = this.myDelegations.reduce(
+    //   (t, r) => t.plus(fromSqd(r.claimableReward)).plus(fromSqd(r.claimedReward)),
+    //   BigNumber(0),
+    // );
 
-    this.totalReward = new Decimal(this.claimedReward).add(this.claimableReward).toFixed(0);
+    this.totalReward = BigNumber(this.claimedReward).plus(this.claimableReward).toFixed(0);
+
+    if (this.totalDelegation && this.capedDelegation) {
+      this.delegationCapacity = calculateDelegationCapacity({
+        capedDelegation: this.capedDelegation,
+        totalDelegation: this.totalDelegation,
+      });
+    }
   }
 
   canEdit() {
@@ -119,9 +113,7 @@ export class BlockchainApiWorker {
 }
 
 // inherit API interface for internal class
-export interface BlockchainApiFullWorker
-  extends WorkerFragmentFragment,
-    WorkerFullFragmentFragment {
+export interface BlockchainApiFullWorker extends BlockchainApiWorker, WorkerFullFragmentFragment {
   owner: WorkerFullFragmentFragment['owner'];
 }
 export class BlockchainApiFullWorker extends BlockchainApiWorker {}
@@ -187,7 +179,7 @@ export function useWorkers({
           case WorkerSortBy.Uptime24h:
             return (a.uptime24Hours ?? -1) - (b.uptime24Hours ?? -1);
           case WorkerSortBy.DelegationCapacity:
-            return a.totalDelegations.capacity.minus(b.totalDelegations.capacity).toNumber();
+            return (a.delegationCapacity ?? -1) - (b.delegationCapacity ?? -1);
           case WorkerSortBy.StakerAPR:
             return (
               (a.stakerApr ?? -1) - (b.stakerApr ?? -1) || a.delegationCount - b.delegationCount
@@ -331,14 +323,14 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
     const filteredWorkers = source ? allWorkers.filter(w => w.owner.id === source) : allWorkers;
 
     return {
-      hasClaimsAvailable: allWorkers.some(w => w.claimableReward > 0),
+      hasClaimsAvailable: allWorkers.some(w => BigInt(w.claimableReward) > 0),
       currentSourceTotalClaimsAvailable: filteredWorkers.reduce(
-        (t, i) => t.add(i.claimableReward),
-        new Decimal(0),
+        (t, i) => t.plus(i.claimableReward),
+        BigNumber(0),
       ),
       sources: values(
         mapValues(groupBy(allWorkers, 'owner.id'), g => {
-          const total = g.reduce((t, i) => t.add(i.claimableReward), new Decimal(0));
+          const total = g.reduce((t, i) => t.plus(i.claimableReward), BigNumber(0));
 
           return {
             ...g[0].owner,
@@ -349,7 +341,7 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
 
       claims: values(
         mapValues(groupBy(filteredWorkers, 'id'), g => {
-          const total = g.reduce((t, i) => t.add(i.claimableReward), new Decimal(0));
+          const total = g.reduce((t, i) => t.plus(i.claimableReward), BigNumber(0));
 
           return {
             ...g[0],
@@ -392,13 +384,13 @@ export function useMyDelegations() {
     for (const d of data?.delegations || []) {
       let worker = workers.get(d.worker.id);
       if (!worker) {
-        worker = d.worker as BlockchainApiWorker;
+        worker = new BlockchainApiWorker({ worker: d.worker });
         worker.myDelegations = [];
         workers.set(worker.id, worker);
       }
       worker.myDelegations.push(d);
     }
-    return [...workers.values()].map(worker => new BlockchainApiWorker({ worker }));
+    return [...workers.values()];
   }, [data?.delegations]);
 
   return {

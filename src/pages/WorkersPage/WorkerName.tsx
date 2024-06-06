@@ -21,9 +21,7 @@ export const WorkerName = ({
   worker,
   to,
 }: {
-  worker: Pick<BlockchainApiWorker, 'name' | 'peerId' | 'online'> & {
-    totalDelegations?: BlockchainApiWorker['totalDelegations'];
-  };
+  worker: Pick<BlockchainApiWorker, 'name' | 'peerId' | 'online'>;
   to?: string;
 }) => {
   return (
@@ -35,7 +33,9 @@ export const WorkerName = ({
       />
       <Box>
         {worker.name ? (
-          <Name>{worker.name.length > 40 ? worker.name.slice(0, 37) + '...' : worker.name}</Name>
+          <Name title={worker.name}>
+            {worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}
+          </Name>
         ) : null}
         <Stack direction="row" spacing={1}>
           <Box>
@@ -43,14 +43,12 @@ export const WorkerName = ({
               text={worker.peerId}
               content={
                 <PeerIdShort>
-                  <Link to={to || ''}>{shortPeerId(worker.peerId)}</Link>
+                  <Link to={to || '#'}>{shortPeerId(worker.peerId)}</Link>
                 </PeerIdShort>
               }
             />
           </Box>
-          {/*{worker.totalDelegations ? (*/}
-          {/*  <WorkerDelegationCapacity value={worker.totalDelegations} />*/}
-          {/*) : null}*/}
+          {/* <WorkerDelegationCapacity worker={worker} /> */}
         </Stack>
       </Box>
     </Stack>

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { info } from '@logger';
 import * as Sentry from '@sentry/react';
-import Decimal from 'decimal.js';
+import BigNumber from 'bignumber.js';
 import { createRoot } from 'react-dom/client';
 import { useNavigate } from 'react-router-dom';
 import { useDisconnect } from 'wagmi';
@@ -11,7 +11,7 @@ import { queryClient } from '@api/client';
 
 import App from './App';
 
-Decimal.set({ precision: 30, rounding: 3 });
+BigNumber.set({ ROUNDING_MODE: 3, DECIMAL_PLACES: 18 });
 
 declare global {
   interface process {

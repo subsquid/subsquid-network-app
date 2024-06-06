@@ -1,24 +1,19 @@
 import { useState } from 'react';
 
+import { peerIdToHex } from '@lib/network';
 import { logger } from '@logger';
-import Decimal from 'decimal.js';
 import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, usePublicClient, useClient } from 'wagmi';
 
 import { useApproveSqd } from '@api/contracts/sqd';
-import {
-  errorMessage,
-  isApproveRequiredError,
-  peerIdToHex,
-  TxResult,
-  WriteContractRes,
-} from '@api/contracts/utils';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
+
+import { TxResult, errorMessage, isApproveRequiredError, WriteContractRes } from '../utils';
 
 import { encodeWorkerMetadata, WorkerMetadata } from './WorkerMetadata';
 import { WORKER_REGISTRATION_CONTRACT_ABI } from './WorkerRegistration.abi';
@@ -69,7 +64,7 @@ function useRegisterFromWallet() {
 
       const approveRes = await approveSqd({
         contractAddress: contracts.WORKER_REGISTRATION,
-        amount: new Decimal(bond.toString()),
+        amount: bond.toString(),
       });
       if (!approveRes.success) {
         return { error: approveRes.failedReason };

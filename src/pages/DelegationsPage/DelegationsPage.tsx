@@ -1,8 +1,12 @@
-import { percentFormatter } from '@lib/formatters/formatters.ts';
+import { useMemo } from 'react';
+
+import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
+import { fromSqd } from '@lib/network';
 import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import BigNumber from 'bignumber.js';
+import { keyBy, mapValues } from 'lodash-es';
 import { Outlet } from 'react-router-dom';
 
-import { formatSqd } from '@api/contracts/utils';
 import { useMyDelegations } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -19,6 +23,25 @@ export function MyDelegations() {
   const { delegations, isLoading } = useMyDelegations();
   const { SQD_TOKEN } = useContracts();
 
+  const groupedDelegations = useMemo(() => {
+    return mapValues(
+      keyBy(delegations, w => w.id),
+      w => {
+        return w.myDelegations.reduce(
+          (s, d) => {
+            s.deposit = s.deposit.plus(d.deposit);
+            s.reward = s.reward.plus(d.claimedReward).plus(d.claimableReward);
+            return s;
+          },
+          {
+            deposit: new BigNumber(0),
+            reward: new BigNumber(0),
+          },
+        );
+      },
+    );
+  }, [delegations]);
+
   return (
     <Box>
       <NetworkPageTitle title="My Delegations" />
@@ -29,19 +52,22 @@ export function MyDelegations() {
           <BorderedTable>
             <TableHead>
               <TableRow>
-                <TableCell width={275}>Worker</TableCell>
+                <TableCell className="pinned" width={240}>
+                  Worker
+                </TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Delegation</TableCell>
-                <TableCell>APR</TableCell>
+                <TableCell>Delegator APR</TableCell>
+                <TableCell>Delegation capacity</TableCell>
+                <TableCell>My Delegation</TableCell>
                 <TableCell>Total reward</TableCell>
-                <TableCell></TableCell>
+                <TableCell className="pinned"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {delegations.map(worker => {
                 return (
-                  <TableRow className="hoverable" key={worker.peerId}>
-                    <TableCell>
+                  <TableRow key={worker.peerId}>
+                    <TableCell className="pinned">
                       <WorkerName
                         worker={worker}
                         to={`/workers/${worker.peerId}?backPath=/delegations`}
@@ -50,12 +76,17 @@ export function MyDelegations() {
                     <TableCell>
                       <WorkerStatus worker={worker} />
                     </TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsTotal)}</TableCell>
                     <TableCell>
                       {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                     </TableCell>
-                    <TableCell>{formatSqd(SQD_TOKEN, worker.myDelegationsRewardsTotal)}</TableCell>
+                    <TableCell>{percentFormatter(worker.delegationCapacity)}</TableCell>
                     <TableCell>
+                      {tokenFormatter(fromSqd(groupedDelegations[worker.id].deposit), SQD_TOKEN)}
+                    </TableCell>
+                    <TableCell>
+                      {tokenFormatter(fromSqd(groupedDelegations[worker.id].reward), SQD_TOKEN)}
+                    </TableCell>
+                    <TableCell className="pinned">
                       <Stack direction="row" spacing={2} justifyContent="flex-end">
                         <WorkerDelegate worker={worker} />
                         <WorkerUndelegate worker={worker} />

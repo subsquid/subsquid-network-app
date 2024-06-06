@@ -13,9 +13,9 @@ import { VESTING_CONTRACT_ABI } from './vesting.abi';
 
 export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] }) {
   const contracts = useContracts();
-  const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
+  const { currentHeight, isLoading: isSquidHeightLoading } = useSquidNetworkHeightHooks();
 
-  const { data: res } = useReadContracts({
+  const { data, isLoading } = useReadContracts({
     contracts: addresses.flatMap(address => {
       const vestingContract = { abi: VESTING_CONTRACT_ABI, address } as const;
       return [
@@ -60,48 +60,48 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     allowFailure: true,
     blockNumber: BigInt(currentHeight),
     query: {
-      enabled: !isHeightLoading && !!addresses.length,
+      enabled: !isSquidHeightLoading && !!addresses.length,
+      select: r => {
+        if (r?.some(r => r.status === 'success')) {
+          return chunk(r, 8).map(ch => ({
+            start: Number(unwrapResult(ch[0])) * 1000,
+            end: Number(unwrapResult(ch[1])) * 1000,
+            deposited: unwrapResult(ch[2])?.toString(),
+            releasable: unwrapResult(ch[3])?.toString(),
+            released: unwrapResult(ch[4])?.toString(),
+            balance: unwrapResult(ch[5])?.toString(),
+            initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
+            expectedTotal: unwrapResult(ch[7])?.toString(),
+          }));
+        } else {
+          return res.current;
+        }
+      },
     },
   });
 
-  const data = useRef<
+  const res = useRef<
     | {
         start?: number;
         end?: number;
-        deposited?: string | undefined;
-        releasable?: string | undefined;
-        released?: string | undefined;
-        balance?: string | undefined;
+        deposited?: string;
+        releasable?: string;
+        released?: string;
+        balance?: string;
         initialRelease?: number;
-        expectedTotal?: string | undefined;
+        expectedTotal?: string;
       }[]
     | undefined
   >(undefined);
-
   useEffect(() => {
-    if (res?.some(r => r.status === 'success')) {
-      data.current = chunk(res, 8).map(ch => ({
-        start: Number(unwrapResult(ch[0])) * 1000,
-        end: Number(unwrapResult(ch[1])) * 1000,
-        deposited: unwrapResult(ch[2])?.toString(),
-        releasable: unwrapResult(ch[3])?.toString(),
-        released: unwrapResult(ch[4])?.toString(),
-        balance: unwrapResult(ch[5])?.toString(),
-        initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
-        expectedTotal: unwrapResult(ch[7])?.toString(),
-      }));
-    }
-  }, [res]);
+    if (!addresses.length) res.current = [];
+    if (!isLoading) res.current = data;
+  }, [addresses, data, isLoading]);
 
-  return addresses.length
-    ? {
-        data: data.current,
-        isLoading: !data.current,
-      }
-    : {
-        data: [],
-        isLoading: false,
-      };
+  return {
+    data: res.current,
+    isLoading: !res.current,
+  };
 }
 
 export function useVestingContract({ address }: { address?: `0x${string}` }) {

@@ -1,10 +1,10 @@
 import { dateFormat } from '@i18n';
-import { addressFormatter, percentFormatter } from '@lib/formatters/formatters';
+import { addressFormatter, percentFormatter, tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network/utils';
 import { Divider, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { formatSqd, fromSqd } from '@api/contracts/utils';
 import { useVestingContract } from '@api/contracts/vesting';
 import { useVestingByAddress } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
@@ -84,21 +84,27 @@ export function Vesting({ backPath }: { backPath: string }) {
               </Stack>
               <Stack direction="row">
                 <DescLabel>Balance</DescLabel>
-                <DescValue>{formatSqd(SQD_TOKEN, vestingInfo?.balance, 8)}</DescValue>
+                <DescValue>{tokenFormatter(fromSqd(vestingInfo?.balance), SQD_TOKEN, 8)}</DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Deposited</DescLabel>
                 <DescValue>
-                  {vestingInfo?.deposited ? formatSqd(SQD_TOKEN, vestingInfo?.deposited, 8) : '-'}
+                  {vestingInfo?.deposited
+                    ? tokenFormatter(fromSqd(vestingInfo?.deposited), SQD_TOKEN, 8)
+                    : '-'}
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Releasable</DescLabel>
-                <DescValue>{formatSqd(SQD_TOKEN, vestingInfo?.releasable, 8)}</DescValue>
+                <DescValue>
+                  {tokenFormatter(fromSqd(vestingInfo?.releasable), SQD_TOKEN, 8)}
+                </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Released</DescLabel>
-                <DescValue>{formatSqd(SQD_TOKEN, vestingInfo?.released, 8)}</DescValue>
+                <DescValue>
+                  {tokenFormatter(fromSqd(vestingInfo?.released), SQD_TOKEN, 8)}
+                </DescValue>
               </Stack>
             </Stack>
           </Box>
@@ -118,11 +124,11 @@ export function Vesting({ backPath }: { backPath: string }) {
               </Stack>
               <Stack direction="row">
                 <DescLabel>Initial release</DescLabel>
-                <DescValue>{`${formatSqd(
-                  SQD_TOKEN,
+                <DescValue>{`${tokenFormatter(
                   fromSqd(vestingInfo?.expectedTotal)
-                    .mul(vestingInfo?.initialRelease ?? 0)
+                    .times(vestingInfo?.initialRelease ?? 0)
                     .div(100),
+                  SQD_TOKEN,
                   8,
                 )} (${percentFormatter(vestingInfo?.initialRelease)})`}</DescValue>
               </Stack>

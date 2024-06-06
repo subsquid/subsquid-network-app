@@ -1,7 +1,7 @@
-import { addressFormatter } from '@lib/formatters/formatters';
+import { addressFormatter, tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd } from '@lib/network';
 import { Box, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
 
-import { formatSqd } from '@api/contracts/utils';
 import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
 import { useContracts } from '@network/useContracts';
 
@@ -45,7 +45,9 @@ export const SourceWalletOption = ({ source }: { source: SourceWalletWithBalance
       </SourceWalletLabel>
       <SourceWalletStack direction="row" spacing={1} justifyContent="space-between">
         <Box>{addressFormatter(source.id, isMobile)}</Box>
-        <SourceWalletBalance>{formatSqd(SQD_TOKEN, source?.balance)}</SourceWalletBalance>
+        <SourceWalletBalance>
+          {tokenFormatter(fromSqd(source?.balance), SQD_TOKEN)}
+        </SourceWalletBalance>
       </SourceWalletStack>
     </SourceWalletOptionWrapper>
   );
