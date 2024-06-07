@@ -1,5 +1,5 @@
 import { percentFormatter } from '@lib/formatters/formatters';
-import { Box, Stack, styled } from '@mui/material';
+import { Box, styled, Tooltip } from '@mui/material';
 import classNames from 'classnames';
 
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
@@ -15,11 +15,18 @@ export const Bar = styled(Box)(({ theme }) => ({
   },
 
   '&.warning': {
-    background: theme.palette.warning.contrastText,
+    background: '#ffb801',
   },
 
   '&.success': {
     background: '#55AD44',
+  },
+}));
+
+export const BarWrapper = styled(Box)(({ theme }) => ({
+  display: 'inline-flex',
+  '& :not(:last-child)': {
+    marginRight: theme.spacing(0.25),
   },
 }));
 
@@ -36,13 +43,15 @@ export function DelegationCapacity({
     delegationCapacity >= 75 ? 'error' : delegationCapacity >= 50 ? 'warning' : 'success';
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
-      <Stack direction="row" spacing={0.25}>
+    <Tooltip
+      placement="right"
+      title={<Box display="flex">{percentFormatter(delegationCapacity)}</Box>}
+    >
+      <BarWrapper>
         {RANGES.map((v, i) => (
           <Bar key={i} className={classNames(v < delegationCapacity ? color : undefined)} />
         ))}
-      </Stack>
-      <Box display="flex">{percentFormatter(delegationCapacity)}</Box>
-    </Stack>
+      </BarWrapper>
+    </Tooltip>
   );
 }
