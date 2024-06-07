@@ -15,11 +15,18 @@ export const Bar = styled(Box)(({ theme }) => ({
   },
 
   '&.warning': {
-    background: theme.palette.warning.contrastText,
+    background: '#ffb801',
   },
 
   '&.success': {
     background: '#55AD44',
+  },
+}));
+
+export const BarWrapper = styled(Box)(({ theme }) => ({
+  display: 'inline-flex',
+  '& :not(:last-child)': {
+    marginRight: theme.spacing(0.25),
   },
 }));
 
@@ -37,11 +44,11 @@ export function DelegationCapacity({
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Stack direction="row" spacing={0.25}>
+      <BarWrapper>
         {RANGES.map((v, i) => (
           <Bar key={i} className={classNames(v < delegationCapacity ? color : undefined)} />
         ))}
-      </Stack>
+      </BarWrapper>
       <Box display="flex">{percentFormatter(delegationCapacity)}</Box>
     </Stack>
   );
