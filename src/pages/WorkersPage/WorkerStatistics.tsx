@@ -15,6 +15,7 @@ import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { useContracts } from '@network/useContracts';
 
+import { DelegationCapacity } from './DelegationCapacity';
 import { UptimeGraph } from './UptimeGraph';
 import { WorkerVersion } from './WorkerVersion';
 
@@ -144,7 +145,9 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
               </Stack>
               <Stack direction="row">
                 <WorkerDescLabel>Delegation capacity</WorkerDescLabel>
-                <WorkerDescValue>{percentFormatter(worker.delegationCapacity)}</WorkerDescValue>
+                <WorkerDescValue>
+                  <DelegationCapacity worker={worker} />
+                </WorkerDescValue>
               </Stack>
               <Stack direction="row">
                 <WorkerDescLabel>Delegator APR</WorkerDescLabel>

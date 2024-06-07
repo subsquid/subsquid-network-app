@@ -14,6 +14,7 @@ import { BorderedTable } from '@components/Table/BorderedTable';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
+import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
@@ -79,7 +80,9 @@ export function MyDelegations() {
                     <TableCell>
                       {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                     </TableCell>
-                    <TableCell>{percentFormatter(worker.delegationCapacity)}</TableCell>
+                    <TableCell>
+                      <DelegationCapacity worker={worker} />
+                    </TableCell>
                     <TableCell>
                       {tokenFormatter(fromSqd(groupedDelegations[worker.id].deposit), SQD_TOKEN)}
                     </TableCell>

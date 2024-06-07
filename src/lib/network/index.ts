@@ -10,11 +10,11 @@ export function calculateDelegationCapacity({
   totalDelegation: string;
 }) {
   const td = BigNumber(totalDelegation);
-  if (td.isZero()) return 100;
+  if (td.isZero()) return 0;
 
   const cd = BigNumber(capedDelegation);
-  if (cd.isZero()) return Infinity;
+  if (cd.isZero()) return 0;
 
-  const ratio = cd.div(td);
-  return ratio.gt(1) ? 100 : ratio.times(100).toNumber();
+  const ratio = new BigNumber(1).minus(cd.div(td));
+  return ratio.lt(0) ? 0 : ratio.times(100).toNumber();
 }

@@ -172,7 +172,7 @@ export function WorkerDelegate({
               <Box>Delegation capacity</Box>
               <Stack direction="row">
                 {isCapedDelegationLoading ? '-' : percentFormatter(delegationCapacity)}
-                <HelpTooltip help="Lower factor leads to lower APR" />
+                <HelpTooltip help="Higher capacity leads to lower APR" />
               </Stack>
             </Stack>
 

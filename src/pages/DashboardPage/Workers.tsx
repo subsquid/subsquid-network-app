@@ -11,6 +11,7 @@ import { Search } from '@components/Search/Search';
 import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { NetworkPageTitle } from '@layouts/NetworkLayout';
+import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerVersion } from '@pages/WorkersPage/WorkerVersion';
 
@@ -163,7 +164,9 @@ export function Workers() {
                         {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                       </TableCell>
                       {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
-                      <TableCell>{percentFormatter(worker.delegationCapacity)} </TableCell>
+                      <TableCell>
+                        <DelegationCapacity worker={worker} />
+                      </TableCell>
                       <TableCell>{dateFormat(worker.createdAt)}</TableCell>
                       <TableCell className="pinned">
                         <Box display="flex" justifyContent="flex-end">
