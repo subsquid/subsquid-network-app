@@ -30,7 +30,7 @@ export const BarWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const BARS_COUNT = 8;
+const BARS_COUNT = 5;
 const RANGES = Array.from({ length: BARS_COUNT }, (_, i) => (i * 100) / BARS_COUNT);
 
 export function DelegationCapacity({
@@ -40,7 +40,7 @@ export function DelegationCapacity({
 }) {
   const delegationCapacity = worker.delegationCapacity || 0;
   const color =
-    delegationCapacity >= 75 ? 'error' : delegationCapacity >= 50 ? 'warning' : 'success';
+    delegationCapacity >= 80 ? 'error' : delegationCapacity >= 40 ? 'warning' : 'success';
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
