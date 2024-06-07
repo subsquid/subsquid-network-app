@@ -18,7 +18,7 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
   '& td, & th': {
     background: theme.palette.background.paper,
     borderBottom: `1px solid ${theme.palette.background.content}`,
-    padding: theme.spacing(2.5, 1.75),
+    padding: theme.spacing(2.5, 1.5),
   },
 
   '& td:first-of-type, & th:first-of-type': {
