@@ -16,7 +16,7 @@ import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
 
-import { useExpectedAprAfterDelegation } from './WorkerDelegate';
+import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegate';
 
 export const undelegateSchema = yup.object({
   source: yup.string().label('Source').trim().required().typeError('${path} is invalid'),
@@ -186,7 +186,7 @@ export function WorkerUndelegate({
             <Box>Expected APR</Box>
             <Stack direction="row">
               {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
-              <HelpTooltip help="Value can change" />
+              <HelpTooltip help={EXPECTED_APR_TIP} />
             </Stack>
           </Stack>
           <BlockchainContractError error={error} />

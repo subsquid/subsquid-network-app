@@ -17,6 +17,13 @@ import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
 
+export const EXPECTED_APR_TIP = (
+  <Box>
+    An estimated delegation APR. The realized APR may differ significantly and depends on the worker
+    uptime and the total amount of SQD delegated to the worker, which may change over time.
+  </Box>
+);
+
 export const delegateSchema = yup.object({
   source: yup.string().label('Source').trim().required().typeError('${path} is invalid'),
   amount: yup
@@ -169,7 +176,7 @@ export function WorkerDelegate({
               <Box>Expected APR</Box>
               <Stack direction="row">
                 {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
-                <HelpTooltip help="Value can change" />
+                <HelpTooltip help={EXPECTED_APR_TIP} />
               </Stack>
             </Stack>
 
