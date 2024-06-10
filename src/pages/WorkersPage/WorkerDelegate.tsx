@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network/utils';
@@ -9,7 +9,7 @@ import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
 import { useCapedStakeAfterDelegation, useWorkerDelegate } from '@api/contracts/staking';
-import { BlockchainApiWorker } from '@api/subsquid-network-squid';
+import { BlockchainApiWorker, useWorkerRewardStats } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
@@ -81,16 +81,6 @@ export function WorkerDelegate({
     },
   });
 
-  const [delegation] = useDebounce(formik.values.amount, 400);
-  const {
-    data: { delegationCapacity },
-    isPending: isCapedDelegationLoading,
-  } = useCapedStakeAfterDelegation({
-    workerId: worker?.id || '',
-    amount: toSqd(delegation),
-    enabled: open && !!worker,
-  });
-
   useEffect(() => {
     if (isSourceLoading) return;
     else if (formik.values.source) return;
@@ -104,6 +94,13 @@ export function WorkerDelegate({
       max: fromSqd(source.balance).toFixed(),
     });
   }, [formik, isSourceLoading, sources]);
+
+  const [delegation] = useDebounce(formik.values.amount, 500);
+  const { isPending: isExpectedAprPending, stakerApr } = useExpectedAprAfterDelegation({
+    workerId: worker?.id,
+    amount: toSqd(delegation),
+    enabled: open && !!worker,
+  });
 
   return (
     <>
@@ -169,10 +166,10 @@ export function WorkerDelegate({
               />
             </FormRow>
             <Stack direction="row" justifyContent="space-between" alignContent="center">
-              <Box>Delegation capacity</Box>
+              <Box>Expected APR</Box>
               <Stack direction="row">
-                {isCapedDelegationLoading ? '-' : percentFormatter(delegationCapacity)}
-                <HelpTooltip help="Higher capacity leads to lower APR" />
+                {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
+                <HelpTooltip help="Value can change" />
               </Stack>
             </Stack>
 
@@ -182,4 +179,76 @@ export function WorkerDelegate({
       </ContractCallDialog>
     </>
   );
+}
+
+export function useExpectedAprAfterDelegation({
+  workerId,
+  amount,
+  enabled,
+}: {
+  workerId?: string;
+  amount: string;
+  enabled?: boolean;
+}) {
+  const { data: rewardStats, isLoading: isRewardStatsLoading } = useWorkerRewardStats(workerId);
+
+  const { data, isPending: isCapedDelegationLoading } = useCapedStakeAfterDelegation({
+    workerId: workerId || '',
+    amount: amount,
+    enabled: enabled && !!workerId,
+  });
+
+  const expectedApr = useMemo(() => {
+    if (!rewardStats) return;
+
+    const { baseApr, utilizedStake, dTenure, liveness, trafficWeight, capedDelegation } =
+      rewardStats;
+
+    const totalDelegation = BigNumber(rewardStats.totalDelegation || 0);
+    const bond = BigNumber(rewardStats.bond || 0);
+
+    const expectedCappedDelegation = BigNumber(data.capedDelegation);
+
+    const expectedTotalDelegation = BigNumber.max(totalDelegation.plus(amount), 0);
+    const expectedUtilizedStake = BigNumber(utilizedStake)
+      .minus(capedDelegation || 0)
+      .plus(expectedCappedDelegation);
+
+    const supplyRatio = expectedCappedDelegation.plus(bond || 0).div(expectedUtilizedStake);
+
+    const dTraffic = Math.min(
+      BigNumber(trafficWeight || 0)
+        .div(supplyRatio)
+        .toNumber() ** 0.1,
+      1,
+    );
+
+    const actualYield = BigNumber(baseApr)
+      .times(liveness || 0)
+      .times(dTraffic)
+      .times(dTenure || 0);
+
+    const halfDelegation = expectedCappedDelegation.div(2);
+
+    const workerReward = actualYield.times(BigNumber(bond || 0).plus(halfDelegation));
+    const workerApr = workerReward
+      .div(bond || 0)
+      .times(100)
+      .toNumber();
+
+    const stakerReward = actualYield.times(halfDelegation);
+    const stakerApr = expectedTotalDelegation
+      ? stakerReward.div(expectedTotalDelegation).times(100).toNumber()
+      : 0;
+
+    return {
+      workerApr,
+      stakerApr,
+    };
+  }, [amount, data.capedDelegation, rewardStats]);
+
+  return {
+    ...expectedApr,
+    isPending: isCapedDelegationLoading || isRewardStatsLoading,
+  };
 }

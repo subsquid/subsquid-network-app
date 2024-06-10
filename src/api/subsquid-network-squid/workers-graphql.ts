@@ -17,6 +17,7 @@ import {
   useMyWorkersQuery,
   useWorkerByPeerIdQuery,
   useWorkerDaysUptimeByIdQuery,
+  useWorkerRewardStatsQuery,
   WorkerFragmentFragment,
   WorkerFullFragmentFragment,
   WorkerStatus,
@@ -417,5 +418,28 @@ export function useIsWorkerOperator() {
   return {
     isLoading: isLoading,
     isWorkerOperator: data ?? false,
+  };
+}
+
+export function useWorkerRewardStats(workerId?: string) {
+  const datasource = useSquidDataSource();
+  const { data, isLoading } = useWorkerRewardStatsQuery(
+    datasource,
+    {
+      workerId: workerId || '',
+    },
+    {
+      select: res => {
+        return {
+          ...res.workerById,
+          ...res.statistics[0],
+        };
+      },
+    },
+  );
+
+  return {
+    isLoading: isLoading,
+    data,
   };
 }

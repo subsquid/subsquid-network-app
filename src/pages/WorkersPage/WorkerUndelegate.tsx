@@ -8,13 +8,15 @@ import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
-import { useCapedStakeAfterDelegation, useWorkerUndelegate } from '@api/contracts/staking';
+import { useWorkerUndelegate } from '@api/contracts/staking';
 import { BlockchainApiWorker } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
+
+import { useExpectedAprAfterDelegation } from './WorkerDelegate';
 
 export const undelegateSchema = yup.object({
   source: yup.string().label('Source').trim().required().typeError('${path} is invalid'),
@@ -94,14 +96,10 @@ export function WorkerUndelegate({
     },
   });
 
-  const [delegation] = useDebounce(formik.values.amount, 400);
-  const {
-    data: { delegationCapacity },
-    isPending: isCapedDelegationLoading,
-  } = useCapedStakeAfterDelegation({
-    workerId: worker?.id || '',
-    amount: toSqd(delegation),
-    undelegate: true,
+  const [delegation] = useDebounce(formik.values.amount, 500);
+  const { isPending: isExpectedAprPending, stakerApr } = useExpectedAprAfterDelegation({
+    workerId: worker?.id,
+    amount: '-' + toSqd(delegation),
     enabled: open && !!worker,
   });
 
@@ -185,10 +183,10 @@ export function WorkerUndelegate({
             />
           </FormRow>
           <Stack direction="row" justifyContent="space-between" alignContent="center">
-            <Box>Delegation capacity</Box>
+            <Box>Expected APR</Box>
             <Stack direction="row">
-              {isCapedDelegationLoading ? '-' : percentFormatter(delegationCapacity)}
-              <HelpTooltip help="Higher capacity leads to lower APR" />
+              {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
+              <HelpTooltip help="Value can change" />
             </Stack>
           </Stack>
           <BlockchainContractError error={error} />

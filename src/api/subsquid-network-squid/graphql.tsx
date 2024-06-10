@@ -674,6 +674,12 @@ export enum ClaimOrderByInput {
   WorkerCreatedAtDesc = 'worker_createdAt_DESC',
   WorkerCreatedAtDescNullsFirst = 'worker_createdAt_DESC_NULLS_FIRST',
   WorkerCreatedAtDescNullsLast = 'worker_createdAt_DESC_NULLS_LAST',
+  WorkerDTenureAsc = 'worker_dTenure_ASC',
+  WorkerDTenureAscNullsFirst = 'worker_dTenure_ASC_NULLS_FIRST',
+  WorkerDTenureAscNullsLast = 'worker_dTenure_ASC_NULLS_LAST',
+  WorkerDTenureDesc = 'worker_dTenure_DESC',
+  WorkerDTenureDescNullsFirst = 'worker_dTenure_DESC_NULLS_FIRST',
+  WorkerDTenureDescNullsLast = 'worker_dTenure_DESC_NULLS_LAST',
   WorkerDelegationCountAsc = 'worker_delegationCount_ASC',
   WorkerDelegationCountAscNullsFirst = 'worker_delegationCount_ASC_NULLS_FIRST',
   WorkerDelegationCountAscNullsLast = 'worker_delegationCount_ASC_NULLS_LAST',
@@ -716,6 +722,12 @@ export enum ClaimOrderByInput {
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsFirst = 'worker_jailed_DESC_NULLS_FIRST',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLivenessAsc = 'worker_liveness_ASC',
+  WorkerLivenessAscNullsFirst = 'worker_liveness_ASC_NULLS_FIRST',
+  WorkerLivenessAscNullsLast = 'worker_liveness_ASC_NULLS_LAST',
+  WorkerLivenessDesc = 'worker_liveness_DESC',
+  WorkerLivenessDescNullsFirst = 'worker_liveness_DESC_NULLS_FIRST',
+  WorkerLivenessDescNullsLast = 'worker_liveness_DESC_NULLS_LAST',
   WorkerLockEndAsc = 'worker_lockEnd_ASC',
   WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
   WorkerLockEndAscNullsLast = 'worker_lockEnd_ASC_NULLS_LAST',
@@ -818,6 +830,12 @@ export enum ClaimOrderByInput {
   WorkerTotalDelegationDesc = 'worker_totalDelegation_DESC',
   WorkerTotalDelegationDescNullsFirst = 'worker_totalDelegation_DESC_NULLS_FIRST',
   WorkerTotalDelegationDescNullsLast = 'worker_totalDelegation_DESC_NULLS_LAST',
+  WorkerTrafficWeightAsc = 'worker_trafficWeight_ASC',
+  WorkerTrafficWeightAscNullsFirst = 'worker_trafficWeight_ASC_NULLS_FIRST',
+  WorkerTrafficWeightAscNullsLast = 'worker_trafficWeight_ASC_NULLS_LAST',
+  WorkerTrafficWeightDesc = 'worker_trafficWeight_DESC',
+  WorkerTrafficWeightDescNullsFirst = 'worker_trafficWeight_DESC_NULLS_FIRST',
+  WorkerTrafficWeightDescNullsLast = 'worker_trafficWeight_DESC_NULLS_LAST',
   WorkerUptime24HoursAsc = 'worker_uptime24Hours_ASC',
   WorkerUptime24HoursAscNullsFirst = 'worker_uptime24Hours_ASC_NULLS_FIRST',
   WorkerUptime24HoursAscNullsLast = 'worker_uptime24Hours_ASC_NULLS_LAST',
@@ -1204,6 +1222,12 @@ export enum DelegationOrderByInput {
   WorkerCreatedAtDesc = 'worker_createdAt_DESC',
   WorkerCreatedAtDescNullsFirst = 'worker_createdAt_DESC_NULLS_FIRST',
   WorkerCreatedAtDescNullsLast = 'worker_createdAt_DESC_NULLS_LAST',
+  WorkerDTenureAsc = 'worker_dTenure_ASC',
+  WorkerDTenureAscNullsFirst = 'worker_dTenure_ASC_NULLS_FIRST',
+  WorkerDTenureAscNullsLast = 'worker_dTenure_ASC_NULLS_LAST',
+  WorkerDTenureDesc = 'worker_dTenure_DESC',
+  WorkerDTenureDescNullsFirst = 'worker_dTenure_DESC_NULLS_FIRST',
+  WorkerDTenureDescNullsLast = 'worker_dTenure_DESC_NULLS_LAST',
   WorkerDelegationCountAsc = 'worker_delegationCount_ASC',
   WorkerDelegationCountAscNullsFirst = 'worker_delegationCount_ASC_NULLS_FIRST',
   WorkerDelegationCountAscNullsLast = 'worker_delegationCount_ASC_NULLS_LAST',
@@ -1246,6 +1270,12 @@ export enum DelegationOrderByInput {
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsFirst = 'worker_jailed_DESC_NULLS_FIRST',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLivenessAsc = 'worker_liveness_ASC',
+  WorkerLivenessAscNullsFirst = 'worker_liveness_ASC_NULLS_FIRST',
+  WorkerLivenessAscNullsLast = 'worker_liveness_ASC_NULLS_LAST',
+  WorkerLivenessDesc = 'worker_liveness_DESC',
+  WorkerLivenessDescNullsFirst = 'worker_liveness_DESC_NULLS_FIRST',
+  WorkerLivenessDescNullsLast = 'worker_liveness_DESC_NULLS_LAST',
   WorkerLockEndAsc = 'worker_lockEnd_ASC',
   WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
   WorkerLockEndAscNullsLast = 'worker_lockEnd_ASC_NULLS_LAST',
@@ -1348,6 +1378,12 @@ export enum DelegationOrderByInput {
   WorkerTotalDelegationDesc = 'worker_totalDelegation_DESC',
   WorkerTotalDelegationDescNullsFirst = 'worker_totalDelegation_DESC_NULLS_FIRST',
   WorkerTotalDelegationDescNullsLast = 'worker_totalDelegation_DESC_NULLS_LAST',
+  WorkerTrafficWeightAsc = 'worker_trafficWeight_ASC',
+  WorkerTrafficWeightAscNullsFirst = 'worker_trafficWeight_ASC_NULLS_FIRST',
+  WorkerTrafficWeightAscNullsLast = 'worker_trafficWeight_ASC_NULLS_LAST',
+  WorkerTrafficWeightDesc = 'worker_trafficWeight_DESC',
+  WorkerTrafficWeightDescNullsFirst = 'worker_trafficWeight_DESC_NULLS_FIRST',
+  WorkerTrafficWeightDescNullsLast = 'worker_trafficWeight_DESC_NULLS_LAST',
   WorkerUptime24HoursAsc = 'worker_uptime24Hours_ASC',
   WorkerUptime24HoursAscNullsFirst = 'worker_uptime24Hours_ASC_NULLS_FIRST',
   WorkerUptime24HoursAscNullsLast = 'worker_uptime24Hours_ASC_NULLS_LAST',
@@ -3211,6 +3247,7 @@ export type SquidStatus = {
 
 export type Statistics = {
   __typename?: 'Statistics';
+  baseApr: Scalars['Float']['output'];
   blockTime: Scalars['Int']['output'];
   blockTimeL1: Scalars['Int']['output'];
   currentEpoch?: Maybe<Scalars['Int']['output']>;
@@ -3220,6 +3257,7 @@ export type Statistics = {
   lastBlockTimestamp: Scalars['DateTime']['output'];
   lastBlockTimestampL1: Scalars['DateTime']['output'];
   lastSnapshotTimestamp: Scalars['DateTime']['output'];
+  utilizedStake: Scalars['BigInt']['output'];
 };
 
 export type StatisticsConnection = {
@@ -3236,6 +3274,12 @@ export type StatisticsEdge = {
 };
 
 export enum StatisticsOrderByInput {
+  BaseAprAsc = 'baseApr_ASC',
+  BaseAprAscNullsFirst = 'baseApr_ASC_NULLS_FIRST',
+  BaseAprAscNullsLast = 'baseApr_ASC_NULLS_LAST',
+  BaseAprDesc = 'baseApr_DESC',
+  BaseAprDescNullsFirst = 'baseApr_DESC_NULLS_FIRST',
+  BaseAprDescNullsLast = 'baseApr_DESC_NULLS_LAST',
   BlockTimeL1Asc = 'blockTimeL1_ASC',
   BlockTimeL1AscNullsFirst = 'blockTimeL1_ASC_NULLS_FIRST',
   BlockTimeL1AscNullsLast = 'blockTimeL1_ASC_NULLS_LAST',
@@ -3290,11 +3334,26 @@ export enum StatisticsOrderByInput {
   LastSnapshotTimestampDesc = 'lastSnapshotTimestamp_DESC',
   LastSnapshotTimestampDescNullsFirst = 'lastSnapshotTimestamp_DESC_NULLS_FIRST',
   LastSnapshotTimestampDescNullsLast = 'lastSnapshotTimestamp_DESC_NULLS_LAST',
+  UtilizedStakeAsc = 'utilizedStake_ASC',
+  UtilizedStakeAscNullsFirst = 'utilizedStake_ASC_NULLS_FIRST',
+  UtilizedStakeAscNullsLast = 'utilizedStake_ASC_NULLS_LAST',
+  UtilizedStakeDesc = 'utilizedStake_DESC',
+  UtilizedStakeDescNullsFirst = 'utilizedStake_DESC_NULLS_FIRST',
+  UtilizedStakeDescNullsLast = 'utilizedStake_DESC_NULLS_LAST',
 }
 
 export type StatisticsWhereInput = {
   AND?: InputMaybe<Array<StatisticsWhereInput>>;
   OR?: InputMaybe<Array<StatisticsWhereInput>>;
+  baseApr_eq?: InputMaybe<Scalars['Float']['input']>;
+  baseApr_gt?: InputMaybe<Scalars['Float']['input']>;
+  baseApr_gte?: InputMaybe<Scalars['Float']['input']>;
+  baseApr_in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  baseApr_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  baseApr_lt?: InputMaybe<Scalars['Float']['input']>;
+  baseApr_lte?: InputMaybe<Scalars['Float']['input']>;
+  baseApr_not_eq?: InputMaybe<Scalars['Float']['input']>;
+  baseApr_not_in?: InputMaybe<Array<Scalars['Float']['input']>>;
   blockTimeL1_eq?: InputMaybe<Scalars['Int']['input']>;
   blockTimeL1_gt?: InputMaybe<Scalars['Int']['input']>;
   blockTimeL1_gte?: InputMaybe<Scalars['Int']['input']>;
@@ -3384,6 +3443,15 @@ export type StatisticsWhereInput = {
   lastSnapshotTimestamp_lte?: InputMaybe<Scalars['DateTime']['input']>;
   lastSnapshotTimestamp_not_eq?: InputMaybe<Scalars['DateTime']['input']>;
   lastSnapshotTimestamp_not_in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  utilizedStake_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  utilizedStake_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  utilizedStake_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  utilizedStake_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  utilizedStake_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  utilizedStake_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  utilizedStake_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  utilizedStake_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  utilizedStake_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
 };
 
 export type Transfer = {
@@ -3555,6 +3623,7 @@ export type Worker = {
   claimedReward: Scalars['BigInt']['output'];
   claims: Array<Claim>;
   createdAt: Scalars['DateTime']['output'];
+  dTenure?: Maybe<Scalars['Float']['output']>;
   dayUptimes?: Maybe<Array<WorkerDayUptime>>;
   delegationCount: Scalars['Int']['output'];
   delegations: Array<Delegation>;
@@ -3564,6 +3633,7 @@ export type Worker = {
   id: Scalars['String']['output'];
   jailReason?: Maybe<Scalars['String']['output']>;
   jailed?: Maybe<Scalars['Boolean']['output']>;
+  liveness?: Maybe<Scalars['Float']['output']>;
   lockEnd?: Maybe<Scalars['Int']['output']>;
   lockStart?: Maybe<Scalars['Int']['output']>;
   locked?: Maybe<Scalars['Boolean']['output']>;
@@ -3587,6 +3657,7 @@ export type Worker = {
   storedData?: Maybe<Scalars['BigInt']['output']>;
   totalDelegation: Scalars['BigInt']['output'];
   totalDelegationRewards: Scalars['BigInt']['output'];
+  trafficWeight?: Maybe<Scalars['Float']['output']>;
   uptime24Hours?: Maybe<Scalars['Float']['output']>;
   uptime90Days?: Maybe<Scalars['Float']['output']>;
   version?: Maybe<Scalars['String']['output']>;
@@ -3677,6 +3748,12 @@ export enum WorkerOrderByInput {
   CreatedAtDesc = 'createdAt_DESC',
   CreatedAtDescNullsFirst = 'createdAt_DESC_NULLS_FIRST',
   CreatedAtDescNullsLast = 'createdAt_DESC_NULLS_LAST',
+  DTenureAsc = 'dTenure_ASC',
+  DTenureAscNullsFirst = 'dTenure_ASC_NULLS_FIRST',
+  DTenureAscNullsLast = 'dTenure_ASC_NULLS_LAST',
+  DTenureDesc = 'dTenure_DESC',
+  DTenureDescNullsFirst = 'dTenure_DESC_NULLS_FIRST',
+  DTenureDescNullsLast = 'dTenure_DESC_NULLS_LAST',
   DelegationCountAsc = 'delegationCount_ASC',
   DelegationCountAscNullsFirst = 'delegationCount_ASC_NULLS_FIRST',
   DelegationCountAscNullsLast = 'delegationCount_ASC_NULLS_LAST',
@@ -3719,6 +3796,12 @@ export enum WorkerOrderByInput {
   JailedDesc = 'jailed_DESC',
   JailedDescNullsFirst = 'jailed_DESC_NULLS_FIRST',
   JailedDescNullsLast = 'jailed_DESC_NULLS_LAST',
+  LivenessAsc = 'liveness_ASC',
+  LivenessAscNullsFirst = 'liveness_ASC_NULLS_FIRST',
+  LivenessAscNullsLast = 'liveness_ASC_NULLS_LAST',
+  LivenessDesc = 'liveness_DESC',
+  LivenessDescNullsFirst = 'liveness_DESC_NULLS_FIRST',
+  LivenessDescNullsLast = 'liveness_DESC_NULLS_LAST',
   LockEndAsc = 'lockEnd_ASC',
   LockEndAscNullsFirst = 'lockEnd_ASC_NULLS_FIRST',
   LockEndAscNullsLast = 'lockEnd_ASC_NULLS_LAST',
@@ -3869,6 +3952,12 @@ export enum WorkerOrderByInput {
   TotalDelegationDesc = 'totalDelegation_DESC',
   TotalDelegationDescNullsFirst = 'totalDelegation_DESC_NULLS_FIRST',
   TotalDelegationDescNullsLast = 'totalDelegation_DESC_NULLS_LAST',
+  TrafficWeightAsc = 'trafficWeight_ASC',
+  TrafficWeightAscNullsFirst = 'trafficWeight_ASC_NULLS_FIRST',
+  TrafficWeightAscNullsLast = 'trafficWeight_ASC_NULLS_LAST',
+  TrafficWeightDesc = 'trafficWeight_DESC',
+  TrafficWeightDescNullsFirst = 'trafficWeight_DESC_NULLS_FIRST',
+  TrafficWeightDescNullsLast = 'trafficWeight_DESC_NULLS_LAST',
   Uptime24HoursAsc = 'uptime24Hours_ASC',
   Uptime24HoursAscNullsFirst = 'uptime24Hours_ASC_NULLS_FIRST',
   Uptime24HoursAscNullsLast = 'uptime24Hours_ASC_NULLS_LAST',
@@ -3978,6 +4067,12 @@ export enum WorkerRewardOrderByInput {
   WorkerCreatedAtDesc = 'worker_createdAt_DESC',
   WorkerCreatedAtDescNullsFirst = 'worker_createdAt_DESC_NULLS_FIRST',
   WorkerCreatedAtDescNullsLast = 'worker_createdAt_DESC_NULLS_LAST',
+  WorkerDTenureAsc = 'worker_dTenure_ASC',
+  WorkerDTenureAscNullsFirst = 'worker_dTenure_ASC_NULLS_FIRST',
+  WorkerDTenureAscNullsLast = 'worker_dTenure_ASC_NULLS_LAST',
+  WorkerDTenureDesc = 'worker_dTenure_DESC',
+  WorkerDTenureDescNullsFirst = 'worker_dTenure_DESC_NULLS_FIRST',
+  WorkerDTenureDescNullsLast = 'worker_dTenure_DESC_NULLS_LAST',
   WorkerDelegationCountAsc = 'worker_delegationCount_ASC',
   WorkerDelegationCountAscNullsFirst = 'worker_delegationCount_ASC_NULLS_FIRST',
   WorkerDelegationCountAscNullsLast = 'worker_delegationCount_ASC_NULLS_LAST',
@@ -4020,6 +4115,12 @@ export enum WorkerRewardOrderByInput {
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsFirst = 'worker_jailed_DESC_NULLS_FIRST',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLivenessAsc = 'worker_liveness_ASC',
+  WorkerLivenessAscNullsFirst = 'worker_liveness_ASC_NULLS_FIRST',
+  WorkerLivenessAscNullsLast = 'worker_liveness_ASC_NULLS_LAST',
+  WorkerLivenessDesc = 'worker_liveness_DESC',
+  WorkerLivenessDescNullsFirst = 'worker_liveness_DESC_NULLS_FIRST',
+  WorkerLivenessDescNullsLast = 'worker_liveness_DESC_NULLS_LAST',
   WorkerLockEndAsc = 'worker_lockEnd_ASC',
   WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
   WorkerLockEndAscNullsLast = 'worker_lockEnd_ASC_NULLS_LAST',
@@ -4122,6 +4223,12 @@ export enum WorkerRewardOrderByInput {
   WorkerTotalDelegationDesc = 'worker_totalDelegation_DESC',
   WorkerTotalDelegationDescNullsFirst = 'worker_totalDelegation_DESC_NULLS_FIRST',
   WorkerTotalDelegationDescNullsLast = 'worker_totalDelegation_DESC_NULLS_LAST',
+  WorkerTrafficWeightAsc = 'worker_trafficWeight_ASC',
+  WorkerTrafficWeightAscNullsFirst = 'worker_trafficWeight_ASC_NULLS_FIRST',
+  WorkerTrafficWeightAscNullsLast = 'worker_trafficWeight_ASC_NULLS_LAST',
+  WorkerTrafficWeightDesc = 'worker_trafficWeight_DESC',
+  WorkerTrafficWeightDescNullsFirst = 'worker_trafficWeight_DESC_NULLS_FIRST',
+  WorkerTrafficWeightDescNullsLast = 'worker_trafficWeight_DESC_NULLS_LAST',
   WorkerUptime24HoursAsc = 'worker_uptime24Hours_ASC',
   WorkerUptime24HoursAscNullsFirst = 'worker_uptime24Hours_ASC_NULLS_FIRST',
   WorkerUptime24HoursAscNullsLast = 'worker_uptime24Hours_ASC_NULLS_LAST',
@@ -4333,6 +4440,12 @@ export enum WorkerSnapshotOrderByInput {
   WorkerCreatedAtDesc = 'worker_createdAt_DESC',
   WorkerCreatedAtDescNullsFirst = 'worker_createdAt_DESC_NULLS_FIRST',
   WorkerCreatedAtDescNullsLast = 'worker_createdAt_DESC_NULLS_LAST',
+  WorkerDTenureAsc = 'worker_dTenure_ASC',
+  WorkerDTenureAscNullsFirst = 'worker_dTenure_ASC_NULLS_FIRST',
+  WorkerDTenureAscNullsLast = 'worker_dTenure_ASC_NULLS_LAST',
+  WorkerDTenureDesc = 'worker_dTenure_DESC',
+  WorkerDTenureDescNullsFirst = 'worker_dTenure_DESC_NULLS_FIRST',
+  WorkerDTenureDescNullsLast = 'worker_dTenure_DESC_NULLS_LAST',
   WorkerDelegationCountAsc = 'worker_delegationCount_ASC',
   WorkerDelegationCountAscNullsFirst = 'worker_delegationCount_ASC_NULLS_FIRST',
   WorkerDelegationCountAscNullsLast = 'worker_delegationCount_ASC_NULLS_LAST',
@@ -4375,6 +4488,12 @@ export enum WorkerSnapshotOrderByInput {
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsFirst = 'worker_jailed_DESC_NULLS_FIRST',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLivenessAsc = 'worker_liveness_ASC',
+  WorkerLivenessAscNullsFirst = 'worker_liveness_ASC_NULLS_FIRST',
+  WorkerLivenessAscNullsLast = 'worker_liveness_ASC_NULLS_LAST',
+  WorkerLivenessDesc = 'worker_liveness_DESC',
+  WorkerLivenessDescNullsFirst = 'worker_liveness_DESC_NULLS_FIRST',
+  WorkerLivenessDescNullsLast = 'worker_liveness_DESC_NULLS_LAST',
   WorkerLockEndAsc = 'worker_lockEnd_ASC',
   WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
   WorkerLockEndAscNullsLast = 'worker_lockEnd_ASC_NULLS_LAST',
@@ -4477,6 +4596,12 @@ export enum WorkerSnapshotOrderByInput {
   WorkerTotalDelegationDesc = 'worker_totalDelegation_DESC',
   WorkerTotalDelegationDescNullsFirst = 'worker_totalDelegation_DESC_NULLS_FIRST',
   WorkerTotalDelegationDescNullsLast = 'worker_totalDelegation_DESC_NULLS_LAST',
+  WorkerTrafficWeightAsc = 'worker_trafficWeight_ASC',
+  WorkerTrafficWeightAscNullsFirst = 'worker_trafficWeight_ASC_NULLS_FIRST',
+  WorkerTrafficWeightAscNullsLast = 'worker_trafficWeight_ASC_NULLS_LAST',
+  WorkerTrafficWeightDesc = 'worker_trafficWeight_DESC',
+  WorkerTrafficWeightDescNullsFirst = 'worker_trafficWeight_DESC_NULLS_FIRST',
+  WorkerTrafficWeightDescNullsLast = 'worker_trafficWeight_DESC_NULLS_LAST',
   WorkerUptime24HoursAsc = 'worker_uptime24Hours_ASC',
   WorkerUptime24HoursAscNullsFirst = 'worker_uptime24Hours_ASC_NULLS_FIRST',
   WorkerUptime24HoursAscNullsLast = 'worker_uptime24Hours_ASC_NULLS_LAST',
@@ -4646,6 +4771,12 @@ export enum WorkerStatusChangeOrderByInput {
   WorkerCreatedAtDesc = 'worker_createdAt_DESC',
   WorkerCreatedAtDescNullsFirst = 'worker_createdAt_DESC_NULLS_FIRST',
   WorkerCreatedAtDescNullsLast = 'worker_createdAt_DESC_NULLS_LAST',
+  WorkerDTenureAsc = 'worker_dTenure_ASC',
+  WorkerDTenureAscNullsFirst = 'worker_dTenure_ASC_NULLS_FIRST',
+  WorkerDTenureAscNullsLast = 'worker_dTenure_ASC_NULLS_LAST',
+  WorkerDTenureDesc = 'worker_dTenure_DESC',
+  WorkerDTenureDescNullsFirst = 'worker_dTenure_DESC_NULLS_FIRST',
+  WorkerDTenureDescNullsLast = 'worker_dTenure_DESC_NULLS_LAST',
   WorkerDelegationCountAsc = 'worker_delegationCount_ASC',
   WorkerDelegationCountAscNullsFirst = 'worker_delegationCount_ASC_NULLS_FIRST',
   WorkerDelegationCountAscNullsLast = 'worker_delegationCount_ASC_NULLS_LAST',
@@ -4688,6 +4819,12 @@ export enum WorkerStatusChangeOrderByInput {
   WorkerJailedDesc = 'worker_jailed_DESC',
   WorkerJailedDescNullsFirst = 'worker_jailed_DESC_NULLS_FIRST',
   WorkerJailedDescNullsLast = 'worker_jailed_DESC_NULLS_LAST',
+  WorkerLivenessAsc = 'worker_liveness_ASC',
+  WorkerLivenessAscNullsFirst = 'worker_liveness_ASC_NULLS_FIRST',
+  WorkerLivenessAscNullsLast = 'worker_liveness_ASC_NULLS_LAST',
+  WorkerLivenessDesc = 'worker_liveness_DESC',
+  WorkerLivenessDescNullsFirst = 'worker_liveness_DESC_NULLS_FIRST',
+  WorkerLivenessDescNullsLast = 'worker_liveness_DESC_NULLS_LAST',
   WorkerLockEndAsc = 'worker_lockEnd_ASC',
   WorkerLockEndAscNullsFirst = 'worker_lockEnd_ASC_NULLS_FIRST',
   WorkerLockEndAscNullsLast = 'worker_lockEnd_ASC_NULLS_LAST',
@@ -4790,6 +4927,12 @@ export enum WorkerStatusChangeOrderByInput {
   WorkerTotalDelegationDesc = 'worker_totalDelegation_DESC',
   WorkerTotalDelegationDescNullsFirst = 'worker_totalDelegation_DESC_NULLS_FIRST',
   WorkerTotalDelegationDescNullsLast = 'worker_totalDelegation_DESC_NULLS_LAST',
+  WorkerTrafficWeightAsc = 'worker_trafficWeight_ASC',
+  WorkerTrafficWeightAscNullsFirst = 'worker_trafficWeight_ASC_NULLS_FIRST',
+  WorkerTrafficWeightAscNullsLast = 'worker_trafficWeight_ASC_NULLS_LAST',
+  WorkerTrafficWeightDesc = 'worker_trafficWeight_DESC',
+  WorkerTrafficWeightDescNullsFirst = 'worker_trafficWeight_DESC_NULLS_FIRST',
+  WorkerTrafficWeightDescNullsLast = 'worker_trafficWeight_DESC_NULLS_LAST',
   WorkerUptime24HoursAsc = 'worker_uptime24Hours_ASC',
   WorkerUptime24HoursAscNullsFirst = 'worker_uptime24Hours_ASC_NULLS_FIRST',
   WorkerUptime24HoursAscNullsLast = 'worker_uptime24Hours_ASC_NULLS_LAST',
@@ -4933,6 +5076,15 @@ export type WorkerWhereInput = {
   createdAt_lte?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_not_eq?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_not_in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  dTenure_eq?: InputMaybe<Scalars['Float']['input']>;
+  dTenure_gt?: InputMaybe<Scalars['Float']['input']>;
+  dTenure_gte?: InputMaybe<Scalars['Float']['input']>;
+  dTenure_in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  dTenure_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  dTenure_lt?: InputMaybe<Scalars['Float']['input']>;
+  dTenure_lte?: InputMaybe<Scalars['Float']['input']>;
+  dTenure_not_eq?: InputMaybe<Scalars['Float']['input']>;
+  dTenure_not_in?: InputMaybe<Array<Scalars['Float']['input']>>;
   dayUptimes_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   delegationCount_eq?: InputMaybe<Scalars['Int']['input']>;
   delegationCount_gt?: InputMaybe<Scalars['Int']['input']>;
@@ -5020,6 +5172,15 @@ export type WorkerWhereInput = {
   jailed_eq?: InputMaybe<Scalars['Boolean']['input']>;
   jailed_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   jailed_not_eq?: InputMaybe<Scalars['Boolean']['input']>;
+  liveness_eq?: InputMaybe<Scalars['Float']['input']>;
+  liveness_gt?: InputMaybe<Scalars['Float']['input']>;
+  liveness_gte?: InputMaybe<Scalars['Float']['input']>;
+  liveness_in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  liveness_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  liveness_lt?: InputMaybe<Scalars['Float']['input']>;
+  liveness_lte?: InputMaybe<Scalars['Float']['input']>;
+  liveness_not_eq?: InputMaybe<Scalars['Float']['input']>;
+  liveness_not_in?: InputMaybe<Array<Scalars['Float']['input']>>;
   lockEnd_eq?: InputMaybe<Scalars['Int']['input']>;
   lockEnd_gt?: InputMaybe<Scalars['Int']['input']>;
   lockEnd_gte?: InputMaybe<Scalars['Int']['input']>;
@@ -5186,6 +5347,15 @@ export type WorkerWhereInput = {
   totalDelegation_lte?: InputMaybe<Scalars['BigInt']['input']>;
   totalDelegation_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
   totalDelegation_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  trafficWeight_eq?: InputMaybe<Scalars['Float']['input']>;
+  trafficWeight_gt?: InputMaybe<Scalars['Float']['input']>;
+  trafficWeight_gte?: InputMaybe<Scalars['Float']['input']>;
+  trafficWeight_in?: InputMaybe<Array<Scalars['Float']['input']>>;
+  trafficWeight_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  trafficWeight_lt?: InputMaybe<Scalars['Float']['input']>;
+  trafficWeight_lte?: InputMaybe<Scalars['Float']['input']>;
+  trafficWeight_not_eq?: InputMaybe<Scalars['Float']['input']>;
+  trafficWeight_not_in?: InputMaybe<Array<Scalars['Float']['input']>>;
   uptime24Hours_eq?: InputMaybe<Scalars['Float']['input']>;
   uptime24Hours_gt?: InputMaybe<Scalars['Float']['input']>;
   uptime24Hours_gte?: InputMaybe<Scalars['Float']['input']>;
@@ -5479,6 +5649,24 @@ export type MyWorkersCountQueryVariables = Exact<{
 export type MyWorkersCountQuery = {
   __typename?: 'Query';
   workersConnection: { __typename?: 'WorkersConnection'; totalCount: number };
+};
+
+export type WorkerRewardStatsQueryVariables = Exact<{
+  workerId: Scalars['String']['input'];
+}>;
+
+export type WorkerRewardStatsQuery = {
+  __typename?: 'Query';
+  workerById?: {
+    __typename?: 'Worker';
+    liveness?: number;
+    dTenure?: number;
+    trafficWeight?: number;
+    bond: string;
+    capedDelegation: string;
+    totalDelegation: string;
+  };
+  statistics: Array<{ __typename?: 'Statistics'; utilizedStake: string; baseApr: number }>;
 };
 
 export type MyAssetsQueryVariables = Exact<{
@@ -6052,6 +6240,42 @@ export const useMyWorkersCountQuery = <TData = MyWorkersCountQuery, TError = unk
       dataSource.endpoint,
       dataSource.fetchParams || {},
       MyWorkersCountDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const WorkerRewardStatsDocument = `
+    query workerRewardStats($workerId: String!) {
+  workerById(id: $workerId) {
+    liveness
+    dTenure
+    trafficWeight
+    bond
+    capedDelegation
+    totalDelegation
+  }
+  statistics(limit: 1) {
+    utilizedStake
+    baseApr
+  }
+}
+    `;
+
+export const useWorkerRewardStatsQuery = <TData = WorkerRewardStatsQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: WorkerRewardStatsQueryVariables,
+  options?: Omit<UseQueryOptions<WorkerRewardStatsQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<WorkerRewardStatsQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<WorkerRewardStatsQuery, TError, TData>({
+    queryKey: ['workerRewardStats', variables],
+    queryFn: fetcher<WorkerRewardStatsQuery, WorkerRewardStatsQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      WorkerRewardStatsDocument,
       variables,
     ),
     ...options,

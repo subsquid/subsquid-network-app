@@ -142,6 +142,22 @@ query myWorkersCount($address: String!) {
   }
 }
 
+query workerRewardStats($workerId: String!) {
+  workerById(id: $workerId) {
+    liveness
+    dTenure
+    trafficWeight
+    bond
+    capedDelegation
+    totalDelegation
+  }
+  
+  statistics(limit: 1) {
+    utilizedStake
+    baseApr
+  }
+}
+
 query myAssets($address: String!) {
   accounts(where: { id_eq: $address }) {
     balance
