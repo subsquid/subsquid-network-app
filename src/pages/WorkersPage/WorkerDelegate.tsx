@@ -88,11 +88,17 @@ export function WorkerDelegate({
     },
   });
 
-  useEffect(() => {
+  const source = useMemo(() => {
     if (isSourceLoading) return;
-    else if (formik.values.source) return;
 
-    const source = sources.find(c => fromSqd(c.balance).gte(0)) || sources?.[0];
+    return (
+      (formik.values.source
+        ? sources.find(c => c.id === formik.values.source)
+        : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
+    );
+  }, [formik.values.source, isSourceLoading, sources]);
+
+  useEffect(() => {
     if (!source) return;
 
     formik.setValues({
@@ -100,7 +106,8 @@ export function WorkerDelegate({
       source: source.id,
       max: fromSqd(source.balance).toFixed(),
     });
-  }, [formik, isSourceLoading, sources]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source]);
 
   const [delegation] = useDebounce(formik.values.amount, 500);
   const { isPending: isExpectedAprPending, stakerApr } = useExpectedAprAfterDelegation({
