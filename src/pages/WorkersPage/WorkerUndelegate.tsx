@@ -107,10 +107,17 @@ export function WorkerUndelegate({
     enabled: open && !!worker,
   });
 
-  useEffect(() => {
-    if (formik.values.source) return;
+  const source = useMemo(() => {
+    if (!worker) return;
 
-    const source = worker?.delegations.filter(s => !BigNumber(s.deposit).isZero())?.[0];
+    return (
+      (formik.values.source
+        ? worker?.delegations.find(c => c.owner.id === formik.values.source)
+        : worker?.delegations.find(c => fromSqd(c.deposit).gte(0))) || worker?.delegations?.[0]
+    );
+  }, [formik.values.source, worker]);
+
+  useEffect(() => {
     if (!source) return;
 
     formik.setValues({
@@ -118,7 +125,8 @@ export function WorkerUndelegate({
       source: source.owner.id,
       max: fromSqd(source.deposit).toFixed(),
     });
-  }, [worker?.delegations, formik]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source]);
 
   const canUndelegate = useMemo(() => {
     return !!worker?.delegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));

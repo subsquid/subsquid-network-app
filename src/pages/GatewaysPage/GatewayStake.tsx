@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { fromSqd, toSqd } from '@lib/network/utils';
 import { Button, Chip } from '@mui/material';
 import * as yup from '@schema';
-import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
 
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
@@ -54,8 +53,8 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
   const formik = useFormik({
     initialValues: {
       source: '',
-      amount: 0,
-      max: 0,
+      amount: '0',
+      max: '0',
       autoExtension: false,
       durationBlocks: MIN_BLOCKS_LOCK,
     },
@@ -81,21 +80,26 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
     },
   });
 
-  useEffect(() => {
+  const source = useMemo(() => {
     if (isSourceLoading) return;
-    else if (formik.values.source) return;
 
-    const source =
-      sources.find(s => BigNumber(s.balance).gte(0) && !!data?.some(o => o.account.id === s.id)) ||
-      sources?.[0];
+    return (
+      (formik.values.source
+        ? sources.find(c => c.id === formik.values.source)
+        : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
+    );
+  }, [formik.values.source, isSourceLoading, sources]);
+
+  useEffect(() => {
     if (!source) return;
 
     formik.setValues({
       ...formik.values,
       source: source.id,
-      max: fromSqd(source.balance).toNumber(),
+      max: fromSqd(source.balance).toFixed(),
     });
-  }, [data, formik, isSourceLoading, sources]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source]);
 
   return (
     <>

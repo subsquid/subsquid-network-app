@@ -175,7 +175,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                       <WorkerDescLabel>Total reward</WorkerDescLabel>
                       <WorkerDescValue>
                         {tokenFormatter(
-                          fromSqd(worker.claimableReward).plus(worker.claimedReward),
+                          fromSqd(worker.claimableReward).plus(fromSqd(worker.claimedReward)),
                           SQD_TOKEN,
                         )}
                       </WorkerDescValue>

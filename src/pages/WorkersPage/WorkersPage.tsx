@@ -62,7 +62,7 @@ export function MyWorkers() {
                     <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
                     <TableCell>
                       {tokenFormatter(
-                        fromSqd(worker.claimableReward).plus(worker.claimedReward),
+                        fromSqd(worker.claimableReward).plus(fromSqd(worker.claimedReward)),
                         SQD_TOKEN,
                       )}
                     </TableCell>
