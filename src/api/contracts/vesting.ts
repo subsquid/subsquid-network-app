@@ -60,7 +60,7 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     allowFailure: true,
     blockNumber: BigInt(currentHeight),
     query: {
-      enabled: !isSquidHeightLoading && !!addresses.length,
+      enabled: !isSquidHeightLoading,
       select: r => {
         if (r?.some(r => r.status === 'success')) {
           return chunk(r, 8).map(ch => ({
@@ -94,7 +94,11 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     | undefined
   >(undefined);
   useEffect(() => {
-    if (!addresses.length) res.current = [];
+    if (!addresses.length) {
+      res.current = [];
+      return;
+    }
+
     if (!isLoading) res.current = data;
   }, [addresses, data, isLoading]);
 
