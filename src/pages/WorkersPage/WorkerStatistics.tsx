@@ -158,7 +158,7 @@ export const WorkerStatistics = ({ worker }: { worker: BlockchainApiFullWorker }
               <Stack direction="row">
                 <WorkerDescLabel>Total reward</WorkerDescLabel>
                 <WorkerDescValue>
-                  {tokenFormatter(fromSqd(worker.totalReward), SQD_TOKEN)}
+                  {tokenFormatter(fromSqd(worker.totalDelegationRewards), SQD_TOKEN)}
                 </WorkerDescValue>
               </Stack>
             </Stack>

@@ -38,14 +38,18 @@ export function workerStatus(worker: BlockchainApiWorker): {
       if (worker.jailed) {
         return { label: 'Jailed', color: 'error', tip: worker.jailReason || 'Unknown' };
       } else if (!worker.online) {
-        return { label: 'Offline', color: 'default' };
+        return {
+          label: 'Offline',
+          color: 'default',
+          tip: worker.dialOk === false ? 'Unreachable' : undefined,
+        };
       }
 
       return { label: 'Online', color: 'success' };
     case Status.Registering:
       return { label: 'Registering', color: 'default' };
     case Status.Deregistering:
-      return { label: 'Unregistring', color: 'default' };
+      return { label: 'Deregistering', color: 'default' };
     case Status.Deregistered:
       return { label: 'Deregistered', color: 'default' };
   }
