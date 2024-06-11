@@ -5,7 +5,7 @@ import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
 import { keyBy } from 'lodash-es';
 
-import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
+import { Worker } from '@api/subsquid-network-squid';
 
 import { StatusBar } from './StatusBar';
 
@@ -31,7 +31,11 @@ const StyledNotes = styled(Box)(({ theme }) => ({
 
 const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
 
-export const UptimeGraph = ({ worker }: { worker: BlockchainApiFullWorker }) => {
+export const UptimeGraph = ({
+  worker,
+}: {
+  worker: Pick<Worker, 'dayUptimes' | 'uptime90Days'>;
+}) => {
   const theme = useTheme();
   const w1200 = useMediaQuery(theme.breakpoints.up(1200));
   const w1000 = useMediaQuery(theme.breakpoints.up(1000));

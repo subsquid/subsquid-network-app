@@ -39,38 +39,40 @@ query account($address: String!) {
 
 ### WORKERS ###
 
-fragment WorkerFragment on Worker {
+fragment WorkerBaseFragment on Worker {
   id
   name
   peerId
+}
+
+fragment WorkerStatusFragment on Worker {
   status
+  online
+  jailed
+  dialOk
+  jailReason
+}
+
+fragment WorkerFragment on Worker {
+  ...WorkerBaseFragment
+  ...WorkerStatusFragment
+  version
   createdAt
+  uptime90Days
+  apr
+  stakerApr
+  totalDelegation
+  capedDelegation
+}
+
+fragment WorkerFullFragment on Worker {
+  ...WorkerFragment
   bond
   claimableReward
   claimedReward
   uptime24Hours
-  uptime90Days
-  totalDelegation
-  capedDelegation
   delegationCount
-  apr
-  stakerApr
-  online
-  jailed
-  dialOk
   locked
-  version
-  jailReason
-  owner {
-    id
-    type
-  }
-  realOwner {
-    id
-  }
-}
-
-fragment WorkerFullFragment on Worker {
   totalDelegationRewards
   website
   email
@@ -90,6 +92,9 @@ fragment WorkerFullFragment on Worker {
     id
     type
   }
+  realOwner {
+    id
+  }
 }
 
 query allWorkers {
@@ -98,17 +103,17 @@ query allWorkers {
   }
 }
 
-query workerByPeerId($peerId: String!, $address: String!) {
+query workerByPeerId($peerId: String!, $address: String) {
   workers(where: { peerId_eq: $peerId }, limit: 1) {
-    ...WorkerFragment
     ...WorkerFullFragment
-    myDelegations: delegations(where: { realOwner: { id_eq: $address } }) {
+    delegations(where: { realOwner: { id_eq: $address } }) {
+      claimableReward
+      claimedReward
       deposit
       locked
       owner {
         id
         type
-        balance
       }
     }
   }
@@ -124,15 +129,9 @@ query workerDaysUptimeById($id: String!, $from: DateTime!) {
 query myWorkers($address: String!) {
   workers(orderBy: id_ASC, where: { realOwner: { id_eq: $address }, status_not_eq: WITHDRAWN }) {
     ...WorkerFragment
-    myDelegations: delegations(where: { realOwner: { id_eq: $address } }) {
-      deposit
-      locked
-      owner {
-        id
-        type
-        balance
-      }
-    }
+    uptime24Hours
+    claimableReward
+    claimedReward
   }
 }
 
@@ -142,19 +141,46 @@ query myWorkersCount($address: String!) {
   }
 }
 
-query workerRewardStats($workerId: String!) {
+query workerDelegationInfo($workerId: String!) {
   workerById(id: $workerId) {
+    bond
+    totalDelegation
+    capedDelegation
     liveness
     dTenure
     trafficWeight
-    bond
-    capedDelegation
-    totalDelegation
   }
-  
+
   statistics(limit: 1) {
     utilizedStake
     baseApr
+  }
+}
+
+query workerOwner($workerId: String!) {
+  workerById(id: $workerId) {
+    owner {
+      id
+      type
+    }
+    realOwner {
+      id
+    }
+  }
+}
+
+query myWorkerDelegations($address: String!, $workerId: String!) {
+  workerById(id: $workerId) {
+    delegations(where: { realOwner: { id_eq: $address } }) {
+      claimableReward
+      claimedReward
+      deposit
+      locked
+      owner {
+        id
+        type
+      }
+    }
   }
 }
 
@@ -167,6 +193,7 @@ query myAssets($address: String!) {
     }
   }
   workers(where: { realOwner: { id_eq: $address } }) {
+    ...WorkerBaseFragment
     bond
     claimableReward
   }
@@ -182,29 +209,27 @@ query myAssets($address: String!) {
 }
 
 query myDelegations($address: String!) {
-  delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
-    claimableReward
-    claimedReward
-    deposit
-    locked
-    worker {
-      ...WorkerFragment
-    }
-    owner {
-      id
-      type
+  workers(where: { delegations_some: { realOwner: { id_eq: $address } } }) {
+    ...WorkerFragment
+    delegations(where: { realOwner: { id_eq: $address } }) {
+      claimableReward
+      claimedReward
+      deposit
+      locked
+      owner {
+        id
+        type
+      }
     }
   }
 }
 
-query myClaimsAvailable($address: String!) {
+query myClaims($address: String!) {
   delegations(where: { realOwner: { id_eq: $address }, claimableReward_gt: 0 }) {
     claimableReward
     deposit
     worker {
-      id
-      name
-      peerId
+      ...WorkerBaseFragment
     }
     owner {
       id
@@ -212,9 +237,7 @@ query myClaimsAvailable($address: String!) {
     }
   }
   workers(where: { realOwner: { id_eq: $address }, claimableReward_gt: 0 }) {
-    id
-    name
-    peerId
+    ...WorkerBaseFragment
     claimableReward
     owner {
       id

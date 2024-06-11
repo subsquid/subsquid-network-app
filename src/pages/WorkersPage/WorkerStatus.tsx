@@ -1,9 +1,9 @@
-import React from 'react';
+import { useMemo } from 'react';
 
 import { Chip as MaterialChip, Tooltip, chipClasses, styled } from '@mui/material';
 import capitalize from 'lodash-es/capitalize';
 
-import { BlockchainApiWorker, WorkerStatus as Status } from '@api/subsquid-network-squid';
+import { WorkerStatus as Status, WorkerStatusFragmentFragment } from '@api/subsquid-network-squid';
 
 export const Chip = styled(MaterialChip)(({ theme: { spacing } }) => ({
   fontSize: '0.75rem',
@@ -26,35 +26,33 @@ export const Chip = styled(MaterialChip)(({ theme: { spacing } }) => ({
   },
 }));
 
-export function workerStatus(worker: BlockchainApiWorker): {
-  label: string;
-  color: 'error' | 'success' | 'default';
-  tip?: string;
-} {
-  if (!worker.status) return { label: 'Unknown', color: 'default' };
+export function WorkerStatus({ worker }: { worker: WorkerStatusFragmentFragment }) {
+  const { label, color, tip } = useMemo((): {
+    label: string;
+    color: 'error' | 'success' | 'default';
+    tip?: string;
+  } => {
+    if (!worker.status) return { label: 'Unknown', color: 'default' };
 
-  switch (worker.status) {
-    case Status.Active:
-      if (worker.jailed) {
-        return { label: 'Jailed', color: 'error', tip: worker.jailReason || 'Unknown' };
-      } else if (!worker.online) {
-        return { label: 'Offline', color: 'default' };
-      }
+    switch (worker.status) {
+      case Status.Active:
+        if (worker.jailed) {
+          return { label: 'Jailed', color: 'error', tip: worker.jailReason || 'Unknown' };
+        } else if (!worker.online) {
+          return { label: 'Offline', color: 'default' };
+        }
 
-      return { label: 'Online', color: 'success' };
-    case Status.Registering:
-      return { label: 'Registering', color: 'default' };
-    case Status.Deregistering:
-      return { label: 'Unregistring', color: 'default' };
-    case Status.Deregistered:
-      return { label: 'Deregistered', color: 'default' };
-  }
+        return { label: 'Online', color: 'success' };
+      case Status.Registering:
+        return { label: 'Registering', color: 'default' };
+      case Status.Deregistering:
+        return { label: 'Deregistering', color: 'default' };
+      case Status.Deregistered:
+        return { label: 'Deregistered', color: 'default' };
+    }
 
-  return { label: capitalize(worker.status), color: 'default' };
-}
-
-export function WorkerStatus({ worker }: { worker: BlockchainApiWorker }) {
-  const { label, color, tip } = workerStatus(worker);
+    return { label: capitalize(worker.status), color: 'default' };
+  }, [worker.jailReason, worker.jailed, worker.online, worker.status]);
 
   const chip = <Chip color={color} label={label} />;
 
