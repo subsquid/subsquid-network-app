@@ -110,7 +110,7 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (isLoading) return;
 
-    if (chainHeight && BigInt(currentHeight) < chainHeight && maxWaitHeight < chainHeight) {
+    if (chainHeight && BigInt(currentHeight) < chainHeight - 5n && maxWaitHeight < chainHeight) {
       setWaitHeight(chainHeight);
     }
   }, [chainHeight, currentHeight, heightHooks, isLoading, maxWaitHeight, setWaitHeight]);
