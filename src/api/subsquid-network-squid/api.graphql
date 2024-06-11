@@ -106,7 +106,7 @@ query allWorkers {
 query workerByPeerId($peerId: String!, $address: String) {
   workers(where: { peerId_eq: $peerId }, limit: 1) {
     ...WorkerFullFragment
-    delegations(where: { realOwner: { id_eq: $address } }) {
+    delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
       claimableReward
       claimedReward
       deposit
@@ -171,7 +171,7 @@ query workerOwner($workerId: String!) {
 
 query myWorkerDelegations($address: String!, $workerId: String!) {
   workerById(id: $workerId) {
-    delegations(where: { realOwner: { id_eq: $address } }) {
+    delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0  }) {
       claimableReward
       claimedReward
       deposit

@@ -6171,7 +6171,7 @@ export const WorkerByPeerIdDocument = `
     query workerByPeerId($peerId: String!, $address: String) {
   workers(where: {peerId_eq: $peerId}, limit: 1) {
     ...WorkerFullFragment
-    delegations(where: {realOwner: {id_eq: $address}}) {
+    delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
       claimableReward
       claimedReward
       deposit
@@ -6364,7 +6364,7 @@ export const useWorkerOwnerQuery = <TData = WorkerOwnerQuery, TError = unknown>(
 export const MyWorkerDelegationsDocument = `
     query myWorkerDelegations($address: String!, $workerId: String!) {
   workerById(id: $workerId) {
-    delegations(where: {realOwner: {id_eq: $address}}) {
+    delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
       claimableReward
       claimedReward
       deposit
