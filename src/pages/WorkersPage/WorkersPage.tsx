@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
 import { fromSqd } from '@lib/network';
 import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
@@ -62,7 +60,12 @@ export function MyWorkers() {
                     <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
                     <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
                     <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
-                    <TableCell>{tokenFormatter(fromSqd(worker.totalReward), SQD_TOKEN)}</TableCell>
+                    <TableCell>
+                      {tokenFormatter(
+                        fromSqd(worker.claimableReward).plus(fromSqd(worker.claimedReward)),
+                        SQD_TOKEN,
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
                         <WorkerUnregister worker={worker} />

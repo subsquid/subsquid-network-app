@@ -2,8 +2,6 @@ import { percentFormatter } from '@lib/formatters/formatters';
 import { Box, Stack, styled } from '@mui/material';
 import classNames from 'classnames';
 
-import { BlockchainApiWorker } from '@api/subsquid-network-squid';
-
 export const Bar = styled(Box)(({ theme }) => ({
   width: theme.spacing(0.75),
   height: theme.spacing(2),
@@ -11,15 +9,15 @@ export const Bar = styled(Box)(({ theme }) => ({
   background: '#EBEBEB',
 
   '&.error': {
-    background: theme.palette.error.main,
+    background: theme.palette.networkStatus.offline,
   },
 
   '&.warning': {
-    background: '#ffb801',
+    background: theme.palette.networkStatus.downtime,
   },
 
   '&.success': {
-    background: '#55AD44',
+    background: theme.palette.networkStatus.online,
   },
 }));
 
@@ -33,11 +31,7 @@ export const BarWrapper = styled(Box)(({ theme }) => ({
 const BARS_COUNT = 5;
 const RANGES = Array.from({ length: BARS_COUNT }, (_, i) => (i * 100) / BARS_COUNT);
 
-export function DelegationCapacity({
-  worker,
-}: {
-  worker: Pick<BlockchainApiWorker, 'delegationCapacity'>;
-}) {
+export function DelegationCapacity({ worker }: { worker: { delegationCapacity: number } }) {
   const delegationCapacity = worker.delegationCapacity || 0;
   const color =
     delegationCapacity >= 80 ? 'error' : delegationCapacity >= 40 ? 'warning' : 'success';

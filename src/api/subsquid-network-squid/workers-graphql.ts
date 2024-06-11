@@ -8,115 +8,118 @@ import { useAccount } from '@network/useAccount.ts';
 
 import { useSquidDataSource } from './datasource';
 import {
-  AccountType,
   ClaimType,
   useAllWorkersQuery,
-  useMyClaimsAvailableQuery,
+  useMyClaimsQuery,
   useMyDelegationsQuery,
+  useMyWorkerDelegationsQuery,
   useMyWorkersCountQuery,
   useMyWorkersQuery,
   useWorkerByPeerIdQuery,
-  useWorkerDaysUptimeByIdQuery,
-  WorkerFragmentFragment,
-  WorkerFullFragmentFragment,
-  WorkerStatus,
+  useWorkerDelegationInfoQuery,
+  useWorkerOwnerQuery,
+  Worker,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
 
 // inherit API interface for internal class
-export interface BlockchainApiWorker extends Omit<WorkerFragmentFragment, 'createdAt'> {
-  createdAt: Date;
-}
+// export interface BlockchainApiWorker extends Omit<WorkerFragmentFragment, 'createdAt'> {
+//   createdAt: Date;
+// }
 
-export class BlockchainApiWorker {
-  ownedByMe?: boolean;
-  delegationCapacity?: number;
-  delegationEnabled: boolean = false;
-  myDelegations: {
-    owner: { id: string; type: AccountType };
-    deposit: string;
-    locked?: boolean;
-    claimableReward: string;
-    claimedReward: string;
-  }[] = [];
-  totalReward: string;
-  // myDelegationsTotal: BigNumber;
-  // myDelegationsRewardsTotal: BigNumber;
+// export class BlockchainApiWorker {
+//   ownedByMe?: boolean;
+//   delegationCapacity?: number;
+//   delegationEnabled: boolean = false;
+//   myDelegations: {
+//     owner: { id: string; type: AccountType };
+//     deposit: string;
+//     locked?: boolean;
+//     claimableReward: string;
+//     claimedReward: string;
+//   }[] = [];
+//   totalReward: string;
+//   // myDelegationsTotal: BigNumber;
+//   // myDelegationsRewardsTotal: BigNumber;
 
-  constructor({ worker, address }: { worker: WorkerFragmentFragment; address?: `0x${string}` }) {
-    Object.assign(this, {
-      ...worker,
-      createdAt: new Date(worker.createdAt),
-      delegationEnabled: worker.status === WorkerStatus.Active,
-      ownedByMe: worker.realOwner?.id === address,
-    });
+//   constructor({ worker, address }: { worker: WorkerFragmentFragment; address?: `0x${string}` }) {
+//     Object.assign(this, {
+//       ...worker,
+//       createdAt: new Date(worker.createdAt),
+//       delegationEnabled: worker.status === WorkerStatus.Active,
+//       ownedByMe: worker.realOwner?.id === address,
+//     });
 
-    // this.myDelegationsTotal = this.myDelegations.reduce(
-    //   (t, r) => t.plus(fromSqd(r.deposit)),
-    //   BigNumber(0),
-    // );
+//     // this.myDelegationsTotal = this.myDelegations.reduce(
+//     //   (t, r) => t.plus(fromSqd(r.deposit)),
+//     //   BigNumber(0),
+//     // );
 
-    // this.myDelegationsRewardsTotal = this.myDelegations.reduce(
-    //   (t, r) => t.plus(fromSqd(r.claimableReward)).plus(fromSqd(r.claimedReward)),
-    //   BigNumber(0),
-    // );
+//     // this.myDelegationsRewardsTotal = this.myDelegations.reduce(
+//     //   (t, r) => t.plus(fromSqd(r.claimableReward)).plus(fromSqd(r.claimedReward)),
+//     //   BigNumber(0),
+//     // );
 
-    this.totalReward = BigNumber(this.claimedReward).plus(this.claimableReward).toFixed(0);
+//     this.totalReward = BigNumber(this.claimedReward).plus(this.claimableReward).toFixed(0);
 
-    if (this.totalDelegation && this.capedDelegation) {
-      this.delegationCapacity = calculateDelegationCapacity({
-        capedDelegation: this.capedDelegation,
-        totalDelegation: this.totalDelegation,
-      });
-    }
-  }
+//     if (this.totalDelegation && this.capedDelegation) {
+//       this.delegationCapacity = calculateDelegationCapacity({
+//         capedDelegation: this.capedDelegation,
+//         totalDelegation: this.totalDelegation,
+//       });
+//     }
+//   }
 
-  canEdit() {
-    if (!this.ownedByMe) return false;
+//   canEdit() {
+//     if (!this.ownedByMe) return false;
 
-    switch (this.status) {
-      case WorkerStatus.Registering:
-      case WorkerStatus.Active:
-        return true;
-      default:
-        return false;
-    }
-  }
+//     switch (this.status) {
+//       case WorkerStatus.Registering:
+//       case WorkerStatus.Active:
+//         return true;
+//       default:
+//         return false;
+//     }
+//   }
 
-  canUnregister() {
-    if (!this.ownedByMe) return false;
+//   canUnregister() {
+//     if (!this.ownedByMe) return false;
 
-    switch (this.status) {
-      case WorkerStatus.Deregistering:
-      case WorkerStatus.Deregistered:
-      case WorkerStatus.Withdrawn:
-        return false;
-      default:
-        return true;
-    }
-  }
+//     switch (this.status) {
+//       case WorkerStatus.Deregistering:
+//       case WorkerStatus.Deregistered:
+//       case WorkerStatus.Withdrawn:
+//         return false;
+//       default:
+//         return true;
+//     }
+//   }
 
-  canWithdraw() {
-    return this.status === WorkerStatus.Deregistered && !this.locked;
-  }
+//   canWithdraw() {
+//     return this.status === WorkerStatus.Deregistered && !this.locked;
+//   }
 
-  displayStats() {
-    switch (this.status) {
-      case WorkerStatus.Registering:
-      case WorkerStatus.Active:
-      case WorkerStatus.Deregistering:
-        return true;
-      default:
-        return false;
-    }
-  }
-}
+//   displayStats() {
+//     switch (this.status) {
+//       case WorkerStatus.Registering:
+//       case WorkerStatus.Active:
+//       case WorkerStatus.Deregistering:
+//         return true;
+//       default:
+//         return false;
+//     }
+//   }
+// }
 
 // inherit API interface for internal class
-export interface BlockchainApiFullWorker extends BlockchainApiWorker, WorkerFullFragmentFragment {
-  owner: WorkerFullFragmentFragment['owner'];
+// export interface BlockchainApiFullWorker extends BlockchainApiWorker, WorkerFullFragmentFragment {
+//   owner: WorkerFullFragmentFragment['owner'];
+// }
+// export class BlockchainApiFullWorker extends BlockchainApiWorker {}
+
+export interface WorkerExtended extends Worker {
+  delegationCapacity: number;
 }
-export class BlockchainApiFullWorker extends BlockchainApiWorker {}
 
 export enum WorkerSortBy {
   JoinedAt = 'joined_at',
@@ -146,7 +149,6 @@ export function useWorkers({
   sortDir: SortDir;
 }) {
   const dataSource = useSquidDataSource();
-  const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const { data, isPending } = useAllWorkersQuery(dataSource, {});
@@ -162,11 +164,14 @@ export function useWorkers({
 
         return true;
       })
-      .map(worker => {
-        return new BlockchainApiWorker({
-          worker,
-          address,
-        });
+      .map(w => {
+        return {
+          ...w,
+          delegationCapacity: calculateDelegationCapacity({
+            totalDelegation: w.totalDelegation,
+            capedDelegation: w.capedDelegation,
+          }),
+        };
       })
       .sort((a, b) => {
         if (sortDir === SortDir.Desc) {
@@ -176,18 +181,14 @@ export function useWorkers({
         switch (sortBy) {
           case WorkerSortBy.Uptime90d:
             return (a.uptime90Days ?? -1) - (b.uptime90Days ?? -1);
-          case WorkerSortBy.Uptime24h:
-            return (a.uptime24Hours ?? -1) - (b.uptime24Hours ?? -1);
           case WorkerSortBy.DelegationCapacity:
             return (a.delegationCapacity ?? -1) - (b.delegationCapacity ?? -1);
           case WorkerSortBy.StakerAPR:
-            return (
-              (a.stakerApr ?? -1) - (b.stakerApr ?? -1) || a.delegationCount - b.delegationCount
-            );
+            return (a.stakerApr ?? -1) - (b.stakerApr ?? -1);
           case WorkerSortBy.WorkerAPR:
             return (a.apr ?? -1) - (b.apr ?? -1);
           default:
-            return a.createdAt.valueOf() - b.createdAt.valueOf();
+            return new Date(a.createdAt).valueOf() - new Date(b.createdAt).valueOf();
         }
       });
 
@@ -199,7 +200,7 @@ export function useWorkers({
       totalPages: Math.floor(filtered.length / perPage),
       workers: filtered.slice((normalizedPage - 1) * perPage, normalizedPage * perPage),
     };
-  }, [data?.workers, search, sortBy, sortDir, address, page, perPage]);
+  }, [data?.workers, search, sortBy, sortDir, page, perPage]);
 
   return {
     ...filteredData,
@@ -220,13 +221,9 @@ export function useMyWorkers() {
     },
     {
       select: res => {
-        return res.workers.map(
-          w =>
-            new BlockchainApiWorker({
-              worker: w,
-              address,
-            }),
-        );
+        return res.workers.map(w => {
+          return w;
+        });
       },
       enabled,
     },
@@ -241,23 +238,24 @@ export function useMyWorkers() {
 export function useWorkerByPeerId(peerId?: string) {
   const datasource = useSquidDataSource();
   const enabled = !!peerId;
-  const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
+  const { address } = useAccount();
 
   const { data, isPending } = useWorkerByPeerIdQuery(
     datasource,
-    {
-      peerId: peerId || '',
-      address: address || '',
-    },
+    { peerId: peerId || '', address },
     {
       select: res => {
         if (!res.workers.length) return;
-
-        return new BlockchainApiFullWorker({
-          worker: res.workers[0],
-          address,
-        });
+        return res.workers.map(w => {
+          return {
+            ...w,
+            delegationCapacity: calculateDelegationCapacity({
+              totalDelegation: w.totalDelegation,
+              capedDelegation: w.capedDelegation,
+            }),
+          };
+        })[0];
       },
       enabled,
     },
@@ -269,38 +267,11 @@ export function useWorkerByPeerId(peerId?: string) {
   };
 }
 
-// TODO: remove hardcoded date
-export function useWorkerDaysUptimeById(workerId?: string) {
-  const enabled = !!workerId;
-  const datasource = useSquidDataSource();
-
-  const { data, isLoading } = useWorkerDaysUptimeByIdQuery(
-    datasource,
-    {
-      id: workerId || '',
-      from: '2024-01-23T12:00:00.000000Z',
-    },
-    {
-      select: res =>
-        res.workerSnapshotsByDay.map(({ timestamp, uptime }) => ({
-          timestamp,
-          uptime,
-        })),
-      enabled,
-    },
-  );
-
-  return {
-    data: data || [],
-    isLoading: enabled ? isLoading : false,
-  };
-}
-
 export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
   const { address } = useAccount();
   const datasource = useSquidDataSource();
 
-  const { data, isLoading } = useMyClaimsAvailableQuery(datasource, {
+  const { data, isLoading } = useMyClaimsQuery(datasource, {
     address: address || '',
   });
 
@@ -379,23 +350,23 @@ export function useMyDelegations() {
     address: address || '',
   });
 
-  const delegations: BlockchainApiWorker[] = useMemo(() => {
-    const workers: Map<string, BlockchainApiWorker> = new Map();
-    for (const d of data?.delegations || []) {
-      let worker = workers.get(d.worker.id);
-      if (!worker) {
-        worker = new BlockchainApiWorker({ worker: d.worker });
-        worker.myDelegations = [];
-        workers.set(worker.id, worker);
-      }
-      worker.myDelegations.push(d);
-    }
-    return [...workers.values()];
-  }, [data?.delegations]);
+  const workers = useMemo(() => {
+    return (
+      data?.workers.map(w => {
+        return {
+          ...w,
+          delegationCapacity: calculateDelegationCapacity({
+            totalDelegation: w.totalDelegation,
+            capedDelegation: w.capedDelegation,
+          }),
+        };
+      }) || []
+    );
+  }, [data]);
 
   return {
     isLoading: isSettingsLoading || isLoading,
-    delegations,
+    workers,
   };
 }
 
@@ -417,5 +388,85 @@ export function useIsWorkerOperator() {
   return {
     isLoading: isLoading,
     isWorkerOperator: data ?? false,
+  };
+}
+
+export function useWorkerDelegationInfo({
+  workerId,
+  enabled,
+}: {
+  workerId?: string;
+  enabled?: boolean;
+}) {
+  const datasource = useSquidDataSource();
+  const { data, isLoading } = useWorkerDelegationInfoQuery(
+    datasource,
+    {
+      workerId: workerId || '',
+    },
+    {
+      select: res => {
+        return {
+          worker: res.workerById,
+          info: res.statistics[0],
+        };
+      },
+      enabled,
+    },
+  );
+
+  return {
+    isLoading: isLoading,
+    data,
+  };
+}
+
+export function useWorkerOwner({ workerId, enabled }: { workerId?: string; enabled?: boolean }) {
+  const datasource = useSquidDataSource();
+  const { data, isLoading } = useWorkerOwnerQuery(
+    datasource,
+    {
+      workerId: workerId || '',
+    },
+    {
+      select: res => {
+        return res.workerById;
+      },
+      enabled,
+    },
+  );
+
+  return {
+    isLoading: isLoading,
+    data,
+  };
+}
+
+export function useMyWorkerDelegations({
+  workerId,
+  enabled,
+}: {
+  workerId?: string;
+  enabled?: boolean;
+}) {
+  const { address } = useAccount();
+  const datasource = useSquidDataSource();
+  const { data, isLoading } = useMyWorkerDelegationsQuery(
+    datasource,
+    {
+      workerId: workerId || '',
+      address: address || '',
+    },
+    {
+      select: res => {
+        return res.workerById;
+      },
+      enabled,
+    },
+  );
+
+  return {
+    isLoading: isLoading,
+    data,
   };
 }

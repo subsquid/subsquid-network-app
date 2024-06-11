@@ -1,10 +1,8 @@
-import React from 'react';
-
 import { IconButton, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
-import { BlockchainApiFullWorker } from '@api/subsquid-network-squid';
+import { Worker, WorkerStatusFragmentFragment } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { shortPeerId } from '@components/PeerId';
@@ -21,13 +19,19 @@ export const PeerIdRow = styled(Box, {
   overflowWrap: 'anywhere',
 }));
 
-function WorkerTitle({ worker }: { worker: BlockchainApiFullWorker }) {
+function WorkerTitle({
+  worker,
+  canEdit,
+}: {
+  worker: Pick<Worker, 'peerId' | 'name'>;
+  canEdit: boolean;
+}) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box sx={{ fontSize: '1.5rem', lineHeight: 1.4, overflowWrap: 'anywhere' }}>
         {worker.name || worker.peerId}
       </Box>
-      {worker.canEdit() ? (
+      {canEdit ? (
         <IconButton component={Link} to={`/workers/${worker.peerId}/edit`}>
           <EditIcon size={18} color="#1D1D1F" />
         </IconButton>
@@ -36,7 +40,13 @@ function WorkerTitle({ worker }: { worker: BlockchainApiFullWorker }) {
   );
 }
 
-export const WorkerCard = ({ worker }: { worker: BlockchainApiFullWorker }) => {
+export const WorkerCard = ({
+  worker,
+  canEdit,
+}: {
+  worker: Pick<Worker, 'peerId' | 'name'> & WorkerStatusFragmentFragment;
+  canEdit: boolean;
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
 
@@ -49,7 +59,7 @@ export const WorkerCard = ({ worker }: { worker: BlockchainApiFullWorker }) => {
         size={100}
       />
       <Box sx={{ flex: 1 }}>
-        <WorkerTitle worker={worker} />
+        <WorkerTitle worker={worker} canEdit={canEdit} />
         <PeerIdRow>
           <CopyToClipboard
             text={worker.peerId}
@@ -58,7 +68,6 @@ export const WorkerCard = ({ worker }: { worker: BlockchainApiFullWorker }) => {
         </PeerIdRow>
         <WorkerStatus worker={worker} />
       </Box>
-      {/* <WorkerDescription>{worker.description}</WorkerDescription> */}
     </Stack>
   );
 };

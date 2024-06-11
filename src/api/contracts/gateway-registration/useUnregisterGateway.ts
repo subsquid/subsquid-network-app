@@ -7,7 +7,7 @@ import { useWriteContract, usePublicClient } from 'wagmi';
 
 import { AccountType } from '@api/subsquid-network-squid';
 import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
@@ -78,7 +78,7 @@ export function useUnregisterGateway() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
 
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const unregisterGatewayFromWallet = useUnregisterGatewayFromWallet();
   const unregisterGatewayFromVestingContract = useUnregisterGatewayFromVestingContract();
 

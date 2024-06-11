@@ -127,6 +127,15 @@ export function Workers() {
                     sort={WorkerSortBy.DelegationCapacity}
                     query={query}
                     setQuery={setQuery}
+                    help={
+                      <Box>
+                        The Delegator APR decreases significantly once more than 20,000 SQD is
+                        delegated to the worker.
+                        <br />
+                        To maximize delegation rewards, choose workers with high uptime and a low
+                        amount of delegated SQD.
+                      </Box>
+                    }
                   >
                     Delegation capacity
                   </SortableHeaderCell>

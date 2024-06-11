@@ -5,7 +5,7 @@ import { erc20Abi, MulticallResponse } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useReadContracts, useWriteContract, useClient } from 'wagmi';
 
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
 
 import { errorMessage, WriteContractRes } from './utils';
@@ -13,7 +13,7 @@ import { VESTING_CONTRACT_ABI } from './vesting.abi';
 
 export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] }) {
   const contracts = useContracts();
-  const { currentHeight, isLoading: isSquidHeightLoading } = useSquidNetworkHeightHooks();
+  const { currentHeight, isLoading: isSquidHeightLoading } = useSquidNetworkHeight();
 
   const { data, isLoading } = useReadContracts({
     contracts: addresses.flatMap(address => {
@@ -60,7 +60,7 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     allowFailure: true,
     blockNumber: BigInt(currentHeight),
     query: {
-      enabled: !isSquidHeightLoading && !!addresses.length,
+      enabled: !isSquidHeightLoading,
       select: r => {
         if (r?.some(r => r.status === 'success')) {
           return chunk(r, 8).map(ch => ({
@@ -94,7 +94,11 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     | undefined
   >(undefined);
   useEffect(() => {
-    if (!addresses.length) res.current = [];
+    if (!addresses.length) {
+      res.current = [];
+      return;
+    }
+
     if (!isLoading) res.current = data;
   }, [addresses, data, isLoading]);
 
@@ -119,7 +123,7 @@ function unwrapResult<T>(result?: MulticallResponse<T>): T | undefined {
 
 export function useVestingContractRelease() {
   const client = useClient();
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { SQD } = useContracts();

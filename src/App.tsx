@@ -9,6 +9,7 @@ import { WagmiProvider } from 'wagmi';
 
 import { queryClient } from '@api/client';
 import { Alert } from '@components/Alert';
+import { SquidHeightProvider } from '@hooks/useSquidNetworkHeightHooks';
 import { wagmiConfig } from '@network/config';
 
 import { AppRoutes } from './AppRoutes';
@@ -22,24 +23,26 @@ function App() {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <RainbowKitProvider modalSize="compact" theme={rainbowkitTheme}>
-            <SnackbarProvider
-              hideIconVariant
-              preventDuplicate
-              maxSnack={3}
-              Components={{
-                subsquid: Alert,
-              }}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-              <CssBaseline />
-              <BrowserRouter>
-                <AppRoutes />
-              </BrowserRouter>
-            </SnackbarProvider>
-          </RainbowKitProvider>
-        </ThemeProvider>
+        <SquidHeightProvider>
+          <ThemeProvider theme={theme}>
+            <RainbowKitProvider modalSize="compact" theme={rainbowkitTheme}>
+              <SnackbarProvider
+                hideIconVariant
+                preventDuplicate
+                maxSnack={3}
+                Components={{
+                  subsquid: Alert,
+                }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              >
+                <CssBaseline />
+                <BrowserRouter>
+                  <AppRoutes />
+                </BrowserRouter>
+              </SnackbarProvider>
+            </RainbowKitProvider>
+          </ThemeProvider>
+        </SquidHeightProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

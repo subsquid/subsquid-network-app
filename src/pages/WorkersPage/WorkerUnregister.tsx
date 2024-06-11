@@ -5,33 +5,38 @@ import { Box } from '@mui/material';
 
 import { useUnregisterWorker } from '@api/contracts/worker-registration/useUnregisterWorker';
 import { useWithdrawWorker } from '@api/contracts/worker-registration/useWithdrawWorker';
-import { BlockchainApiWorker, WorkerStatus } from '@api/subsquid-network-squid';
+import { AccountType, useWorkerOwner, Worker, WorkerStatus } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 
-export function WorkerUnregister({ worker }: { worker: BlockchainApiWorker }) {
+export function WorkerUnregister({
+  worker,
+  disabled,
+}: {
+  worker: Pick<Worker, 'id' | 'status' | 'peerId'>;
+  disabled?: boolean;
+}) {
   const {
     unregisterWorker,
     error: unregisterError,
-    isLoading: isUnregistering,
+    isLoading: isDeregistering,
   } = useUnregisterWorker();
   const { withdrawWorker, error: withdrawError, isLoading: isWithdrawing } = useWithdrawWorker();
-
-  if (!worker.ownedByMe) return null;
+  const { data } = useWorkerOwner({ workerId: worker.id, enabled: !disabled });
 
   return (
     <Box>
       <Box sx={{ textAlign: 'right' }}>
-        {!worker.canUnregister() ? (
+        {worker.status === WorkerStatus.Deregistered || worker.status === WorkerStatus.Withdrawn ? (
           <LoadingButton
             loading={isWithdrawing}
             onClick={async e => {
               e.stopPropagation();
               await withdrawWorker({
                 peerId: worker.peerId,
-                source: worker.owner,
+                source: data?.owner || { id: '', type: AccountType.User },
               });
             }}
-            disabled={!worker.canWithdraw()}
+            disabled={disabled || worker.status === WorkerStatus.Withdrawn}
             variant="contained"
             color="error"
           >
@@ -39,13 +44,13 @@ export function WorkerUnregister({ worker }: { worker: BlockchainApiWorker }) {
           </LoadingButton>
         ) : (
           <LoadingButton
-            loading={isUnregistering}
-            disabled={worker.status !== WorkerStatus.Active}
+            loading={isDeregistering}
+            disabled={disabled || worker.status !== WorkerStatus.Active}
             onClick={async e => {
               e.stopPropagation();
               await unregisterWorker({
                 peerId: worker.peerId,
-                source: worker.owner,
+                source: data?.owner || { id: '', type: AccountType.User },
               });
             }}
             variant="contained"

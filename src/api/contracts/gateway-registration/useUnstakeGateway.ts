@@ -4,7 +4,7 @@ import { encodeFunctionData } from 'viem';
 import { useWriteContract, usePublicClient } from 'wagmi';
 
 import { AccountType, GatewayStakeFragmentFragment } from '@api/subsquid-network-squid';
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
@@ -65,7 +65,7 @@ function useUnstakeFromVestingContract() {
 
 export function useUnstakeGateway() {
   const client = usePublicClient();
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

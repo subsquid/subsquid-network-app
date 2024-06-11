@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { fromSqd } from '@lib/network/utils';
 import { LoadingButton } from '@mui/lab';
@@ -100,9 +100,18 @@ function AddWorkerForm() {
     },
   });
 
+  const source = useMemo(() => {
+    if (isContractsLoading) return;
+
+    return (
+      (formik.values.source
+        ? sources.find(c => c.id === formik.values.source)
+        : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
+    );
+  }, [formik.values.source, isContractsLoading, sources]);
+
   useEffect(() => {
     if (isContractsLoading) return;
-    else if (formik.values.source) return;
     else if (isSettingsLoading) return;
 
     const source = sources.find(c => fromSqd(c.balance).gte(bondAmount)) || sources[0];
@@ -112,7 +121,8 @@ function AddWorkerForm() {
       ...formik.values,
       source: source.id,
     });
-  }, [bondAmount, formik, isContractsLoading, isSettingsLoading, sources]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [source]);
 
   return (
     <>
