@@ -9,15 +9,15 @@ export const Bar = styled(Box)(({ theme }) => ({
   background: '#EBEBEB',
 
   '&.error': {
-    background: theme.palette.error.main,
+    background: theme.palette.networkStatus.offline,
   },
 
   '&.warning': {
-    background: '#ffb801',
+    background: theme.palette.networkStatus.downtime,
   },
 
   '&.success': {
-    background: '#55AD44',
+    background: theme.palette.networkStatus.online,
   },
 }));
 
