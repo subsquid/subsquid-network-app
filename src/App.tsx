@@ -23,26 +23,26 @@ function App() {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <RainbowKitProvider modalSize="compact" theme={rainbowkitTheme}>
-            <SnackbarProvider
-              hideIconVariant
-              preventDuplicate
-              maxSnack={3}
-              Components={{
-                subsquid: Alert,
-              }}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-              <SquidHeightProvider>
+        <SquidHeightProvider>
+          <ThemeProvider theme={theme}>
+            <RainbowKitProvider modalSize="compact" theme={rainbowkitTheme}>
+              <SnackbarProvider
+                hideIconVariant
+                preventDuplicate
+                maxSnack={3}
+                Components={{
+                  subsquid: Alert,
+                }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              >
                 <CssBaseline />
                 <BrowserRouter>
                   <AppRoutes />
                 </BrowserRouter>
-              </SquidHeightProvider>
-            </SnackbarProvider>
-          </RainbowKitProvider>
-        </ThemeProvider>
+              </SnackbarProvider>
+            </RainbowKitProvider>
+          </ThemeProvider>
+        </SquidHeightProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
