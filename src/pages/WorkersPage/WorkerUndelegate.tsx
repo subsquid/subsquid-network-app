@@ -9,7 +9,7 @@ import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
 import { useWorkerUndelegate } from '@api/contracts/staking';
-import { BlockchainApiWorker } from '@api/subsquid-network-squid';
+import { Account, Delegation, Worker } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
@@ -34,7 +34,11 @@ export function WorkerUndelegate({
   worker,
   disabled,
 }: {
-  worker?: BlockchainApiWorker;
+  worker?: Pick<Worker, 'id'> & {
+    delegations: (Pick<Delegation, 'deposit' | 'locked'> & {
+      owner: Pick<Account, 'id' | 'type'>;
+    })[];
+  };
   disabled?: boolean;
 }) {
   const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
@@ -48,7 +52,7 @@ export function WorkerUndelegate({
 
   const options = useMemo(
     () =>
-      (worker?.myDelegations || [])
+      (worker?.delegations || [])
         .filter(s => !BigNumber(s.deposit).isZero())
         .map(s => {
           return {
@@ -64,7 +68,7 @@ export function WorkerUndelegate({
             value: s.owner.id,
           };
         }),
-    [worker?.myDelegations],
+    [worker?.delegations],
   );
 
   const formik = useFormik({
@@ -79,7 +83,7 @@ export function WorkerUndelegate({
     validateOnMount: true,
 
     onSubmit: async values => {
-      const wallet = worker?.myDelegations.find(w => w?.owner.id === values.source);
+      const wallet = worker?.delegations.find(w => w?.owner.id === values.source);
       if (!wallet || !worker) return;
 
       const { failedReason } = await undelegateFromWorker({
@@ -106,7 +110,7 @@ export function WorkerUndelegate({
   useEffect(() => {
     if (formik.values.source) return;
 
-    const source = worker?.myDelegations.filter(s => !BigNumber(s.deposit).isZero())?.[0];
+    const source = worker?.delegations.filter(s => !BigNumber(s.deposit).isZero())?.[0];
     if (!source) return;
 
     formik.setValues({
@@ -114,11 +118,11 @@ export function WorkerUndelegate({
       source: source.owner.id,
       max: fromSqd(source.deposit).toFixed(),
     });
-  }, [formik, worker?.myDelegations]);
+  }, [worker?.delegations, formik]);
 
   const canUndelegate = useMemo(() => {
-    return !!worker?.myDelegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
-  }, [worker?.myDelegations]);
+    return !!worker?.delegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
+  }, [worker?.delegations]);
 
   return (
     <>
@@ -150,7 +154,7 @@ export function WorkerUndelegate({
               id="source"
               formik={formik}
               onChange={e => {
-                const wallet = worker?.myDelegations.find(s => s.owner.id === e.target.value);
+                const wallet = worker?.delegations.find(s => s.owner.id === e.target.value);
                 if (!wallet) return;
 
                 formik.setFieldValue('source', wallet.owner.id);

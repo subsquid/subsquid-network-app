@@ -21,14 +21,14 @@ import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 
 export function MyDelegations() {
-  const { delegations, isLoading } = useMyDelegations();
+  const { workers: delegations, isLoading } = useMyDelegations();
   const { SQD_TOKEN } = useContracts();
 
   const groupedDelegations = useMemo(() => {
     return mapValues(
       keyBy(delegations, w => w.id),
       w => {
-        return w.myDelegations.reduce(
+        return w.delegations.reduce(
           (s, d) => {
             s.deposit = s.deposit.plus(d.deposit);
             s.reward = s.reward.plus(d.claimedReward).plus(d.claimableReward);

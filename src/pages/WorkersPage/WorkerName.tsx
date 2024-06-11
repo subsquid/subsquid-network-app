@@ -2,7 +2,7 @@ import { Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
-import { BlockchainApiWorker } from '@api/subsquid-network-squid';
+import { Worker } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { PeerIdShort, shortPeerId } from '@components/PeerId';
@@ -21,7 +21,7 @@ export const WorkerName = ({
   worker,
   to,
 }: {
-  worker: Pick<BlockchainApiWorker, 'name' | 'peerId' | 'online'>;
+  worker: Pick<Worker, 'name' | 'peerId'>;
   to?: string;
 }) => {
   return (

@@ -9,7 +9,7 @@ import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
 import { useCapedStakeAfterDelegation, useWorkerDelegate } from '@api/contracts/staking';
-import { BlockchainApiWorker, useWorkerRewardStats } from '@api/subsquid-network-squid';
+import { Worker, WorkerStatus, useWorkerDelegationInfo } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
@@ -40,7 +40,7 @@ export function WorkerDelegate({
   worker,
   disabled,
 }: {
-  worker?: BlockchainApiWorker;
+  worker?: Pick<Worker, 'id' | 'status'>;
   disabled?: boolean;
 }) {
   const { delegateToWorker, error, isLoading } = useWorkerDelegate();
@@ -112,7 +112,7 @@ export function WorkerDelegate({
   return (
     <>
       <Button
-        disabled={disabled || !worker?.delegationEnabled}
+        disabled={disabled || !worker || worker.status !== WorkerStatus.Active}
         onClick={handleOpen}
         variant="contained"
       >
@@ -197,7 +197,10 @@ export function useExpectedAprAfterDelegation({
   amount: string;
   enabled?: boolean;
 }) {
-  const { data: rewardStats, isLoading: isRewardStatsLoading } = useWorkerRewardStats(workerId);
+  const { data: rewardStats, isLoading: isRewardStatsLoading } = useWorkerDelegationInfo({
+    workerId,
+    enabled,
+  });
 
   const { data, isPending: isCapedDelegationLoading } = useCapedStakeAfterDelegation({
     workerId: workerId || '',
@@ -208,32 +211,32 @@ export function useExpectedAprAfterDelegation({
   const expectedApr = useMemo(() => {
     if (!rewardStats) return;
 
-    const { baseApr, utilizedStake, dTenure, liveness, trafficWeight, capedDelegation } =
-      rewardStats;
+    const { worker, info } = rewardStats;
+    if (!worker) return;
 
-    const totalDelegation = BigNumber(rewardStats.totalDelegation || 0);
-    const bond = BigNumber(rewardStats.bond || 0);
+    const totalDelegation = BigNumber(worker.totalDelegation || 0);
+    const bond = BigNumber(worker.bond || 0);
 
     const expectedCappedDelegation = BigNumber(data.capedDelegation);
 
     const expectedTotalDelegation = BigNumber.max(totalDelegation.plus(amount), 0);
-    const expectedUtilizedStake = BigNumber(utilizedStake)
-      .minus(capedDelegation || 0)
+    const expectedUtilizedStake = BigNumber(info.utilizedStake)
+      .minus(worker.capedDelegation || 0)
       .plus(expectedCappedDelegation);
 
     const supplyRatio = expectedCappedDelegation.plus(bond || 0).div(expectedUtilizedStake);
 
     const dTraffic = Math.min(
-      BigNumber(trafficWeight || 0)
+      BigNumber(worker.trafficWeight || 0)
         .div(supplyRatio)
         .toNumber() ** 0.1,
       1,
     );
 
-    const actualYield = BigNumber(baseApr)
-      .times(liveness || 0)
+    const actualYield = BigNumber(info.baseApr)
+      .times(worker.liveness || 0)
       .times(dTraffic)
-      .times(dTenure || 0);
+      .times(worker.dTenure || 0);
 
     const halfDelegation = expectedCappedDelegation.div(2);
 

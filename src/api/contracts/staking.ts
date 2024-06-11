@@ -15,7 +15,7 @@ import {
 
 import { useApproveSqd } from '@api/contracts/sqd';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
-import { AccountType, BlockchainApiWorker, SourceWallet } from '@api/subsquid-network-squid';
+import { AccountType, Worker, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
@@ -25,7 +25,7 @@ import { STAKING_CONTRACT_ABI } from './staking.abi';
 import { errorMessage, TxResult, isApproveRequiredError, WriteContractRes } from './utils';
 
 type WorkerDepositRequest = {
-  worker: BlockchainApiWorker;
+  worker: Pick<Worker, 'id'>;
   amount: string;
   wallet: Pick<SourceWallet, 'id' | 'type'>;
 };
