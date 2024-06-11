@@ -2,10 +2,10 @@ import React from 'react';
 
 import { Box, CircularProgress, Paper, Stack } from '@mui/material';
 
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 
 export const SyncSquidSnackbar = () => {
-  const { isWaiting, waitHeight, currentHeight } = useSquidNetworkHeightHooks();
+  const { isWaiting, waitHeight, currentHeight } = useSquidNetworkHeight();
 
   if (!isWaiting) return null;
 

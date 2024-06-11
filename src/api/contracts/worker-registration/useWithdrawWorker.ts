@@ -9,7 +9,7 @@ import { useWriteContract, useClient } from 'wagmi';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { UnregisterWorkerRequest } from '@api/contracts/worker-registration/useUnregisterWorker';
 import { AccountType } from '@api/subsquid-network-squid';
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
@@ -69,7 +69,7 @@ export function useWithdrawWorker() {
   const client = useClient();
   const { address } = useAccount();
   const [isLoading, setLoading] = useState(false);
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const [error, setError] = useState<string | null>(null);
 
   const withdrawWorkerFromWallet = useWithdrawWorkerFromWallet();

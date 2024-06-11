@@ -9,7 +9,7 @@ import { useWriteContract, usePublicClient, useClient } from 'wagmi';
 import { useApproveSqd } from '@api/contracts/sqd';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
@@ -120,7 +120,7 @@ export function useRegisterWorker() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
 
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const registerWorkerContract = useRegisterFromWallet();
   const registerVestingContract = useRegisterWorkerFromVestingContract();
 

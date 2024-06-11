@@ -16,7 +16,7 @@ import {
 import { useApproveSqd } from '@api/contracts/sqd';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType, Worker, SourceWallet } from '@api/subsquid-network-squid';
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
@@ -104,7 +104,7 @@ function useDepositFromVestingContract() {
 
 export function useWorkerDelegate() {
   const client = useClient();
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -195,7 +195,7 @@ function useUndelegateFromVestingContract() {
 
 export function useWorkerUndelegate() {
   const client = usePublicClient();
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -238,7 +238,7 @@ export function useWorkerUndelegate() {
 
 export function useCapedStake({ workerId }: { workerId?: string }) {
   const contracts = useContracts();
-  const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeightHooks();
+  const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeight();
 
   const { data, isLoading } = useReadContract({
     address: contracts.SOFT_CAP,

@@ -7,7 +7,7 @@ import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, useClient } from 'wagmi';
 
 import { AccountType } from '@api/subsquid-network-squid';
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
@@ -79,7 +79,7 @@ export function useUpdateWorker() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
 
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const updateWorkerFromWallet = useUpdateWorkerFromWallet();
   const updateWorkerFromVestingContract = useUpdateWorkerFromVestingContract();
 

@@ -7,7 +7,7 @@ import { useWriteContract, useClient } from 'wagmi';
 import { REWARD_TREASURY_CONTRACT_ABI } from '@api/contracts/reaward-treasury.abi';
 import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
-import { useSquidNetworkHeightHooks } from '@hooks/useSquidNetworkHeightHooks.ts';
+import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount.ts';
 import { useContracts } from '@network/useContracts.ts';
 
@@ -67,7 +67,7 @@ function useClaimFromVestingContract() {
 
 export function useClaim() {
   const client = useClient();
-  const { setWaitHeight } = useSquidNetworkHeightHooks();
+  const { setWaitHeight } = useSquidNetworkHeight();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

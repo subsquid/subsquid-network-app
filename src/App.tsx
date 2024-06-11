@@ -9,6 +9,7 @@ import { WagmiProvider } from 'wagmi';
 
 import { queryClient } from '@api/client';
 import { Alert } from '@components/Alert';
+import { SquidHeightProvider } from '@hooks/useSquidNetworkHeightHooks';
 import { wagmiConfig } from '@network/config';
 
 import { AppRoutes } from './AppRoutes';
@@ -33,10 +34,12 @@ function App() {
               }}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-              <CssBaseline />
-              <BrowserRouter>
-                <AppRoutes />
-              </BrowserRouter>
+              <SquidHeightProvider>
+                <CssBaseline />
+                <BrowserRouter>
+                  <AppRoutes />
+                </BrowserRouter>
+              </SquidHeightProvider>
             </SnackbarProvider>
           </RainbowKitProvider>
         </ThemeProvider>
