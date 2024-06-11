@@ -102,19 +102,16 @@ function AddWorkerForm() {
 
   const source = useMemo(() => {
     if (isContractsLoading) return;
+    if (isSettingsLoading) return;
 
     return (
       (formik.values.source
         ? sources.find(c => c.id === formik.values.source)
         : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
     );
-  }, [formik.values.source, isContractsLoading, sources]);
+  }, [formik.values.source, isContractsLoading, isSettingsLoading, sources]);
 
   useEffect(() => {
-    if (isContractsLoading) return;
-    else if (isSettingsLoading) return;
-
-    const source = sources.find(c => fromSqd(c.balance).gte(bondAmount)) || sources[0];
     if (!source) return;
 
     formik.setValues({
