@@ -9,6 +9,7 @@ import { useAccount } from '@network/useAccount.ts';
 import { useSquidDataSource } from './datasource';
 import {
   ClaimType,
+  MyDelegationsQuery,
   useAllWorkersQuery,
   useMyClaimsQuery,
   useMyDelegationsQuery,
@@ -19,6 +20,7 @@ import {
   useWorkerDelegationInfoQuery,
   useWorkerOwnerQuery,
   Worker,
+  WorkerFragmentFragment,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
 
@@ -332,15 +334,6 @@ export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
   };
 }
 
-// type ArrayElement<ArrayType extends readonly unknown[]> =
-//   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-
-// type Delegation = {
-//   worker: BlockchainApiWorker;
-//   totalReward: any;
-//   delegations: Omit<ArrayElement<MyDelegationsQuery['delegations']>, 'worker'>[];
-// };
-
 export function useMyDelegations() {
   const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
@@ -351,17 +344,34 @@ export function useMyDelegations() {
   });
 
   const workers = useMemo(() => {
-    return (
-      data?.workers.map(w => {
-        return {
-          ...w,
+    type W = WorkerFragmentFragment &
+      Pick<WorkerExtended, 'delegationCapacity'> & {
+        delegations: Omit<MyDelegationsQuery['delegations'][number], 'worker'>[];
+      };
+
+    const workers: Map<string, W> = new Map();
+    data?.delegations.map(d => {
+      let worker = workers.get(d.worker.id);
+      if (!worker) {
+        worker = {
+          ...d.worker,
+          delegations: [],
           delegationCapacity: calculateDelegationCapacity({
-            totalDelegation: w.totalDelegation,
-            capedDelegation: w.capedDelegation,
+            totalDelegation: d.worker.totalDelegation,
+            capedDelegation: d.worker.capedDelegation,
           }),
         };
-      }) || []
-    );
+        workers.set(worker.id, worker);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const delegation = {
+        ...d,
+        worker: undefined,
+      };
+      delete delegation['worker'];
+      worker.delegations.push(delegation);
+    });
+    return [...workers.values()];
   }, [data]);
 
   return {
