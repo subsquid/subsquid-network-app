@@ -107,9 +107,9 @@ function AddWorkerForm() {
     return (
       (formik.values.source
         ? sources.find(c => c.id === formik.values.source)
-        : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
+        : sources.find(c => fromSqd(c.balance).gte(fromSqd(bondAmount)))) || sources?.[0]
     );
-  }, [formik.values.source, isContractsLoading, isSettingsLoading, sources]);
+  }, [bondAmount, formik.values.source, isContractsLoading, isSettingsLoading, sources]);
 
   useEffect(() => {
     if (!source) return;
@@ -189,7 +189,11 @@ function AddWorkerForm() {
               <BlockchainContractError error={error} />
             </Card>
             <Box mt={2.5} justifyContent="flex-end" display="flex">
-              <LoadingButton disabled={isLoading} variant="contained" type="submit">
+              <LoadingButton
+                disabled={isLoading || fromSqd(source?.balance || 0).lt(fromSqd(bondAmount))}
+                variant="contained"
+                type="submit"
+              >
                 Register
               </LoadingButton>
             </Box>
