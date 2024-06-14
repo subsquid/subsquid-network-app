@@ -1,16 +1,13 @@
-import { useMemo } from 'react';
-
 import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
 import { fromSqd } from '@lib/network';
 import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import BigNumber from 'bignumber.js';
-import { keyBy, mapValues } from 'lodash-es';
 import { Outlet } from 'react-router-dom';
 
-import { useMyDelegations } from '@api/subsquid-network-squid';
+import { SortDir, useMyDelegations, WorkerSortBy } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
-import { BorderedTable } from '@components/Table/BorderedTable';
+import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';
+import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
@@ -21,27 +18,34 @@ import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 
 export function MyDelegations() {
-  const { workers: delegations, isLoading } = useMyDelegations();
+  const [query, setQuery] = useLocationState({
+    sortBy: new Location.Enum<WorkerSortBy>(WorkerSortBy.MyDelegationReward),
+    sortDir: new Location.Enum<SortDir>(SortDir.Desc),
+  });
+  const { workers: delegations, isLoading } = useMyDelegations({
+    sortBy: query.sortBy as WorkerSortBy,
+    sortDir: query.sortDir as SortDir,
+  });
   const { SQD_TOKEN } = useContracts();
 
-  const groupedDelegations = useMemo(() => {
-    return mapValues(
-      keyBy(delegations, w => w.id),
-      w => {
-        return w.delegations.reduce(
-          (s, d) => {
-            s.deposit = s.deposit.plus(d.deposit);
-            s.reward = s.reward.plus(d.claimedReward).plus(d.claimableReward);
-            return s;
-          },
-          {
-            deposit: new BigNumber(0),
-            reward: new BigNumber(0),
-          },
-        );
-      },
-    );
-  }, [delegations]);
+  // const groupedDelegations = useMemo(() => {
+  //   return mapValues(
+  //     keyBy(delegations, w => w.id),
+  //     w => {
+  //       return w.delegations.reduce(
+  //         (s, d) => {
+  //           s.deposit = s.deposit.plus(d.deposit);
+  //           s.reward = s.reward.plus(d.claimedReward).plus(d.claimableReward);
+  //           return s;
+  //         },
+  //         {
+  //           deposit: new BigNumber(0),
+  //           reward: new BigNumber(0),
+  //         },
+  //       );
+  //     },
+  //   );
+  // }, [delegations]);
 
   return (
     <Box>
@@ -57,10 +61,30 @@ export function MyDelegations() {
                   Worker
                 </TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Delegator APR</TableCell>
-                <TableCell>Delegation capacity</TableCell>
-                <TableCell>My Delegation</TableCell>
-                <TableCell>Total reward</TableCell>
+                <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
+                  Delegator APR
+                </SortableHeaderCell>
+                <SortableHeaderCell
+                  sort={WorkerSortBy.DelegationCapacity}
+                  query={query}
+                  setQuery={setQuery}
+                >
+                  Delegation capacity
+                </SortableHeaderCell>
+                <SortableHeaderCell
+                  sort={WorkerSortBy.MyDelegation}
+                  query={query}
+                  setQuery={setQuery}
+                >
+                  My Delegation
+                </SortableHeaderCell>
+                <SortableHeaderCell
+                  sort={WorkerSortBy.MyDelegationReward}
+                  query={query}
+                  setQuery={setQuery}
+                >
+                  Total reward
+                </SortableHeaderCell>
                 <TableCell className="pinned"></TableCell>
               </TableRow>
             </TableHead>
@@ -80,11 +104,9 @@ export function MyDelegations() {
                     <TableCell>
                       <DelegationCapacity worker={worker} />
                     </TableCell>
+                    <TableCell>{tokenFormatter(fromSqd(worker.myDelegation), SQD_TOKEN)}</TableCell>
                     <TableCell>
-                      {tokenFormatter(fromSqd(groupedDelegations[worker.id].deposit), SQD_TOKEN)}
-                    </TableCell>
-                    <TableCell>
-                      {tokenFormatter(fromSqd(groupedDelegations[worker.id].reward), SQD_TOKEN)}
+                      {tokenFormatter(fromSqd(worker.myTotalDelegationReward), SQD_TOKEN)}
                     </TableCell>
                     <TableCell className="pinned">
                       <Stack direction="row" spacing={2} justifyContent="flex-end">
