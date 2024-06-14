@@ -69,10 +69,7 @@ export function MyDelegations() {
                 return (
                   <TableRow key={worker.peerId}>
                     <TableCell className="pinned">
-                      <WorkerName
-                        worker={worker}
-                        to={`/workers/${worker.peerId}?backPath=/delegations`}
-                      />
+                      <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
                     </TableCell>
                     <TableCell>
                       <WorkerStatus worker={worker} />
