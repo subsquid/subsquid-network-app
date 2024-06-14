@@ -73,9 +73,11 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
             initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
             expectedTotal: unwrapResult(ch[7])?.toString(),
           }));
-        } else {
-          return res.current;
+        } else if (!addresses.length) {
+          return [];
         }
+
+        return res.current;
       },
     },
   });
@@ -94,12 +96,8 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     | undefined
   >(undefined);
   useEffect(() => {
-    if (!addresses.length) {
-      res.current = [];
-      return;
-    }
-
-    if (!isLoading) res.current = data;
+    if (isLoading) return;
+    res.current = data;
   }, [addresses, data, isLoading]);
 
   return {
