@@ -26,7 +26,6 @@ export const AppRoutes = () => {
         <Route element={<Navigate to="/assets" replace={true} />} index />
         <Route path="/dashboard">
           <Route element={<DashboardPage />} index />
-          <Route element={<Worker backPath="/dashboard" />} path="workers/:peerId" />
         </Route>
 
         <Route path="/assets">
@@ -37,12 +36,11 @@ export const AppRoutes = () => {
         <Route path="/workers">
           <Route element={<WorkersPage />} index />
           <Route element={<AddNewWorker />} path="add" />
-          <Route element={<Worker backPath="/workers" />} path=":peerId" />
+          <Route element={<Worker backPath="/dashboard" />} path=":peerId" />
           <Route element={<WorkerEdit />} path=":peerId/edit" />
         </Route>
         <Route path="/delegations">
           <Route element={<DelegationsPage />} index />
-          <Route element={<Worker backPath="/delegations" />} path="workers/:peerId" />
         </Route>
         <Route path="/gateways">
           <Route element={<GatewaysPage />} index />

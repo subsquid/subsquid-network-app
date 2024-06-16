@@ -2,16 +2,26 @@ import React from 'react';
 
 import ArrowBack from '@mui/icons-material/ArrowBackIosNew';
 import { SxProps } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { RoundIconButton } from '@components/RoundIconButton';
 
-export function BackButton({ path, sx }: { path: string; sx?: SxProps }) {
+export function BackButton({ path, sx }: { path?: string; sx?: SxProps }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
-    <Link to={path}>
-      <RoundIconButton sx={sx}>
-        <ArrowBack />
-      </RoundIconButton>
-    </Link>
+    <RoundIconButton
+      sx={sx}
+      onClick={() => {
+        if (location.key !== 'default') {
+          navigate(-1);
+        } else {
+          navigate(path || '/', { replace: true });
+        }
+      }}
+    >
+      <ArrowBack />
+    </RoundIconButton>
   );
 }

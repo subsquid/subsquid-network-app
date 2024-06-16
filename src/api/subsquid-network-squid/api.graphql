@@ -209,17 +209,19 @@ query myAssets($address: String!) {
 }
 
 query myDelegations($address: String!) {
-  workers(where: { delegations_some: { realOwner: { id_eq: $address } } }) {
-    ...WorkerFragment
-    delegations(where: { realOwner: { id_eq: $address } }) {
-      claimableReward
-      claimedReward
-      deposit
-      locked
-      owner {
-        id
-        type
-      }
+  delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
+    claimableReward
+    claimedReward
+    deposit
+    locked
+    owner {
+      id
+      type
+    }
+    worker {
+      ...WorkerFragment
+      totalDelegation
+      capedDelegation
     }
   }
 }

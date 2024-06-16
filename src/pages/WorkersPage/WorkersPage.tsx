@@ -3,10 +3,11 @@ import { fromSqd } from '@lib/network';
 import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
 
-import { useMyWorkers } from '@api/subsquid-network-squid';
+import { SortDir, useMyWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
-import { BorderedTable } from '@components/Table/BorderedTable';
+import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';
+import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
@@ -17,7 +18,14 @@ import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerUnregister } from './WorkerUnregister';
 
 export function MyWorkers() {
-  const { data, isLoading } = useMyWorkers();
+  const [query, setQuery] = useLocationState({
+    sortBy: new Location.Enum<WorkerSortBy>(WorkerSortBy.WorkerReward),
+    sortDir: new Location.Enum<SortDir>(SortDir.Desc),
+  });
+  const { data, isLoading } = useMyWorkers({
+    sortBy: query.sortBy as WorkerSortBy,
+    sortDir: query.sortDir as SortDir,
+  });
   const { isConnected } = useAccount();
   const { SQD_TOKEN } = useContracts();
 
@@ -40,10 +48,22 @@ export function MyWorkers() {
               <TableRow>
                 <TableCell width={275}>Worker</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Uptime, 24h</TableCell>
-                <TableCell>Uptime, 90d</TableCell>
-                <TableCell>Worker APR</TableCell>
-                <TableCell>Total reward</TableCell>
+                <SortableHeaderCell sort={WorkerSortBy.Uptime24h} query={query} setQuery={setQuery}>
+                  Uptime, 24h
+                </SortableHeaderCell>
+                <SortableHeaderCell sort={WorkerSortBy.Uptime90d} query={query} setQuery={setQuery}>
+                  Uptime, 90d
+                </SortableHeaderCell>
+                <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
+                  Worker APR
+                </SortableHeaderCell>
+                <SortableHeaderCell
+                  sort={WorkerSortBy.WorkerReward}
+                  query={query}
+                  setQuery={setQuery}
+                >
+                  Total reward
+                </SortableHeaderCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>

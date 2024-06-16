@@ -5765,31 +5765,31 @@ export type MyDelegationsQueryVariables = Exact<{
 
 export type MyDelegationsQuery = {
   __typename?: 'Query';
-  workers: Array<{
-    __typename?: 'Worker';
-    version?: string;
-    createdAt: string;
-    uptime90Days?: number;
-    apr?: number;
-    stakerApr?: number;
-    totalDelegation: string;
-    capedDelegation: string;
-    id: string;
-    name?: string;
-    peerId: string;
-    status: WorkerStatus;
-    online?: boolean;
-    jailed?: boolean;
-    dialOk?: boolean;
-    jailReason?: string;
-    delegations: Array<{
-      __typename?: 'Delegation';
-      claimableReward: string;
-      claimedReward: string;
-      deposit: string;
-      locked?: boolean;
-      owner: { __typename?: 'Account'; id: string; type: AccountType };
-    }>;
+  delegations: Array<{
+    __typename?: 'Delegation';
+    claimableReward: string;
+    claimedReward: string;
+    deposit: string;
+    locked?: boolean;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    worker: {
+      __typename?: 'Worker';
+      totalDelegation: string;
+      capedDelegation: string;
+      version?: string;
+      createdAt: string;
+      uptime90Days?: number;
+      apr?: number;
+      stakerApr?: number;
+      id: string;
+      name?: string;
+      peerId: string;
+      status: WorkerStatus;
+      online?: boolean;
+      jailed?: boolean;
+      dialOk?: boolean;
+      jailReason?: string;
+    };
   }>;
 };
 
@@ -6496,17 +6496,19 @@ export const useMyAssetsQuery = <TData = MyAssetsQuery, TError = unknown>(
 
 export const MyDelegationsDocument = `
     query myDelegations($address: String!) {
-  workers(where: {delegations_some: {realOwner: {id_eq: $address}}}) {
-    ...WorkerFragment
-    delegations(where: {realOwner: {id_eq: $address}}) {
-      claimableReward
-      claimedReward
-      deposit
-      locked
-      owner {
-        id
-        type
-      }
+  delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
+    claimableReward
+    claimedReward
+    deposit
+    locked
+    owner {
+      id
+      type
+    }
+    worker {
+      ...WorkerFragment
+      totalDelegation
+      capedDelegation
     }
   }
 }
