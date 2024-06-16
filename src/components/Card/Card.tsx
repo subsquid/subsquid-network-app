@@ -13,7 +13,7 @@ export const CardTitle = styled(Box)(({ theme }) => ({
 
 export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) => ({
   padding: theme.spacing(2.5, 5),
-  boxShadow: `0px 4px 12px 0px #9595953D`,
+  boxShadow: `9px 9px 18px #e2e4e7, -9px -9px 18px #fbfbfb`,
   overflowX: 'auto',
   scrollbarWidth: 'thin',
 

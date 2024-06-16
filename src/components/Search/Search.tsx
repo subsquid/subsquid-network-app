@@ -19,7 +19,6 @@ export const Field = styled(TextField)(({ theme }) => ({
     paddingLeft: 5,
     minHeight: 36,
   },
-  border: `1px solid ${theme.palette.divider}`,
   borderRadius: 6,
 }));
 
