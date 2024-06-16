@@ -83,7 +83,7 @@ function CurrentEpoch() {
     if (!data) return;
 
     const newEpochEnd =
-      (data.epoch.end - data.lastBlockL1) * data.blockTimeL1 +
+      (data.epoch.end - data.lastBlockL1 + 1) * data.blockTimeL1 +
       new Date(data.lastBlockTimestampL1).getTime();
 
     setEpochEnd(newEpochEnd);
