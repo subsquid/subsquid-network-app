@@ -1,7 +1,16 @@
 import { dateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
-import { IconButton, styled, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import {
+  IconButton,
+  styled,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { Box } from '@mui/system';
 
 import { SortDir, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
@@ -10,7 +19,6 @@ import { Loader } from '@components/Loader';
 import { Search } from '@components/Search/Search';
 import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';
 import { Location, useLocationState } from '@hooks/useLocationState';
-import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerVersion } from '@pages/WorkersPage/WorkerVersion';
@@ -28,7 +36,7 @@ function TableNavigation({
   totalPages: number;
 }) {
   const hasPrevPage = page > 1;
-  const hasNextPage = page <= totalPages;
+  const hasNextPage = page < totalPages;
 
   return (
     <Box sx={{ textAlign: 'right', mt: 1 }}>
@@ -66,6 +74,9 @@ export const SummaryValue = styled(Box, {
 }));
 
 export function Workers() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('xxs'));
+
   const [query, setQuery] = useLocationState({
     page: new Location.Number(1),
     search: new Location.String(''),
@@ -82,113 +93,123 @@ export function Workers() {
 
   return (
     <Box>
-      <NetworkPageTitle
-        title="Dashboard"
-        endAdornment={
-          <Search placeholder="Search " value={query.search} onChange={setQuery.search} />
-        }
-      />
-
       {isLoading ? (
         <Loader />
-      ) : workers.length ? (
+      ) : (
         <>
-          <Card noPadding>
-            <BorderedTable>
-              <TableHead>
-                <TableRow>
-                  <TableCell className="pinned" sx={{ minWidth: 240 }}>
-                    Worker
-                  </TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Version</TableCell>
-                  <SortableHeaderCell
-                    sort={WorkerSortBy.Uptime90d}
-                    query={query}
-                    setQuery={setQuery}
-                  >
-                    Uptime, 90d
-                  </SortableHeaderCell>
-                  <SortableHeaderCell
-                    sort={WorkerSortBy.WorkerAPR}
-                    query={query}
-                    setQuery={setQuery}
-                  >
-                    Worker APR
-                  </SortableHeaderCell>
-                  <SortableHeaderCell
-                    sort={WorkerSortBy.StakerAPR}
-                    query={query}
-                    setQuery={setQuery}
-                  >
-                    Delegator APR
-                  </SortableHeaderCell>
-                  <SortableHeaderCell
-                    sort={WorkerSortBy.DelegationCapacity}
-                    query={query}
-                    setQuery={setQuery}
-                    help={
-                      <Box>
-                        The Delegator APR decreases significantly once more than 20,000 SQD is
-                        delegated to the worker.
-                        <br />
-                        To maximize delegation rewards, choose workers with high uptime and a low
-                        amount of delegated SQD.
-                      </Box>
-                    }
-                  >
-                    Delegation capacity
-                  </SortableHeaderCell>
-                  <SortableHeaderCell
-                    sort={WorkerSortBy.JoinedAt}
-                    query={query}
-                    setQuery={setQuery}
-                  >
-                    Registered
-                  </SortableHeaderCell>
-                  <TableCell className="pinned"></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {workers.map(worker => {
-                  return (
-                    <TableRow key={worker.peerId}>
-                      <TableCell className="pinned">
-                        <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
-                      </TableCell>
-                      <TableCell>
-                        <WorkerStatus worker={worker} />
-                      </TableCell>
-                      <TableCell>
-                        <WorkerVersion worker={worker} />
-                      </TableCell>
-                      <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
-                      <TableCell>
-                        {worker.apr != null ? percentFormatter(worker.apr) : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                      </TableCell>
-                      {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
-                      <TableCell>
-                        <DelegationCapacity worker={worker} />
-                      </TableCell>
-                      <TableCell>{dateFormat(worker.createdAt)}</TableCell>
-                      <TableCell className="pinned">
-                        <Box display="flex" justifyContent="flex-end">
-                          <WorkerDelegate worker={worker} />
+          <Card
+            noPadding={!!workers.length}
+            title={
+              <Box display="flex" justifyContent="flex-end">
+                <Search
+                  placeholder="Search "
+                  value={query.search}
+                  onChange={setQuery.search}
+                  fullWidth={isMobile}
+                />
+              </Box>
+            }
+          >
+            {workers.length ? (
+              <BorderedTable>
+                <TableHead>
+                  <TableRow>
+                    <TableCell className="pinned" sx={{ minWidth: 240 }}>
+                      Worker
+                    </TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Version</TableCell>
+                    <SortableHeaderCell
+                      sort={WorkerSortBy.Uptime90d}
+                      query={query}
+                      setQuery={setQuery}
+                    >
+                      Uptime, 90d
+                    </SortableHeaderCell>
+                    <SortableHeaderCell
+                      sort={WorkerSortBy.WorkerAPR}
+                      query={query}
+                      setQuery={setQuery}
+                    >
+                      Worker APR
+                    </SortableHeaderCell>
+                    <SortableHeaderCell
+                      sort={WorkerSortBy.StakerAPR}
+                      query={query}
+                      setQuery={setQuery}
+                    >
+                      Delegator APR
+                    </SortableHeaderCell>
+                    <SortableHeaderCell
+                      sort={WorkerSortBy.DelegationCapacity}
+                      query={query}
+                      setQuery={setQuery}
+                      help={
+                        <Box>
+                          The Delegator APR decreases significantly once more than 20,000 SQD is
+                          delegated to the worker.
+                          <br />
+                          To maximize delegation rewards, choose workers with high uptime and a low
+                          amount of delegated SQD.
                         </Box>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </BorderedTable>
+                      }
+                    >
+                      Delegation capacity
+                    </SortableHeaderCell>
+                    <SortableHeaderCell
+                      sort={WorkerSortBy.JoinedAt}
+                      query={query}
+                      setQuery={setQuery}
+                    >
+                      Registered
+                    </SortableHeaderCell>
+                    <TableCell className="pinned"></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {workers.map(worker => {
+                    return (
+                      <TableRow key={worker.peerId}>
+                        <TableCell className="pinned">
+                          <WorkerName
+                            worker={worker}
+                            to={`/workers/${worker.peerId}?backPath=/dashboard`}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <WorkerStatus worker={worker} />
+                        </TableCell>
+                        <TableCell>
+                          <WorkerVersion worker={worker} />
+                        </TableCell>
+                        <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                        <TableCell>
+                          {worker.apr != null ? percentFormatter(worker.apr) : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+                        </TableCell>
+                        {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
+                        <TableCell>
+                          <DelegationCapacity worker={worker} />
+                        </TableCell>
+                        <TableCell>{dateFormat(worker.createdAt)}</TableCell>
+                        <TableCell className="pinned">
+                          <Box display="flex" justifyContent="flex-end">
+                            <WorkerDelegate worker={worker} />
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </BorderedTable>
+            ) : (
+              <Box sx={{ textAlign: 'center' }}>No items to show</Box>
+            )}
           </Card>
           <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
         </>
-      ) : (
-        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
       )}
     </Box>
   );

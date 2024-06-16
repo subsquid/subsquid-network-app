@@ -44,7 +44,6 @@ export const WorkerDescLabel = styled(Box, {
   color: theme.palette.text.secondary,
   whiteSpace: 'balance',
   maxWidth: theme.spacing(25),
-  fontSize: '1rem',
 }));
 
 export const WorkerColumn = styled(Box, {

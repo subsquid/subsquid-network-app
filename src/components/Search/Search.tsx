@@ -5,9 +5,8 @@ import { Box, styled } from '@mui/material';
 
 import { TextField } from '@components/Form';
 
-export const Field = styled(TextField)(() => ({
+export const Field = styled(TextField)(({ theme }) => ({
   // background: theme.palette.background.default,
-  borderWidth: 0,
   [`& .MuiInputBase-root`]: {
     paddingLeft: 10,
   },
@@ -20,6 +19,8 @@ export const Field = styled(TextField)(() => ({
     paddingLeft: 5,
     minHeight: 36,
   },
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: 6,
 }));
 
 export const Search = ({
@@ -45,7 +46,7 @@ export const Search = ({
   const handleChange = useCallback((value: string) => onChange?.(value), [onChange]);
 
   return (
-    <Box sx={{ flex: fullWidth ? '1' : '0 0 200px', position: 'relative' }}>
+    <Box sx={{ flex: fullWidth ? 1 : '0 0 250px', position: 'relative' }}>
       <Field
         placeholder={placeholder}
         variant="filled"
