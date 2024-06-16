@@ -12,6 +12,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 
 import { useNetworkSummary } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
+import { Loader } from '@components/Loader';
 import { useContracts } from '@network/useContracts';
 
 export const WorkerColumnLabel = styled(Box, {
@@ -172,17 +173,25 @@ function Stats() {
 }
 
 export function NetworkSummary() {
+  const { isLoading } = useNetworkSummary();
+
   return (
-    <Grid container spacing={2} direction="row" sx={{ mb: 4 }}>
-      <Grid xxs={12} xs={6}>
-        <OnlineInfo />
-      </Grid>
-      <Grid xxs={12} xs={6}>
-        <CurrentEpoch />
-      </Grid>
-      <Grid xxs={12}>
-        <Stats />
-      </Grid>
-    </Grid>
+    <>
+      {!isLoading ? (
+        <Grid container spacing={2} direction="row" sx={{ mb: 4 }}>
+          <Grid xxs={12} xs={6}>
+            <OnlineInfo />
+          </Grid>
+          <Grid xxs={12} xs={6}>
+            <CurrentEpoch />
+          </Grid>
+          <Grid xxs={12}>
+            <Stats />
+          </Grid>
+        </Grid>
+      ) : (
+        <Loader />
+      )}
+    </>
   );
 }
