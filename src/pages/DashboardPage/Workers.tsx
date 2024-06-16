@@ -154,10 +154,7 @@ export function Workers() {
                   return (
                     <TableRow key={worker.peerId}>
                       <TableCell className="pinned">
-                        <WorkerName
-                          worker={worker}
-                          to={`/workers/${worker.peerId}?backPath=/dashboard`}
-                        />
+                        <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
                       </TableCell>
                       <TableCell>
                         <WorkerStatus worker={worker} />
