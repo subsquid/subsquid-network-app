@@ -2561,6 +2561,27 @@ export type GatewaysConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type NetworkStats = {
+  __typename?: 'NetworkStats';
+  blockTime: Scalars['Float']['output'];
+  blockTimeL1: Scalars['Float']['output'];
+  lastBlock: Scalars['Float']['output'];
+  lastBlockL1: Scalars['Float']['output'];
+  lastBlockTimestamp: Scalars['DateTime']['output'];
+  lastBlockTimestampL1: Scalars['DateTime']['output'];
+  onlineWorkersCount: Scalars['Float']['output'];
+  queries24Hours: Scalars['BigInt']['output'];
+  queries90Days: Scalars['BigInt']['output'];
+  servedData24Hours: Scalars['BigInt']['output'];
+  servedData90Days: Scalars['BigInt']['output'];
+  stakerApr: Scalars['Float']['output'];
+  storedData: Scalars['BigInt']['output'];
+  totalBond: Scalars['BigInt']['output'];
+  totalDelegation: Scalars['BigInt']['output'];
+  workerApr: Scalars['Float']['output'];
+  workersCount: Scalars['Float']['output'];
+};
+
 export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor: Scalars['String']['output'];
@@ -2631,6 +2652,7 @@ export type Query = {
   gatewayStatusChangesConnection: GatewayStatusChangesConnection;
   gateways: Array<Gateway>;
   gatewaysConnection: GatewaysConnection;
+  networkStats: NetworkStats;
   settings: Array<Settings>;
   settingsById?: Maybe<Settings>;
   /** @deprecated Use settingsById */
@@ -4684,7 +4706,7 @@ export enum WorkerStatus {
   Deregistered = 'DEREGISTERED',
   Deregistering = 'DEREGISTERING',
   Registering = 'REGISTERING',
-  Unknow = 'UNKNOW',
+  Unknown = 'UNKNOWN',
   Withdrawn = 'WITHDRAWN',
 }
 
@@ -5929,6 +5951,39 @@ export type VestingByAddressQuery = {
   };
 };
 
+export type NetworkSummaryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type NetworkSummaryQuery = {
+  __typename?: 'Query';
+  networkStats: {
+    __typename?: 'NetworkStats';
+    onlineWorkersCount: number;
+    queries90Days: string;
+    queries24Hours: string;
+    servedData90Days: string;
+    servedData24Hours: string;
+    stakerApr: number;
+    totalBond: string;
+    totalDelegation: string;
+    storedData: string;
+    workerApr: number;
+    workersCount: number;
+  };
+};
+
+export type CurrentEpochQueryVariables = Exact<{ [key: string]: never }>;
+
+export type CurrentEpochQuery = {
+  __typename?: 'Query';
+  networkStats: {
+    __typename?: 'NetworkStats';
+    blockTimeL1: number;
+    lastBlockL1: number;
+    lastBlockTimestampL1: string;
+  };
+  epoches: Array<{ __typename?: 'Epoch'; number: number; start: number; end: number }>;
+};
+
 export const WorkerBaseFragmentFragmentDoc = `
     fragment WorkerBaseFragment on Worker {
   id
@@ -6626,6 +6681,77 @@ export const useVestingByAddressQuery = <TData = VestingByAddressQuery, TError =
       dataSource.endpoint,
       dataSource.fetchParams || {},
       VestingByAddressDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const NetworkSummaryDocument = `
+    query networkSummary {
+  networkStats {
+    onlineWorkersCount
+    queries90Days
+    queries24Hours
+    servedData90Days
+    servedData24Hours
+    stakerApr
+    totalBond
+    totalDelegation
+    storedData
+    workerApr
+    workersCount
+  }
+}
+    `;
+
+export const useNetworkSummaryQuery = <TData = NetworkSummaryQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables?: NetworkSummaryQueryVariables,
+  options?: Omit<UseQueryOptions<NetworkSummaryQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<NetworkSummaryQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<NetworkSummaryQuery, TError, TData>({
+    queryKey: variables === undefined ? ['networkSummary'] : ['networkSummary', variables],
+    queryFn: fetcher<NetworkSummaryQuery, NetworkSummaryQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      NetworkSummaryDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const CurrentEpochDocument = `
+    query currentEpoch {
+  networkStats {
+    blockTimeL1
+    lastBlockL1
+    lastBlockTimestampL1
+  }
+  epoches(limit: 1, orderBy: id_DESC) {
+    number
+    start
+    end
+  }
+}
+    `;
+
+export const useCurrentEpochQuery = <TData = CurrentEpochQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables?: CurrentEpochQueryVariables,
+  options?: Omit<UseQueryOptions<CurrentEpochQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<CurrentEpochQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<CurrentEpochQuery, TError, TData>({
+    queryKey: variables === undefined ? ['currentEpoch'] : ['currentEpoch', variables],
+    queryFn: fetcher<CurrentEpochQuery, CurrentEpochQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      CurrentEpochDocument,
       variables,
     ),
     ...options,

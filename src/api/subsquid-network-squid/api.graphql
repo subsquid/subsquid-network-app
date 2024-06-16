@@ -171,7 +171,7 @@ query workerOwner($workerId: String!) {
 
 query myWorkerDelegations($address: String!, $workerId: String!) {
   workerById(id: $workerId) {
-    delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0  }) {
+    delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
       claimableReward
       claimedReward
       deposit
@@ -318,5 +318,35 @@ fragment VestingFragment on Account {
 query vestingByAddress($address: String!) {
   accountById(id: $address) {
     ...VestingFragment
+  }
+}
+
+query networkSummary {
+  networkStats {
+    onlineWorkersCount
+    queries90Days
+    queries24Hours
+    servedData90Days
+    servedData24Hours
+    stakerApr
+    totalBond
+    totalDelegation
+    storedData
+    workerApr
+    workersCount
+  }
+}
+
+query currentEpoch {
+  networkStats {
+    blockTimeL1
+    lastBlockL1
+    lastBlockTimestampL1
+  }
+
+  epoches(limit: 1, orderBy: id_DESC) {
+    number
+    start
+    end
   }
 }

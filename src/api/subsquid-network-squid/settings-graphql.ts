@@ -1,7 +1,7 @@
 import { toSqd } from '@lib/network';
 
 import { useSquidDataSource } from './datasource';
-import { useSettingsQuery } from './graphql';
+import { useCurrentEpochQuery, useNetworkSummaryQuery, useSettingsQuery } from './graphql';
 
 export function useNetworkSettings() {
   const dataSource = useSquidDataSource();
@@ -17,5 +17,45 @@ export function useNetworkSettings() {
     minimalWorkerVersion,
     recommendedWorkerVersion,
     isPending,
+  };
+}
+
+export function useNetworkSummary() {
+  const dataSource = useSquidDataSource();
+  const { data: networkStats, isLoading: isNetworkStatsLoading } = useNetworkSummaryQuery(
+    dataSource,
+    {},
+    {
+      select: res => {
+        return {
+          ...res.networkStats,
+        };
+      },
+    },
+  );
+
+  const { data: currentEpoch, isLoading: isCurrentEpochLoading } = useCurrentEpochQuery(
+    dataSource,
+    {},
+    {
+      select: res => {
+        return {
+          ...res.networkStats,
+          epoch: res.epoches[0],
+        };
+      },
+      refetchInterval: 6000, // a half of block time in l1
+    },
+  );
+
+  return {
+    data:
+      networkStats && currentEpoch
+        ? {
+            ...networkStats,
+            ...currentEpoch,
+          }
+        : undefined,
+    isLoading: isNetworkStatsLoading || isCurrentEpochLoading,
   };
 }

@@ -19,6 +19,7 @@ export const BorderedTable = styled(Table)(({ theme }) => ({
     background: theme.palette.background.paper,
     borderBottom: `1px solid ${theme.palette.background.content}`,
     padding: theme.spacing(2.5, 1.5),
+    fontVariantNumeric: 'tabular-nums',
   },
 
   '& td:first-of-type, & th:first-of-type': {
