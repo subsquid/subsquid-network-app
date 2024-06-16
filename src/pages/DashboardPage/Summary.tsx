@@ -178,7 +178,7 @@ export function NetworkSummary() {
   return (
     <>
       {!isLoading ? (
-        <Grid container spacing={2} direction="row" sx={{ mb: 4 }}>
+        <Grid container rowSpacing={2} columnSpacing={3} direction="row" sx={{ mb: 4 }}>
           <Grid xxs={12} xs={6}>
             <OnlineInfo />
           </Grid>
