@@ -1,15 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { dateFormat } from '@i18n';
 import { fromSqd, toSqd } from '@lib/network/utils';
-import { Button, Chip } from '@mui/material';
+import { Box, Button, Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
 import { useFormik } from 'formik';
+import { useDebounce } from 'use-debounce';
 
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
 import { useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
+import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
 
@@ -46,8 +49,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
     options,
     isPending: isSourceLoading,
   } = useMySourceOptions({
-    enabled: open,
-    sourceDisabled: s => s.balance === '0',
+    sourceDisabled: s => s.balance === '0' || !!data?.operators.some(o => o.account.id === s.id),
   });
 
   const formik = useFormik({
@@ -56,7 +58,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
       amount: '0',
       max: '0',
       autoExtension: false,
-      durationBlocks: MIN_BLOCKS_LOCK,
+      durationBlocks: MIN_BLOCKS_LOCK.toString(),
     },
     validationSchema: stakeSchema,
     validateOnChange: true,
@@ -69,7 +71,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
 
       const { failedReason } = await stakeToGateway({
         amount: toSqd(values.amount),
-        durationBlocks: values.durationBlocks,
+        durationBlocks: Number(values.durationBlocks),
         autoExtension: values.autoExtension,
         wallet,
       });
@@ -101,12 +103,21 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source]);
 
+  const [lockDuration] = useDebounce(formik.values.durationBlocks, 500);
+  const unlockAt = useMemo(() => {
+    if (!data) return Date.now();
+
+    return (
+      (Number(lockDuration) + 1) * data.blockTimeL1 + new Date(data.lastBlockTimestampL1).getTime()
+    );
+  }, [data, lockDuration]);
+
   return (
     <>
       <Button
         onClick={handleOpen}
         variant="contained"
-        disabled={disabled || data?.length === sources.length}
+        disabled={disabled || data?.operators.length === sources.length}
       >
         Add lock
       </Button>
@@ -172,11 +183,20 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
                 label="Lock blocks duration"
                 formik={formik}
                 showErrorOnlyOfTouched
+                autoComplete="off"
               />
             </FormRow>
             <FormRow>
               <FormikSwitch id="autoExtension" label="Auto extension" formik={formik} />
             </FormRow>
+            <Stack direction="row" justifyContent="space-between" alignContent="center">
+              <Box>Unlock at</Box>
+              <Stack direction="row">
+                ~{dateFormat(unlockAt, 'dateTime')}
+                <HelpTooltip help="Automatically relocked if auto extension is enabled" />
+              </Stack>
+            </Stack>
+
             <BlockchainContractError error={error} />
           </Form>
         )}
