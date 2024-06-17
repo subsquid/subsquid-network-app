@@ -7,6 +7,7 @@ import * as yup from '@schema';
 import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
+import { useComputationUnits } from '@api/contracts/gateway-registration/useComputationUnits';
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
 import { useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { BlockchainContractError } from '@components/BlockchainContractError';
@@ -104,13 +105,17 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
   }, [source]);
 
   const [lockDuration] = useDebounce(formik.values.durationBlocks, 500);
+  const [amount] = useDebounce(formik.values.amount, 500);
   const unlockAt = useMemo(() => {
     if (!data) return Date.now();
-
     return (
       (Number(lockDuration) + 1) * data.blockTimeL1 + new Date(data.lastBlockTimestampL1).getTime()
     );
   }, [data, lockDuration]);
+  const { data: computationUnits, isPending: isComputationUnitsLoading } = useComputationUnits({
+    amount: toSqd(amount),
+    lockDuration: Number(lockDuration),
+  });
 
   return (
     <>
@@ -189,11 +194,17 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
             <FormRow>
               <FormikSwitch id="autoExtension" label="Auto extension" formik={formik} />
             </FormRow>
-            <Stack direction="row" justifyContent="space-between" alignContent="center">
-              <Box>Unlock at</Box>
-              <Stack direction="row">
-                ~{dateFormat(unlockAt, 'dateTime')}
-                <HelpTooltip help="Automatically relocked if auto extension is enabled" />
+            <Stack spacing={2}>
+              <Stack direction="row" justifyContent="space-between" alignContent="center">
+                <Box>Unlock at</Box>
+                <Stack direction="row">
+                  ~{dateFormat(unlockAt, 'dateTime')}
+                  <HelpTooltip help="Automatically relocked if auto extension is enabled" />
+                </Stack>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignContent="center">
+                <Box>Expected CU</Box>
+                {isComputationUnitsLoading ? '-' : computationUnits}
               </Stack>
             </Stack>
 
