@@ -269,7 +269,7 @@ export const NetworkLayout = ({
   const network = getSubsquidNetwork();
 
   useEffect(() => {
-    if (!isConnected || walletClient.isLoading) return;
+    if (!isConnected) return;
     if (chain?.id === getChainId(network)) return;
 
     disconnect();

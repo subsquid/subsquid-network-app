@@ -90,7 +90,7 @@ function TotalBalance({
         <Box sx={{ textAlign: 'center', width: '100%' }}>
           <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
           <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
-            {tokenFormatter(total, SQD_TOKEN, 4)}
+            {tokenFormatter(total, SQD_TOKEN, 3)}
           </Box>
         </Box>
       </Box>
@@ -168,7 +168,7 @@ export function MyAssets() {
                         value={d.name}
                       />
                       <HelpTooltip help={d.help}>
-                        <TokenBalanceValue value={d.balance} decimals={8} />
+                        <TokenBalanceValue value={d.balance} decimals={6} />
                       </HelpTooltip>
                     </TokenBalanceItem>
 

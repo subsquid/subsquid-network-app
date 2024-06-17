@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { chunk } from 'lodash-es';
 import { erc20Abi, MulticallResponse } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
-import { useReadContracts, useWriteContract, useClient } from 'wagmi';
+import { useReadContracts, useWriteContract, useClient, useBlockNumber } from 'wagmi';
 
 import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
@@ -11,12 +11,12 @@ import { useContracts } from '@network/useContracts';
 import { errorMessage, WriteContractRes } from './utils';
 import { VESTING_CONTRACT_ABI } from './vesting.abi';
 
-export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] }) {
+export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[] }) {
   const contracts = useContracts();
   const { currentHeight, isLoading: isSquidHeightLoading } = useSquidNetworkHeight();
 
   const { data, isLoading } = useReadContracts({
-    contracts: addresses.flatMap(address => {
+    contracts: addresses?.flatMap(address => {
       const vestingContract = { abi: VESTING_CONTRACT_ABI, address } as const;
       return [
         {
@@ -60,29 +60,11 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
     allowFailure: true,
     blockNumber: BigInt(currentHeight),
     query: {
-      enabled: !isSquidHeightLoading,
-      select: r => {
-        if (r?.some(r => r.status === 'success')) {
-          return chunk(r, 8).map(ch => ({
-            start: Number(unwrapResult(ch[0])) * 1000,
-            end: Number(unwrapResult(ch[1])) * 1000,
-            deposited: unwrapResult(ch[2])?.toString(),
-            releasable: unwrapResult(ch[3])?.toString(),
-            released: unwrapResult(ch[4])?.toString(),
-            balance: unwrapResult(ch[5])?.toString(),
-            initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
-            expectedTotal: unwrapResult(ch[7])?.toString(),
-          }));
-        } else if (!addresses.length) {
-          return [];
-        }
-
-        return res.current;
-      },
+      enabled: !isSquidHeightLoading && !!addresses?.length,
     },
   });
 
-  const res = useRef<
+  const [vestings, setVestings] = useState<
     | {
         start?: number;
         end?: number;
@@ -95,14 +77,31 @@ export function useVestingContracts({ addresses }: { addresses: `0x${string}`[] 
       }[]
     | undefined
   >(undefined);
+
   useEffect(() => {
-    if (isLoading) return;
-    res.current = data;
-  }, [addresses, data, isLoading]);
+    if (isLoading || !addresses) return;
+
+    if (data?.some(r => r.status === 'success')) {
+      setVestings(
+        chunk(data, 8).map(ch => ({
+          start: Number(unwrapResult(ch[0])) * 1000,
+          end: Number(unwrapResult(ch[1])) * 1000,
+          deposited: unwrapResult(ch[2])?.toString(),
+          releasable: unwrapResult(ch[3])?.toString(),
+          released: unwrapResult(ch[4])?.toString(),
+          balance: unwrapResult(ch[5])?.toString(),
+          initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
+          expectedTotal: unwrapResult(ch[7])?.toString(),
+        })),
+      );
+    } else if (data?.length === 0) {
+      setVestings([]);
+    }
+  }, [addresses, data, isLoading, setVestings]);
 
   return {
-    data: res.current,
-    isLoading: !res.current,
+    data: vestings,
+    isLoading: isLoading && !vestings,
   };
 }
 

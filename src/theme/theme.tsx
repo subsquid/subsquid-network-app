@@ -548,7 +548,8 @@ export const useCreateTheme = (mode: PaletteType) => {
           MuiPaper: {
             styleOverrides: {
               elevation1: {
-                border: `1px solid ${colors.divider}`,
+                // border: `1px solid ${colors.divider}`,
+                border: 'none',
                 boxShadow: 'none',
               },
               rounded: {
@@ -648,7 +649,7 @@ export const useCreateTheme = (mode: PaletteType) => {
                 lineHeight: 1.6,
                 maxWidth: 400,
                 padding: `${spacing * 1.5}px ${spacing * 2.5}px`,
-                boxShadow: `0px 4px 14px rgba(101, 101, 101, 0.21)`,
+                boxShadow: `0px 2px 12px rgba(101, 101, 101, 0.21)`,
                 border: `1px solid ${alpha(colors.text.primary, 0.2)}`,
               },
               arrow: {

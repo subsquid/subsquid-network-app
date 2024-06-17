@@ -21,6 +21,7 @@ import {
   useWorkerDelegationInfoQuery,
   useWorkerOwnerQuery,
   Worker,
+  WorkerFragmentFragment,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
 // inherit API interface for internal class
