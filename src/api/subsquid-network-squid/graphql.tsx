@@ -5926,6 +5926,12 @@ export type MyGatewayStakesQuery = {
       lockEnd: number;
     };
   }>;
+  networkStats: {
+    __typename?: 'NetworkStats';
+    blockTimeL1: number;
+    lastBlockL1: number;
+    lastBlockTimestampL1: string;
+  };
 };
 
 export type VestingFragmentFragment = {
@@ -6639,6 +6645,11 @@ export const MyGatewayStakesDocument = `
     where: {account: {id_eq: $address, OR: {owner: {id_eq: $address}}}}
   ) {
     ...GatewayStakeFragment
+  }
+  networkStats {
+    blockTimeL1
+    lastBlockL1
+    lastBlockTimestampL1
   }
 }
     ${GatewayStakeFragmentFragmentDoc}`;

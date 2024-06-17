@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import { dateFormat } from '@i18n';
 import { tokenFormatter } from '@lib/formatters/formatters';
@@ -6,6 +6,7 @@ import { fromSqd } from '@lib/network';
 import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
 
+import { GatewayStake as GatewayStakeGraphql } from '@api/subsquid-network-squid';
 import { useMyGateways, useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
 import { Card } from '@components/Card';
 import { Loader } from '@components/Loader';
@@ -25,12 +26,31 @@ export function MyStakes() {
   const { data, isLoading } = useMyGatewayStakes();
   const { SQD_TOKEN } = useContracts();
 
+  const getUnlockAt = useCallback(
+    (o: {
+      pendingStake?: Pick<GatewayStakeGraphql, 'lockEnd'>;
+      stake?: Pick<GatewayStakeGraphql, 'lockEnd'>;
+      autoExtension: boolean;
+    }) => {
+      if (!data) return;
+
+      const stake = o.pendingStake || o.stake;
+      if (!stake) return;
+
+      return (
+        (Number(stake.lockEnd) - data.lastBlockL1 + 1) * data.blockTimeL1 +
+        new Date(data.lastBlockTimestampL1).getTime()
+      );
+    },
+    [data],
+  );
+
   return (
     <Box>
       <NetworkPageTitle title="My Locks" endAdornment={<GatewayStake />} />
       {isLoading ? (
         <Loader />
-      ) : data?.length ? (
+      ) : data?.operators.length ? (
         <Card noPadding>
           <BorderedTable>
             <TableHead>
@@ -38,11 +58,12 @@ export function MyStakes() {
                 <TableCell>Operator</TableCell>
                 <TableCell>Pending</TableCell>
                 <TableCell>Active</TableCell>
-                <TableCell></TableCell>
+                <TableCell>Expired</TableCell>
+                <TableCell>Unlock at</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {data?.map((o, i) => {
+              {data?.operators.map((o, i) => {
                 return (
                   <TableRow key={i}>
                     <TableCell>
@@ -54,7 +75,17 @@ export function MyStakes() {
                         : '-'}
                     </TableCell>
                     <TableCell>
-                      {o.stake ? tokenFormatter(fromSqd(o.stake?.amount), SQD_TOKEN) : '-'}
+                      {o.stake && o.stake.locked
+                        ? tokenFormatter(fromSqd(o.stake?.amount), SQD_TOKEN)
+                        : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {o.stake && !o.stake.locked
+                        ? tokenFormatter(fromSqd(o.stake?.amount), SQD_TOKEN)
+                        : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {o.autoExtension ? '-' : dateFormat(getUnlockAt(o), 'dateTime')}
                     </TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">

@@ -306,6 +306,12 @@ query myGatewayStakes($address: String!) {
   gatewayOperators(where: { account: { id_eq: $address, OR: { owner: { id_eq: $address } } } }) {
     ...GatewayStakeFragment
   }
+
+  networkStats {
+    blockTimeL1
+    lastBlockL1
+    lastBlockTimestampL1
+  }
 }
 
 fragment VestingFragment on Account {
