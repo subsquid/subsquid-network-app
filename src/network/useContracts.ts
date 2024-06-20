@@ -33,7 +33,7 @@ export function useContracts(): {
         REWARD_TREASURY: `0x237abf43bc51fd5c50d0d598a1a4c26e56a8a2a0`,
         REWARD_DISTRIBUTION: `0x4de282bD18aE4987B3070F4D5eF8c80756362AEa`,
         GATEWAY_REGISTRATION: `0x8a90a1ce5fa8cf71de9e6f76b7d3c0b72feb8c4b`,
-        SOFT_CAP: `0xde29d5215c28036ce56091ea91038c94c84c87d0`,
+        SOFT_CAP: `0x0eb27b1cbba04698dd7ce0f2364584d33a616545`,
         SQD_TOKEN: 'SQD',
       };
     }
