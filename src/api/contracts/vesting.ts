@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
+import { keepPreviousData } from '@tanstack/react-query';
 import { chunk } from 'lodash-es';
 import { erc20Abi, MulticallResponse } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
-import { useReadContracts, useWriteContract, useClient, useBlockNumber } from 'wagmi';
+import { useReadContracts, useWriteContract, useClient } from 'wagmi';
 
 import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
@@ -61,47 +62,31 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
     blockNumber: BigInt(currentHeight),
     query: {
       enabled: !isSquidHeightLoading && !!addresses?.length,
+      placeholderData: keepPreviousData,
+      select: res => {
+        if (res?.some(r => r.status === 'success')) {
+          return chunk(res, 8).map(ch => ({
+            start: Number(unwrapResult(ch[0])) * 1000,
+            end: Number(unwrapResult(ch[1])) * 1000,
+            deposited: unwrapResult(ch[2])?.toString(),
+            releasable: unwrapResult(ch[3])?.toString(),
+            released: unwrapResult(ch[4])?.toString(),
+            balance: unwrapResult(ch[5])?.toString(),
+            initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
+            expectedTotal: unwrapResult(ch[7])?.toString(),
+          }));
+        } else if (res?.length === 0) {
+          return [];
+        }
+
+        return undefined;
+      },
     },
   });
 
-  const [vestings, setVestings] = useState<
-    | {
-        start?: number;
-        end?: number;
-        deposited?: string;
-        releasable?: string;
-        released?: string;
-        balance?: string;
-        initialRelease?: number;
-        expectedTotal?: string;
-      }[]
-    | undefined
-  >(undefined);
-
-  useEffect(() => {
-    if (isLoading || !addresses) return;
-
-    if (data?.some(r => r.status === 'success')) {
-      setVestings(
-        chunk(data, 8).map(ch => ({
-          start: Number(unwrapResult(ch[0])) * 1000,
-          end: Number(unwrapResult(ch[1])) * 1000,
-          deposited: unwrapResult(ch[2])?.toString(),
-          releasable: unwrapResult(ch[3])?.toString(),
-          released: unwrapResult(ch[4])?.toString(),
-          balance: unwrapResult(ch[5])?.toString(),
-          initialRelease: Number(unwrapResult(ch[6]) || 0) / 100,
-          expectedTotal: unwrapResult(ch[7])?.toString(),
-        })),
-      );
-    } else if (data?.length === 0) {
-      setVestings([]);
-    }
-  }, [addresses, data, isLoading, setVestings]);
-
   return {
-    data: vestings,
-    isLoading: isLoading && !vestings,
+    data,
+    isLoading: isLoading,
   };
 }
 
