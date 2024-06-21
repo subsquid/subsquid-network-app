@@ -12,7 +12,6 @@ import { useParams, useSearchParams } from 'react-router-dom';
 
 import { useWorkerByPeerId, WorkerStatus } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
-import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
 import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
@@ -143,18 +142,11 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                     </WorkerDescValue>
                   </Stack>
                   <Stack direction="row">
-                    <WorkerDescLabel>Contact</WorkerDescLabel>
-                    <WorkerDescValue>
-                      {worker.email ? <CopyToClipboard text={worker.email} /> : '-'}
-                    </WorkerDescValue>
-                  </Stack>
-                  <Stack direction="row">
                     <WorkerDescLabel>Description</WorkerDescLabel>
                     <WorkerDescValue>{worker.description || '-'}</WorkerDescValue>
                   </Stack>
                 </Stack>
               </Box>
-
               <Box>
                 <Title>Bond</Title>
                 <Stack spacing={2}>
