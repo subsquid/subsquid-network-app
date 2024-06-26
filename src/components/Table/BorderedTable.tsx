@@ -133,6 +133,7 @@ export function SortableHeaderCell<S extends string>({
         <Box>
           <SortIcon query={query} value={sort} />
         </Box>
+        {/* <TableSortLabel direction={query.sortDir as any} /> */}
       </ClickableStack>
     </HeaderCell>
   );

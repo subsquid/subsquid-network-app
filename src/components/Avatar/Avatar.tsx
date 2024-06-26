@@ -33,7 +33,7 @@ function stringToColor(string: string) {
 export const Avatar = ({
   name,
   colorDiscriminator = name,
-  size = 44,
+  size = 40,
   variant,
   // online,
 }: {
@@ -48,10 +48,18 @@ export const Avatar = ({
   }, [colorDiscriminator]);
 
   return (
-    <Box position="relative">
+    <Box
+      position="relative"
+      sx={{ fontSize: '20px', lineHeight: '20px', fontWeight: 300, textAlign: 'center' }}
+    >
       <MaterialAvatar
         variant={variant}
-        sx={{ bgcolor: color, width: size, height: size, color: 'white' }}
+        sx={{
+          bgcolor: color,
+          width: size,
+          height: size,
+          color: 'white',
+        }}
       >
         {name.slice(0, 2).toUpperCase()}
       </MaterialAvatar>

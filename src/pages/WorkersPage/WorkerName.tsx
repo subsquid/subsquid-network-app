@@ -12,9 +12,10 @@ import { PeerIdShort, shortPeerId } from '@components/PeerId';
 const Name = styled(Box, {
   name: 'Name',
 })(({ theme }) => ({
-  marginBottom: theme.spacing(0.5),
-  fontWeight: 500,
+  marginBottom: theme.spacing(0.25),
   whiteSpace: 'nowrap',
+  fontSize: 16,
+  lineHeight: '24px',
 }));
 
 export const WorkerName = ({
@@ -25,7 +26,7 @@ export const WorkerName = ({
   to?: string;
 }) => {
   return (
-    <Stack spacing={2} direction="row">
+    <Stack spacing={1.5} direction="row" alignItems="center">
       <Avatar
         // online={!!worker.online}
         name={worker.name || worker.peerId}
@@ -37,7 +38,7 @@ export const WorkerName = ({
             {worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}
           </Name>
         ) : null}
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} sx={{ fontSize: 14, lineHeight: '20px' }}>
           <Box>
             <CopyToClipboard
               text={worker.peerId}

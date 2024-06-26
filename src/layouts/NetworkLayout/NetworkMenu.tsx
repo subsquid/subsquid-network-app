@@ -1,15 +1,16 @@
 import React, { ForwardedRef, forwardRef } from 'react';
 
-import { Box, Button, buttonClasses, styled } from '@mui/material';
+import { Box, Button, styled } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useIsWorkerOperator } from '@api/subsquid-network-squid';
-import { AccountIcon } from '@icons/AccountIcon';
-import { ComputersIcon } from '@icons/ComputersIcon';
 import { ContactsIcon } from '@icons/ContactsIcon';
 import { DashboardIcon } from '@icons/DashboardIcon';
-import { DocumentIcon } from '@icons/DocumentIcon';
+import { DoorIcon } from '@icons/DoorIcon';
+import { HandIcon } from '@icons/HandIcon';
+import { NetworkNodeIcon } from '@icons/NetworkNodeIcon';
 import { OpenInNewIcon } from '@icons/OpenInNewIcon';
+import { SavingsIcon } from '@icons/SavingsIcon';
 import { useWorkersChatUrl } from '@network/useWorkersChat';
 
 interface NetworkMenuProps {
@@ -18,19 +19,16 @@ interface NetworkMenuProps {
 
 const MenuItem = styled(Button)(({ theme: { palette, spacing } }) => ({
   display: 'flex',
-  justifyContent: 'flex-start',
   alignItems: 'center',
-  height: 60,
+  height: spacing(7),
   width: '100%',
-  color: palette.text.secondary,
+  minWidth: 0,
 
   fontWeight: 500,
   textAlign: 'center',
-  padding: spacing(0, 3),
+  padding: spacing(0, 2),
   borderRadius: 0,
-  marginBottom: spacing(1.5),
   '& .leftIcon': {
-    marginRight: spacing(2),
     display: 'flex',
     width: '20px',
     alignItems: 'center',
@@ -41,32 +39,32 @@ const MenuItem = styled(Button)(({ theme: { palette, spacing } }) => ({
   '& svg:not(.badge) path': {
     transition: 'fill 300ms ease-out',
   },
-  ['&:hover']: {
-    backgroundColor: palette.background.paper,
-    color: palette.info.contrastText,
-    // '& svg:not(.badge) path': {
-    //   fill: 'red',
-    // },
-    // '& svg.badge path': {
-    //   fill: 'inherit',
-    // },
-  },
-  [`&.selected`]: {
-    // backgroundColor: palette.info.main,
-    // color: palette.info.contrastText,
-    // '& svg:not(.badge) path': {
-    //   fill: palette.info.contrastText,
-    // },
-  },
+  // ['&:hover']: {
+  //   backgroundColor: palette.background.paper,
+  //   color: palette.info.contrastText,
+  //   // '& svg:not(.badge) path': {
+  //   //   fill: 'red',
+  //   // },
+  //   // '& svg.badge path': {
+  //   //   fill: 'inherit',
+  //   // },
+  // },
+  // [`&.selected`]: {
+  //   // backgroundColor: palette.info.main,
+  //   // color: palette.info.contrastText,
+  //   // '& svg:not(.badge) path': {
+  //   //   fill: palette.info.contrastText,
+  //   // },
+  // },
 
-  [`&.${buttonClasses.disabled}`]: {
-    opacity: 0.4,
-    backgroundColor: 'transparent',
-    color: palette.text.secondary,
-    '& svg:not(.badge) path': {
-      fill: palette.text.secondary,
-    },
-  },
+  // [`&.${buttonClasses.disabled}`]: {
+  //   opacity: 0.4,
+  //   backgroundColor: 'transparent',
+  //   color: palette.text.secondary,
+  //   '& svg:not(.badge) path': {
+  //     fill: palette.text.secondary,
+  //   },
+  // },
 }));
 
 const Text = styled(Box)({
@@ -110,15 +108,15 @@ export const Item = forwardRef(
         className={active ? 'selected' : undefined}
         disabled={disabled}
       >
-        <Box className="leftIcon">
-          <LeftIcon />
+        <Box className="leftIcon" justifyContent="center" alignContent="center">
+          <LeftIcon variant={active ? 'filled' : 'outlined'} />
         </Box>
-        <Text>{label}</Text>
+        {/* <Text>{label}</Text>
         {RightIcon ? (
           <Box className="rightIcon">
             <RightIcon />
           </Box>
-        ) : null}
+        ) : null} */}
       </MenuItem>
     );
 
@@ -138,13 +136,11 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
 
   return (
     <>
-      <div style={{ height: '1.125rem' }} />
-
       <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
-      <Item LeftIcon={AccountIcon} label="Assets" onClick={onItemClick} path="/assets" />
-      <Item LeftIcon={ComputersIcon} label="Workers" onClick={onItemClick} path="/workers" />
-      <Item LeftIcon={AccountIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
-      <Item LeftIcon={DocumentIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
+      <Item LeftIcon={SavingsIcon} label="Assets" onClick={onItemClick} path="/assets" />
+      <Item LeftIcon={NetworkNodeIcon} label="Workers" onClick={onItemClick} path="/workers" />
+      <Item LeftIcon={HandIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
+      <Item LeftIcon={DoorIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
 
       <div style={{ flex: 1 }} />
 

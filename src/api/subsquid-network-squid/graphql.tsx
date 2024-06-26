@@ -6203,7 +6203,7 @@ export const useAccountQuery = <TData = AccountQuery, TError = unknown>(
 
 export const AllWorkersDocument = `
     query allWorkers {
-  workers(where: {status_eq: ACTIVE}) {
+  workers(where: {status_eq: ACTIVE}, orderBy: totalDelegation_ASC) {
     ...WorkerFragment
   }
 }

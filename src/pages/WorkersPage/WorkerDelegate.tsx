@@ -121,7 +121,8 @@ export function WorkerDelegate({
       <Button
         disabled={disabled || !worker || worker.status !== WorkerStatus.Active}
         onClick={handleOpen}
-        variant="contained"
+        variant="outlined"
+        color="secondary"
       >
         Delegate
       </Button>

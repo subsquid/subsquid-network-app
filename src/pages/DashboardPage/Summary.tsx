@@ -34,7 +34,7 @@ function OnlineInfo() {
   const { data } = useNetworkSummary();
 
   return (
-    <Card>
+    <Card sx={{ minWidth: 434, minHeight: 256 }}>
       <Stack direction="row" justifyContent="space-between" spacing={2}>
         <Box>
           <WorkerColumnLabel>Workers online</WorkerColumnLabel>
@@ -98,7 +98,7 @@ function CurrentEpoch() {
   }, []);
 
   return (
-    <Card>
+    <Card sx={{ minWidth: 434, minHeight: 256 }}>
       <Stack direction="row" justifyContent="space-between" spacing={2}>
         <Box>
           <WorkerColumnLabel>Current epoch</WorkerColumnLabel>
@@ -178,7 +178,7 @@ export function NetworkSummary() {
   return (
     <>
       {!isLoading ? (
-        <Grid container rowSpacing={2} columnSpacing={3} direction="row" sx={{ mb: 4 }}>
+        <Grid container spacing={2} direction="row" sx={{ mb: 2 }}>
           <Grid xxs={12} xs={6}>
             <OnlineInfo />
           </Grid>

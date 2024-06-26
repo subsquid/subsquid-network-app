@@ -14,9 +14,6 @@ export const Wrapper = styled(Stack)(({ theme }) => ({
     // marginTop: theme.spacing(-1),
     padding: 0,
     backgroundColor: 'transparent',
-    '& path': {
-      stroke: theme.palette.primary.main,
-    },
   },
   '&.gutterBottom': {
     marginBottom: theme.spacing(1.5),
