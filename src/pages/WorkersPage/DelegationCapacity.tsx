@@ -40,7 +40,10 @@ export function DelegationCapacity({ worker }: { worker: { delegationCapacity: n
     <Stack direction="row" spacing={1} alignItems="center">
       <BarWrapper>
         {RANGES.map((v, i) => (
-          <Bar key={i} className={classNames(v < delegationCapacity ? color : undefined)} />
+          <Bar
+            key={i}
+            className={classNames(v < delegationCapacity || i === 0 ? color : undefined)}
+          />
         ))}
       </BarWrapper>
       <Box display="flex">{percentFormatter(delegationCapacity)}</Box>

@@ -173,14 +173,6 @@ function AddWorkerForm() {
               <FormRow>
                 <FormikTextInput
                   showErrorOnlyOfTouched
-                  id="email"
-                  label="Email address"
-                  formik={formik}
-                />
-              </FormRow>
-              <FormRow>
-                <FormikTextInput
-                  showErrorOnlyOfTouched
                   id="website"
                   label="Website"
                   formik={formik}
