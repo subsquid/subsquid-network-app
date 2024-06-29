@@ -21,6 +21,7 @@ export const DashboardTableBase = styled(Table)(({ theme }) => ({
   },
 
   '& th': {
+    ...theme.typography.body2,
     minHeight: theme.spacing(4),
     textAlign: 'start',
     paddingTop: 0,
@@ -60,7 +61,7 @@ export function DashboardTable({
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          marginBottom={2}
+          marginBottom={1}
           minHeight={36}
         >
           {title}

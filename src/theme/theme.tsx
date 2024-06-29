@@ -212,6 +212,7 @@ export const useCreateTheme = (mode: PaletteType) => {
             color: colors.text.secondary,
             fontSize: 14,
             lineHeight: '20px',
+            fontWeight: 500,
           },
           button: {
             fontSize: '14px',
