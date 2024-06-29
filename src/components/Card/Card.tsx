@@ -12,8 +12,9 @@ export const CardTitle = styled(Box)(({ theme }) => ({
 }));
 
 export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) => ({
-  padding: theme.spacing(2.5, 5),
-  boxShadow: `0px 4px 12px 0px #9595953D`,
+  padding: theme.spacing(1.5, 1.5),
+  // boxShadow: `0px 4px 12px 0px #9595953D`,
+  boxShadow: 'none',
   overflowX: 'auto',
   scrollbarWidth: 'thin',
 
@@ -48,7 +49,7 @@ export const Card = ({
   noPadding?: boolean;
 }>) => {
   return (
-    <Box>
+    <>
       {title ? <CardTitle>{title}</CardTitle> : null}
       <CardWrapper
         className={classNames({
@@ -59,6 +60,6 @@ export const Card = ({
       >
         {children}
       </CardWrapper>
-    </Box>
+    </>
   );
 };

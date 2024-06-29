@@ -7,12 +7,13 @@ import { getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 export const LogoWrapper = styled('div', {
   name: 'LogoWrapper',
-})(() => ({
+})(({theme}) => ({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   '& img': {
-    display: 'block',
-    marginRight: 2,
+    // display: 'block',
+    // marginRight: 2,
   },
   userSelect: 'none',
 }));
@@ -41,19 +42,19 @@ export const LogoSecondary = styled(Box, {
 export function Logo({ color = '#fff' }: { color?: string }) {
   const theme = useTheme();
   const narrow = useMediaQuery(theme.breakpoints.down('lg'));
-  const size = 32;
+  const size = 40;
 
   const network = getSubsquidNetwork();
 
   return (
     <LogoWrapper>
       <img width={size} height={size} src="/logo.png" />
-      {!narrow ? (
+      {/* {!narrow ? (
         <>
           <LogoPrimary sx={{ color }}>SUBSQUID</LogoPrimary>
           <LogoSecondary sx={{ color }}>{upperFirst(network)}</LogoSecondary>
         </>
-      ) : null}
+      ) : null} */}
     </LogoWrapper>
   );
 }

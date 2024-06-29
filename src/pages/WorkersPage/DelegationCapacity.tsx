@@ -4,27 +4,27 @@ import classNames from 'classnames';
 
 export const Bar = styled(Box)(({ theme }) => ({
   width: theme.spacing(0.75),
-  height: theme.spacing(2),
-  borderRadius: '2px',
-  background: '#EBEBEB',
+  height: theme.spacing(3),
+  borderRadius: 360,
+  background: theme.palette.background.paper,
 
   '&.error': {
-    background: theme.palette.networkStatus.offline,
+    background: theme.palette.error.main,
   },
 
   '&.warning': {
-    background: theme.palette.networkStatus.downtime,
+    background: theme.palette.warning.main,
   },
 
   '&.success': {
-    background: theme.palette.networkStatus.online,
+    background: theme.palette.success.main,
   },
 }));
 
 export const BarWrapper = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   '& :not(:last-child)': {
-    marginRight: theme.spacing(0.25),
+    marginRight: theme.spacing(0.5),
   },
 }));
 

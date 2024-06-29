@@ -1,14 +1,16 @@
 import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
 import { fromSqd } from '@lib/network';
+import { Add } from '@mui/icons-material';
 import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
 
 import { SortDir, useMyWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
-import { Card } from '@components/Card';
+import SquaredChip from '@components/Chip/SquaredChip';
 import { Loader } from '@components/Loader';
-import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';
+import { SortableHeaderCell } from '@components/Table/BorderedTable';
+import { DashboardTable } from '@components/Table/DashboardTable';
 import { Location, useLocationState } from '@hooks/useLocationState';
-import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
+import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
@@ -31,19 +33,27 @@ export function MyWorkers() {
 
   return (
     <Box>
-      <NetworkPageTitle
-        title="My Workers"
-        endAdornment={
-          <Button variant="contained" disabled={!isConnected} component={Link} to="/workers/add">
-            Add worker
-          </Button>
+      <DashboardTable
+        title={
+          <>
+            <SquaredChip label="My Workers" color="primary" />
+            <Button
+              color="info"
+              startIcon={<Add />}
+              variant="contained"
+              disabled={!isConnected}
+              component={Link}
+              to="/workers/add"
+            >
+              ADD WORKER
+            </Button>
+          </>
         }
-      />
-      {isLoading ? (
-        <Loader />
-      ) : data.length ? (
-        <Card noPadding>
-          <BorderedTable>
+      >
+        {isLoading ? (
+          <Loader />
+        ) : data.length ? (
+          <>
             <TableHead>
               <TableRow>
                 <TableCell width={275}>Worker</TableCell>
@@ -95,11 +105,11 @@ export function MyWorkers() {
                 );
               })}
             </TableBody>
-          </BorderedTable>
-        </Card>
-      ) : (
-        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
-      )}
+          </>
+        ) : (
+          'No items to show'
+        )}
+      </DashboardTable>
     </Box>
   );
 }

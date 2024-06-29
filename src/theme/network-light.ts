@@ -2,75 +2,67 @@ import { alpha } from '@mui/system/colorManipulator';
 
 export const NetworkLightTheme = {
   primary: {
-    main: '#2c2c2c',
-    light: '#333333',
-    contrastText: '#fff',
+    main: '#d5d8dd',
+    contrastText: '#3E4A5C',
   },
   secondary: {
-    main: '#E8CDEB',
-    contrastText: '#B721FD',
+    main: '#8596ad',
+    contrastText: '#540f8a',
   },
   info: {
-    light: '#3880EC',
-    main: '#2c2c2c',
+    main: '#726fff',
     contrastText: '#fff',
   },
   success: {
-    light: '#55AD44',
-    main: '#1FB48E',
-    dark: '#148568',
+    main: '#248a0f',
     contrastText: '#fff',
+    background: '#e3f7e0',
   },
   error: {
-    main: '#FD6E65',
-    dark: '#E7362B',
+    main: '#ff2a00',
     contrastText: '#fff',
+    background: '#ffddd6',
   },
   warning: {
-    main: '#F5EDBF',
-    contrastText: '#DC9101',
-    dark: '#F90',
+    main: '#ffa800',
+    contrastText: '#fff',
   },
   importantLink: {
     main: '#3880EC',
-    hover: '#66a0f5',
   },
   text: {
-    primary: '#1D1D1F',
-    secondary: alpha('#1D1D1F', 0.5),
-    default: alpha('#1D1D1F', 0.8),
-    disabled: alpha('#1D1D1F', 0.3),
+    primary: '#0d0d0d',
+    secondary: '#3e4a5c',
+    disabled: '#c2cad6',
   },
   background: {
-    default: '#f2f2f2',
-    paper: '#fff',
-    input: '#f2f2f2',
-    content: '#f6f8fb',
+    default: '#ffffff',
+    paper: '#f0f2f5',
   },
-  divider: '#e8e8e8',
+  divider: '#C2CAD6',
   code: {
     background: '#FBFBFB',
     border: alpha('#1D1D1F', 0.1),
   },
   alerts: {
-    info: {
-      background: '#E8E7E7',
-      text: '#231F20',
-    },
-    success: {
-      background: '#96F3C6',
-      text: '#231F20',
-    },
+    // info: {
+    //   background: '#E8E7E7',
+    //   text: '#231F20',
+    // },
+    // success: {
+    //   background: '#96F3C6',
+    //   text: '#231F20',
+    // },
     warning: {
       background: '#FCE38E',
 
       text: '#231F20',
     },
-    error: {
-      background: '#FBB9B2',
-      contrastText: '#CA0E01',
-      text: '#231F20',
-    },
+    // error: {
+    //   background: '#FBB9B2',
+    //   contrastText: '#CA0E01',
+    //   text: '#231F20',
+    // },
   },
   networkStatus: {
     online: '#65C971',

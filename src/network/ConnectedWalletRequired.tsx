@@ -1,16 +1,10 @@
 import React, { PropsWithChildren } from 'react';
 
-import { Box, Button, styled } from '@mui/material';
+import { Box } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
-import { WalletIcon } from '@icons/WalletIcon';
-
-export const ConnectButton = styled(Button, {
-  name: 'ConnectButton',
-})(({ theme }) => ({
-  color: theme.palette.info.contrastText,
-}));
+import ConnectButton from '@components/Button/ConnectButton';
 
 export function ConnectedWalletRequired({ children }: PropsWithChildren) {
   const { isConnected } = useAccount();
@@ -28,9 +22,7 @@ export function ConnectedWalletRequired({ children }: PropsWithChildren) {
       >
         <Box sx={{ textAlign: 'center' }}>
           <Box sx={{ mb: 2 }}>Connect your wallet to proceed</Box>
-          <Button variant="contained" startIcon={<WalletIcon />} onClick={openConnectModal}>
-            Connect wallet
-          </Button>
+          <ConnectButton onClick={openConnectModal} />
         </Box>
       </Box>
     );

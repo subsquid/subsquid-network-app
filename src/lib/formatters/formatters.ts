@@ -23,7 +23,7 @@ export function numberWithSpacesFormatter(val?: number | string) {
 }
 
 export function bytesFormatter(val?: number | string) {
-  if (!val) return '0 GB';
+  if (!val) return '0 MB';
 
   return prettyBytes(Number(val), { maximumFractionDigits: 0 });
 }
@@ -49,7 +49,7 @@ export function tokenFormatter(val: number | BigNumber, currency: string, decima
       trimEnd(
         bn.toFormat(decimals ?? 6, BigNumber.ROUND_FLOOR, {
           decimalSeparator: '.',
-          groupSeparator: ' ',
+          groupSeparator: ',',
           groupSize: 3,
         }),
         '0',

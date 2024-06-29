@@ -8,7 +8,7 @@ import { Workers } from './Workers';
 export function DashboardPage() {
   return (
     <CenteredPageWrapper className="wide">
-      <NetworkPageTitle title="Dashboard" />
+      {/* <NetworkPageTitle title="Dashboard" /> */}
       <NetworkSummary />
       <Workers />
       <Outlet />
