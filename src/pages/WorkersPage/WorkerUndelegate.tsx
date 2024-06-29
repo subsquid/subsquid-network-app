@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
-import { Box, Button, Chip, Stack } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Box, Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
@@ -134,14 +135,15 @@ export function WorkerUndelegate({
 
   return (
     <>
-      <Button
+      <LoadingButton
+        loading={open}
         disabled={disabled || !canUndelegate}
         color="error"
         onClick={handleOpen}
-        variant="contained"
+        variant="outlined"
       >
-        Undelegate
-      </Button>
+        UNDELEGATE
+      </LoadingButton>
       <ContractCallDialog
         title="Undelegate"
         open={open}
@@ -198,7 +200,7 @@ export function WorkerUndelegate({
             <Box>Expected APR</Box>
             <Stack direction="row">
               {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
-              <HelpTooltip help={EXPECTED_APR_TIP} />
+              <HelpTooltip title={EXPECTED_APR_TIP} />
             </Stack>
           </Stack>
           <BlockchainContractError error={error} />

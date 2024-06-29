@@ -7,19 +7,21 @@ export const NetworkLightTheme = {
   },
   secondary: {
     main: '#8596ad',
+    contrastText: '#540f8a',
   },
   info: {
-    light: '#3880EC',
-    main: '#2c2c2c',
+    main: '#726fff',
     contrastText: '#fff',
   },
   success: {
-    main: '#e3f7e0',
-    contrastText: '#248a0f',
+    main: '#248a0f',
+    contrastText: '#fff',
+    background: '#e3f7e0',
   },
   error: {
     main: '#ff2a00',
     contrastText: '#fff',
+    background: '#ffddd6',
   },
   warning: {
     main: '#ffa800',
@@ -31,8 +33,7 @@ export const NetworkLightTheme = {
   text: {
     primary: '#0d0d0d',
     secondary: '#3e4a5c',
-    default: alpha('#1D1D1F', 0.8),
-    disabled: alpha('#1D1D1F', 0.3),
+    disabled: '#c2cad6',
   },
   background: {
     default: '#ffffff',

@@ -199,7 +199,7 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
                 <Box>Unlock at</Box>
                 <Stack direction="row">
                   ~{dateFormat(unlockAt, 'dateTime')}
-                  <HelpTooltip help="Automatically relocked if auto extension is enabled" />
+                  <HelpTooltip title="Automatically relocked if auto extension is enabled" />
                 </Stack>
               </Stack>
               <Stack direction="row" justifyContent="space-between" alignContent="center">

@@ -123,12 +123,7 @@ export function SortableHeaderCell<S extends string>({
 
   return (
     <HeaderCell help={help}>
-      <ClickableStack
-        onClick={handleSortChange(sort)}
-        direction="row"
-        spacing={1}
-        alignItems="center"
-      >
+      <ClickableStack onClick={handleSortChange(sort)} direction="row" spacing={1}>
         <Box>{children}</Box>
         <Box>
           <SortIcon query={query} value={sort} />

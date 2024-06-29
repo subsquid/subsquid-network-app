@@ -17,7 +17,7 @@ export const Bar = styled(Box)(({ theme }) => ({
   },
 
   '&.success': {
-    background: theme.palette.success.contrastText,
+    background: theme.palette.success.main,
   },
 }));
 

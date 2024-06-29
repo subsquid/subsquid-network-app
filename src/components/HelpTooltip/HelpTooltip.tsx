@@ -1,7 +1,8 @@
 import React, { PropsWithChildren } from 'react';
 
-import { HelpOutline } from '@mui/icons-material';
-import { Box, Stack, Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
+
+import { InfoIcon } from '@icons/InfoIcon';
 
 // export const Help = styled(Box)(({ theme, color }) => ({
 //   width: 15,
@@ -19,17 +20,15 @@ import { Box, Stack, Tooltip } from '@mui/material';
 // }));
 
 export const HelpTooltip = ({
-  help,
-  children,
+  title,
 }: PropsWithChildren<{
-  help: React.ReactNode;
+  title: React.ReactNode;
 }>) => {
   return (
-    <Stack direction="row" alignItems="center" spacing={1}>
-      <Box>{children}</Box>
-      <Tooltip title={help} placement="top" arrow>
-        <HelpOutline sx={{ width: 16, height: 16 }} />
-      </Tooltip>
-    </Stack>
+    <Tooltip title={title} placement="top">
+      <Box display="flex">
+        <InfoIcon />
+      </Box>
+    </Tooltip>
   );
 };

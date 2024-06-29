@@ -4,11 +4,13 @@ import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/mate
 import { Outlet } from 'react-router-dom';
 
 import { SortDir, useMyDelegations, WorkerSortBy } from '@api/subsquid-network-squid';
-import { Card } from '@components/Card';
-import { Loader } from '@components/Loader';
-import { BorderedTable, SortableHeaderCell } from '@components/Table/BorderedTable';
+import SquaredChip from '@components/Chip/SquaredChip';
+import { NoItems } from '@components/NoItems';
+import Placeholder from '@components/Placeholer';
+import { SortableHeaderCell } from '@components/Table/BorderedTable';
+import { DashboardTable } from '@components/Table/DashboardTable';
 import { Location, useLocationState } from '@hooks/useLocationState';
-import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
+import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
@@ -49,80 +51,76 @@ export function MyDelegations() {
 
   return (
     <Box>
-      <NetworkPageTitle title="My Delegations" />
-      {isLoading ? (
-        <Loader />
-      ) : delegations.length ? (
-        <Card noPadding>
-          <BorderedTable>
-            <TableHead>
-              <TableRow>
-                <TableCell className="pinned" width={240}>
-                  Worker
-                </TableCell>
-                <TableCell>Status</TableCell>
-                <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
-                  Delegator APR
-                </SortableHeaderCell>
-                <SortableHeaderCell
-                  sort={WorkerSortBy.DelegationCapacity}
-                  query={query}
-                  setQuery={setQuery}
-                >
-                  Delegation capacity
-                </SortableHeaderCell>
-                <SortableHeaderCell
-                  sort={WorkerSortBy.MyDelegation}
-                  query={query}
-                  setQuery={setQuery}
-                >
-                  My Delegation
-                </SortableHeaderCell>
-                <SortableHeaderCell
-                  sort={WorkerSortBy.MyDelegationReward}
-                  query={query}
-                  setQuery={setQuery}
-                >
-                  Total reward
-                </SortableHeaderCell>
-                <TableCell className="pinned"></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {delegations.map(worker => {
-                return (
-                  <TableRow key={worker.peerId}>
-                    <TableCell className="pinned">
-                      <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
-                    </TableCell>
-                    <TableCell>
-                      <WorkerStatus worker={worker} />
-                    </TableCell>
-                    <TableCell>
-                      {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                    </TableCell>
-                    <TableCell>
-                      <DelegationCapacity worker={worker} />
-                    </TableCell>
-                    <TableCell>{tokenFormatter(fromSqd(worker.myDelegation), SQD_TOKEN)}</TableCell>
-                    <TableCell>
-                      {tokenFormatter(fromSqd(worker.myTotalDelegationReward), SQD_TOKEN)}
-                    </TableCell>
-                    <TableCell className="pinned">
-                      <Stack direction="row" spacing={2} justifyContent="flex-end">
-                        <WorkerDelegate worker={worker} />
-                        <WorkerUndelegate worker={worker} />
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </BorderedTable>
-        </Card>
-      ) : (
-        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
-      )}
+      <DashboardTable
+        loading={isLoading}
+        title={<SquaredChip label="My Delegations" color="primary" />}
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell className="pinned" width={240}>
+              Worker
+            </TableCell>
+            <TableCell>Status</TableCell>
+            <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
+              Delegator APR
+            </SortableHeaderCell>
+            <SortableHeaderCell
+              sort={WorkerSortBy.DelegationCapacity}
+              query={query}
+              setQuery={setQuery}
+            >
+              Delegation capacity
+            </SortableHeaderCell>
+            <SortableHeaderCell sort={WorkerSortBy.MyDelegation} query={query} setQuery={setQuery}>
+              My Delegation
+            </SortableHeaderCell>
+            <SortableHeaderCell
+              sort={WorkerSortBy.MyDelegationReward}
+              query={query}
+              setQuery={setQuery}
+            >
+              Total reward
+            </SortableHeaderCell>
+            <TableCell className="pinned"></TableCell>
+          </TableRow>
+        </TableHead>
+        {delegations.length ? (
+          <TableBody>
+            {delegations.map(worker => {
+              return (
+                <TableRow key={worker.peerId}>
+                  <TableCell className="pinned">
+                    <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
+                  </TableCell>
+                  <TableCell>
+                    <WorkerStatus worker={worker} />
+                  </TableCell>
+                  <TableCell>
+                    {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+                  </TableCell>
+                  <TableCell>
+                    <DelegationCapacity worker={worker} />
+                  </TableCell>
+                  <TableCell>{tokenFormatter(fromSqd(worker.myDelegation), SQD_TOKEN)}</TableCell>
+                  <TableCell>
+                    {tokenFormatter(fromSqd(worker.myTotalDelegationReward), SQD_TOKEN)}
+                  </TableCell>
+                  <TableCell className="pinned">
+                    <Stack direction="row" spacing={2} justifyContent="flex-end">
+                      <WorkerDelegate worker={worker} />
+                      <WorkerUndelegate worker={worker} />
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        ) : (
+          <Placeholder>
+            <NoItems />
+          </Placeholder>
+        )}
+      </DashboardTable>
     </Box>
   );
 }

@@ -6,30 +6,18 @@ import capitalize from 'lodash-es/capitalize';
 
 import { WorkerStatus as Status, WorkerStatusFragmentFragment } from '@api/subsquid-network-squid';
 
-export const Chip = styled(MaterialChip)(({ theme: { spacing } }) => ({
-  fontSize: 14,
-  fontWeight: 500,
-  lineHeight: 1,
-  height: 24,
-
-  [`& .${chipClasses.label}`]: {
-    padding: spacing(0, 1, 0, 0.5),
-    margin: 0,
-  },
-
-  // [`& .${chipClasses.colorError}`]: {
-  //   background: '#FFE6C0',
-  //   color: '#FF6B35',
+export const Chip = styled(MaterialChip)(({ theme }) => ({
+  // [`&.${chipClasses.colorSuccess}`]: {
+  //   background: theme.palette.success.background,
+  //   color: theme.palette.success.main,
   // },
-
-  // [`& .${chipClasses.colorSuccess}`]: {
-  //   background: '#E3F7E0',
-  //   color: '#55AD44',
+  // [`&.${chipClasses.colorError}`]: {
+  //   background: theme.palette.error.background,
+  //   color: theme.palette.error.main,
   // },
-
-  [`& .${chipClasses.icon}`]: {
-    padding: spacing(0, 0, 0, 1),
-    margin: 0,
+  [`&.${chipClasses.colorPrimary}`]: {
+    color: theme.palette.primary.contrastText,
+    borderColor: theme.palette.primary.contrastText,
   },
 }));
 
@@ -65,9 +53,10 @@ export function WorkerStatus({ worker }: { worker: WorkerStatusFragmentFragment 
     <Chip
       color={color}
       label={label}
+      variant="outlined"
       icon={
         <Box display="flex" justifyContent="center">
-          <CircleRounded sx={{ fontSize: 8 }} />
+          <CircleRounded sx={{ fontSize: 7 }} />
         </Box>
       }
     />

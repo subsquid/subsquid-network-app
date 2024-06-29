@@ -298,7 +298,7 @@ export const NetworkLayout = ({
               </MenuButton>
             ) : null} */}
           {/* </AppToolbarSidebar> */}
-          <AppToolbarContent>Dashboard</AppToolbarContent>
+          <AppToolbarContent></AppToolbarContent>
           {/* <NetworkSwitcher hideText={isMobile} /> */}
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}

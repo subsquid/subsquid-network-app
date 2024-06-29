@@ -92,13 +92,8 @@ export function ClaimButton() {
 
   return (
     <>
-      <Button
-        disabled={!hasClaimsAvailable}
-        onClick={handleOpen}
-        color="success"
-        variant="contained"
-      >
-        Claim
+      <Button disabled={!hasClaimsAvailable} onClick={handleOpen} color="info" variant="contained">
+        CLAIM
       </Button>
       <ContractCallDialog
         title="Claim"

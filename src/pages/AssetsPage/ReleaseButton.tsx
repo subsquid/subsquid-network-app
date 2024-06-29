@@ -66,10 +66,11 @@ export function ReleaseButton({
     <>
       <Button
         onClick={handleOpen}
-        variant="contained"
+        variant="outlined"
+        color="secondary"
         disabled={disabled || fromSqd(data?.releasable).lte(0)}
       >
-        Release
+        RELEASE
       </Button>
       <ContractCallDialog
         title="Release"

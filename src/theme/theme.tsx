@@ -75,6 +75,14 @@ declare module '@mui/material/styles/createPalette' {
     default: string;
   }
 
+  export interface PaletteColor {
+    light: string;
+    main: string;
+    dark: string;
+    contrastText: string;
+    background: string;
+  }
+
   export interface Palette {
     importantLink: PaletteColor;
     code: {
@@ -171,67 +179,47 @@ export const useCreateTheme = (mode: PaletteType) => {
         typography: {
           fontFamily,
           h1: {
-            fontSize: 32,
-            lineHeight: 1.5,
+            fontSize: 64,
+            lineHeight: 1,
             fontWeight: 500,
-            color: colors.text?.primary,
-            letterSpacing: '-0.02em',
+            color: colors.text.primary,
+            letterSpacing: '-1%',
           },
           h2: {
-            fontSize: 24,
+            fontSize: 40,
             lineHeight: 1,
             fontWeight: 500,
             color: colors.text?.primary,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-1%',
           },
           h3: {
-            fontSize: 17,
-            lineHeight: 1.5,
+            fontSize: 32,
+            lineHeight: '36px',
             fontWeight: 500,
-            letterSpacing: '-0.02em',
           },
           h4: {
-            fontSize: 16,
-            lineHeight: 1.5,
+            fontSize: 20,
+            lineHeight: '24px',
             fontWeight: 500,
-            letterSpacing: '-0.02em',
-          },
-          h5: {
-            fontSize: 15,
-            lineHeight: 1.5,
-            fontWeight: 500,
-            letterSpacing: '-0.02em',
-          },
-          h6: {
-            fontSize: 14,
-            lineHeight: 1.5,
-            fontWeight: 500,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-1%',
           },
           body1: {
             fontSize: 16,
             lineHeight: '24px',
             fontWeight: 500,
-            letterSpacing: '-0.02em',
           },
           body2: {
-            fontSize: 16,
-            lineHeight: '24px',
-            fontWeight: 500,
-            letterSpacing: '-0.02em',
-          },
-          caption: {
-            fontSize: 11,
-            lineHeight: '16px',
-            fontWeight: 500,
-            letterSpacing: '-0.02em',
+            color: colors.text.secondary,
+            fontSize: 14,
+            lineHeight: '20px',
           },
           button: {
-            fontSize: '16px',
+            fontSize: '14px',
             lineHeight: '24px',
-            fontWeight: 500,
-            color: '#fff',
+            fontWeight: 600,
+            letterSpacing: '8%',
           },
+          caption: {},
         },
         palette: {
           mode,
@@ -300,21 +288,28 @@ export const useCreateTheme = (mode: PaletteType) => {
                 textTransform: 'none',
                 transition: 'all 300ms ease-out',
                 borderRadius: 360,
+                boxShadow: 'none',
+                textShadow: 'none',
+                '&:hover': {
+                  boxShadow: 'none',
+                  textShadow: 'none',
+                },
+                '&:focus': {
+                  boxShadow: 'none',
+                  textShadow: 'none',
+                },
               },
-              // sizeSmall: {
-              //   minHeight: 36,
-              //   fontSize: '1rem',
-              //   fontWeight: 500,
-              //   paddingLeft: spacing * 2,
-              //   paddingRight: spacing * 2,
-              // },
-              // sizeLarge: {
-              //   minHeight: 52,
-              //   borderRadius: 8,
-              // },
 
               outlined: {
                 color: colors.text.primary,
+              },
+
+              outlinedSecondary: {
+                borderColor: colors.secondary.main,
+              },
+
+              outlinedError: {
+                borderColor: colors.error.main,
               },
 
               // contained: {
@@ -362,6 +357,13 @@ export const useCreateTheme = (mode: PaletteType) => {
               },
             },
           },
+          MuiCard: {
+            styleOverrides: {
+              root: {
+                padding: 1.5 * spacing,
+              },
+            },
+          },
           MuiFilledInput: {
             styleOverrides: {
               root: {
@@ -389,6 +391,11 @@ export const useCreateTheme = (mode: PaletteType) => {
                 '&:after': {
                   display: 'none',
                 },
+                // '&:active': {
+                //   borderStyle: 'solid',
+                //   borderWidth: '1px',
+                //   borderColor: colors.divider,
+                // },
                 borderRadius: 360,
               },
               // sizeSmall: {
@@ -426,10 +433,32 @@ export const useCreateTheme = (mode: PaletteType) => {
                 maxWidth: 400,
                 padding: `${spacing * 0.5}px ${spacing}px`,
                 boxShadow: `0px 2px 4px 0px rgba(0, 0, 0, 0.20)`,
-                // border: `1px solid ${alpha(colors.text.primary, 0.2)}`,
+                borderStyle: 'solid',
+                borderWidth: '1px',
+                borderColor: colors.divider,
               },
               arrow: {
                 display: 'none',
+              },
+            },
+          },
+          MuiChip: {
+            styleOverrides: {
+              root: {
+                fontSize: '14px',
+                fontWeight: 500,
+                lineHeight: '24px',
+                height: 24,
+              },
+
+              label: {
+                margin: 0,
+                padding: `0px ${spacing}px`,
+              },
+
+              icon: {
+                margin: `0px ${-1.5 * spacing}px 0px 0px`,
+                padding: `0px ${spacing}px`,
               },
             },
           },
