@@ -13,10 +13,11 @@ export const Loader = ({
     return (
       <Box
         sx={{
-          minHeight,
+          height: 1,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          flex: 1,
           // '& .subsquid-loader:after': {
           //   backgroundColor: theme.palette.primary.main,
           // },
@@ -25,7 +26,7 @@ export const Loader = ({
         {/* <div className="show visible">
           <div className="subsquid-loader"></div>
         </div> */}
-        <CircularProgress color="primary" />
+        <CircularProgress color="secondary" />
       </Box>
     );
   }

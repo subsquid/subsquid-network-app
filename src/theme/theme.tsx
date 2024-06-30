@@ -463,25 +463,17 @@ export const useCreateTheme = (mode: PaletteType) => {
               },
             },
           },
+          MuiDialog: {
+            styleOverrides: {
+              container: {},
+              paper: {
+                boxShadow: 'none',
+                background: colors.background.default,
+              },
+            },
+          },
         },
         // components: {
-        //   MuiAvatar: {
-        //     styleOverrides: {
-        //       root: {
-        //         // border: `1px solid ${borderColor}`,
-        //       },
-        //       colorDefault: {
-        //         background: colors.primary.main,
-        //         overflow: 'hidden',
-        //         '& svg': {
-        //           transform: 'scale(1.5) translateY(3px)',
-        //           '& path': {
-        //             fill: colors.primary.contrastText,
-        //           },
-        //         },
-        //       },
-        //     },
-        //   },
 
         //   MuiTabs: {
         //     styleOverrides: {
@@ -658,14 +650,6 @@ export const useCreateTheme = (mode: PaletteType) => {
         //         sx: {
         //           marginTop: 1,
         //         },
-        //       },
-        //     },
-        //   },
-        //   MuiDialog: {
-        //     styleOverrides: {
-        //       container: {},
-        //       paper: {
-        //         boxShadow: 'none',
         //       },
         //     },
         //   },

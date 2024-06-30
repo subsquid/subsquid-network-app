@@ -6,7 +6,7 @@ import {
   tokenFormatter,
 } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
-import { Box, Card, Divider, Stack, SxProps, Typography, useTheme } from '@mui/material';
+import { Box, Card, Divider, Stack, SxProps, Typography } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 
 import { useNetworkSummary } from '@api/subsquid-network-squid';
@@ -29,50 +29,48 @@ export function ColumnValue({ children }: PropsWithChildren) {
 export function SummarySection({
   title,
   action,
-  content,
   sx,
-}: {
+  children,
+  loading,
+}: PropsWithChildren<{
   title?: React.ReactNode;
   action?: React.ReactNode;
-  content?: React.ReactNode;
   sx?: SxProps;
-}) {
+  loading?: boolean;
+}>) {
   return (
-    <Card
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: '100%',
-        ...sx,
-      }}
-    >
-      <Box display="flex" justifyContent="space-between">
-        <Box display="flex" justifyContent="flex-start">
-          {title}
-        </Box>
-        <Box display="flex" justifyContent="flex-end">
-          {action}
-        </Box>
-      </Box>
+    <Card sx={sx}>
       <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="flex-start"
-        alignContent="stretch"
-        alignSelf="stretch"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: 1,
+        }}
       >
-        {content}
+        <Box display="flex" justifyContent="space-between">
+          <Box display="flex" justifyContent="flex-start">
+            {title}
+          </Box>
+          <Box display="flex" justifyContent="flex-end">
+            {action}
+          </Box>
+        </Box>
+        <Box display="flex" justifyContent="stretch" alignItems="flex-end" flex={1}>
+          {loading ? <Loader /> : children}
+        </Box>
       </Box>
     </Card>
   );
 }
 
 function OnlineInfo() {
-  const { data } = useNetworkSummary();
+  const { data, isLoading } = useNetworkSummary();
 
   return (
     <SummarySection
+      sx={{ height: 1 }}
+      loading={isLoading}
       title={<SquaredChip label="Workers Online" color="primary" />}
       action={
         <Stack direction="row" spacing={1}>
@@ -80,20 +78,19 @@ function OnlineInfo() {
           <SquaredChip label={bytesFormatter(data?.storedData)} color="info" />
         </Stack>
       }
-      content={
-        <Box display="flex">
-          <Typography variant="h1">{data?.onlineWorkersCount || 0}</Typography>
-          <Typography variant="h1" color={theme => theme.palette.text.disabled}>
-            /{data?.workersCount || 0}
-          </Typography>
-        </Box>
-      }
-    />
+    >
+      <Box display="flex">
+        <Typography variant="h1">{data?.onlineWorkersCount || 0}</Typography>
+        <Typography variant="h1" color={theme => theme.palette.text.disabled}>
+          /{data?.workersCount || 0}
+        </Typography>
+      </Box>
+    </SummarySection>
   );
 }
 
 function CurrentEpoch() {
-  const { data } = useNetworkSummary();
+  const { data, isLoading } = useNetworkSummary();
 
   const [epochEnd, setEpochEnd] = useState<number>(Date.now());
   const [curTime, setCurTime] = useState(Date.now());
@@ -140,6 +137,8 @@ function CurrentEpoch() {
 
   return (
     <SummarySection
+      sx={{ height: 1 }}
+      loading={isLoading}
       title={<SquaredChip label="Current epoch" color="primary" />}
       action={
         <Stack direction="row" spacing={1}>
@@ -150,35 +149,34 @@ function CurrentEpoch() {
           />
         </Stack>
       }
-      content={
-        <Box fontSize={64} lineHeight="64px">
-          {data?.epoch?.number || 0}
-        </Box>
-      }
-    />
+    >
+      <Box fontSize={64} lineHeight="64px">
+        {data?.epoch?.number || 0}
+      </Box>
+    </SummarySection>
   );
 }
 
 function Stats() {
-  const { data } = useNetworkSummary();
+  const { data, isLoading } = useNetworkSummary();
   const { SQD_TOKEN } = useContracts();
 
   return (
     <SummarySection
+      loading={isLoading}
+      sx={{ height: 1 }}
       title={<SquaredChip label="Other Data" color="primary" />}
-      content={
-        <Stack divider={<Divider />} spacing={1} flex={1}>
-          <Box>
-            <ColumnLabel>Total bond</ColumnLabel>
-            <ColumnValue>{tokenFormatter(fromSqd(data?.totalBond), SQD_TOKEN, 3)}</ColumnValue>
-          </Box>
-          <Box>
-            <ColumnLabel>Total delegation</ColumnLabel>
-            <ColumnValue>
-              {tokenFormatter(fromSqd(data?.totalDelegation), SQD_TOKEN, 3)}
-            </ColumnValue>
-          </Box>
-          {/* <Box>
+    >
+      <Stack divider={<Divider />} spacing={1}>
+        <Box>
+          <ColumnLabel>Total bond</ColumnLabel>
+          <ColumnValue>{tokenFormatter(fromSqd(data?.totalBond), SQD_TOKEN, 3)}</ColumnValue>
+        </Box>
+        <Box>
+          <ColumnLabel>Total delegation</ColumnLabel>
+          <ColumnValue>{tokenFormatter(fromSqd(data?.totalDelegation), SQD_TOKEN, 3)}</ColumnValue>
+        </Box>
+        {/* <Box>
             <WorkerColumnLabel>Worker APR</WorkerColumnLabel>
             <WorkerColumnValue>{percentFormatter(data?.workerApr)}</WorkerColumnValue>
           </Box>
@@ -186,69 +184,64 @@ function Stats() {
             <WorkerColumnLabel>Delegator APR</WorkerColumnLabel>
             <WorkerColumnValue>{percentFormatter(data?.stakerApr)}</WorkerColumnValue>
           </Box> */}
-          <Box>
-            <ColumnLabel>Queries, 24h / 90d</ColumnLabel>
-            <ColumnValue>
-              {numberWithSpacesFormatter(data?.queries24Hours)} /{' '}
-              {numberWithSpacesFormatter(data?.queries90Days)}
-            </ColumnValue>
-          </Box>
-          <Box>
-            <ColumnLabel>Data served, 24h / 90d</ColumnLabel>
-            <ColumnValue>
-              {bytesFormatter(data?.servedData24Hours)} / {bytesFormatter(data?.servedData90Days)}
-            </ColumnValue>
-          </Box>
-        </Stack>
-      }
-    />
+        <Box>
+          <ColumnLabel>Queries, 24h / 90d</ColumnLabel>
+          <ColumnValue>
+            {numberWithSpacesFormatter(data?.queries24Hours)} /{' '}
+            {numberWithSpacesFormatter(data?.queries90Days)}
+          </ColumnValue>
+        </Box>
+        <Box>
+          <ColumnLabel>Data served, 24h / 90d</ColumnLabel>
+          <ColumnValue>
+            {bytesFormatter(data?.servedData24Hours)} / {bytesFormatter(data?.servedData90Days)}
+          </ColumnValue>
+        </Box>
+      </Stack>
+    </SummarySection>
   );
 }
 
 export function NetworkSummary() {
-  const { isLoading } = useNetworkSummary();
-  const theme = useTheme();
-
   return (
-    <Box minHeight={528} mb={2}>
-      {!isLoading ? (
-        <>
-          <Grid container spacing={2} disableEqualOverflow sx={{ minHeight: 'inherit' }}>
-            <Grid container xxs={8}>
-              <Grid xxs={6}>
-                <OnlineInfo />
-              </Grid>
-              <Grid xxs={6}>
-                <CurrentEpoch />
-              </Grid>
-              <Grid xxs={6}>
-                <SummarySection
-                  title={<SquaredChip label="Worker APR" color="primary" />}
-                  action="Last 14 days"
-                  content={
-                    <Box display="flex" fontSize={20}>
-                      No Data
-                    </Box>
-                  }
-                />
-              </Grid>
-              <Grid xxs={6}>
-                <SummarySection
-                  title={<SquaredChip label="Delegator APR" color="primary" />}
-                  action="Last 14 days"
-                  content={
-                    <Box display="flex" fontSize={20}>
-                      No Data
-                    </Box>
-                  }
-                />
-              </Grid>
+    <Box minHeight={528} mb={2} display="flex">
+      <>
+        <Grid container spacing={2} disableEqualOverflow flex={1}>
+          <Grid container xxs={8}>
+            <Grid xxs={6} minHeight={0.5}>
+              <OnlineInfo />
             </Grid>
-            <Grid xxs={4}>
-              <Stats />
+            <Grid xxs={6} minHeight={0.5}>
+              <CurrentEpoch />
+            </Grid>
+            <Grid xxs={6} minHeight={0.5}>
+              <SummarySection
+                sx={{ height: 1 }}
+                title={<SquaredChip label="Worker APR" color="primary" />}
+                action="Last 14 days"
+              >
+                <Box display="flex" fontSize={20}>
+                  No Data
+                </Box>
+              </SummarySection>
+            </Grid>
+            <Grid xxs={6} minHeight={0.5}>
+              <SummarySection
+                sx={{ height: 1 }}
+                title={<SquaredChip label="Delegator APR" color="primary" />}
+                action="Last 14 days"
+              >
+                <Box display="flex" fontSize={20}>
+                  No Data
+                </Box>
+              </SummarySection>
             </Grid>
           </Grid>
-          {/* <Box height={500}>
+          <Grid xxs={4}>
+            <Stats />
+          </Grid>
+        </Grid>
+        {/* <Box height={500}>
             <ResponsiveChartContainer
               series={[
                 {
@@ -280,10 +273,7 @@ export function NetworkSummary() {
               </defs>
             </ResponsiveChartContainer>
           </Box> */}
-        </>
-      ) : (
-        <Loader />
-      )}
+      </>
     </Box>
   );
 }

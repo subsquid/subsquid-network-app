@@ -15,12 +15,12 @@ import {
   useTheme,
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
+import { PieChart } from '@mui/x-charts/PieChart';
 import BigNumber from 'bignumber.js';
 
 import { useMyAssets } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
-import { Loader } from '@components/Loader';
 import { useContracts } from '@network/useContracts';
 import { ColumnLabel, ColumnValue, SummarySection } from '@pages/DashboardPage/Summary';
 
@@ -69,6 +69,24 @@ function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: Bi
       alignItems="flex-end"
       flex={1}
     >
+      <Box display="flex" pr={7} pb={3} alignItems="center">
+        <PieChart
+          series={[
+            {
+              data: balances.map(i => ({ id: i.name, value: i.value.toNumber(), color: i.color })),
+              outerRadius: 120,
+              innerRadius: 60,
+              valueFormatter: v => tokenFormatter(v.value, SQD_TOKEN, 3),
+              cx: 128,
+              cy: 128,
+            },
+          ]}
+          width={256}
+          height={256}
+          skipAnimation
+        />
+      </Box>
+
       {/* <PieChart width={210} height={210}>
         <Pie
           data={balances.map(i => ({ name: i.name, value: i.value.toNumber() }))}
@@ -95,7 +113,9 @@ function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: Bi
       <Box mb={1}>
         <SquaredChip label="Total" color="primary" />
       </Box>
-      <Typography variant="h2">{tokenFormatter(total, SQD_TOKEN, 3)}</Typography>
+      <Typography variant="h2" textAlign="end">
+        {tokenFormatter(total, SQD_TOKEN, 3)}
+      </Typography>
     </Box>
   );
 }
@@ -154,36 +174,34 @@ export function MyAssets() {
   );
 
   return (
-    <Box minHeight={448} mb={2}>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <SummarySection
-          sx={{ minHeight: 'inherit' }}
-          title={<SquaredChip label="My Assets" color="primary" />}
-          action={<ClaimButton />}
-          content={
-            <Grid container spacing={2} disableEqualOverflow>
-              <Grid xxs={4}>
-                <Stack divider={<Divider />} spacing={1} flex={1} justifyContent="flex-end">
-                  <TokenBalance balance={data[0]} />
-                  <TokenBalance balance={data[1]} />
-                  <TokenBalance balance={data[2]} />
-                </Stack>
-              </Grid>
-              <Grid xxs={4} display="flex" alignContent="stretch">
-                <Stack divider={<Divider />} spacing={1} flex={1} justifyContent="flex-end">
-                  <TokenBalance balance={data[3]} />
-                  <TokenBalance balance={data[4]} />
-                </Stack>
-              </Grid>
-              <Grid xxs={4} display="flex" alignContent="stretch">
-                <TotalBalance balances={data} total={fromSqd(assets.total)} />
-              </Grid>
-            </Grid>
-          }
-        />
-      )}
+    <Box minHeight={448} mb={2} display="flex">
+      <SummarySection
+        loading={isLoading}
+        sx={{ width: 1 }}
+        title={<SquaredChip label="My Assets" color="primary" />}
+        action={<ClaimButton />}
+      >
+        <Grid container spacing={2} disableEqualOverflow flex={1}>
+          <Grid xxs={4}>
+            <Stack divider={<Divider />} spacing={1} height={1} justifyContent="flex-end">
+              <TokenBalance balance={data[0]} />
+              <TokenBalance balance={data[1]} />
+              <TokenBalance balance={data[2]} />
+            </Stack>
+          </Grid>
+          <Grid xxs={4}>
+            <Stack divider={<Divider />} spacing={1} height={1} justifyContent="flex-end">
+              <TokenBalance balance={data[3]} />
+              <TokenBalance balance={data[4]} />
+            </Stack>
+          </Grid>
+          <Grid xxs={4}>
+            <Box display="flex" alignItems="flex-end" height={1}>
+              <TotalBalance balances={data} total={fromSqd(assets.total)} />
+            </Box>
+          </Grid>
+        </Grid>
+      </SummarySection>
     </Box>
   );
 }

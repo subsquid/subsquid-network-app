@@ -184,7 +184,9 @@ export function Workers() {
           )}
         </TableBody>
       </DashboardTable>
-      <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
+      {isLoading ? null : (
+        <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
+      )}
     </Box>
   );
 }
