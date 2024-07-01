@@ -12,14 +12,14 @@ export function percentFormatter(value?: number | string | BigNumber) {
   return `${value.lt(0.01) && value.gt(0) ? '<0.01' : value.toFixed(2)}%`;
 }
 
-const formatter8 = new Intl.NumberFormat('fr-FR', {
+const formatter8 = new Intl.NumberFormat('en', {
   maximumFractionDigits: 8,
 });
 
-export function numberWithSpacesFormatter(val?: number | string) {
+export function numberWithCommasFormatter(val?: number | string) {
   if (val === undefined) return '';
 
-  return formatter8.format(Number(val)).replace(',', '.');
+  return formatter8.format(Number(val));
 }
 
 export function bytesFormatter(val?: number | string) {

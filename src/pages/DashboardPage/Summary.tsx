@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 
 import {
   bytesFormatter,
-  numberWithSpacesFormatter,
+  numberWithCommasFormatter,
   percentFormatter,
   tokenFormatter,
 } from '@lib/formatters/formatters';
@@ -199,8 +199,8 @@ function Stats() {
         <Box>
           <ColumnLabel>Queries, 24h / 90d</ColumnLabel>
           <ColumnValue>
-            {numberWithSpacesFormatter(data?.queries24Hours)} /{' '}
-            {numberWithSpacesFormatter(data?.queries90Days)}
+            {numberWithCommasFormatter(data?.queries24Hours)} /{' '}
+            {numberWithCommasFormatter(data?.queries90Days)}
           </ColumnValue>
         </Box>
         <Box>

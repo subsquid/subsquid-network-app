@@ -1,7 +1,7 @@
 import { dateFormat } from '@i18n';
 import {
   bytesFormatter,
-  numberWithSpacesFormatter,
+  numberWithCommasFormatter,
   percentFormatter,
   tokenFormatter,
   urlFormatter,
@@ -218,8 +218,8 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                   <Stack direction="row">
                     <WorkerDescLabel>Queries, 24h / 90d</WorkerDescLabel>
                     <WorkerDescValue>
-                      {numberWithSpacesFormatter(worker.queries24Hours)} /{' '}
-                      {numberWithSpacesFormatter(worker.queries90Days)}
+                      {numberWithCommasFormatter(worker.queries24Hours)} /{' '}
+                      {numberWithCommasFormatter(worker.queries90Days)}
                     </WorkerDescValue>
                   </Stack>
                   <Stack direction="row">
