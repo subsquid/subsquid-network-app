@@ -3,11 +3,13 @@ import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import {
   bytesFormatter,
   numberWithSpacesFormatter,
+  percentFormatter,
   tokenFormatter,
 } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
-import { Box, Card, Divider, Stack, SxProps, Typography } from '@mui/material';
+import { alpha, Box, Card, Divider, Stack, SxProps, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
+import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 
 import { useNetworkSummary } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
@@ -202,6 +204,118 @@ function Stats() {
   );
 }
 
+function AprTooltip({ active, payload }: TooltipProps<number, string>) {
+  return active && payload?.length ? (
+    <SquaredChip
+      label={percentFormatter(payload[0].value)}
+      color="info"
+      sx={{ transform: 'translateX(-50%)' }}
+    />
+  ) : null;
+}
+
+function AprChart({ data }: { data: { value: number }[] }) {
+  const theme = useTheme();
+
+  return (
+    <ResponsiveContainer width="200%" height="85%" style={{ margin: theme.spacing(-1.5) }}>
+      <AreaChart
+        width={200}
+        height={60}
+        data={data}
+        defaultShowTooltip
+        margin={{
+          top: 24,
+          right: 0,
+          left: 0,
+          bottom: 0,
+        }}
+      >
+        <defs>
+          <linearGradient id="area-gradient" x2="0" y2="1">
+            <stop offset="0%" stopColor={theme.palette.info.main} />
+            <stop offset="100%" stopColor={alpha(theme.palette.info.main, 0.25)} />
+          </linearGradient>
+        </defs>
+        <Tooltip
+          content={<AprTooltip />}
+          animationDuration={0}
+          cursor={{
+            stroke: theme.palette.text.secondary,
+            strokeWidth: 2,
+            strokeDasharray: 6,
+          }}
+          defaultIndex={data.length - 2}
+          active
+          allowEscapeViewBox={{ x: true }}
+          position={{ y: -6 }}
+          wrapperStyle={{
+            zIndex: theme.zIndex.tooltip,
+          }}
+          offset={0}
+        />
+        <Area
+          animationDuration={0}
+          type="linear"
+          dataKey="value"
+          stroke={theme.palette.info.main}
+          strokeWidth={theme.spacing(0.5)}
+          fill="url(#area-gradient)"
+          activeDot={{
+            strokeWidth: 0,
+          }}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
+function WorkersApr() {
+  const { data, isLoading } = useNetworkSummary();
+
+  const aprs = useMemo(() => {
+    if (!data) return [];
+
+    return data.aprs.map((apr, i) => ({
+      value: i === data.aprs.length - 1 ? (apr.workerApr + data.workerApr) / 2 : apr.workerApr,
+    }));
+  }, [data]);
+
+  return (
+    <SummarySection
+      loading={isLoading}
+      sx={{ height: 1, overflow: 'visible' }}
+      title={<SquaredChip label="Worker APR" color="primary" />}
+      action="Last 14 days"
+    >
+      <AprChart data={aprs} />
+    </SummarySection>
+  );
+}
+
+function DelegatorsApr() {
+  const { data, isLoading } = useNetworkSummary();
+
+  const aprs = useMemo(() => {
+    if (!data) return [];
+
+    return data.aprs.map((apr, i) => ({
+      value: i === data.aprs.length - 1 ? (apr.stakerApr + data.stakerApr) / 2 : apr.stakerApr,
+    }));
+  }, [data]);
+
+  return (
+    <SummarySection
+      loading={isLoading}
+      sx={{ height: 1, overflow: 'visible' }}
+      title={<SquaredChip label="Delegator APR" color="primary" />}
+      action="Last 14 days"
+    >
+      <AprChart data={aprs || []} />
+    </SummarySection>
+  );
+}
+
 export function NetworkSummary() {
   return (
     <Box minHeight={528} mb={2} display="flex">
@@ -215,63 +329,19 @@ export function NetworkSummary() {
               <CurrentEpoch />
             </Grid>
             <Grid xxs={6} minHeight={0.5}>
-              <SummarySection
-                sx={{ height: 1 }}
-                title={<SquaredChip label="Worker APR" color="primary" />}
-                action="Last 14 days"
-              >
-                <Box display="flex" fontSize={20}>
-                  No Data
-                </Box>
-              </SummarySection>
+              <WorkersApr />
             </Grid>
             <Grid xxs={6} minHeight={0.5}>
-              <SummarySection
-                sx={{ height: 1 }}
-                title={<SquaredChip label="Delegator APR" color="primary" />}
-                action="Last 14 days"
-              >
-                <Box display="flex" fontSize={20}>
-                  No Data
-                </Box>
-              </SummarySection>
+              <DelegatorsApr />
             </Grid>
           </Grid>
           <Grid xxs={4}>
             <Stats />
           </Grid>
         </Grid>
+
         {/* <Box height={500}>
-            <ResponsiveChartContainer
-              series={[
-                {
-                  data: [2, 5.5, 2, 8.5, 1.5, 5],
-                  type: 'line',
-                  area: true,
-                  curve: 'linear',
-                  color: theme.palette.info.main,
-                },
-              ]}
-              xAxis={[
-                {
-                  data: [1, 2, 3, 4, 5, 6],
-                },
-              ]}
-              sx={{
-                [`& .${areaElementClasses.root}`]: {
-                  fill: 'url(#area-gradient)',
-                },
-              }}
-            >
-              <LinePlot></LinePlot>
-              <AreaPlot></AreaPlot>
-              <defs>
-                <linearGradient id="area-gradient" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#e66465" />
-                  <stop offset="100%" stopColor="#9198e5" />
-                </linearGradient>
-              </defs>
-            </ResponsiveChartContainer>
+            
           </Box> */}
       </>
     </Box>

@@ -15,8 +15,8 @@ import {
   useTheme,
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
-import { PieChart } from '@mui/x-charts/PieChart';
 import BigNumber from 'bignumber.js';
+import { Cell, Pie, PieChart } from 'recharts';
 
 import { useMyAssets } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
@@ -69,7 +69,7 @@ function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: Bi
       alignItems="flex-end"
       flex={1}
     >
-      <Box display="flex" pr={7} pb={3} alignItems="center">
+      {/* <Box display="flex" pr={7} pb={3} alignItems="center">
         <PieChart
           series={[
             {
@@ -85,31 +85,28 @@ function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: Bi
           height={256}
           skipAnimation
         />
+      </Box> */}
+      <Box mb={4} mr={7}>
+        <PieChart width={240} height={240}>
+          <Pie
+            data={balances.map(i => ({ name: i.name, value: i.value.toNumber() }))}
+            animationDuration={0}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={120}
+            nameKey="name"
+            dataKey="value"
+            style={{ outline: 'none' }}
+          >
+            {balances.map(i => (
+              <Cell key={i.name} fill={i.color} strokeWidth={0} />
+            ))}
+          </Pie>
+        </PieChart>
       </Box>
 
-      {/* <PieChart width={210} height={210}>
-        <Pie
-          data={balances.map(i => ({ name: i.name, value: i.value.toNumber() }))}
-          animationBegin={0}
-          animationDuration={0}
-          cx="50%"
-          cy="50%"
-          innerRadius={60}
-          outerRadius={105}
-          nameKey="name"
-          dataKey="value"
-        >
-          {balances.map(i => (
-            <Cell
-              onClick={e => {
-                e.preventDefault();
-              }}
-              key={i.name}
-              fill={i.background}
-            />
-          ))}
-        </Pie>
-      </PieChart> */}
+      {/*  */}
       <Box mb={1}>
         <SquaredChip label="Total" color="primary" />
       </Box>

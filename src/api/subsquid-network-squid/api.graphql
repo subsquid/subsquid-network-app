@@ -342,6 +342,11 @@ query networkSummary {
     storedData
     workerApr
     workersCount
+    aprs {
+      stakerApr
+      timestamp
+      workerApr
+    }
   }
 }
 
