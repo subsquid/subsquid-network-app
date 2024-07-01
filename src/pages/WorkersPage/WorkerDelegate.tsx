@@ -10,10 +10,10 @@ import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
 import { useCapedStakeAfterDelegation, useWorkerDelegate } from '@api/contracts/staking';
-import { Worker, WorkerStatus, useWorkerDelegationInfo } from '@api/subsquid-network-squid';
+import { useWorkerDelegationInfo, Worker, WorkerStatus } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
+import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
@@ -182,10 +182,11 @@ export function WorkerDelegate({
                 }}
               />
             </FormRow>
+            <FormDivider />
             <Stack direction="row" justifyContent="space-between" alignContent="center">
               <Box>Expected APR</Box>
-              <Stack direction="row">
-                {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
                 <HelpTooltip title={EXPECTED_APR_TIP} />
               </Stack>
             </Stack>

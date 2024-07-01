@@ -78,7 +78,7 @@ export function FormikTextInput({
       : null;
 
   return (
-    <FormControl variant="standard">
+    <FormControl fullWidth variant="standard">
       <InputLabel shrink>{label}</InputLabel>
       <TextField
         id={id}

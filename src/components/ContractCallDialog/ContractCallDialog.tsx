@@ -13,7 +13,7 @@ export function ContractCallDialog({
   open,
   maxWidth,
   minWidth = 600,
-  confirmColor = 'primary',
+  confirmColor = 'info',
   confirmButtonText = title,
   cancelButtonText = 'Cancel',
   hideCancelButton = true,

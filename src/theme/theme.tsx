@@ -373,13 +373,10 @@ export const useCreateTheme = (mode: PaletteType) => {
               root: {
                 transition: 'all 300ms ease-out',
 
-                // '& .MuiSelect-select.MuiSelect-filled': {
-                //   paddingTop: 0,
-                //   paddingBottom: spacing,
-                // },
-                // '& input': {
-                //   fontSize: '0.875rem',
-                // },
+                '& .MuiSelect-select.MuiSelect-filled': {
+                  paddingTop: '10px !important',
+                  paddingBottom: '10px !important',
+                },
 
                 // '&:hover': {
                 //   background: colors.background?.input,
@@ -404,33 +401,34 @@ export const useCreateTheme = (mode: PaletteType) => {
                 borderStyle: 'solid',
                 borderWidth: '1px',
                 borderColor: colors.divider,
-
                 backgroundColor: colors.background.paper,
               },
-              // sizeSmall: {
-              //   '& .MuiSelect-select.MuiSelect-filled': {
-              //     paddingTop: 6,
-              //     paddingBottom: 6,
-              //   },
-              // },
+              sizeSmall: {
+                '& .MuiSelect-select.MuiSelect-filled': {
+                  paddingTop: 6,
+                  paddingBottom: 6,
+                },
+              },
 
-              // inputTypeSearch: {},
-              // input: {
-              //   paddingTop: 22,
-              //   '&:-webkit-autofill': {
-              //     // backgroundClip: 'text',
-              //     // fontFamily,
-              //   },
-              // },
-              // inputHiddenLabel: {
-              //   paddingTop: `${spacing}px !important`,
-              //   paddingBottom: `${spacing}px !important`,
-              // },
-              // inputMultiline: {
-              //   paddingTop: 0,
-              // },
+              inputTypeSearch: {},
               input: {
-                padding: spacing,
+                paddingTop: 10,
+                paddingBottom: 10,
+                '&:-webkit-autofill': {
+                  // backgroundClip: 'text',
+                  // fontFamily,
+                },
+              },
+              inputHiddenLabel: {
+                paddingTop: `${spacing}px !important`,
+                paddingBottom: `${spacing}px !important`,
+              },
+              multiline: {
+                paddingTop: 10,
+                paddingBottom: 10,
+              },
+              inputMultiline: {
+                paddingTop: 0,
               },
             },
           },
@@ -445,6 +443,17 @@ export const useCreateTheme = (mode: PaletteType) => {
             },
             defaultProps: {
               // IconComponent: KeyboardArrowDownIcon,
+            },
+          },
+          MuiFormHelperText: {
+            styleOverrides: {
+              root: {
+                marginLeft: 0,
+                marginRight: 0,
+                '&.Mui-error': {
+                  // color: colors.error.contrastText,
+                },
+              },
             },
           },
           MuiTooltip: {
@@ -563,17 +572,7 @@ export const useCreateTheme = (mode: PaletteType) => {
         //       },
         //     },
         //   },
-        //   MuiFormHelperText: {
-        //     styleOverrides: {
-        //       root: {
-        //         marginLeft: 0,
-        //         marginRight: 0,
-        //         '&.Mui-error': {
-        //           // color: colors.error.contrastText,
-        //         },
-        //       },
-        //     },
-        //   },
+
         //   MuiInputLabel: {
         //     styleOverrides: {
         //       root: {

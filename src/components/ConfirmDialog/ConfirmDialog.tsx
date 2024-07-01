@@ -1,6 +1,5 @@
 import React, { PropsWithChildren, SyntheticEvent } from 'react';
 
-import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from '@mui/lab';
 import {
   Box,
@@ -13,7 +12,9 @@ import {
   useTheme,
 } from '@mui/material';
 
+import SquaredChip from '@components/Chip/SquaredChip.tsx';
 import { Dialog } from '@components/Dialog';
+import { CloseIcon } from '@icons/CloseIcon.tsx';
 
 export const ConfirmWrapper = styled(Box, {
   name: 'ConfirmWrapper',
@@ -58,6 +59,7 @@ export const Actions = styled(Box)(({ theme: { spacing, breakpoints } }) => ({
   padding: 0,
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'flex-end',
   gap: spacing(2),
   margin: spacing(4, 4),
   '* > :not(:first-of-type)': {
@@ -73,7 +75,7 @@ export type ConfirmDialogProps = {
   open: boolean;
   maxWidth?: string | number;
   minWidth?: string | number;
-  confirmColor?: 'primary' | 'error' | 'success';
+  confirmColor?: 'primary' | 'error' | 'success' | 'info';
   confirmButtonText?: string;
   cancelButtonText?: string;
   disableBackdropClick?: boolean;
@@ -91,7 +93,7 @@ export function ConfirmDialog({
   open,
   maxWidth = 440,
   minWidth = 440,
-  confirmColor = 'primary',
+  confirmColor = 'info',
   confirmButtonText = 'Confirm',
   cancelButtonText = 'Cancel',
   disableBackdropClick = false,
@@ -126,7 +128,7 @@ export function ConfirmDialog({
         }}
       >
         <ConfirmDialogTitle>
-          {title}
+          <SquaredChip label={title} color="primary" />
           <CloseIconButton onClick={onReject}>
             <CloseIcon />
           </CloseIconButton>
@@ -136,14 +138,13 @@ export function ConfirmDialog({
         </Content>
         <Actions>
           {!hideCancelButton ? (
-            <Button onClick={onReject} fullWidth size="large" variant="contained" color="info">
+            <Button onClick={onReject} fullWidth size="large" variant="contained" color="primary">
               {cancelButtonText}
             </Button>
           ) : null}
           {!hideConfirmButton ? (
             <LoadingButton
               onClick={handleApprove}
-              fullWidth
               disabled={disableConfirmButton}
               size="large"
               loading={loading}

@@ -6,3 +6,4 @@ export * from './FormikCheckBoxInput';
 export * from './ClickableTextField';
 export * from './FormikSelect';
 export * from './FormikSwitch';
+export * from './FormDivider';
