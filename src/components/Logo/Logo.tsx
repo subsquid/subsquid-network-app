@@ -1,16 +1,17 @@
 import React from 'react';
 
 import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
-import { upperFirst } from 'lodash-es';
 
 import { getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
+import { LogoCompact } from './LogoCompact';
+import { LogoFull } from './LogoFull';
+
 export const LogoWrapper = styled('div', {
   name: 'LogoWrapper',
-})(({theme}) => ({
+})(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
   '& img': {
     // display: 'block',
     // marginRight: 2,
@@ -41,14 +42,15 @@ export const LogoSecondary = styled(Box, {
 
 export function Logo({ color = '#fff' }: { color?: string }) {
   const theme = useTheme();
-  const narrow = useMediaQuery(theme.breakpoints.down('lg'));
+  const compact = useMediaQuery(theme.breakpoints.down('xl'));
   const size = 40;
 
   const network = getSubsquidNetwork();
 
   return (
     <LogoWrapper>
-      <img width={size} height={size} src="/logo.png" />
+      {compact ? <LogoCompact /> : <LogoFull />}
+      {/* <img width={size} height={size} src="/logo.png" /> */}
       {/* {!narrow ? (
         <>
           <LogoPrimary sx={{ color }}>SUBSQUID</LogoPrimary>

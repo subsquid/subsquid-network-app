@@ -1,12 +1,11 @@
 import React, { ForwardedRef, forwardRef } from 'react';
 
-import { Box, Button, styled } from '@mui/material';
+import { Box, Button, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useIsWorkerOperator } from '@api/subsquid-network-squid';
 import { ContactsIcon } from '@icons/ContactsIcon';
 import { DashboardIcon } from '@icons/DashboardIcon';
-import { DoorIcon } from '@icons/DoorIcon';
 import { HandIcon } from '@icons/HandIcon';
 import { NetworkNodeIcon } from '@icons/NetworkNodeIcon';
 import { OpenInNewIcon } from '@icons/OpenInNewIcon';
@@ -17,28 +16,38 @@ interface NetworkMenuProps {
   onItemClick: () => void;
 }
 
-const MenuItem = styled(Button)(({ theme: { palette, spacing } }) => ({
+const MenuItem = styled(Button)(({ theme: { palette, spacing, breakpoints } }) => ({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   height: spacing(7),
-  width: '100%',
   minWidth: 0,
 
-  fontWeight: 500,
-  textAlign: 'center',
-  padding: spacing(0, 2),
+  padding: spacing(0),
+  [breakpoints.up('xl')]: {
+    justifyContent: 'flex-start',
+    padding: spacing(0, 2.5),
+  },
+
   borderRadius: 0,
   '& .leftIcon': {
     display: 'flex',
-    width: '20px',
     alignItems: 'center',
+    marginRight: spacing(0),
+
+    [breakpoints.up('xl')]: {
+      marginRight: spacing(1.5),
+    },
   },
+
   '& .rightIcon': {
-    height: '20px',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing(1),
   },
-  '& svg:not(.badge) path': {
-    transition: 'fill 300ms ease-out',
-  },
+  // '& svg:not(.badge) path': {
+  //   transition: 'fill 300ms ease-out',
+  // },
   // ['&:hover']: {
   //   backgroundColor: palette.background.paper,
   //   color: palette.info.contrastText,
@@ -66,12 +75,6 @@ const MenuItem = styled(Button)(({ theme: { palette, spacing } }) => ({
   //   },
   // },
 }));
-
-const Text = styled(Box)({
-  fontSize: '0.875rem',
-  flex: 1,
-  textAlign: 'left',
-});
 
 export const Item = forwardRef(
   (
@@ -101,32 +104,43 @@ export const Item = forwardRef(
     const location = useLocation();
     const active = forceActive || (!forceInactive && location.pathname.startsWith(path));
 
+    const theme = useTheme();
+    const compact = useMediaQuery(theme.breakpoints.down('xl'));
+
     const button = (
       <MenuItem
         ref={ref}
         onClick={onClick}
         className={active ? 'selected' : undefined}
         disabled={disabled}
+        // @ts-expect-error: satisfy the compiler
+        component={Link}
+        to={path}
+        target={target}
+        rel={target ? 'noreferrer' : undefined}
       >
-        <Box className="leftIcon" justifyContent="center" alignContent="center">
+        <Box className="leftIcon">
           <LeftIcon variant={active ? 'filled' : 'outlined'} />
         </Box>
-        {/* <Text>{label}</Text>
-        {RightIcon ? (
-          <Box className="rightIcon">
-            <RightIcon />
-          </Box>
-        ) : null} */}
+        {!compact ? (
+          <>
+            <Typography variant="body1">{label}</Typography>
+            {RightIcon ? (
+              <Box className="rightIcon">
+                <RightIcon />
+              </Box>
+            ) : null}
+          </>
+        ) : null}
       </MenuItem>
     );
 
     if (disabled) return button;
 
-    return (
-      <Link to={path} target={target} rel={target ? 'noreferrer' : undefined}>
-        {button}
-      </Link>
-    );
+    return button;
+    // <Link to={path} target={target} rel={target ? 'noreferrer' : undefined}>
+    // { button }
+    // </Link>
   },
 );
 
@@ -153,7 +167,7 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       {/*/>*/}
       {isWorkerOperator ? (
         <Item
-          label="Operators chat"
+          label="Operators Chat"
           path={workersChatUrl || '/null'}
           target="_blank"
           LeftIcon={ContactsIcon}
@@ -161,7 +175,7 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
         />
       ) : null}
       <Item
-        label="Community chat"
+        label="Community Chat"
         path={process.env.DISCORD_API_URL || '/null'}
         target="_blank"
         LeftIcon={ContactsIcon}

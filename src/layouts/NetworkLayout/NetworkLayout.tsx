@@ -31,7 +31,7 @@ import { UserMenu } from './UserMenu';
 const APP_BAR_HEIGHT = 60;
 const SIDEBAR_WIDTH = {
   M: 56,
-  L: 56,
+  L: 240,
 };
 
 export const Main = styled('div', {
@@ -115,9 +115,9 @@ export const Content = styled('div', {
       paddingLeft: 0,
     },
 
-    // [theme.breakpoints.up('xl')]: {
-    //   paddingLeft: SIDEBAR_WIDTH.L,
-    // },
+    [theme.breakpoints.up('xl')]: {
+      paddingLeft: SIDEBAR_WIDTH.L,
+    },
   };
 });
 
@@ -153,24 +153,25 @@ const Sidebar = styled('div', {
 
   return {
     display: 'flex',
-    flexFlow: 'column',
+    flexDirection: 'column',
     alignItems: 'stretch',
     // marginTop: APP_BAR_HEIGHT + bannerHeight,
     background: theme.palette[variant].main,
     position: 'fixed',
     top: 0,
-    // paddingTop: theme.spacing(0),
+    // paddingLeft: theme.spacing(1),
+    // paddingTop: theme.spacing(1),
     bottom: 0,
     // paddingBottom: theme.spacing(3),
     zIndex: theme.zIndex.appBar + 1,
     // boxShadow: '-5px 4px 20px rgba(0, 0, 0, 0.25)',
-    width: theme.spacing(7),
+    width: SIDEBAR_WIDTH.M,
     overflowY: 'auto',
     overflowX: 'hidden',
 
-    // [theme.breakpoints.up('xl')]: {
-    //   width: SIDEBAR_WIDTH.L,
-    // },
+    [theme.breakpoints.up('xl')]: {
+      width: SIDEBAR_WIDTH.L,
+    },
 
     '&.guideActive': {
       zIndex: theme.zIndex.guide.highlight,
@@ -208,9 +209,9 @@ const SidebarLogo = styled('div', {
 })(({ theme, color }) => {
   return {
     display: 'flex',
-    flexFlow: 'column',
     height: APP_BAR_HEIGHT,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    padding: theme.spacing(0, 2),
   };
 });
 
