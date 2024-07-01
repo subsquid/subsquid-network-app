@@ -8,6 +8,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -39,7 +40,13 @@ function TableNavigation({
   const hasNextPage = page < totalPages;
 
   return (
-    <Box sx={{ textAlign: 'right', mt: 1 }}>
+    <Box
+      sx={{ textAlign: 'right', mt: 1 }}
+      display="flex"
+      alignItems="center"
+      flex={1}
+      justifyContent="flex-end"
+    >
       <IconButton
         onClick={() => {
           setPage?.(page - 1);
@@ -48,6 +55,9 @@ function TableNavigation({
       >
         <ArrowBackIosNew />
       </IconButton>
+      <Typography sx={{ fontVariant: 'tabular-nums' }}>
+        {page} / {totalPages}
+      </Typography>
       <IconButton
         onClick={() => {
           setPage?.(page + 1);

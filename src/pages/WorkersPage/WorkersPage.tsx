@@ -6,7 +6,8 @@ import { Link, Outlet } from 'react-router-dom';
 
 import { SortDir, useMyWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
-import { Loader } from '@components/Loader';
+import { NoItems } from '@components/NoItems';
+import Placeholder from '@components/Placeholer';
 import { SortableHeaderCell } from '@components/Table/BorderedTable';
 import { DashboardTable } from '@components/Table/DashboardTable';
 import { Location, useLocationState } from '@hooks/useLocationState';
@@ -34,6 +35,7 @@ export function MyWorkers() {
   return (
     <Box>
       <DashboardTable
+        loading={isLoading}
         title={
           <>
             <SquaredChip label="My Workers" color="primary" />
@@ -50,9 +52,7 @@ export function MyWorkers() {
           </>
         }
       >
-        {isLoading ? (
-          <Loader />
-        ) : data.length ? (
+        {data.length ? (
           <>
             <TableHead>
               <TableRow>
@@ -107,7 +107,9 @@ export function MyWorkers() {
             </TableBody>
           </>
         ) : (
-          'No items to show'
+          <Placeholder>
+            <NoItems />
+          </Placeholder>
         )}
       </DashboardTable>
     </Box>

@@ -144,6 +144,7 @@ export function WorkerDelegate({
             <FormRow>
               <FormikSelect
                 id="source"
+                label="Wallet"
                 disabled={!options.length}
                 showErrorOnlyOfTouched
                 options={options}

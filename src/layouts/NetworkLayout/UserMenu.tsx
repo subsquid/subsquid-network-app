@@ -61,7 +61,6 @@ export function UserMenu() {
             transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
             color: 'primary.contrastText',
             // opacity: 0.2,
-            ml: 2,
             width: 20,
             height: 20,
           }}
@@ -73,10 +72,12 @@ export function UserMenu() {
         onClose={handleClose}
         disableEscapeKeyDown
         disableAutoFocus
-        PaperProps={{
-          sx: {
-            overflow: 'visible',
-            width: 261,
+        slotProps={{
+          paper: {
+            sx: {
+              overflow: 'visible',
+              width: 261,
+            },
           },
         }}
         transformOrigin={{
@@ -88,7 +89,7 @@ export function UserMenu() {
           vertical: 'bottom',
         }}
       >
-        <Box sx={{ ml: 2, mr: 2, mb: 2 }}>
+        <Box sx={{ m: 1 }}>
           <LogoutMenuItem />
         </Box>
       </UserMenuStyled>

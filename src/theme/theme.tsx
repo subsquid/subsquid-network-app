@@ -348,6 +348,9 @@ export const useCreateTheme = (mode: PaletteType) => {
               //   },
               // },
             },
+            defaultProps: {
+              color: 'primary',
+            },
           },
           MuiPaper: {
             styleOverrides: {
@@ -371,8 +374,8 @@ export const useCreateTheme = (mode: PaletteType) => {
                 transition: 'all 300ms ease-out',
 
                 // '& .MuiSelect-select.MuiSelect-filled': {
-                //   paddingTop: 8,
-                //   paddingBottom: 8,
+                //   paddingTop: 0,
+                //   paddingBottom: spacing,
                 // },
                 // '& input': {
                 //   fontSize: '0.875rem',
@@ -397,7 +400,12 @@ export const useCreateTheme = (mode: PaletteType) => {
                 //   borderWidth: '1px',
                 //   borderColor: colors.divider,
                 // },
-                borderRadius: 360,
+                borderRadius: 4,
+                borderStyle: 'solid',
+                borderWidth: '1px',
+                borderColor: colors.divider,
+
+                backgroundColor: colors.background.paper,
               },
               // sizeSmall: {
               //   '& .MuiSelect-select.MuiSelect-filled': {
@@ -421,6 +429,22 @@ export const useCreateTheme = (mode: PaletteType) => {
               // inputMultiline: {
               //   paddingTop: 0,
               // },
+              input: {
+                padding: spacing,
+              },
+            },
+          },
+          MuiSelect: {
+            styleOverrides: {
+              filled: {
+                paddingTop: 0,
+              },
+              icon: {
+                // marginRight: 5,
+              },
+            },
+            defaultProps: {
+              // IconComponent: KeyboardArrowDownIcon,
             },
           },
           MuiTooltip: {
@@ -442,6 +466,10 @@ export const useCreateTheme = (mode: PaletteType) => {
                 display: 'none',
               },
             },
+            defaultProps: {
+              enterTouchDelay: 0,
+              leaveTouchDelay: 5000,
+            },
           },
           MuiChip: {
             styleOverrides: {
@@ -462,13 +490,31 @@ export const useCreateTheme = (mode: PaletteType) => {
                 padding: `0px ${spacing}px`,
               },
             },
+            defaultProps: {
+              color: 'primary',
+            },
           },
           MuiDialog: {
             styleOverrides: {
-              container: {},
               paper: {
                 boxShadow: 'none',
                 background: colors.background.default,
+              },
+            },
+          },
+          MuiMenu: {
+            styleOverrides: {
+              paper: {
+                background: colors.background.default,
+                border: `1px solid ${colors.divider}`,
+                // boxShadow: `0px 2px 4px 0px rgba(0, 0, 0, 0.20)`,
+                borderStyle: 'solid',
+                borderWidth: '1px',
+                borderColor: colors.divider,
+              },
+              root: {
+                marginTop: spacing,
+                backdropFilter: 'none',
               },
             },
           },

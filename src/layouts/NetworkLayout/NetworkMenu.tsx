@@ -140,7 +140,7 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       <Item LeftIcon={SavingsIcon} label="Assets" onClick={onItemClick} path="/assets" />
       <Item LeftIcon={NetworkNodeIcon} label="Workers" onClick={onItemClick} path="/workers" />
       <Item LeftIcon={HandIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
-      <Item LeftIcon={DoorIcon} label="Gateways" onClick={onItemClick} path="/gateways" />
+      {/* <Item LeftIcon={DoorIcon} label="Gateways" onClick={onItemClick} path="/gateways" /> */}
 
       <div style={{ flex: 1 }} />
 

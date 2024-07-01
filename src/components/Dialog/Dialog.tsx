@@ -4,8 +4,7 @@ export const Dialog = styled(DialogMui, {
   name: 'Dialog',
 })(({ theme }) => ({
   '& .MuiBackdrop-root': {
-    backdropFilter: 'blur(5px)',
-    backgroundColor:
-      theme.palette.mode === 'light' ? 'rgba(166, 166, 166, 0.6)' : 'rgba(0, 0, 0, 0.2);',
+    // backdropFilter: 'blur(1px)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 }));

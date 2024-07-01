@@ -13,6 +13,10 @@ import {
 const FormSelect = styled(Select, {
   name: 'FormSelect',
 })(({ theme }) => ({
+  'label + &': {
+    marginTop: theme.spacing(3),
+  },
+
   '& .MuiSelect-select.MuiSelect-filled': {
     paddingTop: 22,
   },
@@ -54,9 +58,14 @@ export function FormikSelect({
       : null;
 
   return (
-    <FormControl hiddenLabel={!label} variant="filled" fullWidth error={Boolean(actualError)}>
+    <FormControl hiddenLabel={!label} variant="standard" fullWidth error={Boolean(actualError)}>
       {label && <InputLabel>{label}</InputLabel>}
-      <FormSelect disabled={disabled} onChange={onChange} value={formik.values[id]}>
+      <FormSelect
+        disabled={disabled}
+        onChange={onChange}
+        value={formik.values[id]}
+        variant="filled"
+      >
         {options.map(o => {
           return (
             <MenuItem disabled={o.disabled} key={o.value} value={o.value}>

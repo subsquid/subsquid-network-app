@@ -9,6 +9,8 @@ export const Field = styled(TextField)(({ theme }) => ({
   // background: theme.palette.background.default,
   [`& .MuiInputBase-root`]: {
     padding: theme.spacing(0, 1),
+    borderRadius: 360,
+    border: 'none',
   },
   // '& svg': {
   //   position: 'absolute',
@@ -48,6 +50,7 @@ export const Search = ({
       <Field
         placeholder={placeholder}
         variant="filled"
+        inputMode="search"
         className="paper"
         value={realTimeValue}
         size="small"

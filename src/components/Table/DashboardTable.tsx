@@ -5,9 +5,6 @@ import { Box, styled, SxProps, Table } from '@mui/material';
 import { Loader } from '@components/Loader';
 
 export const DashboardTableBase = styled(Table)(({ theme }) => ({
-  overflowX: 'auto',
-  scrollbarWidth: 'thin',
-
   '& td, & th': {
     ...theme.typography.body1,
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -55,19 +52,15 @@ export function DashboardTable({
   loading,
 }: PropsWithChildren<{ title?: React.ReactNode; sx?: SxProps; loading?: boolean }>) {
   return (
-    <Box>
+    <Box sx={{ ...sx }}>
       {title ? (
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          marginBottom={1}
-          minHeight={36}
-        >
+        <Box display="flex" justifyContent="space-between" marginBottom={1} minHeight={36}>
           {title}
         </Box>
       ) : null}
-      {loading ? <Loader /> : <DashboardTableBase sx={{ ...sx }}>{children}</DashboardTableBase>}
+      <Box sx={{ overflowX: 'auto', scrollbarWidth: 'thin', overflowY: 'clip' }}>
+        {loading ? <Loader /> : <DashboardTableBase>{children}</DashboardTableBase>}
+      </Box>
     </Box>
   );
 }
