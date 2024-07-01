@@ -116,7 +116,7 @@ export function Workers() {
       >
         <TableHead>
           <TableRow>
-            <TableCell className="pinned" sx={{ width: 240 }}>
+            <TableCell className="pinned" sx={{ width: 300 }}>
               Worker
             </TableCell>
             <TableCell>Status</TableCell>

@@ -7,7 +7,17 @@ import {
   tokenFormatter,
 } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
-import { alpha, Box, Card, Divider, Stack, SxProps, Typography, useTheme } from '@mui/material';
+import {
+  alpha,
+  Box,
+  Card,
+  Divider,
+  Stack,
+  SxProps,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 
@@ -50,7 +60,7 @@ export function SummarySection({
           height: 1,
         }}
       >
-        <Box display="flex" justifyContent="space-between">
+        <Box display="flex" justifyContent="space-between" mb={1}>
           <Box display="flex" justifyContent="flex-start">
             {title}
           </Box>
@@ -214,7 +224,7 @@ function AprTooltip({ active, payload }: TooltipProps<number, string>) {
   ) : null;
 }
 
-function AprChart({ data }: { data: { value: number }[] }) {
+function AprChart({ data }: { data: { date: string; value: number }[] }) {
   const theme = useTheme();
 
   return (
@@ -245,18 +255,18 @@ function AprChart({ data }: { data: { value: number }[] }) {
             strokeWidth: 2,
             strokeDasharray: 6,
           }}
-          defaultIndex={data.length - 2}
+          defaultIndex={Math.max(data.length - 2, 0)}
           active
           allowEscapeViewBox={{ x: true }}
           position={{ y: -6 }}
           wrapperStyle={{
-            zIndex: theme.zIndex.tooltip,
+            zIndex: theme.zIndex.appBar + 1,
           }}
           offset={0}
         />
         <Area
           animationDuration={0}
-          type="linear"
+          // type="linear"
           dataKey="value"
           stroke={theme.palette.info.main}
           strokeWidth={theme.spacing(0.5)}
@@ -277,6 +287,7 @@ function WorkersApr() {
     if (!data) return [];
 
     return data.aprs.map((apr, i) => ({
+      date: apr.timestamp,
       value: i === data.aprs.length - 1 ? (apr.workerApr + data.workerApr) / 2 : apr.workerApr,
     }));
   }, [data]);
@@ -300,6 +311,7 @@ function DelegatorsApr() {
     if (!data) return [];
 
     return data.aprs.map((apr, i) => ({
+      date: apr.timestamp,
       value: i === data.aprs.length - 1 ? (apr.stakerApr + data.stakerApr) / 2 : apr.stakerApr,
     }));
   }, [data]);
@@ -311,31 +323,36 @@ function DelegatorsApr() {
       title={<SquaredChip label="Delegator APR" color="primary" />}
       action="Last 14 days"
     >
-      <AprChart data={aprs || []} />
+      <AprChart data={aprs} />
     </SummarySection>
   );
 }
 
 export function NetworkSummary() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const size = isMobile ? { minHeight: 128 } : { height: 0.5 };
+
   return (
     <Box minHeight={528} mb={2} display="flex">
       <>
         <Grid container spacing={2} disableEqualOverflow flex={1}>
-          <Grid container xxs={8}>
-            <Grid xxs={6} minHeight={0.5}>
+          <Grid container xxs={12} sm={8}>
+            <Grid xxs={12} sm={6} sx={{ ...size }}>
               <OnlineInfo />
             </Grid>
-            <Grid xxs={6} minHeight={0.5}>
+            <Grid xxs={12} sm={6} sx={{ ...size }}>
               <CurrentEpoch />
             </Grid>
-            <Grid xxs={6} minHeight={0.5}>
+            <Grid xxs={12} sm={6} sx={{ ...size }}>
               <WorkersApr />
             </Grid>
-            <Grid xxs={6} minHeight={0.5}>
+            <Grid xxs={12} sm={6} sx={{ ...size }}>
               <DelegatorsApr />
             </Grid>
           </Grid>
-          <Grid xxs={4}>
+          <Grid xxs={12} sm={4}>
             <Stats />
           </Grid>
         </Grid>

@@ -1,11 +1,13 @@
 import { IconButton, iconButtonClasses, styled } from '@mui/material';
 
 export const RoundIconButton = styled(IconButton)(({ theme: { palette } }) => ({
-  background: palette.primary.main,
   color: palette.primary.contrastText,
   width: 32,
   height: 32,
   transition: 'all 300ms ease-out',
+  borderWidth: 1,
+  borderStyle: 'solid',
+  borderColor: palette.secondary.main,
 
   '&.transparent': {
     background: 'transparent',
@@ -13,11 +15,11 @@ export const RoundIconButton = styled(IconButton)(({ theme: { palette } }) => ({
     opacity: 0.6,
   },
 
-  '&:hover': {
-    background: palette.primary.light,
-    color: palette.primary.contrastText,
-    opacity: 1,
-  },
+  // '&:hover': {
+  //   background: palette.primary.light,
+  //   color: palette.primary.contrastText,
+  //   opacity: 1,
+  // },
 
   [`&.${iconButtonClasses.sizeMedium}`]: {
     width: 32,

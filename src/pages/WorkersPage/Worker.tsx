@@ -10,8 +10,9 @@ import { fromSqd } from '@lib/network';
 import { Box, Divider, Stack, styled } from '@mui/material';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { useWorkerByPeerId, WorkerStatus } from '@api/subsquid-network-squid';
+import { useWorkerByPeerId, WorkerStatus as ApiWorkerStatus } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
+import SquaredChip from '@components/Chip/SquaredChip';
 import { Loader } from '@components/Loader';
 import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
@@ -20,7 +21,6 @@ import { useContracts } from '@network/useContracts';
 import { WorkerUnregister } from '@pages/WorkersPage/WorkerUnregister';
 
 import { DelegationCapacity } from './DelegationCapacity';
-import { UptimeGraph } from './UptimeGraph';
 import { WorkerCard } from './WorkerCard';
 import { WorkerDelegate } from './WorkerDelegate';
 import { WorkerUndelegate } from './WorkerUndelegate';
@@ -74,9 +74,7 @@ export const WorkerDescValue = styled(Box, {
   overflowWrap: 'anywhere',
 }));
 
-export const Title = styled(Box)(({ theme }) => ({
-  fontSize: '1.25rem',
-  lineHeight: 1,
+export const Title = styled(SquaredChip)(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
@@ -94,7 +92,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
         backPath={searchParams.get('backPath') || backPath}
         endAdornment={
           <Stack direction="row" spacing={2}>
-            <WorkerDelegate worker={worker} />
+            <WorkerDelegate worker={worker} variant="outlined" />
             <WorkerUndelegate worker={worker} />
           </Stack>
         }
@@ -106,18 +104,17 @@ export const Worker = ({ backPath }: { backPath: string }) => {
         <NotFound item="worker" id={peerId} />
       ) : (
         <>
-          <Card>
-            <Box sx={{ mb: 4 }}>
+          <Card outlined>
+            <Stack spacing={3} divider={<Divider orientation="horizontal" flexItem />}>
               <WorkerCard
                 worker={worker}
                 canEdit={
                   worker.realOwner.id === address &&
-                  [WorkerStatus.Active, WorkerStatus.Registering].includes(worker.status)
+                  [ApiWorkerStatus.Active, ApiWorkerStatus.Registering].includes(worker.status)
                 }
               />
-            </Box>
-            <Stack spacing={3} divider={<Divider orientation="horizontal" flexItem />}>
               <Box>
+                <Title label="Info" />
                 <Stack spacing={2} direction="column">
                   <Stack direction="row">
                     <WorkerDescLabel>Registered</WorkerDescLabel>
@@ -148,7 +145,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                 </Stack>
               </Box>
               <Box>
-                <Title>Bond</Title>
+                <Title label="Bond" />
                 <Stack spacing={2}>
                   <Stack direction="row">
                     <WorkerDescLabel>Bonded</WorkerDescLabel>
@@ -175,7 +172,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
               </Box>
 
               <Box>
-                <Title>Delegation</Title>
+                <Title label="Delegation" />
                 <Stack spacing={2}>
                   <Stack direction="row">
                     <WorkerDescLabel>Delegators</WorkerDescLabel>
@@ -209,7 +206,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
               </Box>
 
               <Box>
-                <Title>Statistics</Title>
+                <Title label="Statistics" />
                 <Stack spacing={2}>
                   <Stack direction="row">
                     <WorkerDescLabel>Uptime, 24h / 90d</WorkerDescLabel>
@@ -237,12 +234,13 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                     <WorkerDescValue>{bytesFormatter(worker.storedData)}</WorkerDescValue>
                   </Stack>
                 </Stack>
-                <UptimeGraph worker={worker} />
+                {/* <UptimeGraph worker={worker} /> */}
               </Box>
             </Stack>
           </Card>
-          {worker.realOwner.id === address && worker.status !== WorkerStatus.Withdrawn ? (
-            <Box mt={2.5}>
+
+          {worker.realOwner.id === address && worker.status !== ApiWorkerStatus.Withdrawn ? (
+            <Box mt={3}>
               <WorkerUnregister worker={worker} />
             </Box>
           ) : null}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function CloseIcon({ size = 40 }: { size?: number }) {
+export function CloseIcon({ size = 28 }: { size?: number }) {
   return (
     <svg
       width={size}

@@ -1,4 +1,4 @@
-import { Stack, styled } from '@mui/material';
+import { Stack, styled, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
@@ -33,20 +33,20 @@ export const WorkerName = ({
         colorDiscriminator={worker.peerId}
       />
       <Box overflow="clip">
-        {worker.name ? <Name>{worker.name}</Name> : null}
-        <Stack direction="row" spacing={1} sx={{ fontSize: 14, lineHeight: '20px' }}>
-          <Box>
-            <CopyToClipboard
-              text={worker.peerId}
-              content={
-                <PeerIdShort>
-                  <Link to={to || '#'}>{shortPeerId(worker.peerId)}</Link>
-                </PeerIdShort>
-              }
-            />
-          </Box>
-          {/* <WorkerDelegationCapacity worker={worker} /> */}
-        </Stack>
+        {worker.name ? (
+          <Name>{worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}</Name>
+        ) : null}
+        <Typography variant="body2">
+          <CopyToClipboard
+            text={worker.peerId}
+            content={
+              <PeerIdShort>
+                <Link to={to || '#'}>{shortPeerId(worker.peerId)}</Link>
+              </PeerIdShort>
+            }
+          />
+        </Typography>
+        {/* <WorkerDelegationCapacity worker={worker} /> */}
       </Box>
     </Stack>
   );

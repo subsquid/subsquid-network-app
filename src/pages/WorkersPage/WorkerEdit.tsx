@@ -48,7 +48,7 @@ function WorkerForm({
 
   return (
     <Form onSubmit={formik.handleSubmit}>
-      <Card>
+      <Card outlined>
         <FormRow>
           <FormikTextInput showErrorOnlyOfTouched id="name" label="Worker name" formik={formik} />
         </FormRow>
@@ -67,12 +67,12 @@ function WorkerForm({
         </FormRow>
 
         <BlockchainContractError error={error} />
-        <Box>
-          <LoadingButton disabled={isUpdating} variant="contained" type="submit">
-            Apply
-          </LoadingButton>
-        </Box>
       </Card>
+      <Box mt={3} justifyContent="flex-end" display="flex">
+        <LoadingButton disabled={isUpdating} variant="contained" type="submit" color="info">
+          APPLY
+        </LoadingButton>
+      </Box>
     </Form>
   );
 }
@@ -85,7 +85,7 @@ export function WorkerEdit() {
   return (
     <CenteredPageWrapper>
       <ConnectedWalletRequired>
-        <NetworkPageTitle backPath={`/workers/${peerId}`} title="Edit worker" />
+        <NetworkPageTitle backPath={`/workers/${peerId}`} />
         {isPending ? (
           <Loader />
         ) : !worker || worker.realOwner.id !== address ? (

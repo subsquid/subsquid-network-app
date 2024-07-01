@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network/utils';
-import { Box, Button, TableBody, TableCell, TableRow } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Box, TableBody, TableCell, TableRow } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
@@ -11,7 +12,6 @@ import { ClaimType, useMyClaimsAvailable, useMySources } from '@api/subsquid-net
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSelect, FormRow } from '@components/Form';
-import { Loader } from '@components/Loader';
 import { SourceWalletOption } from '@components/SourceWallet';
 import { TableList } from '@components/Table/TableList.tsx';
 import { useContracts } from '@network/useContracts';
@@ -23,7 +23,7 @@ export const claimSchema = yup.object({
 
 export function ClaimButton() {
   const { SQD_TOKEN } = useContracts();
-  const { claim, error, isLoading } = useClaim();
+  const { claim, error, isPending } = useClaim();
   const formik = useFormik({
     initialValues: {
       source: '',
@@ -92,9 +92,14 @@ export function ClaimButton() {
 
   return (
     <>
-      <Button disabled={!hasClaimsAvailable} onClick={handleOpen} color="info" variant="contained">
+      <LoadingButton
+        disabled={!hasClaimsAvailable}
+        onClick={handleOpen}
+        color="info"
+        variant="contained"
+      >
         CLAIM
-      </Button>
+      </LoadingButton>
       <ContractCallDialog
         title="Claim"
         open={open}
@@ -103,54 +108,51 @@ export function ClaimButton() {
 
           formik.handleSubmit();
         }}
-        loading={isLoading}
-        confirmColor="success"
+        loading={isPending}
+        confirmColor="info"
         disableConfirmButton={currentSourceTotalClaimsAvailable.lte(0)}
       >
-        {isClaimsLoading ? (
-          <Loader />
-        ) : (
-          <Form onSubmit={formik.handleSubmit}>
-            <FormRow>
-              <FormikSelect
-                id="source"
-                disabled={!options.length}
-                showErrorOnlyOfTouched
-                options={options}
-                formik={formik}
-              />
-            </FormRow>
+        <Form onSubmit={formik.handleSubmit}>
+          <FormRow>
+            <FormikSelect
+              id="source"
+              disabled={!options.length}
+              showErrorOnlyOfTouched
+              options={options}
+              formik={formik}
+            />
+          </FormRow>
 
-            <Box
-              sx={{
-                overflowX: 'auto',
-                scrollbarWidth: 'thin',
-              }}
-            >
-              <TableList>
-                <TableBody>
-                  {claims.map(w => {
-                    return (
-                      <TableRow key={w.id}>
-                        <TableCell>
-                          <WorkerName worker={w} />
-                        </TableCell>
-                        <TableCell>
-                          {w.type === ClaimType.Worker ? 'Worker reward' : 'Delegation reward'}
-                        </TableCell>
-                        <TableCell align="right">
-                          {tokenFormatter(fromSqd(w.claimableReward), SQD_TOKEN)}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </TableList>
-            </Box>
+          <Box
+            sx={{
+              scrollbarWidth: 'thin',
+              maxHeight: '50vh',
+              overflow: 'auto',
+            }}
+          >
+            <TableList>
+              <TableBody>
+                {claims.map(w => {
+                  return (
+                    <TableRow key={w.id}>
+                      <TableCell>
+                        <WorkerName worker={w} />
+                      </TableCell>
+                      <TableCell>
+                        {w.type === ClaimType.Worker ? 'Worker reward' : 'Delegation reward'}
+                      </TableCell>
+                      <TableCell align="right">
+                        {tokenFormatter(fromSqd(w.claimableReward), SQD_TOKEN)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </TableList>
+          </Box>
 
-            <BlockchainContractError error={error} />
-          </Form>
-        )}
+          <BlockchainContractError error={error} />
+        </Form>
       </ContractCallDialog>
     </>
   );

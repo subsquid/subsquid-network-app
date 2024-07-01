@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 
-import { Box, Paper, styled } from '@mui/material';
+import { Box, Paper, styled, Theme } from '@mui/material';
 import { SxProps } from '@mui/system/styleFunctionSx';
 import classNames from 'classnames';
 
@@ -31,6 +31,13 @@ export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) =>
     padding: 0,
   },
 
+  '&.outlined': {
+    background: theme.palette.background.default,
+    borderColor: theme.palette.divider,
+    borderWidth: 1,
+    borderStyle: 'solid',
+  },
+
   '&.noShadow': {
     boxShadow: 'none',
   },
@@ -41,12 +48,14 @@ export const Card = ({
   title,
   noShadow,
   noPadding,
+  outlined,
   sx,
 }: PropsWithChildren<{
   noShadow?: boolean;
   title?: React.ReactNode;
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
   noPadding?: boolean;
+  outlined?: boolean;
 }>) => {
   return (
     <>
@@ -55,6 +64,7 @@ export const Card = ({
         className={classNames({
           noShadow,
           noPadding,
+          outlined,
         })}
         sx={sx}
       >

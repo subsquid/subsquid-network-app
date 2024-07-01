@@ -4,6 +4,7 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 
 import {
   AppBar as AppBarMaterial,
+  Backdrop,
   Box,
   IconButton,
   Slide,
@@ -19,6 +20,7 @@ import { useDisconnect, useWalletClient } from 'wagmi';
 import { Logo } from '@components/Logo';
 // import { NetworkSwitcher } from '@components/NetworkSwitcher';
 import { useBannerHeight } from '@components/TopBanner';
+import { MenuIcon } from '@icons/MenuIcon';
 import { useAccount } from '@network/useAccount';
 import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
@@ -50,7 +52,7 @@ export const AppToolbar = styled(Box, { name: 'AppToolbar' })(({ theme }) => ({
   alignItems: 'center',
   height: APP_BAR_HEIGHT,
   paddingRight: theme.spacing(3),
-  marginLeft: 56,
+  marginLeft: 12,
 
   [theme.breakpoints.down('xs')]: {
     paddingRight: theme.spacing(2),
@@ -130,17 +132,18 @@ export const ContentWrapper = styled('div', {
   // alignSelf: 'center',
   // color: alpha(theme.palette.text.primary, 0.8),
   maxWidth: '100%',
+  overflowX: 'clip',
 
   [theme.breakpoints.up('xl')]: {
     maxWidth: 1336,
     boxSizing: 'content-box',
   },
-  [theme.breakpoints.down('md')]: {
-    padding: theme.spacing(7.5, 3),
-  },
-  [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(3, 2),
-  },
+  // [theme.breakpoints.down('md')]: {
+  //   padding: theme.spacing(7.5, 3),
+  // },
+  // [theme.breakpoints.down('sm')]: {
+  //   padding: theme.spacing(3, 2),
+  // },
 }));
 
 const Sidebar = styled('div', {
@@ -289,21 +292,27 @@ export const NetworkLayout = ({
           {/* <AppToolbarSidebar> */}
           {/* {narrowXs ? null : <Logo />} */}
           {/* {narrowLg ? (
-              <MenuButton
-                className={classnames({
-                  open: isMenuOpen,
-                })}
-                onClick={() => setIsMenuOpen(open => !open)}
-              >
-                <MenuIcon />
-              </MenuButton>
+  
             ) : null} */}
           {/* </AppToolbarSidebar> */}
+          <MenuButton
+            className={classnames({
+              open: isMenuOpen,
+            })}
+            onClick={() => setIsMenuOpen(open => !open)}
+          >
+            <MenuIcon />
+          </MenuButton>
           <AppToolbarContent></AppToolbarContent>
           {/* <NetworkSwitcher hideText={isMobile} /> */}
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}
           <UserMenu />
+          <Backdrop
+            open={isMenuOpen}
+            onClick={() => setIsMenuOpen(false)}
+            sx={{ background: '#fff0' }}
+          />
         </AppToolbar>
       </AppBar>
 

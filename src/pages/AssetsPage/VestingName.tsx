@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { addressFormatter } from '@lib/formatters/formatters';
-import { Box, Stack, styled } from '@mui/material';
+import { Box, Stack, styled, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
@@ -11,23 +11,22 @@ import { CopyToClipboard } from '@components/CopyToClipboard';
 const Name = styled(Box, {
   name: 'Name',
 })(({ theme }) => ({
-  marginBottom: theme.spacing(0.5),
-  fontWeight: 500,
+  marginBottom: theme.spacing(0.25),
   whiteSpace: 'nowrap',
 }));
 
 export function SourceWalletName({ source, to }: { source: SourceWallet; to?: string }) {
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={2} alignItems="center">
       <Avatar name={source.id.slice(2)} colorDiscriminator={source.id} />
       <Box>
         <Name>{source.type === AccountType.Vesting ? 'Vesting contract' : 'Wallet'}</Name>
-        <Box>
+        <Typography variant="body2">
           <CopyToClipboard
             text={source.id}
             content={<Link to={to || '#'}>{addressFormatter(source.id, true)}</Link>}
           />
-        </Box>
+        </Typography>
       </Box>
     </Stack>
   );

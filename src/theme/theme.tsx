@@ -523,7 +523,6 @@ export const useCreateTheme = (mode: PaletteType) => {
               },
               root: {
                 marginTop: spacing,
-                backdropFilter: 'none',
               },
             },
           },

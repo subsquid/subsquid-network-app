@@ -8,6 +8,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { useVestingContract } from '@api/contracts/vesting';
 import { useVestingByAddress } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
+import SquaredChip from '@components/Chip/SquaredChip';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
 import { NotFound } from '@components/NotFound';
@@ -23,7 +24,6 @@ export const DescLabel = styled(Box, {
   color: theme.palette.text.secondary,
   whiteSpace: 'balance',
   maxWidth: theme.spacing(25),
-  fontSize: '1rem',
 }));
 
 export const DescValue = styled(Box, {
@@ -34,16 +34,14 @@ export const DescValue = styled(Box, {
   overflowWrap: 'anywhere',
 }));
 
-export const Title = styled(Box)(({ theme }) => ({
-  fontSize: '1.25rem',
-  lineHeight: 1,
-  marginBottom: theme.spacing(3),
-}));
-
 export const VestingAddress = styled(Box, {
   name: 'VestingAddress',
 })(({}) => ({
   overflowWrap: 'anywhere',
+}));
+
+export const Title = styled(SquaredChip)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
 }));
 
 export function Vesting({ backPath }: { backPath: string }) {
@@ -68,17 +66,24 @@ export function Vesting({ backPath }: { backPath: string }) {
     <CenteredPageWrapper className="wide">
       <NetworkPageTitle
         backPath={searchParams.get('backPath') || backPath}
-        endAdornment={vesting?.isOwn() ? <ReleaseButton vesting={vesting} /> : null}
+        endAdornment={
+          vesting?.isOwn() ? (
+            <Stack>
+              <ReleaseButton vesting={vesting} />
+            </Stack>
+          ) : null
+        }
       />
-      <Card>
+      <Card outlined>
         <Stack spacing={3} divider={<Divider orientation="horizontal" flexItem />}>
           <Box>
+            <Title label="Info" />
             <Stack spacing={2} direction="column">
               <Stack direction="row">
                 <DescLabel>Contract</DescLabel>
                 <DescValue>
                   <VestingAddress>
-                    <CopyToClipboard text={address} content={addressFormatter(address, isMobile)} />
+                    <CopyToClipboard text={address} content={addressFormatter(address)} />
                   </VestingAddress>
                 </DescValue>
               </Stack>
@@ -109,6 +114,7 @@ export function Vesting({ backPath }: { backPath: string }) {
             </Stack>
           </Box>
           <Box>
+            <Title label="Lock Period" />
             <Stack spacing={2} direction="column">
               <Stack direction="row">
                 <DescLabel>Start</DescLabel>

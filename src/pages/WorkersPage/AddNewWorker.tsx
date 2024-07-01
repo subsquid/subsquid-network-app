@@ -128,7 +128,7 @@ function AddWorkerForm() {
       ) : (
         <>
           <Form onSubmit={formik.handleSubmit}>
-            <Card>
+            <Card outlined>
               <FormRow>
                 <FormikSelect
                   id="source"
@@ -180,13 +180,14 @@ function AddWorkerForm() {
               </FormRow>
               <BlockchainContractError error={error} />
             </Card>
-            <Box mt={2.5} justifyContent="flex-end" display="flex">
+            <Box mt={3} justifyContent="flex-end" display="flex">
               <LoadingButton
                 disabled={isLoading || fromSqd(source?.balance || 0).lt(fromSqd(bondAmount))}
                 variant="contained"
                 type="submit"
+                color="info"
               >
-                Register
+                REGISTER
               </LoadingButton>
             </Box>
           </Form>
@@ -207,7 +208,7 @@ export function AddNewWorker() {
   return (
     <CenteredPageWrapper>
       <ConnectedWalletRequired>
-        <NetworkPageTitle backPath="/workers" title="Worker registration"></NetworkPageTitle>
+        <NetworkPageTitle backPath="/workers"></NetworkPageTitle>
         <AddWorkerForm />
       </ConnectedWalletRequired>
     </CenteredPageWrapper>

@@ -13,7 +13,7 @@ import { useWorkerUndelegate } from '@api/contracts/staking';
 import { Account, Delegation, Worker } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
+import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
 
@@ -42,7 +42,7 @@ export function WorkerUndelegate({
   };
   disabled?: boolean;
 }) {
-  const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
+  const { undelegateFromWorker, error, isPending } = useWorkerUndelegate();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (e: React.UIEvent) => {
@@ -136,7 +136,6 @@ export function WorkerUndelegate({
   return (
     <>
       <LoadingButton
-        loading={open}
         disabled={disabled || !canUndelegate}
         color="error"
         onClick={handleOpen}
@@ -147,7 +146,7 @@ export function WorkerUndelegate({
       <ContractCallDialog
         title="Undelegate"
         open={open}
-        loading={isLoading}
+        loading={isPending}
         onResult={confirmed => {
           if (!confirmed) return handleClose();
 
@@ -196,10 +195,11 @@ export function WorkerUndelegate({
               }}
             />
           </FormRow>
+          <FormDivider />
           <Stack direction="row" justifyContent="space-between" alignContent="center">
             <Box>Expected APR</Box>
-            <Stack direction="row">
-              {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
               <HelpTooltip title={EXPECTED_APR_TIP} />
             </Stack>
           </Stack>

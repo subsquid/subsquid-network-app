@@ -29,7 +29,7 @@ export const ConfirmDialogTitle = styled(Box, {
   fontSize: '1.125rem',
   position: 'relative',
   paddingRight: 45,
-  [breakpoints.down('xxs')]: {
+  [breakpoints.down('sm')]: {
     margin: spacing(4, 3, 2, 3),
     fontSize: '1rem',
   },
@@ -42,16 +42,17 @@ export const CloseIconButton = styled(IconButton, {
   top: -6,
   right: -6,
   opacity: 0.5,
-  [breakpoints.down('xxs')]: {
-    paddingLeft: '10px',
-  },
+  padding: 0,
+  // [breakpoints.down('xxs')]: {
+  //   paddingLeft: '10px',
+  // },
 }));
 
 export const Content = styled(DialogContent)(({ theme: { spacing, breakpoints } }) => ({
   padding: 0,
   margin: spacing(1, 4, 4),
   overflowY: 'visible',
-  [breakpoints.down('xxs')]: {
+  [breakpoints.down('sm')]: {
     margin: spacing(0, 3, 4, 3),
   },
 }));
@@ -65,7 +66,7 @@ export const Actions = styled(Box)(({ theme: { spacing, breakpoints } }) => ({
   '* > :not(:first-of-type)': {
     marginLeft: 0,
   },
-  [breakpoints.down('xxs')]: {
+  [breakpoints.down('sm')]: {
     margin: spacing(3, 3),
   },
 }));
@@ -94,8 +95,8 @@ export function ConfirmDialog({
   maxWidth = 440,
   minWidth = 440,
   confirmColor = 'info',
-  confirmButtonText = 'Confirm',
-  cancelButtonText = 'Cancel',
+  confirmButtonText = 'CONFIRM',
+  cancelButtonText = 'CANCEL',
   disableBackdropClick = false,
   disableConfirmButton = false,
   hideCancelButton = false,
@@ -105,7 +106,7 @@ export function ConfirmDialog({
   onApprove,
 }: PropsWithChildren<ConfirmDialogProps>) {
   const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down('xxs'));
+  const mobile = useMediaQuery(theme.breakpoints.down('sm'));
   const onReject = (e: SyntheticEvent, reason?: 'backdropClick' | 'escapeKeyDown') => {
     if (disableBackdropClick && reason === 'backdropClick') return;
 
