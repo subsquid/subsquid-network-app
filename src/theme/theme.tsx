@@ -207,12 +207,14 @@ export const useCreateTheme = (mode: PaletteType) => {
             fontSize: 16,
             lineHeight: '24px',
             fontWeight: 500,
+            letterSpacing: '0rem',
           },
           body2: {
             color: colors.text.secondary,
             fontSize: 14,
             lineHeight: '20px',
             fontWeight: 500,
+            letterSpacing: '0rem',
           },
           button: {
             fontSize: '12px',
@@ -231,6 +233,12 @@ export const useCreateTheme = (mode: PaletteType) => {
             lineHeight: '24px',
             fontWeight: 600,
             letterSpacing: '0.08rem',
+          },
+          subtitle2: {
+            fontSize: '16px',
+            lineHeight: '24px',
+            fontWeight: 500,
+            letterSpacing: '-0.01rem',
           },
         },
         palette: {

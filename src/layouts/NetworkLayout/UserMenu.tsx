@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { addressFormatter } from '@lib/formatters/formatters';
 import { ExpandMore } from '@mui/icons-material';
-import { Box, Button, Menu, Stack, styled } from '@mui/material';
+import { Box, Button, Menu, Stack, styled, Typography } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
@@ -54,7 +54,7 @@ export function UserMenu() {
         color="primary"
         variant="contained"
       >
-        <Box>{maskedAddress}</Box>
+        <Typography variant="body2">{maskedAddress}</Typography>
         <ExpandMore
           sx={{
             transition: 'transform 300ms ease-out',

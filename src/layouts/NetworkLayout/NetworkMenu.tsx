@@ -124,7 +124,7 @@ export const Item = forwardRef(
         </Box>
         {!compact ? (
           <>
-            <Typography variant="body1">{label}</Typography>
+            <Typography variant="subtitle2">{label}</Typography>
             {RightIcon ? (
               <Box className="rightIcon">
                 <RightIcon />
