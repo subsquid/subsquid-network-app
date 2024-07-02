@@ -13,10 +13,6 @@ export const DashboardTableBase = styled(Table)(({ theme }) => ({
     minHeight: theme.spacing(8),
   },
 
-  '& td.numeric': {
-    fontVariantNumeric: 'tabular-nums',
-  },
-
   '& td:last-child, & th:last-child': {
     paddingRight: theme.spacing(0),
   },
