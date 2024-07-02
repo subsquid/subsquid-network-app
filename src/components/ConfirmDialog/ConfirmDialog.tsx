@@ -139,7 +139,7 @@ export function ConfirmDialog({
         </Content>
         <Actions>
           {!hideCancelButton ? (
-            <Button onClick={onReject} fullWidth size="large" variant="contained" color="primary">
+            <Button onClick={onReject} fullWidth variant="contained" color="primary">
               {cancelButtonText}
             </Button>
           ) : null}
@@ -147,7 +147,6 @@ export function ConfirmDialog({
             <LoadingButton
               onClick={handleApprove}
               disabled={disableConfirmButton}
-              size="large"
               loading={loading}
               color={confirmColor}
               variant="contained"
