@@ -169,13 +169,15 @@ export function Workers() {
                   <TableCell>
                     <WorkerVersion worker={worker} />
                   </TableCell>
-                  <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
-                  <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
-                  <TableCell>
+                  <TableCell className="numeric">{percentFormatter(worker.uptime90Days)}</TableCell>
+                  <TableCell className="numeric">
+                    {worker.apr != null ? percentFormatter(worker.apr) : '-'}
+                  </TableCell>
+                  <TableCell className="numeric">
                     {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                   </TableCell>
                   {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
-                  <TableCell>
+                  <TableCell className="numeric">
                     <DelegationCapacity worker={worker} />
                   </TableCell>
                   <TableCell>{dateFormat(worker.createdAt)}</TableCell>

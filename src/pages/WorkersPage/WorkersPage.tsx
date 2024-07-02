@@ -87,10 +87,16 @@ export function MyWorkers() {
                     <TableCell>
                       <WorkerStatus worker={worker} />
                     </TableCell>
-                    <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
-                    <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
-                    <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
-                    <TableCell>
+                    <TableCell className="numeric">
+                      {percentFormatter(worker.uptime24Hours)}
+                    </TableCell>
+                    <TableCell className="numeric">
+                      {percentFormatter(worker.uptime90Days)}
+                    </TableCell>
+                    <TableCell className="numeric">
+                      {worker.apr != null ? percentFormatter(worker.apr) : '-'}
+                    </TableCell>
+                    <TableCell className="numeric">
                       {tokenFormatter(
                         fromSqd(worker.claimableReward).plus(fromSqd(worker.claimedReward)),
                         SQD_TOKEN,

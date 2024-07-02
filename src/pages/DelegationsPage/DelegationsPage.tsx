@@ -95,14 +95,16 @@ export function MyDelegations() {
                   <TableCell>
                     <WorkerStatus worker={worker} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="numeric">
                     {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="numeric">
                     <DelegationCapacity worker={worker} />
                   </TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(worker.myDelegation), SQD_TOKEN)}</TableCell>
-                  <TableCell>
+                  <TableCell className="numeric">
+                    {tokenFormatter(fromSqd(worker.myDelegation), SQD_TOKEN)}
+                  </TableCell>
+                  <TableCell className="numeric">
                     {tokenFormatter(fromSqd(worker.myTotalDelegationReward), SQD_TOKEN)}
                   </TableCell>
                   <TableCell className="pinned">
