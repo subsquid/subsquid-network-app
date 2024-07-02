@@ -119,7 +119,8 @@ function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: Bi
 
 export function MyAssets() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
+  const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
+  const narrowSm = useMediaQuery(theme.breakpoints.down('sm'));
   const { isLoading, assets } = useMyAssets();
 
   const data = useMemo(
@@ -179,24 +180,33 @@ export function MyAssets() {
         action={<ClaimButton />}
       >
         <Grid container spacing={2} disableEqualOverflow flex={1}>
-          <Grid xxs={4}>
-            <Stack divider={<Divider />} spacing={1} height={1} justifyContent="flex-end">
-              <TokenBalance balance={data[0]} />
-              <TokenBalance balance={data[1]} />
-              <TokenBalance balance={data[2]} />
+          <Grid xxs={12} sm={8}>
+            <Stack
+              divider={<Divider flexItem />}
+              spacing={1}
+              direction={narrowXs ? 'column' : 'row'}
+              alignItems={narrowXs ? 'stretch' : 'flex-end'}
+              height={1}
+              justifyContent="stretch"
+            >
+              <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
+                <TokenBalance balance={data[0]} />
+                <TokenBalance balance={data[1]} />
+                <TokenBalance balance={data[2]} />
+              </Stack>
+              <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
+                <TokenBalance balance={data[3]} />
+                <TokenBalance balance={data[4]} />
+              </Stack>
             </Stack>
           </Grid>
-          <Grid xxs={4}>
-            <Stack divider={<Divider />} spacing={1} height={1} justifyContent="flex-end">
-              <TokenBalance balance={data[3]} />
-              <TokenBalance balance={data[4]} />
-            </Stack>
-          </Grid>
-          <Grid xxs={4}>
-            <Box display="flex" alignItems="flex-end" height={1}>
-              <TotalBalance balances={data} total={fromSqd(assets.total)} />
-            </Box>
-          </Grid>
+          {narrowSm ? null : (
+            <Grid xxs={0} sm={4}>
+              <Box display="flex" alignItems="flex-end" height={1}>
+                <TotalBalance balances={data} total={fromSqd(assets.total)} />
+              </Box>
+            </Grid>
+          )}
         </Grid>
       </SummarySection>
     </Box>
