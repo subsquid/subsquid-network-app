@@ -44,6 +44,7 @@ export const Main = styled('div', {
   display: 'flex',
   flexFlow: 'column',
   position: 'relative',
+  overflowX: 'clip',
 }));
 
 export const AppToolbar = styled(Box, { name: 'AppToolbar' })(({ theme }) => ({
@@ -111,6 +112,7 @@ export const Content = styled('div', {
     justifyContent: 'center',
     paddingTop: APP_BAR_HEIGHT + bannerHeight,
     paddingLeft: SIDEBAR_WIDTH.M,
+    paddingBottom: theme.spacing(8),
     minWidth: 350,
 
     '&.narrow': {
@@ -132,7 +134,7 @@ export const ContentWrapper = styled('div', {
   // alignSelf: 'center',
   // color: alpha(theme.palette.text.primary, 0.8),
   maxWidth: '100%',
-  overflowX: 'clip',
+  overflowX: 'visible',
 
   [theme.breakpoints.up('xl')]: {
     maxWidth: 1336,

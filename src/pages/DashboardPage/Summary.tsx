@@ -263,7 +263,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
           allowEscapeViewBox={{ x: true }}
           position={{ y: -6 }}
           wrapperStyle={{
-            zIndex: theme.zIndex.appBar + 1,
+            zIndex: theme.zIndex.appBar - 1,
           }}
           offset={0}
         />
