@@ -36,7 +36,7 @@ export const WorkerName = ({
         {worker.name ? (
           <Name>{worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}</Name>
         ) : null}
-        <Typography variant="body2">
+        <Typography variant="caption">
           <CopyToClipboard
             text={worker.peerId}
             content={

@@ -9,7 +9,7 @@ export const DashboardTableBase = styled(Table)(({ theme }) => ({
     ...theme.typography.body1,
     borderBottom: `1px solid ${theme.palette.divider}`,
     padding: theme.spacing(1, 2, 1, 0),
-    fontVariantNumeric: 'tabular-nums',
+    // fontVariantNumeric: 'tabular-nums',
     minHeight: theme.spacing(8),
   },
 

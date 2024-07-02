@@ -153,7 +153,7 @@ declare module 'notistack' {
   }
 }
 
-const fontFamily = `'Inter', sans-serif`;
+const fontFamily = `'Matter'`;
 
 export type ColorVariant = OverridableStringUnion<
   'primary' | 'secondary',
@@ -183,14 +183,14 @@ export const useCreateTheme = (mode: PaletteType) => {
             lineHeight: 1,
             fontWeight: 500,
             color: colors.text.primary,
-            letterSpacing: '-1%',
+            letterSpacing: '-0.01rem',
           },
           h2: {
             fontSize: 40,
             lineHeight: 1,
             fontWeight: 500,
             color: colors.text?.primary,
-            letterSpacing: '-1%',
+            letterSpacing: '-0.01rem',
           },
           h3: {
             fontSize: 32,
@@ -201,7 +201,7 @@ export const useCreateTheme = (mode: PaletteType) => {
             fontSize: 20,
             lineHeight: '24px',
             fontWeight: 500,
-            letterSpacing: '-1%',
+            letterSpacing: '-0.01rem',
           },
           body1: {
             fontSize: 16,
@@ -215,12 +215,23 @@ export const useCreateTheme = (mode: PaletteType) => {
             fontWeight: 500,
           },
           button: {
-            fontSize: '14px',
+            fontSize: '12px',
             lineHeight: '24px',
             fontWeight: 600,
-            letterSpacing: '8%',
+            letterSpacing: '0.08rem',
           },
-          caption: {},
+          caption: {
+            color: colors.text.secondary,
+            fontSize: 14,
+            lineHeight: '20px',
+            fontWeight: 400,
+          },
+          subtitle1: {
+            fontSize: '16px',
+            lineHeight: '24px',
+            fontWeight: 600,
+            letterSpacing: '0.08rem',
+          },
         },
         palette: {
           mode,

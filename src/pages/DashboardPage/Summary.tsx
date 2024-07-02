@@ -87,7 +87,10 @@ function OnlineInfo() {
       action={
         <Stack direction="row" spacing={1}>
           <span>Data</span>
-          <SquaredChip label={bytesFormatter(data?.storedData)} color="info" />
+          <SquaredChip
+            label={<Typography variant="subtitle1">{bytesFormatter(data?.storedData)}</Typography>}
+            color="info"
+          />
         </Stack>
       }
     >
@@ -156,7 +159,7 @@ function CurrentEpoch() {
         <Stack direction="row" spacing={1}>
           <span>Ends in</span>
           <SquaredChip
-            label={<Box sx={{ fontVariantNumeric: 'tabular-nums' }}>~{epochEndsIn}</Box>}
+            label={<Typography variant="subtitle1">~{epochEndsIn}</Typography>}
             color="warning"
           />
         </Stack>
@@ -217,7 +220,7 @@ function Stats() {
 function AprTooltip({ active, payload }: TooltipProps<number, string>) {
   return active && payload?.length ? (
     <SquaredChip
-      label={percentFormatter(payload[0].value)}
+      label={<Typography variant="subtitle1">{percentFormatter(payload[0].value)}</Typography>}
       color="info"
       sx={{ transform: 'translateX(-50%)' }}
     />
