@@ -82,6 +82,7 @@ const ClickableStack = styled(Stack)(({ theme }) => ({
   cursor: 'pointer',
   width: 'auto',
   userSelect: 'none',
+  alignItems: 'center',
 }));
 
 export function HeaderCell({
@@ -117,7 +118,7 @@ export function SortableHeaderCell<S extends string>({
       setQuery.sortDir(query.sortDir === SortDir.Asc ? SortDir.Desc : SortDir.Asc);
     } else {
       setQuery.sortBy(sortBy);
-      setQuery.sortDir(SortDir.Desc);
+      setQuery.sortDir(SortDir.Asc);
     }
   };
 
@@ -125,8 +126,8 @@ export function SortableHeaderCell<S extends string>({
     <HeaderCell help={help}>
       <ClickableStack onClick={handleSortChange(sort)} direction="row" spacing={1}>
         <Box>{children}</Box>
-        <Box>
-          <SortIcon query={query} value={sort} />
+        <Box display="flex">
+          <SortIcon query={query as any} value={sort} />
         </Box>
         {/* <TableSortLabel direction={query.sortDir as any} /> */}
       </ClickableStack>
