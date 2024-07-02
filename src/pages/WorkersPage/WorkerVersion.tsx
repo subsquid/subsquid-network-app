@@ -7,6 +7,7 @@ import { WarningIcon } from '@icons/WarningIcon';
 export const WorkerVersionName = styled(Box, {
   name: 'WorkerVersionName',
 })(() => ({
+  display: 'flex',
   whiteSpace: 'nowrap',
 }));
 
@@ -16,15 +17,17 @@ export const WorkerVersion = ({ worker }: { worker: Pick<Worker, 'version'> }) =
   return (
     <>
       {worker.version ? (
-        <Stack spacing={1} direction="row" alignItems="center">
+        <Stack spacing={1} direction="row" alignItems="flex-start">
           <WorkerVersionName>{worker.version}</WorkerVersionName>
-          {!satisfies(worker.version, recommendedWorkerVersion) ? (
-            !satisfies(worker.version, minimalWorkerVersion) ? (
-              <WarningIcon color="error" />
-            ) : (
-              <WarningIcon color="warning" />
-            )
-          ) : null}
+          <Box display="flex">
+            {!satisfies(worker.version, recommendedWorkerVersion) ? (
+              !satisfies(worker.version, minimalWorkerVersion) ? (
+                <WarningIcon color="error" />
+              ) : (
+                <WarningIcon color="warning" />
+              )
+            ) : null}
+          </Box>
         </Stack>
       ) : (
         <Box>-</Box>
