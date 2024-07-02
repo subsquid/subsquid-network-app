@@ -116,9 +116,14 @@ export function Workers() {
       >
         <TableHead>
           <TableRow>
-            <TableCell className="pinned" sx={{ width: 300 }}>
+            <SortableHeaderCell
+              sort={WorkerSortBy.Name}
+              query={query}
+              setQuery={setQuery}
+              sx={{ width: 300 }}
+            >
               Worker
-            </TableCell>
+            </SortableHeaderCell>
             <TableCell>Status</TableCell>
             <TableCell>Version</TableCell>
             <SortableHeaderCell sort={WorkerSortBy.Uptime90d} query={query} setQuery={setQuery}>

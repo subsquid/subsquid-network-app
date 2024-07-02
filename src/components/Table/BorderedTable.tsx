@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, SyntheticEvent } from 'react';
 
-import { Stack, styled, Table, TableCell, Tooltip } from '@mui/material';
+import { Stack, styled, SxProps, Table, TableCell, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
 
 import { SortDir } from '@api/subsquid-network-squid';
@@ -88,13 +88,15 @@ const ClickableStack = styled(Stack)(({ theme }) => ({
 export function HeaderCell({
   help,
   children,
+  sx,
 }: PropsWithChildren<{
   width?: string | number;
   help?: React.ReactNode;
+  sx?: SxProps;
 }>) {
   return (
     <Tooltip title={help} arrow placement="top">
-      <TableCell>{children}</TableCell>
+      <TableCell sx={sx}>{children}</TableCell>
     </Tooltip>
   );
 }
@@ -105,11 +107,13 @@ export function SortableHeaderCell<S extends string>({
   query,
   setQuery,
   help,
+  sx,
 }: PropsWithChildren<{
   sort: S;
   query: { sortBy: string; sortDir: string };
   setQuery: { sortBy: (v: string) => unknown; sortDir: (v: string) => unknown };
   help?: React.ReactNode;
+  sx?: SxProps;
 }>) {
   const handleSortChange = (sortBy: S) => (e: SyntheticEvent) => {
     e.preventDefault();
@@ -123,7 +127,7 @@ export function SortableHeaderCell<S extends string>({
   };
 
   return (
-    <HeaderCell help={help}>
+    <HeaderCell help={help} sx={sx}>
       <ClickableStack onClick={handleSortChange(sort)} direction="row" spacing={1}>
         <Box>{children}</Box>
         <Box display="flex">

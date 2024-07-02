@@ -57,9 +57,14 @@ export function MyDelegations() {
       >
         <TableHead>
           <TableRow>
-            <TableCell className="pinned" width={240}>
+            <SortableHeaderCell
+              sort={WorkerSortBy.Name}
+              query={query}
+              setQuery={setQuery}
+              sx={{ width: 300 }}
+            >
               Worker
-            </TableCell>
+            </SortableHeaderCell>
             <TableCell>Status</TableCell>
             <SortableHeaderCell sort={WorkerSortBy.StakerAPR} query={query} setQuery={setQuery}>
               Delegator APR

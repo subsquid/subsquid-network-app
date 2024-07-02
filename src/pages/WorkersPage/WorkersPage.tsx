@@ -56,7 +56,14 @@ export function MyWorkers() {
           <>
             <TableHead>
               <TableRow>
-                <TableCell width={275}>Worker</TableCell>
+                <SortableHeaderCell
+                  sort={WorkerSortBy.Name}
+                  query={query}
+                  setQuery={setQuery}
+                  sx={{ width: 300 }}
+                >
+                  Worker
+                </SortableHeaderCell>
                 <TableCell>Status</TableCell>
                 <SortableHeaderCell sort={WorkerSortBy.Uptime24h} query={query} setQuery={setQuery}>
                   Uptime, 24h
