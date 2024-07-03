@@ -886,6 +886,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.23.2":
+  version: 7.24.7
+  resolution: "@babel/runtime@npm:7.24.7"
+  dependencies:
+    regenerator-runtime: "npm:^0.14.0"
+  checksum: 10c0/b6fa3ec61a53402f3c1d75f4d808f48b35e0dfae0ec8e2bb5c6fc79fb95935da75766e0ca534d0f1c84871f6ae0d2ebdd950727cfadb745a2cdbef13faef5513
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.18.10, @babel/template@npm:^7.20.7, @babel/template@npm:^7.22.15, @babel/template@npm:^7.24.0":
   version: 7.24.0
   resolution: "@babel/template@npm:7.24.0"
@@ -2455,14 +2464,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/sdk-communication-layer@npm:0.26.2":
-  version: 0.26.2
-  resolution: "@metamask/sdk-communication-layer@npm:0.26.2"
+"@metamask/sdk-communication-layer@npm:0.26.4":
+  version: 0.26.4
+  resolution: "@metamask/sdk-communication-layer@npm:0.26.4"
   dependencies:
     bufferutil: "npm:^4.0.8"
     date-fns: "npm:^2.29.3"
     debug: "npm:^4.3.4"
-    utf-8-validate: "npm:^6.0.3"
+    utf-8-validate: "npm:^5.0.2"
     uuid: "npm:^8.3.2"
   peerDependencies:
     cross-fetch: ^4.0.0
@@ -2470,20 +2479,19 @@ __metadata:
     eventemitter2: ^6.4.7
     readable-stream: ^3.6.2
     socket.io-client: ^4.5.1
-  checksum: 10c0/32ac9d3febb2cb250d7a6cb4714077335f651fceb0562a85e9723475622b5caa5d9f0d39f8983349258f62c34e46eec14f366c0d56baf3b4cfbaa4d1c157c387
+  checksum: 10c0/01f9704942f6751ba03819117ba611dae3712310bdf54fed1637a526d5fd972fc6fe097be27a5ed4b657a8dea8e497861ce81efa1879000d10696c787e8356e2
   languageName: node
   linkType: hard
 
-"@metamask/sdk-install-modal-web@npm:0.26.0":
-  version: 0.26.0
-  resolution: "@metamask/sdk-install-modal-web@npm:0.26.0"
+"@metamask/sdk-install-modal-web@npm:0.26.4":
+  version: 0.26.4
+  resolution: "@metamask/sdk-install-modal-web@npm:0.26.4"
   dependencies:
     qr-code-styling: "npm:^1.6.0-rc.1"
   peerDependencies:
-    i18next: 22.5.1
+    i18next: 23.2.3
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-i18next: ^13.2.2
     react-native: "*"
   peerDependenciesMeta:
     react:
@@ -2492,18 +2500,18 @@ __metadata:
       optional: true
     react-native:
       optional: true
-  checksum: 10c0/04529b31485c4cf0b09e5751dc16c16616d4c9f5dedb16b9e2682e22b087f3189659cfb7c8e376bd3791d73b270347e077f88518f4e38b1109b4fe78542f95d8
+  checksum: 10c0/2bd87481e2630e739d19cfd211e5c68ebe7bd24ee4760764381ef93e4127afb5d6d4ca51b539c424c3bd2368dfe421daf86d689e1462b09c84509d0042968e45
   languageName: node
   linkType: hard
 
-"@metamask/sdk@npm:0.26.3":
-  version: 0.26.3
-  resolution: "@metamask/sdk@npm:0.26.3"
+"@metamask/sdk@npm:0.26.4":
+  version: 0.26.4
+  resolution: "@metamask/sdk@npm:0.26.4"
   dependencies:
     "@metamask/onboarding": "npm:^1.0.1"
     "@metamask/providers": "npm:^15.0.0"
-    "@metamask/sdk-communication-layer": "npm:0.26.2"
-    "@metamask/sdk-install-modal-web": "npm:0.26.0"
+    "@metamask/sdk-communication-layer": "npm:0.26.4"
+    "@metamask/sdk-install-modal-web": "npm:0.26.4"
     "@types/dom-screen-wake-lock": "npm:^1.0.0"
     bowser: "npm:^2.9.0"
     cross-fetch: "npm:^4.0.0"
@@ -2511,7 +2519,7 @@ __metadata:
     eciesjs: "npm:^0.3.15"
     eth-rpc-errors: "npm:^4.0.3"
     eventemitter2: "npm:^6.4.7"
-    i18next: "npm:22.5.1"
+    i18next: "npm:23.11.5"
     i18next-browser-languagedetector: "npm:7.1.0"
     obj-multiplex: "npm:^1.0.0"
     pump: "npm:^3.0.0"
@@ -2530,7 +2538,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10c0/ed9a7cb456a7a9a3c5f71f80ea18838475b551f4d4034d7922bd7b29a116d65c770c37be1961ad191d9373845b13b4e3bcb16207322c2da9216746271e98397b
+  checksum: 10c0/74c671a1dae8f148ad6917f06c01a4d8f57ad9f4be911a7f9f0101be42871efa65a7836779e380a25644a4489a78bda54f68021d2e6066e09dcf08cfd57187f8
   languageName: node
   linkType: hard
 
@@ -3810,7 +3818,7 @@ __metadata:
     vite-plugin-html: "npm:^3.2.2"
     vite-plugin-html-env: "npm:^1.2.8"
     vite-tsconfig-paths: "npm:^4.3.2"
-    wagmi: "npm:^2.10.8"
+    wagmi: "npm:^2.9.2"
     yup: "npm:^1.4.0"
   languageName: unknown
   linkType: soft
@@ -4491,31 +4499,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wagmi/connectors@npm:5.0.20":
-  version: 5.0.20
-  resolution: "@wagmi/connectors@npm:5.0.20"
+"@wagmi/connectors@npm:5.0.21":
+  version: 5.0.21
+  resolution: "@wagmi/connectors@npm:5.0.21"
   dependencies:
     "@coinbase/wallet-sdk": "npm:4.0.4"
-    "@metamask/sdk": "npm:0.26.3"
+    "@metamask/sdk": "npm:0.26.4"
     "@safe-global/safe-apps-provider": "npm:0.18.1"
     "@safe-global/safe-apps-sdk": "npm:8.1.0"
     "@walletconnect/ethereum-provider": "npm:2.13.0"
     "@walletconnect/modal": "npm:2.6.2"
     cbw-sdk: "npm:@coinbase/wallet-sdk@3.9.3"
   peerDependencies:
-    "@wagmi/core": 2.11.5
+    "@wagmi/core": 2.11.6
     typescript: ">=5.0.4"
     viem: 2.x
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/09e3a1ee7ab4de1e77d7b9392c9e70f43996fef1665085c5246d4b74e0ad60df5cf2af4e5f6b5faee284f8a4c7e5aad3a8ef23c5f8cc605255e112754fa3c3ad
+  checksum: 10c0/9530d5f35be860526fdf86acfded4fbc7b8b9cc929182828452d3c1d518363b8d0942c3cc6e9088b44fa3832a2606551fb2bb888b2aced45629b97a4f27946ad
   languageName: node
   linkType: hard
 
-"@wagmi/core@npm:2.11.5":
-  version: 2.11.5
-  resolution: "@wagmi/core@npm:2.11.5"
+"@wagmi/core@npm:2.11.6":
+  version: 2.11.6
+  resolution: "@wagmi/core@npm:2.11.6"
   dependencies:
     eventemitter3: "npm:5.0.1"
     mipd: "npm:0.0.5"
@@ -4529,7 +4537,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10c0/687c804547ff37830a824cfc9fc5ca1c41a159f2137d45c730486a607f557d2637ef2cff404b88e65309e0be1fe13b3fdee6d3171fe9c172567d46c54753fdfd
+  checksum: 10c0/a19145915d55cac4c51a119fb762c8d01e14d910f642bb45f9c30ea6d575773acb70f2abd8d9e24e6eff881d7f3515b93eb758a87b6a9f6d8b9c608d5b1a388e
   languageName: node
   linkType: hard
 
@@ -8546,12 +8554,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:22.5.1":
-  version: 22.5.1
-  resolution: "i18next@npm:22.5.1"
+"i18next@npm:23.11.5":
+  version: 23.11.5
+  resolution: "i18next@npm:23.11.5"
   dependencies:
-    "@babel/runtime": "npm:^7.20.6"
-  checksum: 10c0/a284f8d805ebad77114a830e60d5c59485a7f4d45179761f877249b63035572cff4103e5b4702669dff1a0e03b4e8b6df377bc871935f8215e43fd97e8e9e910
+    "@babel/runtime": "npm:^7.23.2"
+  checksum: 10c0/b0bec64250a3e529d4c51e2fc511406a85c5dde3d005d3aabe919551ca31dfc0a8f5490bf6e44649822e895a1fa91a58092d112367669cd11b2eb89e6ba90d1a
   languageName: node
   linkType: hard
 
@@ -13308,13 +13316,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"utf-8-validate@npm:^6.0.3":
-  version: 6.0.4
-  resolution: "utf-8-validate@npm:6.0.4"
+"utf-8-validate@npm:^5.0.2":
+  version: 5.0.10
+  resolution: "utf-8-validate@npm:5.0.10"
   dependencies:
     node-gyp: "npm:latest"
     node-gyp-build: "npm:^4.3.0"
-  checksum: 10c0/f7042d94aec6ca02461b64e725bdc7262266610dbb787331e5bbd49374ef6f75fe9900600df3fc63d97906c23614a965c8989b4bf95d70bf35dc617da99215e7
+  checksum: 10c0/23cd6adc29e6901aa37ff97ce4b81be9238d0023c5e217515b34792f3c3edb01470c3bd6b264096dd73d0b01a1690b57468de3a24167dd83004ff71c51cc025f
   languageName: node
   linkType: hard
 
@@ -13424,9 +13432,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2.16.5":
-  version: 2.16.5
-  resolution: "viem@npm:2.16.5"
+"viem@npm:^2.10.9":
+  version: 2.17.0
+  resolution: "viem@npm:2.17.0"
   dependencies:
     "@adraffy/ens-normalize": "npm:1.10.0"
     "@noble/curves": "npm:1.4.0"
@@ -13441,7 +13449,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/24fd0cf8dd91a831ed5d2a8c2a7ec55dbe213b174973942448a30b5984531d1d066ac371d864cb11a34bbf16cdcab63e48f2861a8c7ea6c8093c503af81c7a1e
+  checksum: 10c0/c4830eb204b654eb54bafd9c229137871642c40bbd40562bf40eda914a31073bd0f662eb39721e8e6fb8791920f3e463b968b29cc9a5c12e2ed342415f6ff33b
   languageName: node
   linkType: hard
 
@@ -13535,12 +13543,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wagmi@npm:^2.10.8":
-  version: 2.10.8
-  resolution: "wagmi@npm:2.10.8"
+"wagmi@npm:^2.9.2":
+  version: 2.10.9
+  resolution: "wagmi@npm:2.10.9"
   dependencies:
-    "@wagmi/connectors": "npm:5.0.20"
-    "@wagmi/core": "npm:2.11.5"
+    "@wagmi/connectors": "npm:5.0.21"
+    "@wagmi/core": "npm:2.11.6"
     use-sync-external-store: "npm:1.2.0"
   peerDependencies:
     "@tanstack/react-query": ">=5.0.0"
@@ -13550,7 +13558,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/8231268155606c22e91ffde2d066e127fcd858d3e4e3386e38db1f817d87452fc88c01b18380f383ab9e597a508f6d6177cc4b2b67ed9512a27c8727ecc3dd89
+  checksum: 10c0/a7e2d127e9e04b758e76f1c204d4133fd348945787ba16e6d6db8604996e27643b606250056e785d5f6b08be8bf67d3402aa81d0a4b297359a5f0782bf683485
   languageName: node
   linkType: hard
 
