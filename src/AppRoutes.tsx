@@ -47,7 +47,7 @@ export const AppRoutes = () => {
           <Route element={<AddNewGateway />} path="add" />
           <Route element={<Gateway backPath="/gateways" />} path=":peerId" />
         </Route>
-        <Route element={<Navigate to="/assets" replace={true} />} path="*" />
+        <Route element={<Navigate to="/dashboard" replace={true} />} path="*" />
       </Route>
     </Routes>
   );

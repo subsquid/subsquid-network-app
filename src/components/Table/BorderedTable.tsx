@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, SyntheticEvent } from 'react';
 
-import { Stack, styled, Table, TableCell, Tooltip } from '@mui/material';
+import { Stack, styled, SxProps, Table, TableCell, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
 
 import { SortDir } from '@api/subsquid-network-squid';
@@ -82,18 +82,21 @@ const ClickableStack = styled(Stack)(({ theme }) => ({
   cursor: 'pointer',
   width: 'auto',
   userSelect: 'none',
+  alignItems: 'center',
 }));
 
 export function HeaderCell({
   help,
   children,
+  sx,
 }: PropsWithChildren<{
   width?: string | number;
   help?: React.ReactNode;
+  sx?: SxProps;
 }>) {
   return (
     <Tooltip title={help} arrow placement="top">
-      <TableCell>{children}</TableCell>
+      <TableCell sx={sx}>{children}</TableCell>
     </Tooltip>
   );
 }
@@ -104,11 +107,13 @@ export function SortableHeaderCell<S extends string>({
   query,
   setQuery,
   help,
+  sx,
 }: PropsWithChildren<{
   sort: S;
   query: { sortBy: string; sortDir: string };
   setQuery: { sortBy: (v: string) => unknown; sortDir: (v: string) => unknown };
   help?: React.ReactNode;
+  sx?: SxProps;
 }>) {
   const handleSortChange = (sortBy: S) => (e: SyntheticEvent) => {
     e.preventDefault();
@@ -117,22 +122,18 @@ export function SortableHeaderCell<S extends string>({
       setQuery.sortDir(query.sortDir === SortDir.Asc ? SortDir.Desc : SortDir.Asc);
     } else {
       setQuery.sortBy(sortBy);
-      setQuery.sortDir(SortDir.Desc);
+      setQuery.sortDir(SortDir.Asc);
     }
   };
 
   return (
-    <HeaderCell help={help}>
-      <ClickableStack
-        onClick={handleSortChange(sort)}
-        direction="row"
-        spacing={1}
-        alignItems="center"
-      >
+    <HeaderCell help={help} sx={sx}>
+      <ClickableStack onClick={handleSortChange(sort)} direction="row" spacing={1}>
         <Box>{children}</Box>
-        <Box>
-          <SortIcon query={query} value={sort} />
+        <Box display="flex">
+          <SortIcon query={query as any} value={sort} />
         </Box>
+        {/* <TableSortLabel direction={query.sortDir as any} /> */}
       </ClickableStack>
     </HeaderCell>
   );

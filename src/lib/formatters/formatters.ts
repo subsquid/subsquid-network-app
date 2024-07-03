@@ -12,18 +12,18 @@ export function percentFormatter(value?: number | string | BigNumber) {
   return `${value.lt(0.01) && value.gt(0) ? '<0.01' : value.toFixed(2)}%`;
 }
 
-const formatter8 = new Intl.NumberFormat('fr-FR', {
+const formatter8 = new Intl.NumberFormat('en', {
   maximumFractionDigits: 8,
 });
 
-export function numberWithSpacesFormatter(val?: number | string) {
+export function numberWithCommasFormatter(val?: number | string) {
   if (val === undefined) return '';
 
-  return formatter8.format(Number(val)).replace(',', '.');
+  return formatter8.format(Number(val));
 }
 
 export function bytesFormatter(val?: number | string) {
-  if (!val) return '0 GB';
+  if (!val) return '0 MB';
 
   return prettyBytes(Number(val), { maximumFractionDigits: 0 });
 }
@@ -49,7 +49,7 @@ export function tokenFormatter(val: number | BigNumber, currency: string, decima
       trimEnd(
         bn.toFormat(decimals ?? 6, BigNumber.ROUND_FLOOR, {
           decimalSeparator: '.',
-          groupSeparator: ' ',
+          groupSeparator: ',',
           groupSize: 3,
         }),
         '0',

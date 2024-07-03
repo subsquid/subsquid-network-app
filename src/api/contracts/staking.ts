@@ -105,7 +105,7 @@ function useDepositFromVestingContract() {
 export function useWorkerDelegate() {
   const client = useClient();
   const { setWaitHeight } = useSquidNetworkHeight();
-  const [isLoading, setLoading] = useState(false);
+  const [isPending, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const depositFromWallet = useDelegateFromWallet();
@@ -140,7 +140,7 @@ export function useWorkerDelegate() {
 
   return {
     delegateToWorker,
-    isLoading,
+    isPending,
     error,
   };
 }
@@ -196,7 +196,7 @@ function useUndelegateFromVestingContract() {
 export function useWorkerUndelegate() {
   const client = usePublicClient();
   const { setWaitHeight } = useSquidNetworkHeight();
-  const [isLoading, setLoading] = useState(false);
+  const [isPending, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const undelegateFromWallet = useUndelegateFromWallet();
@@ -231,7 +231,7 @@ export function useWorkerUndelegate() {
 
   return {
     undelegateFromWorker,
-    isLoading,
+    isPending,
     error,
   };
 }

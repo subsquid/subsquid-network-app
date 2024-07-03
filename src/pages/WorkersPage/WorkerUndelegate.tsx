@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
-import { Box, Button, Chip, Stack } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Box, Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
@@ -12,7 +13,7 @@ import { useWorkerUndelegate } from '@api/contracts/staking';
 import { Account, Delegation, Worker } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
+import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
 
@@ -41,7 +42,7 @@ export function WorkerUndelegate({
   };
   disabled?: boolean;
 }) {
-  const { undelegateFromWorker, error, isLoading } = useWorkerUndelegate();
+  const { undelegateFromWorker, error, isPending } = useWorkerUndelegate();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (e: React.UIEvent) => {
@@ -134,18 +135,18 @@ export function WorkerUndelegate({
 
   return (
     <>
-      <Button
+      <LoadingButton
         disabled={disabled || !canUndelegate}
         color="error"
         onClick={handleOpen}
-        variant="contained"
+        variant="outlined"
       >
-        Undelegate
-      </Button>
+        UNDELEGATE
+      </LoadingButton>
       <ContractCallDialog
         title="Undelegate"
         open={open}
-        loading={isLoading}
+        loading={isPending}
         onResult={confirmed => {
           if (!confirmed) return handleClose();
 
@@ -194,11 +195,12 @@ export function WorkerUndelegate({
               }}
             />
           </FormRow>
+          <FormDivider />
           <Stack direction="row" justifyContent="space-between" alignContent="center">
             <Box>Expected APR</Box>
-            <Stack direction="row">
-              {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
-              <HelpTooltip help={EXPECTED_APR_TIP} />
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
+              <HelpTooltip title={EXPECTED_APR_TIP} />
             </Stack>
           </Stack>
           <BlockchainContractError error={error} />

@@ -2,19 +2,19 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network/utils';
-import { Box, Button, Chip, Stack } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Box, Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
 import { useCapedStakeAfterDelegation, useWorkerDelegate } from '@api/contracts/staking';
-import { Worker, WorkerStatus, useWorkerDelegationInfo } from '@api/subsquid-network-squid';
+import { useWorkerDelegationInfo, Worker, WorkerStatus } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
+import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
-import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
 
 export const EXPECTED_APR_TIP = (
@@ -39,11 +39,13 @@ export const delegateSchema = yup.object({
 export function WorkerDelegate({
   worker,
   disabled,
+  variant = 'outlined',
 }: {
   worker?: Pick<Worker, 'id' | 'status'>;
+  variant?: 'outlined' | 'contained';
   disabled?: boolean;
 }) {
-  const { delegateToWorker, error, isLoading } = useWorkerDelegate();
+  const { delegateToWorker, error, isPending } = useWorkerDelegate();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (event: React.UIEvent) => {
@@ -118,78 +120,77 @@ export function WorkerDelegate({
 
   return (
     <>
-      <Button
+      <LoadingButton
         disabled={disabled || !worker || worker.status !== WorkerStatus.Active}
         onClick={handleOpen}
-        variant="contained"
+        variant={variant}
+        color={variant === 'contained' ? 'info' : 'secondary'}
       >
-        Delegate
-      </Button>
+        DELEGATE
+      </LoadingButton>
       <ContractCallDialog
         title="Delegate"
+        confirmButtonText="DELEGATE"
         open={open}
         onResult={confirmed => {
           if (!confirmed) return handleClose();
 
           formik.handleSubmit();
         }}
-        loading={isLoading}
+        loading={isPending}
       >
-        {isSourceLoading ? (
-          <Loader />
-        ) : (
-          <Form onSubmit={formik.handleSubmit}>
-            <FormRow>
-              <FormikSelect
-                id="source"
-                disabled={!options.length}
-                showErrorOnlyOfTouched
-                options={options}
-                formik={formik}
-                onChange={e => {
-                  const wallet = sources.find(w => w?.id === e.target.value);
-                  if (!wallet) return;
+        <Form onSubmit={formik.handleSubmit}>
+          <FormRow>
+            <FormikSelect
+              id="source"
+              disabled={!options.length}
+              showErrorOnlyOfTouched
+              options={options}
+              formik={formik}
+              onChange={e => {
+                const wallet = sources.find(w => w?.id === e.target.value);
+                if (!wallet) return;
 
-                  formik.setFieldValue('source', wallet.id);
-                  formik.setFieldValue('max', fromSqd(wallet.balance).toFixed());
-                }}
-              />
-            </FormRow>
-            <FormRow>
-              <FormikTextInput
-                id="amount"
-                label="Amount"
-                formik={formik}
-                showErrorOnlyOfTouched
-                autoComplete="off"
-                InputProps={{
-                  endAdornment: (
-                    <Chip
-                      clickable
-                      disabled={formik.values.max === formik.values.amount}
-                      onClick={() => {
-                        formik.setValues({
-                          ...formik.values,
-                          amount: formik.values.max,
-                        });
-                      }}
-                      label="Max"
-                    />
-                  ),
-                }}
-              />
-            </FormRow>
-            <Stack direction="row" justifyContent="space-between" alignContent="center">
-              <Box>Expected APR</Box>
-              <Stack direction="row">
-                {isExpectedAprPending ? '-' : percentFormatter(stakerApr)}
-                <HelpTooltip help={EXPECTED_APR_TIP} />
-              </Stack>
+                formik.setFieldValue('source', wallet.id);
+                formik.setFieldValue('max', fromSqd(wallet.balance).toFixed());
+              }}
+            />
+          </FormRow>
+          <FormRow>
+            <FormikTextInput
+              id="amount"
+              label="Amount"
+              formik={formik}
+              showErrorOnlyOfTouched
+              autoComplete="off"
+              InputProps={{
+                endAdornment: (
+                  <Chip
+                    clickable
+                    disabled={formik.values.max === formik.values.amount}
+                    onClick={() => {
+                      formik.setValues({
+                        ...formik.values,
+                        amount: formik.values.max,
+                      });
+                    }}
+                    label="Max"
+                  />
+                ),
+              }}
+            />
+          </FormRow>
+          <FormDivider />
+          <Stack direction="row" justifyContent="space-between" alignContent="center">
+            <Box>Expected APR</Box>
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
+              <HelpTooltip title={EXPECTED_APR_TIP} />
             </Stack>
+          </Stack>
 
-            <BlockchainContractError error={error} />
-          </Form>
-        )}
+          <BlockchainContractError error={error} />
+        </Form>
       </ContractCallDialog>
     </>
   );
@@ -254,9 +255,9 @@ export function useExpectedAprAfterDelegation({
       .toNumber();
 
     const stakerReward = actualYield.times(halfDelegation);
-    const stakerApr = expectedTotalDelegation
+    const stakerApr = expectedTotalDelegation.gt(0)
       ? stakerReward.div(expectedTotalDelegation).times(100).toNumber()
-      : 0;
+      : workerApr / 2;
 
     return {
       workerApr,

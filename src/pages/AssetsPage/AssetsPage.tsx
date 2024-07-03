@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
@@ -14,7 +13,6 @@ export function AssetsPage() {
     <CenteredPageWrapper className="wide">
       <ConnectedWalletRequired>
         <MyAssets />
-        <Box sx={{ height: 64 }} />
         <MyVestings />
       </ConnectedWalletRequired>
       <Outlet />

@@ -68,7 +68,7 @@ function useClaimFromVestingContract() {
 export function useClaim() {
   const client = useClient();
   const { setWaitHeight } = useSquidNetworkHeight();
-  const [isLoading, setLoading] = useState(false);
+  const [isPending, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const claimFromWallet = useClaimFromWallet();
@@ -99,7 +99,7 @@ export function useClaim() {
 
   return {
     claim,
-    isLoading,
+    isPending,
     error,
   };
 }

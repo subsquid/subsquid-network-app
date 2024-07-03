@@ -1,4 +1,4 @@
-import { Stack, styled } from '@mui/material';
+import { Stack, styled, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
@@ -12,9 +12,10 @@ import { PeerIdShort, shortPeerId } from '@components/PeerId';
 const Name = styled(Box, {
   name: 'Name',
 })(({ theme }) => ({
-  marginBottom: theme.spacing(0.5),
-  fontWeight: 500,
+  marginBottom: theme.spacing(0.25),
   whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
 }));
 
 export const WorkerName = ({
@@ -25,31 +26,27 @@ export const WorkerName = ({
   to?: string;
 }) => {
   return (
-    <Stack spacing={2} direction="row">
+    <Stack spacing={1.5} direction="row" alignItems="center">
       <Avatar
         // online={!!worker.online}
         name={worker.name || worker.peerId}
         colorDiscriminator={worker.peerId}
       />
-      <Box>
+      <Box overflow="clip">
         {worker.name ? (
-          <Name title={worker.name}>
-            {worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}
-          </Name>
+          <Name>{worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}</Name>
         ) : null}
-        <Stack direction="row" spacing={1}>
-          <Box>
-            <CopyToClipboard
-              text={worker.peerId}
-              content={
-                <PeerIdShort>
-                  <Link to={to || '#'}>{shortPeerId(worker.peerId)}</Link>
-                </PeerIdShort>
-              }
-            />
-          </Box>
-          {/* <WorkerDelegationCapacity worker={worker} /> */}
-        </Stack>
+        <Typography variant="caption">
+          <CopyToClipboard
+            text={worker.peerId}
+            content={
+              <PeerIdShort>
+                <Link to={to || '#'}>{shortPeerId(worker.peerId)}</Link>
+              </PeerIdShort>
+            }
+          />
+        </Typography>
+        {/* <WorkerDelegationCapacity worker={worker} /> */}
       </Box>
     </Stack>
   );

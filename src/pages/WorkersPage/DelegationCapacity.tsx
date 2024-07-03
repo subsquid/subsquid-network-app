@@ -2,29 +2,12 @@ import { percentFormatter } from '@lib/formatters/formatters';
 import { Box, Stack, styled } from '@mui/material';
 import classNames from 'classnames';
 
-export const Bar = styled(Box)(({ theme }) => ({
-  width: theme.spacing(0.75),
-  height: theme.spacing(2),
-  borderRadius: '2px',
-  background: '#EBEBEB',
-
-  '&.error': {
-    background: theme.palette.networkStatus.offline,
-  },
-
-  '&.warning': {
-    background: theme.palette.networkStatus.downtime,
-  },
-
-  '&.success': {
-    background: theme.palette.networkStatus.online,
-  },
-}));
+import { StyledBar } from './StatusBar';
 
 export const BarWrapper = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   '& :not(:last-child)': {
-    marginRight: theme.spacing(0.25),
+    marginRight: theme.spacing(0.5),
   },
 }));
 
@@ -40,7 +23,7 @@ export function DelegationCapacity({ worker }: { worker: { delegationCapacity: n
     <Stack direction="row" spacing={1} alignItems="center">
       <BarWrapper>
         {RANGES.map((v, i) => (
-          <Bar
+          <StyledBar
             key={i}
             className={classNames(v < delegationCapacity || i === 0 ? color : undefined)}
           />

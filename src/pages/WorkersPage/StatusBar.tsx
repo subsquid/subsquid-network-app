@@ -11,16 +11,22 @@ interface UptimeItem {
   backgroundColor: string;
 }
 
-const statusBarWidth = 6;
+export const StyledBar = styled(Box)(({ theme }) => ({
+  width: theme.spacing(0.75),
+  height: theme.spacing(3),
+  borderRadius: 360,
+  background: theme.palette.background.paper,
 
-export const StyledBar = styled(Box)(({ theme: { palette } }) => ({
-  width: `${statusBarWidth}px`,
-  height: '34px',
-  borderRadius: '1px',
-  cursor: 'pointer',
+  '&.error': {
+    background: theme.palette.error.main,
+  },
 
-  '&:hover': {
-    background: palette.grayScale.gray500,
+  '&.warning': {
+    background: theme.palette.warning.main,
+  },
+
+  '&.success': {
+    background: theme.palette.success.main,
   },
 }));
 

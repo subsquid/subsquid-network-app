@@ -37,10 +37,10 @@ export function WorkerUnregister({
               });
             }}
             disabled={disabled || worker.status === WorkerStatus.Withdrawn}
-            variant="contained"
+            variant="outlined"
             color="error"
           >
-            Withdraw
+            WITHDRAW
           </LoadingButton>
         ) : (
           <LoadingButton
@@ -53,10 +53,10 @@ export function WorkerUnregister({
                 source: data?.owner || { id: '', type: AccountType.User },
               });
             }}
-            variant="contained"
+            variant="outlined"
             color="error"
           >
-            Unregister
+            UNREGISTER
           </LoadingButton>
         )}
       </Box>

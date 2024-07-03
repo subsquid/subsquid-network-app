@@ -21,7 +21,6 @@ import {
   useWorkerDelegationInfoQuery,
   useWorkerOwnerQuery,
   Worker,
-  WorkerFragmentFragment,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
 // inherit API interface for internal class
@@ -136,6 +135,7 @@ export enum WorkerSortBy {
   DelegationCapacity = 'delegation_capacity',
   MyDelegation = 'my_delegation',
   MyDelegationReward = 'my_delegation_reward',
+  Name = 'name',
 }
 
 export enum SortDir {
@@ -154,6 +154,8 @@ export function sortWorkers<T extends PartialDeep<WorkerExtended, { recurseIntoA
     }
 
     switch (sortBy) {
+      case WorkerSortBy.Name:
+        return a.name ? (b.name ? a.name.localeCompare(b.name) : -1) : 1;
       case WorkerSortBy.Uptime90d:
         return (a.uptime90Days ?? -1) - (b.uptime90Days ?? -1);
       case WorkerSortBy.Uptime24h:

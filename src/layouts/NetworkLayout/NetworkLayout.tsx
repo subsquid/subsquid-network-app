@@ -4,6 +4,7 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 
 import {
   AppBar as AppBarMaterial,
+  Backdrop,
   Box,
   IconButton,
   Slide,
@@ -18,7 +19,7 @@ import { useDisconnect, useWalletClient } from 'wagmi';
 
 import { Logo } from '@components/Logo';
 // import { NetworkSwitcher } from '@components/NetworkSwitcher';
-import { TopBanner, useBannerHeight } from '@components/TopBanner';
+import { useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
 import { useAccount } from '@network/useAccount';
 import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
@@ -29,20 +30,21 @@ import { NetworkMenu } from './NetworkMenu';
 import { SyncSquidSnackbar } from './SyncSquidSnackbar';
 import { UserMenu } from './UserMenu';
 
-const APP_BAR_HEIGHT = 52;
+const APP_BAR_HEIGHT = 60;
 const SIDEBAR_WIDTH = {
-  M: 248,
-  L: 320,
+  M: 56,
+  L: 240,
 };
 
 export const Main = styled('div', {
   name: 'Main',
 })(({ theme }) => ({
   minHeight: '100%',
-  background: theme.palette.background.paper,
+  background: theme.palette.background.default,
   display: 'flex',
   flexFlow: 'column',
   position: 'relative',
+  overflowX: 'clip',
 }));
 
 export const AppToolbar = styled(Box, { name: 'AppToolbar' })(({ theme }) => ({
@@ -51,6 +53,7 @@ export const AppToolbar = styled(Box, { name: 'AppToolbar' })(({ theme }) => ({
   alignItems: 'center',
   height: APP_BAR_HEIGHT,
   paddingRight: theme.spacing(3),
+  marginLeft: 12,
 
   [theme.breakpoints.down('xs')]: {
     paddingRight: theme.spacing(2),
@@ -60,7 +63,7 @@ export const AppToolbar = styled(Box, { name: 'AppToolbar' })(({ theme }) => ({
 export const AppToolbarSidebar = styled('div', {
   name: 'AppToolbarSidebar',
 })(({ theme }) => ({
-  width: SIDEBAR_WIDTH.L,
+  width: theme.spacing(7),
   display: 'flex',
   alignItems: 'center',
   paddingLeft: theme.spacing(3),
@@ -70,11 +73,11 @@ export const AppToolbarSidebar = styled('div', {
   },
 
   [theme.breakpoints.down('xl')]: {
-    width: SIDEBAR_WIDTH.M,
+    width: theme.spacing(7),
   },
 
   [theme.breakpoints.down('md')]: {
-    width: 'auto',
+    // width: 'auto',
     '&:after': {
       display: 'none',
     },
@@ -91,16 +94,9 @@ export const AppToolbarContent = styled('div', {
   flex: 1,
   paddingLeft: theme.spacing(3),
   display: 'flex',
-  justifyContent: 'flex-end',
-
-  [theme.breakpoints.down('xl')]: {
-    width: 'auto',
-    borderRight: 'none',
-    // paddingLeft: theme.spacing(2),
-  },
-  [theme.breakpoints.down('md')]: {
-    paddingLeft: theme.spacing(0),
-  },
+  justifyContent: 'flex-start',
+  fontWeight: 500,
+  fontSize: 32,
 }));
 
 export const Content = styled('div', {
@@ -110,12 +106,13 @@ export const Content = styled('div', {
 
   return {
     flex: 1,
-    background: theme.palette.background.content,
+    // background: theme.palette.background.content,
     display: 'flex',
     alignItems: 'stretch',
     justifyContent: 'center',
     paddingTop: APP_BAR_HEIGHT + bannerHeight,
     paddingLeft: SIDEBAR_WIDTH.M,
+    paddingBottom: theme.spacing(8),
     minWidth: 350,
 
     '&.narrow': {
@@ -132,22 +129,23 @@ export const ContentWrapper = styled('div', {
   name: 'ContentWrapper',
 })(({ theme }) => ({
   margin: theme.spacing(0, 'auto'),
-  padding: theme.spacing(7.5),
+  padding: theme.spacing(2),
   flex: '1',
   // alignSelf: 'center',
-  color: alpha(theme.palette.text.primary, 0.8),
+  // color: alpha(theme.palette.text.primary, 0.8),
   maxWidth: '100%',
+  overflowX: 'visible',
 
   [theme.breakpoints.up('xl')]: {
-    maxWidth: 1200,
+    maxWidth: 1336,
     boxSizing: 'content-box',
   },
-  [theme.breakpoints.down('md')]: {
-    padding: theme.spacing(7.5, 3),
-  },
-  [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(3, 2),
-  },
+  // [theme.breakpoints.down('md')]: {
+  //   padding: theme.spacing(7.5, 3),
+  // },
+  // [theme.breakpoints.down('sm')]: {
+  //   padding: theme.spacing(3, 2),
+  // },
 }));
 
 const Sidebar = styled('div', {
@@ -160,19 +158,21 @@ const Sidebar = styled('div', {
 
   return {
     display: 'flex',
-    flexFlow: 'column',
+    flexDirection: 'column',
     alignItems: 'stretch',
-    marginTop: APP_BAR_HEIGHT + bannerHeight,
-    background: theme.palette.background.paper,
+    // marginTop: APP_BAR_HEIGHT + bannerHeight,
+    background: theme.palette[variant].main,
     position: 'fixed',
     top: 0,
-    // paddingTop: theme.spacing(0),
+    // paddingLeft: theme.spacing(1),
+    // paddingTop: theme.spacing(1),
     bottom: 0,
-    paddingBottom: theme.spacing(3),
-    zIndex: theme.zIndex.appBar - 1,
-    boxShadow: '-5px 4px 20px rgba(0, 0, 0, 0.25)',
+    // paddingBottom: theme.spacing(3),
+    zIndex: theme.zIndex.appBar + 1,
+    // boxShadow: '-5px 4px 20px rgba(0, 0, 0, 0.25)',
     width: SIDEBAR_WIDTH.M,
     overflowY: 'auto',
+    overflowX: 'hidden',
 
     [theme.breakpoints.up('xl')]: {
       width: SIDEBAR_WIDTH.L,
@@ -182,25 +182,41 @@ const Sidebar = styled('div', {
       zIndex: theme.zIndex.guide.highlight,
     },
 
-    '& .MuiButtonBase-root:hover': {
-      color: theme.palette[variant].main,
+    '& .MuiButtonBase-root': {
+      color: theme.palette[variant].contrastText,
       '& path': {
-        fill: theme.palette[variant].main,
+        fill: theme.palette[variant].contrastText,
       },
     },
+    // '& .MuiButtonBase-root:hover': {
+    //   color: theme.palette[variant].light,
+    //   '& path': {
+    //     fill: theme.palette[variant].light,
+    //   },
+    // },
     '& .MuiButtonBase-root.selected': {
-      color: theme.palette[variant].contrastText,
-      background: theme.palette[variant].main,
+      color: theme.palette.text.primary,
       '& path': {
-        fill: theme.palette[variant].contrastText,
+        fill: theme.palette.text.primary,
       },
     },
-    '& .MuiButtonBase-root.selected:hover': {
-      color: theme.palette[variant].contrastText,
-      '& path': {
-        fill: theme.palette[variant].contrastText,
-      },
-    },
+    // '& .MuiButtonBase-root.selected:hover': {
+    //   color: theme.palette[variant].light,
+    //   '& path': {
+    //     fill: theme.palette[variant].light,
+    //   },
+    // },
+  };
+});
+
+const SidebarLogo = styled('div', {
+  name: 'SidebarLogo',
+})(({ theme, color }) => {
+  return {
+    display: 'flex',
+    height: APP_BAR_HEIGHT,
+    justifyContent: 'flex-start',
+    padding: theme.spacing(0, 2),
   };
 });
 
@@ -208,17 +224,7 @@ const AppBar = styled(AppBarMaterial, {
   name: 'AppBar',
 })(({ theme }) => {
   return {
-    position: 'fixed',
-    top: 0,
-    right: 0,
-    left: 0,
-    background: theme.palette.info.main,
     zIndex: theme.zIndex.appBar,
-    boxShadow: 'none',
-
-    '&.guideActive': {
-      zIndex: theme.zIndex.guide.highlight,
-    },
   };
 });
 
@@ -282,32 +288,41 @@ export const NetworkLayout = ({
   return (
     <Main>
       <SyncSquidSnackbar />
+      {/* <TopBanner /> */}
       <AppBar>
-        <TopBanner />
         <AppToolbar>
-          <AppToolbarSidebar>
-            {narrowXs ? null : <Logo />}
-            {narrowLg ? (
-              <MenuButton
-                className={classnames({
-                  open: isMenuOpen,
-                })}
-                onClick={() => setIsMenuOpen(open => !open)}
-              >
-                <MenuIcon />
-              </MenuButton>
-            ) : null}
-          </AppToolbarSidebar>
-          <AppToolbarContent />
+          {/* <AppToolbarSidebar> */}
+          {/* {narrowXs ? null : <Logo />} */}
+          {/* {narrowLg ? (
+  
+            ) : null} */}
+          {/* </AppToolbarSidebar> */}
+          <MenuButton
+            className={classnames({
+              open: isMenuOpen,
+            })}
+            onClick={() => setIsMenuOpen(open => !open)}
+          >
+            <MenuIcon />
+          </MenuButton>
+          <AppToolbarContent></AppToolbarContent>
           {/* <NetworkSwitcher hideText={isMobile} /> */}
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
           {narrowXs ? <AppToolbarContent /> : null}
           <UserMenu />
+          <Backdrop
+            open={isMenuOpen}
+            onClick={() => setIsMenuOpen(false)}
+            sx={{ background: '#fff0' }}
+          />
         </AppToolbar>
       </AppBar>
 
       <Slide direction="right" in={!narrowLg || isMenuOpen} appear={false}>
-        <Sidebar color="info">
+        <Sidebar>
+          <SidebarLogo>
+            <Logo />
+          </SidebarLogo>
           <NetworkMenu onItemClick={() => setIsMenuOpen(false)} />
         </Sidebar>
       </Slide>

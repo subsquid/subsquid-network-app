@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 
 import {
-  IconButton,
-  InputAdornment,
   styled,
   SxProps,
   TextField as MaterialTextField,
+  FormControl,
+  InputLabel,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
 import { InputProps as StandardInputProps } from '@mui/material/Input/Input';
 
@@ -13,10 +15,8 @@ import { VisibleIcon } from '@icons/VisibleIcon';
 import { VisibleOffIcon } from '@icons/VisibleOffIcon';
 
 export const TextField = styled(MaterialTextField)(({ theme }) => ({
-  '&.paper': {
-    '& .MuiFilledInput-root': {
-      background: theme.palette.background.paper,
-    },
+  'label + &': {
+    marginTop: theme.spacing(3),
   },
   [theme.breakpoints.down('xxs')]: {
     '& .MuiInputLabel-root': {
@@ -78,41 +78,43 @@ export function FormikTextInput({
       : null;
 
   return (
-    <TextField
-      id={id}
-      fullWidth
-      className={variant}
-      type={visible ? 'text' : type}
-      label={label}
-      variant="filled"
-      multiline={multiline}
-      minRows={minRows}
-      maxRows={maxRows}
-      rows={rows}
-      placeholder={placeholder}
-      value={formik.values[id] ? formik.values[id] : ''}
-      onChange={formik.handleChange}
-      onBlur={e => {
-        formik.handleBlur(e);
-        onBlur?.();
-      }}
-      onFocus={onFocus}
-      error={Boolean(actualError)}
-      sx={sx}
-      helperText={actualError || helperText}
-      autoComplete={autoComplete}
-      InputProps={
-        InputProps || {
-          endAdornment:
-            type === 'password' ? (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setVisible(!visible)} edge="end" sx={{ mr: '-5px' }}>
-                  {visible ? <VisibleOffIcon /> : <VisibleIcon />}
-                </IconButton>
-              </InputAdornment>
-            ) : undefined,
+    <FormControl fullWidth variant="standard">
+      <InputLabel shrink>{label}</InputLabel>
+      <TextField
+        id={id}
+        fullWidth
+        className={variant}
+        type={visible ? 'text' : type}
+        variant="filled"
+        multiline={multiline}
+        minRows={minRows}
+        maxRows={maxRows}
+        rows={rows}
+        placeholder={placeholder}
+        value={formik.values[id] ? formik.values[id] : ''}
+        onChange={formik.handleChange}
+        onBlur={e => {
+          formik.handleBlur(e);
+          onBlur?.();
+        }}
+        onFocus={onFocus}
+        error={Boolean(actualError)}
+        sx={sx}
+        helperText={actualError || helperText}
+        autoComplete={autoComplete}
+        InputProps={
+          InputProps || {
+            endAdornment:
+              type === 'password' ? (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setVisible(!visible)} edge="end" sx={{ mr: '-5px' }}>
+                    {visible ? <VisibleOffIcon /> : <VisibleIcon />}
+                  </IconButton>
+                </InputAdornment>
+              ) : undefined,
+          }
         }
-      }
-    />
+      />
+    </FormControl>
   );
 }

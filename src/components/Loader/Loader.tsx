@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 
-import { Box, useTheme } from '@mui/material';
+import { Box, CircularProgress, useTheme } from '@mui/material';
 
 export const Loader = ({
   minHeight = 300,
@@ -13,18 +13,20 @@ export const Loader = ({
     return (
       <Box
         sx={{
-          minHeight,
+          height: 1,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          '& .subsquid-loader:after': {
-            backgroundColor: theme.palette.primary.main,
-          },
+          flex: 1,
+          // '& .subsquid-loader:after': {
+          //   backgroundColor: theme.palette.primary.main,
+          // },
         }}
       >
-        <div className="show visible">
+        {/* <div className="show visible">
           <div className="subsquid-loader"></div>
-        </div>
+        </div> */}
+        <CircularProgress color="secondary" />
       </Box>
     );
   }

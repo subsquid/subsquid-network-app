@@ -1,21 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
-import { Button, TableBody, TableCell, TableRow } from '@mui/material';
-import { useFormik } from 'formik';
+import { LoadingButton } from '@mui/lab';
 import * as yup from 'yup';
 
 import { useVestingContract, useVestingContractRelease } from '@api/contracts/vesting';
 import { SourceWallet } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
-import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form } from '@components/Form';
-import { Loader } from '@components/Loader';
-import { TableList } from '@components/Table/TableList';
-import { useContracts } from '@network/useContracts';
-
-import { SourceWalletName } from './VestingName';
 
 export const claimSchema = yup.object({
   source: yup.string().label('Source').trim().required('Source is required'),
@@ -32,77 +23,25 @@ export function ReleaseButton({
   const { data, isLoading: isVestingLoading } = useVestingContract({
     address: vesting.id as `0x${string}`,
   });
-  const { SQD_TOKEN } = useContracts();
-
-  const formik = useFormik({
-    initialValues: {
-      source: vesting.id,
-      amount: 0,
-    },
-    validationSchema: claimSchema,
-    validateOnChange: true,
-    validateOnBlur: true,
-    validateOnMount: true,
-
-    onSubmit: async () => {
-      const { failedReason } = await release({
-        address: vesting.id as `0x${string}`,
-      });
-
-      if (!failedReason) {
-        handleClose();
-      }
-    },
-  });
-
-  const [open, setOpen] = useState(false);
-  const handleOpen = (e: React.UIEvent) => {
-    e.stopPropagation();
-    setOpen(true);
-  };
-  const handleClose = () => setOpen(false);
+  const isDisabled = isVestingLoading || fromSqd(data?.releasable).lte(0);
 
   return (
     <>
-      <Button
-        onClick={handleOpen}
-        variant="contained"
-        disabled={disabled || fromSqd(data?.releasable).lte(0)}
-      >
-        Release
-      </Button>
-      <ContractCallDialog
-        title="Release"
-        open={open}
-        onResult={confirmed => {
-          if (!confirmed) return handleClose();
-
-          formik.handleSubmit();
-        }}
+      <LoadingButton
         loading={isLoading}
+        onClick={async e => {
+          e.stopPropagation();
+          await release({
+            address: vesting.id as `0x${string}`,
+          });
+        }}
+        variant="outlined"
+        color="secondary"
+        disabled={disabled || isDisabled}
       >
-        {isVestingLoading ? (
-          <Loader />
-        ) : (
-          <Form onSubmit={formik.handleSubmit}>
-            <TableList>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <SourceWalletName source={vesting} />
-                  </TableCell>
-                  <TableCell>Vesting</TableCell>
-                  <TableCell align="right">
-                    {tokenFormatter(fromSqd(data?.releasable), SQD_TOKEN, 8)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </TableList>
-
-            <BlockchainContractError error={error} />
-          </Form>
-        )}
-      </ContractCallDialog>
+        RELEASE
+      </LoadingButton>
+      <BlockchainContractError error={error} />
     </>
   );
 }

@@ -401,6 +401,13 @@ export type AccountsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type AprSnapshot = {
+  __typename?: 'AprSnapshot';
+  stakerApr: Scalars['Float']['output'];
+  timestamp: Scalars['DateTime']['output'];
+  workerApr: Scalars['Float']['output'];
+};
+
 export type Block = {
   __typename?: 'Block';
   hash: Scalars['String']['output'];
@@ -2563,6 +2570,7 @@ export type GatewaysConnection = {
 
 export type NetworkStats = {
   __typename?: 'NetworkStats';
+  aprs: Array<AprSnapshot>;
   blockTime: Scalars['Float']['output'];
   blockTimeL1: Scalars['Float']['output'];
   lastBlock: Scalars['Float']['output'];
@@ -5974,6 +5982,12 @@ export type NetworkSummaryQuery = {
     storedData: string;
     workerApr: number;
     workersCount: number;
+    aprs: Array<{
+      __typename?: 'AprSnapshot';
+      stakerApr: number;
+      timestamp: string;
+      workerApr: number;
+    }>;
   };
 };
 
@@ -6203,7 +6217,7 @@ export const useAccountQuery = <TData = AccountQuery, TError = unknown>(
 
 export const AllWorkersDocument = `
     query allWorkers {
-  workers(where: {status_eq: ACTIVE}) {
+  workers(where: {status_eq: ACTIVE}, orderBy: totalDelegation_ASC) {
     ...WorkerFragment
   }
 }
@@ -6714,6 +6728,11 @@ export const NetworkSummaryDocument = `
     storedData
     workerApr
     workersCount
+    aprs {
+      stakerApr
+      timestamp
+      workerApr
+    }
   }
 }
     `;

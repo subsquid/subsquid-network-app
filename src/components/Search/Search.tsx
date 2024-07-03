@@ -1,14 +1,16 @@
 import React, { useCallback, useState } from 'react';
 
-import SearchIcon from '@mui/icons-material/Search';
 import { Box, styled } from '@mui/material';
 
 import { TextField } from '@components/Form';
+import { SearchIcon } from '@icons/SearchIcon';
 
 export const Field = styled(TextField)(({ theme }) => ({
   // background: theme.palette.background.default,
   [`& .MuiInputBase-root`]: {
-    paddingLeft: 10,
+    padding: theme.spacing(0, 1),
+    borderRadius: 360,
+    border: 'none',
   },
   // '& svg': {
   //   position: 'absolute',
@@ -16,10 +18,9 @@ export const Field = styled(TextField)(({ theme }) => ({
   '& input': {
     paddingTop: 0,
     paddingBottom: 0,
-    paddingLeft: 5,
-    minHeight: 36,
+    paddingLeft: theme.spacing(1),
+    minHeight: 28,
   },
-  borderRadius: 6,
 }));
 
 export const Search = ({
@@ -45,10 +46,11 @@ export const Search = ({
   const handleChange = useCallback((value: string) => onChange?.(value), [onChange]);
 
   return (
-    <Box sx={{ flex: fullWidth ? 1 : '0 0 250px', position: 'relative' }}>
+    <Box sx={{ flex: fullWidth ? 1 : '0 0 200px', position: 'relative' }}>
       <Field
         placeholder={placeholder}
         variant="filled"
+        inputMode="search"
         className="paper"
         value={realTimeValue}
         size="small"
@@ -59,7 +61,7 @@ export const Search = ({
           handleChange(value);
         }}
         InputProps={{
-          startAdornment: <SearchIcon sx={{ width: 20, height: 20, opacity: 0.5 }} />,
+          startAdornment: <SearchIcon />,
         }}
       />
       {/*<CircularProgress*/}

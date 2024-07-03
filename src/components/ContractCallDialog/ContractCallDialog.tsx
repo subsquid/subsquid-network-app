@@ -1,11 +1,11 @@
 import React, { PropsWithChildren } from 'react';
 
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
+import ConnectButton from '@components/Button/ConnectButton';
 import { ConfirmDialog, ConfirmDialogProps } from '@components/ConfirmDialog';
-import { WalletIcon } from '@icons/WalletIcon';
 
 export function ContractCallDialog({
   title,
@@ -13,9 +13,9 @@ export function ContractCallDialog({
   open,
   maxWidth,
   minWidth = 600,
-  confirmColor = 'primary',
-  confirmButtonText = title,
-  cancelButtonText = 'Cancel',
+  confirmColor = 'info',
+  confirmButtonText = title.toUpperCase(),
+  cancelButtonText,
   hideCancelButton = true,
   disableBackdropClick = true,
   disableConfirmButton = false,
@@ -54,9 +54,7 @@ export function ContractCallDialog({
         >
           <Box sx={{ textAlign: 'center' }}>
             <Box sx={{ mb: 2 }}>Connect your wallet to proceed</Box>
-            <Button variant="contained" startIcon={<WalletIcon />} onClick={openConnectModal}>
-              Connect wallet
-            </Button>
+            <ConnectButton onClick={openConnectModal} />
           </Box>
         </Box>
       </ConfirmDialog>

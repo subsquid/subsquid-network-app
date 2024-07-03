@@ -24,10 +24,10 @@
 <!--    gtag('config', 'G-6JBS6RNP90');-->
 <!--    </script>-->
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet"> -->
   <style>
     #loader {
       position: absolute;
@@ -62,7 +62,7 @@
       content: '';
       width: 48px;
       height: 5px;
-      background: #000;
+      background: #d5d8dd;
       opacity: 0.25;
       position: absolute;
       top: 60px;
@@ -76,7 +76,7 @@
       font-size: 60px;
       width: 100%;
       height: 100%;
-      background: #000;
+      background: #d5d8dd;
       animation: bxSpin 0.5s linear infinite;
       position: absolute;
       top: 0;
@@ -112,12 +112,45 @@
       }
     }
 
+    @font-face {
+      font-family: 'Matter';
+      font-weight: 500;
+      src: 
+          url(/fonts/Matter-Medium.woff2) format('woff2'),
+          url(/fonts/Matter-Medium.woff) format('woff'),
+          url(/fonts/Matter-Medium.otf) format('opentype'),
+          url(/fonts/Matter-Medium.ttf) format('truetype');
+      letter-spacing: normal;
+    }
+
+    @font-face {
+      font-family: 'Matter';
+      font-weight: 400;
+      src: 
+          url(/fonts/Matter-Regular.woff2) format('woff2'),
+          url(/fonts/Matter-Regular.woff) format('woff'),
+          url(/fonts/Matter-Regular.otf) format('opentype'),
+          url(/fonts/Matter-Regular.ttf) format('truetype');
+      letter-spacing: normal;
+    }
+
+    @font-face {
+      font-family: 'Matter';
+      font-weight: 600;
+      src: 
+          url(/fonts/Matter-SemiBold.woff2) format('woff2'),
+          url(/fonts/Matter-SemiBold.woff) format('woff'),
+          url(/fonts/Matter-SemiBold.otf) format('opentype'),
+          url(/fonts/Matter-SemiBold.ttf) format('truetype');
+      letter-spacing: normal;
+    }
+
 
     body, html, #root {
       min-height: 100%;
       height: 100%;
-      font-family: 'Inter', sans-serif;
-      background: #f6f8fb;
+      font-family: 'Matter';
+      background: #fff;
     }
   </style>
 </head>

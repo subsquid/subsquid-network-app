@@ -11,7 +11,7 @@ export const useCreateRainbowKitTheme = (mode: PaletteType) => {
   return useMemo((): Theme => {
     return merge(lightTheme(), {
       blurs: {
-        modalOverlay: 'blur(5px)',
+        modalOverlay: 'blur(0.5px)',
       },
       colors: {
         accentColor: palette.accent.contrastText,
@@ -24,22 +24,22 @@ export const useCreateRainbowKitTheme = (mode: PaletteType) => {
         error: palette.error.main,
         generalBorder: palette.divider,
         menuItemBackground: palette.action.hover,
-        modalBackdrop: 'rgba(166, 166, 166, 0.6)',
-        modalBackground: palette.background.paper,
+        modalBackdrop: 'rgba(0, 0, 0, 0.5)',
+        modalBackground: palette.background.default,
         modalBorder: palette.divider,
         modalText: palette.text.primary,
         modalTextSecondary: palette.text.secondary,
         profileActionHover: palette.action.hover,
-        profileForeground: palette.background.content,
+        profileForeground: palette.background.paper,
         selectedOptionBorder: 'transparent',
       },
       fonts: {
         body: typography.fontFamily,
       },
       radii: {
-        modal: '8px',
-        modalMobile: '8px',
-        actionButton: '4px',
+        modal: '4px',
+        modalMobile: '4px',
+        actionButton: '360px',
       },
       shadows: {
         dialog: 'none',

@@ -37,5 +37,13 @@ export default defineConfig({
     'process.env.NETWORK': encode(process.env.NETWORK || 'mainnet'),
     'process.env.SENTRY_DSN': encode(process.env.SENTRY_DSN || ''),
   },
-  plugins: [tsconfigPaths(), react(), splitVendorChunkPlugin()],
+
+  optimizeDeps: {
+    include: ['@mui/material', '@emotion/react', '@emotion/styled'],
+  },
+  plugins: [
+    tsconfigPaths(),
+    react(),
+    process.env.NODE_ENV === 'production' ? splitVendorChunkPlugin() : undefined,
+  ],
 });

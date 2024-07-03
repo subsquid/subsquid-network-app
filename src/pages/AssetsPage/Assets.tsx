@@ -1,20 +1,38 @@
 import React, { useMemo } from 'react';
 
-import { addressFormatter, tokenFormatter } from '@lib/formatters/formatters';
+import { tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network/utils';
-import { Box, Chip, Stack, styled, SxProps, Theme, useMediaQuery, useTheme } from '@mui/material';
+import { CircleRounded } from '@mui/icons-material';
+import {
+  Box,
+  Divider,
+  Stack,
+  styled,
+  SxProps,
+  Theme,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2';
 import BigNumber from 'bignumber.js';
 import { Cell, Pie, PieChart } from 'recharts';
 
 import { useMyAssets } from '@api/subsquid-network-squid';
-import { Card } from '@components/Card';
-import { CopyToClipboard } from '@components/CopyToClipboard';
+import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
-import { Loader } from '@components/Loader';
-import { NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
+import { ColumnLabel, ColumnValue, SummarySection } from '@pages/DashboardPage/Summary';
 
 import { ClaimButton } from './ClaimButton';
+
+type TokenBalance = {
+  name: string;
+  value: BigNumber;
+  color: string;
+  background: string;
+  tip?: string;
+};
 
 const TokenBalanceList = styled(Box, {
   name: 'TokenBalanceList',
@@ -23,177 +41,174 @@ const TokenBalanceList = styled(Box, {
   gap: theme.spacing(1.5),
 }));
 
-function TokenBalanceItem({ sx, children }: { sx?: SxProps<Theme>; children?: React.ReactNode[] }) {
+function TokenBalance({ sx, balance }: { sx?: SxProps<Theme>; balance?: TokenBalance }) {
+  const { SQD_TOKEN } = useContracts();
+
   return (
-    <Stack alignItems="center" direction="row" spacing={1} sx={{ ...sx }}>
-      {children}
-    </Stack>
+    <Box sx={sx}>
+      <ColumnLabel color={balance?.color}>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <CircleRounded sx={{ fontSize: 11 }} />
+          <Box>{balance?.name}</Box>
+          <HelpTooltip title={balance?.tip} />
+        </Stack>
+      </ColumnLabel>
+      <ColumnValue>{tokenFormatter(balance?.value || 0, SQD_TOKEN, 3)}</ColumnValue>
+    </Box>
   );
 }
 
-function TokenBalanceLabel({ value, sx }: { value: React.ReactNode; sx?: SxProps<Theme> }) {
-  return <Chip sx={{ ...sx }} label={value} />;
-}
-
-function TokenBalanceValue({ value, decimals }: { value: BigNumber; decimals?: number }) {
-  const { SQD_TOKEN } = useContracts();
-
-  return <Box sx={{ fontWeight: 500 }}>{tokenFormatter(value, SQD_TOKEN, decimals)}</Box>;
-}
-
-function TotalBalance({
-  data,
-  total,
-}: {
-  data: { name: string; balance: BigNumber; background: string }[];
-  total: BigNumber;
-}) {
+function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: BigNumber }) {
   const { SQD_TOKEN } = useContracts();
 
   return (
-    <Box sx={{ position: 'relative', alignSelf: 'center' }}>
-      <PieChart width={210} height={210}>
-        <Pie
-          data={data.map(i => ({ name: i.name, value: i.balance.toNumber() }))}
-          animationBegin={0}
-          animationDuration={0}
-          cx="50%"
-          cy="50%"
-          innerRadius={60}
-          outerRadius={105}
-          nameKey="name"
-          dataKey="value"
-        >
-          {data.map(i => (
-            <Cell
-              onClick={e => {
-                e.preventDefault();
-              }}
-              key={i.name}
-              fill={i.background}
-            />
-          ))}
-        </Pie>
-      </PieChart>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          textAlign: 'center',
-        }}
-      >
-        <Box sx={{ textAlign: 'center', width: '100%' }}>
-          <Box sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>Total</Box>
-          <Box sx={{ fontWeight: 500, fontSize: '1.25rem' }}>
-            {tokenFormatter(total, SQD_TOKEN, 3)}
-          </Box>
-        </Box>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="flex-end"
+      alignItems="flex-end"
+      flex={1}
+    >
+      {/* <Box display="flex" pr={7} pb={3} alignItems="center">
+        <PieChart
+          series={[
+            {
+              data: balances.map(i => ({ id: i.name, value: i.value.toNumber(), color: i.color })),
+              outerRadius: 120,
+              innerRadius: 60,
+              valueFormatter: v => tokenFormatter(v.value, SQD_TOKEN, 3),
+              cx: 128,
+              cy: 128,
+            },
+          ]}
+          width={256}
+          height={256}
+          skipAnimation
+        />
+      </Box> */}
+      <Box mb={4} mr={7}>
+        <PieChart width={240} height={240}>
+          <Pie
+            data={balances.map(i => ({ name: i.name, value: i.value.toNumber() }))}
+            animationDuration={0}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={120}
+            nameKey="name"
+            dataKey="value"
+            style={{ outline: 'none' }}
+          >
+            {balances.map(i => (
+              <Cell key={i.name} fill={i.color} strokeWidth={0} />
+            ))}
+          </Pie>
+        </PieChart>
       </Box>
+
+      {/*  */}
+      <Box mb={1}>
+        <SquaredChip label="Total" color="primary" />
+      </Box>
+      <Typography variant="h2" textAlign="end">
+        {tokenFormatter(total, SQD_TOKEN, 3)}
+      </Typography>
     </Box>
   );
 }
 
 export function MyAssets() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
+  const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
+  const narrowSm = useMediaQuery(theme.breakpoints.down('sm'));
   const { isLoading, assets } = useMyAssets();
 
   const data = useMemo(
-    () => [
+    (): TokenBalance[] => [
       {
         name: 'Transferable',
-        balance: fromSqd(assets.balance),
-        background: '#E3F7E0',
-        color: '#55AD44',
-        help: 'Liquid tokens, can be freely transferred to external addresses',
+        value: fromSqd(assets.balance),
+        color: theme.palette.success.main,
+        background: theme.palette.success.background,
+        tip: 'Liquid tokens, can be freely transferred to external addresses',
       },
       {
         name: 'Locked',
-        balance: fromSqd(assets.locked),
-        background: '#FFE6C0',
-        color: '#FF6B35',
-        help: 'Tokens locked in the vesting contracts owned by the wallet. Can be used for bonding (running a worker) and/or delegation',
-        vestings: assets.vestings,
+        value: fromSqd(assets.locked),
+        color: theme.palette.warning.main,
+        background: theme.palette.warning.background,
+        tip: 'Tokens locked in the vesting contracts owned by the wallet. Can be used for bonding (running a worker) and/or delegation',
       },
       {
         name: 'Claimable',
-        balance: fromSqd(assets.claimable),
-        background: '#D1E3FF',
-        color: '#3880EC',
-        help: 'Earned but not yet claimed token rewards, aggregated across all workers and delegations',
+        value: fromSqd(assets.claimable),
+        color: theme.palette.info.main,
+        background: theme.palette.info.background,
+        tip: 'Earned but not yet claimed token rewards, aggregated across all workers and delegations',
       },
       {
         name: 'Bonded',
-        balance: fromSqd(assets.bonded),
-        background: '#EBEBEB',
-        color: '#2B2B2B',
-        help: 'Tokens bonded in the worker registry contract. 100000 SQD has to be bonded per a worker node',
+        value: fromSqd(assets.bonded),
+        color: theme.palette.primary.contrastText,
+        background: theme.palette.primary.main,
+        tip: 'Tokens bonded in the worker registry contract. 100000 SQD has to be bonded per a worker node',
       },
       {
         name: 'Delegated',
-        balance: fromSqd(assets.delegated),
-        background: '#F4DAFF',
-        color: '#9C00FF',
-        help: 'Tokens delegated to workers',
+        value: fromSqd(assets.delegated),
+        color: theme.palette.secondary.contrastText,
+        background: theme.palette.secondary.main,
+        tip: 'Tokens delegated to workers',
       },
     ],
-    [assets],
+    [
+      assets.balance,
+      assets.bonded,
+      assets.claimable,
+      assets.delegated,
+      assets.locked,
+      theme.palette,
+    ],
   );
 
   return (
-    <Box>
-      <NetworkPageTitle title="My Assets" endAdornment={<ClaimButton />} />
-
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <Card>
-          <Stack
-            direction={isMobile ? 'column-reverse' : 'row'}
-            justifyContent="space-between"
-            spacing={2.5}
-          >
-            <TokenBalanceList>
-              {data.map(d => {
-                return (
-                  <React.Fragment key={d.name}>
-                    <TokenBalanceItem key={d.name}>
-                      <TokenBalanceLabel
-                        sx={{ background: d.background, color: d.color }}
-                        value={d.name}
-                      />
-                      <HelpTooltip help={d.help}>
-                        <TokenBalanceValue value={d.balance} decimals={6} />
-                      </HelpTooltip>
-                    </TokenBalanceItem>
-
-                    {d.vestings?.map(v => (
-                      <TokenBalanceItem key={d.name + '-' + v.id} sx={{ ml: 2.5 }}>
-                        <TokenBalanceLabel
-                          sx={{ background: d.background, color: d.color }}
-                          value={
-                            <CopyToClipboard
-                              text={v.id}
-                              content={addressFormatter(v.id, true)}
-                            ></CopyToClipboard>
-                          }
-                        />
-                        <TokenBalanceValue value={fromSqd(v.balance)} decimals={8} />
-                      </TokenBalanceItem>
-                    ))}
-                  </React.Fragment>
-                );
-              })}
-            </TokenBalanceList>
-            <TotalBalance data={data} total={fromSqd(assets.total)} />
-          </Stack>
-        </Card>
-      )}
+    <Box minHeight={448} mb={2} display="flex">
+      <SummarySection
+        loading={isLoading}
+        sx={{ width: 1 }}
+        title={<SquaredChip label="My Assets" color="primary" />}
+        action={<ClaimButton />}
+      >
+        <Grid container spacing={2} disableEqualOverflow flex={1}>
+          <Grid xxs={12} sm={8}>
+            <Stack
+              divider={<Divider flexItem />}
+              spacing={1}
+              direction={narrowXs ? 'column' : 'row'}
+              alignItems={narrowXs ? 'stretch' : 'flex-end'}
+              height={1}
+              justifyContent="stretch"
+            >
+              <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
+                <TokenBalance balance={data[0]} />
+                <TokenBalance balance={data[1]} />
+                <TokenBalance balance={data[2]} />
+              </Stack>
+              <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
+                <TokenBalance balance={data[3]} />
+                <TokenBalance balance={data[4]} />
+              </Stack>
+            </Stack>
+          </Grid>
+          {narrowSm ? null : (
+            <Grid xxs={0} sm={4}>
+              <Box display="flex" alignItems="flex-end" height={1}>
+                <TotalBalance balances={data} total={fromSqd(assets.total)} />
+              </Box>
+            </Grid>
+          )}
+        </Grid>
+      </SummarySection>
     </Box>
   );
 }

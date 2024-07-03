@@ -2,11 +2,11 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { addressFormatter } from '@lib/formatters/formatters';
 import { ExpandMore } from '@mui/icons-material';
-import { Box, Button, Menu, Stack, styled } from '@mui/material';
+import { Box, Button, Menu, Stack, styled, Typography } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
-import { WalletIcon } from '@icons/WalletIcon.tsx';
+import ConnectButton from '@components/Button/ConnectButton';
 
 import { LogoutMenuItem } from './LogoutMenuItem';
 
@@ -14,12 +14,6 @@ export const UserMenuStyled = styled(Menu, {
   name: 'UserMenuStyled',
 })(() => ({
   minWidth: '100%',
-}));
-
-export const ConnectButton = styled(Button, {
-  name: 'ConnectButton',
-})(({ theme }) => ({
-  color: theme.palette.info.contrastText,
 }));
 
 export const Dropdown = styled(Button)(({ theme }) => ({
@@ -46,11 +40,7 @@ export function UserMenu() {
   }, [address]);
 
   if (!address || !isConnected) {
-    return (
-      <ConnectButton startIcon={<WalletIcon />} onClick={openConnectModal}>
-        Connect wallet
-      </ConnectButton>
-    );
+    return <ConnectButton onClick={openConnectModal} />;
   }
 
   return (
@@ -61,15 +51,16 @@ export function UserMenu() {
         onClick={handleOpen}
         alignItems="center"
         ref={ref}
+        color="primary"
+        variant="contained"
       >
-        <Box>{maskedAddress}</Box>
+        <Typography variant="body2">{maskedAddress}</Typography>
         <ExpandMore
           sx={{
             transition: 'transform 300ms ease-out',
             transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
             color: 'primary.contrastText',
             // opacity: 0.2,
-            ml: 2,
             width: 20,
             height: 20,
           }}
@@ -81,10 +72,12 @@ export function UserMenu() {
         onClose={handleClose}
         disableEscapeKeyDown
         disableAutoFocus
-        PaperProps={{
-          sx: {
-            overflow: 'visible',
-            width: 261,
+        slotProps={{
+          paper: {
+            sx: {
+              overflow: 'visible',
+              width: 261,
+            },
           },
         }}
         transformOrigin={{
@@ -96,7 +89,7 @@ export function UserMenu() {
           vertical: 'bottom',
         }}
       >
-        <Box sx={{ ml: 2, mr: 2, mb: 2 }}>
+        <Box sx={{ m: 1 }}>
           <LogoutMenuItem />
         </Box>
       </UserMenuStyled>
