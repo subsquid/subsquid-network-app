@@ -23,6 +23,7 @@ import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'rec
 
 import { useNetworkSummary } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
+import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { useContracts } from '@network/useContracts';
 
@@ -238,7 +239,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
         data={data}
         defaultShowTooltip
         margin={{
-          top: 24,
+          top: 16,
           right: 0,
           left: 0,
           bottom: 0,
@@ -261,7 +262,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
           defaultIndex={Math.max(data.length - 2, 0)}
           active
           allowEscapeViewBox={{ x: true }}
-          position={{ y: -6 }}
+          position={{ y: -10 }}
           wrapperStyle={{
             zIndex: theme.zIndex.appBar - 1,
           }}
@@ -283,48 +284,58 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
   );
 }
 
-function WorkersApr() {
+function WorkersApr({ length }: { length?: number }) {
   const { data, isLoading } = useNetworkSummary();
 
   const aprs = useMemo(() => {
     if (!data) return [];
 
-    return data.aprs.map((apr, i) => ({
+    return data.aprs.slice(length ? -length : 0).map((apr, i) => ({
       date: apr.timestamp,
       value: i === data.aprs.length - 1 ? (apr.workerApr + data.workerApr) / 2 : apr.workerApr,
     }));
-  }, [data]);
+  }, [data, length]);
 
   return (
     <SummarySection
       loading={isLoading}
       sx={{ height: 1, overflow: 'visible' }}
       title={<SquaredChip label="Worker APR" color="primary" />}
-      action="Last 14 days"
+      action={
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Typography>{`Last ${aprs.length} days`}</Typography>
+          <HelpTooltip title="Median value" />
+        </Stack>
+      }
     >
       <AprChart data={aprs} />
     </SummarySection>
   );
 }
 
-function DelegatorsApr() {
+function DelegatorsApr({ length }: { length?: number }) {
   const { data, isLoading } = useNetworkSummary();
 
   const aprs = useMemo(() => {
     if (!data) return [];
 
-    return data.aprs.map((apr, i) => ({
+    return data.aprs.slice(length ? -length : 0).map((apr, i) => ({
       date: apr.timestamp,
       value: i === data.aprs.length - 1 ? (apr.stakerApr + data.stakerApr) / 2 : apr.stakerApr,
     }));
-  }, [data]);
+  }, [data, length]);
 
   return (
     <SummarySection
       loading={isLoading}
       sx={{ height: 1, overflow: 'visible' }}
       title={<SquaredChip label="Delegator APR" color="primary" />}
-      action="Last 14 days"
+      action={
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Typography>{`Last ${aprs.length} days`}</Typography>
+          <HelpTooltip title="Median value" />
+        </Stack>
+      }
     >
       <AprChart data={aprs} />
     </SummarySection>
