@@ -43,9 +43,6 @@ export const LogoSecondary = styled(Box, {
 export function Logo({ color = '#fff' }: { color?: string }) {
   const theme = useTheme();
   const compact = useMediaQuery(theme.breakpoints.down('xl'));
-  const size = 40;
-
-  const network = getSubsquidNetwork();
 
   return (
     <LogoWrapper>
