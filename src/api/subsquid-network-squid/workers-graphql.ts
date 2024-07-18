@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { calculateDelegationCapacity } from '@lib/network';
 import BigNumber from 'bignumber.js';
 import { groupBy, mapValues, values } from 'lodash-es';
+import { compare as compareSemver } from 'semver';
 import { PartialDeep, SimplifyDeep } from 'type-fest';
 
 import { useAccount } from '@network/useAccount.ts';
@@ -23,6 +24,7 @@ import {
   Worker,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
+
 // inherit API interface for internal class
 // export interface BlockchainApiWorker extends Omit<WorkerFragmentFragment, 'createdAt'> {
 //   createdAt: Date;
@@ -136,6 +138,7 @@ export enum WorkerSortBy {
   MyDelegation = 'my_delegation',
   MyDelegationReward = 'my_delegation_reward',
   Name = 'name',
+  Version = 'version',
 }
 
 export enum SortDir {
@@ -174,6 +177,8 @@ export function sortWorkers<T extends PartialDeep<WorkerExtended, { recurseIntoA
         return BigInt(a.myTotalDelegationReward ?? -1) > BigInt(b.myTotalDelegationReward ?? -1)
           ? 1
           : -1;
+      case WorkerSortBy.Version:
+        return a.version ? (b.version ? compareSemver(a.version, b.version) : 1) : -1;
       default:
         return new Date(a.createdAt || 0).valueOf() - new Date(b.createdAt || 0).valueOf();
     }

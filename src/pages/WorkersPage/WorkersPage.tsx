@@ -19,6 +19,7 @@ import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 
 import { WorkerUnregister } from './WorkerUnregister';
+import { WorkerVersion } from './WorkerVersion';
 
 export function MyWorkers() {
   const [query, setQuery] = useLocationState({
@@ -64,6 +65,9 @@ export function MyWorkers() {
                 Worker
               </SortableHeaderCell>
               <TableCell>Status</TableCell>
+              <SortableHeaderCell sort={WorkerSortBy.Version} query={query} setQuery={setQuery}>
+                Version
+              </SortableHeaderCell>
               <SortableHeaderCell sort={WorkerSortBy.Uptime24h} query={query} setQuery={setQuery}>
                 Uptime, 24h
               </SortableHeaderCell>
@@ -93,6 +97,9 @@ export function MyWorkers() {
                     </TableCell>
                     <TableCell>
                       <WorkerStatus worker={worker} />
+                    </TableCell>
+                    <TableCell>
+                      <WorkerVersion worker={worker} />
                     </TableCell>
                     <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
                     <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
