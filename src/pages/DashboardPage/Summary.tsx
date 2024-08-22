@@ -221,7 +221,7 @@ function Stats() {
 function AprTooltip({ active, payload }: TooltipProps<number, string>) {
   return active && payload?.length ? (
     <SquaredChip
-      label={<Typography variant="subtitle1">{percentFormatter(payload[0].value)}</Typography>}
+      label={<Typography variant="subtitle1">{percentFormatter(payload[0]?.value)}</Typography>}
       color="info"
       sx={{ transform: 'translateX(-50%)' }}
     />
@@ -251,23 +251,25 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
             <stop offset="100%" stopColor={alpha(theme.palette.info.main, 0.25)} />
           </linearGradient>
         </defs>
-        <Tooltip
-          content={<AprTooltip />}
-          animationDuration={0}
-          cursor={{
-            stroke: theme.palette.text.secondary,
-            strokeWidth: 2,
-            strokeDasharray: 6,
-          }}
-          defaultIndex={Math.max(data.length - 2, 0)}
-          active
-          allowEscapeViewBox={{ x: true }}
-          position={{ y: -10 }}
-          wrapperStyle={{
-            zIndex: theme.zIndex.appBar - 1,
-          }}
-          offset={0}
-        />
+        {data.length ? (
+          <Tooltip
+            content={<AprTooltip />}
+            animationDuration={0}
+            cursor={{
+              stroke: theme.palette.text.secondary,
+              strokeWidth: 2,
+              strokeDasharray: 6,
+            }}
+            defaultIndex={Math.max(data.length - 2, 0)}
+            active
+            allowEscapeViewBox={{ x: true }}
+            position={{ y: -10 }}
+            wrapperStyle={{
+              zIndex: theme.zIndex.appBar - 1,
+            }}
+            offset={0}
+          />
+        ) : null}
         <Area
           animationDuration={0}
           // type="linear"
