@@ -20,8 +20,8 @@ export const WorkerVersion = ({ worker }: { worker: Pick<Worker, 'version'> }) =
         <Stack spacing={1} direction="row" alignItems="flex-start">
           <WorkerVersionName>{worker.version}</WorkerVersionName>
           <Box display="flex">
-            {!satisfies(worker.version, recommendedWorkerVersion) ? (
-              !satisfies(worker.version, minimalWorkerVersion) ? (
+            {!satisfies(worker.version, recommendedWorkerVersion, { includePrerelease: true }) ? (
+              !satisfies(worker.version, minimalWorkerVersion, { includePrerelease: true }) ? (
                 <WarningIcon color="error" />
               ) : (
                 <WarningIcon color="warning" />

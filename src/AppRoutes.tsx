@@ -23,7 +23,7 @@ export const AppRoutes = () => {
   return (
     <Routes>
       <Route element={<NetworkLayout />} path="/">
-        <Route element={<Navigate to="/assets" replace={true} />} index />
+        <Route element={<Navigate to="/dashboard" replace={true} />} index />
         <Route path="/dashboard">
           <Route element={<DashboardPage />} index />
         </Route>

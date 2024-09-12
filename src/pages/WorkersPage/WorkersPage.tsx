@@ -19,6 +19,7 @@ import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
 
 import { WorkerUnregister } from './WorkerUnregister';
+import { WorkerVersion } from './WorkerVersion';
 
 export function MyWorkers() {
   const [query, setQuery] = useLocationState({
@@ -52,40 +53,43 @@ export function MyWorkers() {
           </>
         }
       >
-        {data.length ? (
-          <>
-            <TableHead>
-              <TableRow>
-                <SortableHeaderCell
-                  sort={WorkerSortBy.Name}
-                  query={query}
-                  setQuery={setQuery}
-                  sx={{ width: 300 }}
-                >
-                  Worker
-                </SortableHeaderCell>
-                <TableCell>Status</TableCell>
-                <SortableHeaderCell sort={WorkerSortBy.Uptime24h} query={query} setQuery={setQuery}>
-                  Uptime, 24h
-                </SortableHeaderCell>
-                <SortableHeaderCell sort={WorkerSortBy.Uptime90d} query={query} setQuery={setQuery}>
-                  Uptime, 90d
-                </SortableHeaderCell>
-                <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
-                  Worker APR
-                </SortableHeaderCell>
-                <SortableHeaderCell
-                  sort={WorkerSortBy.WorkerReward}
-                  query={query}
-                  setQuery={setQuery}
-                >
-                  Total reward
-                </SortableHeaderCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map(worker => {
+        <>
+          <TableHead>
+            <TableRow>
+              <SortableHeaderCell
+                sort={WorkerSortBy.Name}
+                query={query}
+                setQuery={setQuery}
+                sx={{ width: 300 }}
+              >
+                Worker
+              </SortableHeaderCell>
+              <TableCell>Status</TableCell>
+              <SortableHeaderCell sort={WorkerSortBy.Version} query={query} setQuery={setQuery}>
+                Version
+              </SortableHeaderCell>
+              <SortableHeaderCell sort={WorkerSortBy.Uptime24h} query={query} setQuery={setQuery}>
+                Uptime, 24h
+              </SortableHeaderCell>
+              <SortableHeaderCell sort={WorkerSortBy.Uptime90d} query={query} setQuery={setQuery}>
+                Uptime, 90d
+              </SortableHeaderCell>
+              <SortableHeaderCell sort={WorkerSortBy.WorkerAPR} query={query} setQuery={setQuery}>
+                Worker APR
+              </SortableHeaderCell>
+              <SortableHeaderCell
+                sort={WorkerSortBy.WorkerReward}
+                query={query}
+                setQuery={setQuery}
+              >
+                Total reward
+              </SortableHeaderCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.length ? (
+              data.map(worker => {
                 return (
                   <TableRow key={worker.peerId}>
                     <TableCell>
@@ -93,6 +97,9 @@ export function MyWorkers() {
                     </TableCell>
                     <TableCell>
                       <WorkerStatus worker={worker} />
+                    </TableCell>
+                    <TableCell>
+                      <WorkerVersion worker={worker} />
                     </TableCell>
                     <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
                     <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
@@ -110,14 +117,14 @@ export function MyWorkers() {
                     </TableCell>
                   </TableRow>
                 );
-              })}
-            </TableBody>
-          </>
-        ) : (
-          <Placeholder>
-            <NoItems />
-          </Placeholder>
-        )}
+              })
+            ) : (
+              <Placeholder>
+                <NoItems />
+              </Placeholder>
+            )}
+          </TableBody>
+        </>
       </DashboardTable>
     </Box>
   );

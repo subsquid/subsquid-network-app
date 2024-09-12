@@ -89,9 +89,9 @@ export function MyDelegations() {
             <TableCell className="pinned"></TableCell>
           </TableRow>
         </TableHead>
-        {delegations.length ? (
-          <TableBody>
-            {delegations.map(worker => {
+        <TableBody>
+          {delegations.length ? (
+            delegations.map(worker => {
               return (
                 <TableRow key={worker.peerId}>
                   <TableCell className="pinned">
@@ -118,13 +118,13 @@ export function MyDelegations() {
                   </TableCell>
                 </TableRow>
               );
-            })}
-          </TableBody>
-        ) : (
-          <Placeholder>
-            <NoItems />
-          </Placeholder>
-        )}
+            })
+          ) : (
+            <Placeholder>
+              <NoItems />
+            </Placeholder>
+          )}
+        </TableBody>
       </DashboardTable>
     </Box>
   );

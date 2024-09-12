@@ -125,7 +125,9 @@ export function Workers() {
               Worker
             </SortableHeaderCell>
             <TableCell>Status</TableCell>
-            <TableCell>Version</TableCell>
+            <SortableHeaderCell sort={WorkerSortBy.Version} query={query} setQuery={setQuery}>
+              Version
+            </SortableHeaderCell>
             <SortableHeaderCell sort={WorkerSortBy.Uptime90d} query={query} setQuery={setQuery}>
               Uptime, 90d
             </SortableHeaderCell>

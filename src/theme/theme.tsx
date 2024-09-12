@@ -153,7 +153,7 @@ declare module 'notistack' {
   }
 }
 
-const fontFamily = `'Matter'`;
+const fontFamily = `'Matter', 'Inter', sans-serif`;
 
 export type ColorVariant = OverridableStringUnion<
   'primary' | 'secondary',
