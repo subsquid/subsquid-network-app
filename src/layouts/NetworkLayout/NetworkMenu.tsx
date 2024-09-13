@@ -1,11 +1,12 @@
 import React, { ForwardedRef, forwardRef } from 'react';
 
-import { Box, Button, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, styled, Typography } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useIsWorkerOperator } from '@api/subsquid-network-squid';
 import { ContactsIcon } from '@icons/ContactsIcon';
 import { DashboardIcon } from '@icons/DashboardIcon';
+import { DoorIcon } from '@icons/DoorIcon';
 import { HandIcon } from '@icons/HandIcon';
 import { NetworkNodeIcon } from '@icons/NetworkNodeIcon';
 import { OpenInNewIcon } from '@icons/OpenInNewIcon';
@@ -19,25 +20,25 @@ interface NetworkMenuProps {
 const MenuItem = styled(Button)(({ theme: { palette, spacing, breakpoints } }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  // justifyContent: 'center',
   height: spacing(7),
   minWidth: 0,
 
-  padding: spacing(0),
-  [breakpoints.up('xl')]: {
-    justifyContent: 'flex-start',
-    padding: spacing(0, 2.5),
-  },
+  // padding: spacing(0),
+  // [breakpoints.up('xl')]: {
+  // },
+  justifyContent: 'flex-start',
+  padding: spacing(0, 2.5),
 
   borderRadius: 0,
   '& .leftIcon': {
     display: 'flex',
     alignItems: 'center',
-    marginRight: spacing(0),
+    // marginRight: spacing(0),
 
-    [breakpoints.up('xl')]: {
-      marginRight: spacing(1.5),
-    },
+    // [breakpoints.up('xl')]: {
+    // },
+    marginRight: spacing(1.5),
   },
 
   '& .rightIcon': {
@@ -104,8 +105,9 @@ export const Item = forwardRef(
     const location = useLocation();
     const active = forceActive || (!forceInactive && location.pathname.startsWith(path));
 
-    const theme = useTheme();
-    const compact = useMediaQuery(theme.breakpoints.down('xl'));
+    // const theme = useTheme();
+    // const compact = useMediaQuery(theme.breakpoints.down('xl'));
+    // const mobile = useMediaQuery(theme.breakpoints.down('xs'));
 
     const button = (
       <MenuItem
@@ -122,15 +124,17 @@ export const Item = forwardRef(
         <Box className="leftIcon">
           <LeftIcon variant={active ? 'filled' : 'outlined'} />
         </Box>
-        {!compact ? (
+        {/* {!compact || mobile ? (
           <>
-            <Typography variant="subtitle2">{label}</Typography>
-            {RightIcon ? (
-              <Box className="rightIcon">
-                <RightIcon />
-              </Box>
+            
             ) : null}
           </>
+         */}
+        <Typography variant="subtitle2">{label}</Typography>
+        {RightIcon ? (
+          <Box className="rightIcon">
+            <RightIcon />
+          </Box>
         ) : null}
       </MenuItem>
     );
@@ -154,7 +158,7 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
       <Item LeftIcon={SavingsIcon} label="Assets" onClick={onItemClick} path="/assets" />
       <Item LeftIcon={NetworkNodeIcon} label="Workers" onClick={onItemClick} path="/workers" />
       <Item LeftIcon={HandIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
-      {/* <Item LeftIcon={DoorIcon} label="Gateways" onClick={onItemClick} path="/gateways" /> */}
+      <Item LeftIcon={DoorIcon} label="Portals" onClick={onItemClick} path="/portals" />
 
       <div style={{ flex: 1 }} />
 

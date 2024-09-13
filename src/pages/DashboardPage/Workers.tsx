@@ -15,11 +15,8 @@ import {
 import { Box } from '@mui/system';
 
 import { SortDir, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
-import { NoItems } from '@components/NoItems';
-import Placeholder from '@components/Placeholer';
 import { Search } from '@components/Search/Search';
-import { SortableHeaderCell } from '@components/Table/BorderedTable';
-import { DashboardTable } from '@components/Table/DashboardTable';
+import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
@@ -195,9 +192,7 @@ export function Workers() {
               );
             })
           ) : (
-            <Placeholder>
-              <NoItems />
-            </Placeholder>
+            <NoItems />
           )}
         </TableBody>
       </DashboardTable>

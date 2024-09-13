@@ -5,19 +5,18 @@ import { logger } from '@logger';
 import { encodeFunctionData } from 'viem';
 import { useWriteContract, usePublicClient } from 'wagmi';
 
-import { AccountType } from '@api/subsquid-network-squid';
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
+import { AccountType, GatewayFragmentFragment } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
 import { TxResult, errorMessage, WriteContractRes } from '../utils';
-import { VESTING_CONTRACT_ABI } from '../vesting.abi';
+import { VESTING_CONTRACT_ABI } from '../abi/vesting.abi';
 
-import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';
+import { GATEWAY_REGISTRATION_CONTRACT_ABI } from '../abi/GatewayRegistration.abi';
 
 export interface UnregisterGatewayRequest {
-  gateway: BlockchainGateway;
+  gateway: GatewayFragmentFragment;
 }
 
 function useUnregisterGatewayFromWallet() {

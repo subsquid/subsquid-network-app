@@ -9,9 +9,9 @@ import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
 import { TxResult, errorMessage, WriteContractRes } from '../utils';
-import { VESTING_CONTRACT_ABI } from '../vesting.abi';
+import { VESTING_CONTRACT_ABI } from '../abi/vesting.abi';
 
-import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';
+import { GATEWAY_REGISTRATION_CONTRACT_ABI } from '../abi/GatewayRegistration.abi';
 
 type UnstakeGatewayRequest = {
   operator: GatewayStakeFragmentFragment;
@@ -51,7 +51,7 @@ function useUnstakeFromVestingContract() {
       return {
         tx: await writeContractAsync({
           account,
-          address: operator.account.id as `0x${string}`,
+          address: operator.owner.id as `0x${string}`,
           abi: VESTING_CONTRACT_ABI,
           functionName: 'execute',
           args: [contracts.GATEWAY_REGISTRATION, data],
@@ -76,7 +76,7 @@ export function useUnstakeGateway() {
     setLoading(true);
 
     const res =
-      req.operator.account.type === AccountType.User
+      req.operator.owner.type === AccountType.User
         ? await unstakeFromWallet(req)
         : await unstakeFromVestingContract(req);
 

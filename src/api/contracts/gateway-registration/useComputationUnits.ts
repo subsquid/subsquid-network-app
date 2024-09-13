@@ -2,7 +2,7 @@ import { useReadContract } from 'wagmi';
 
 import { useContracts } from '@network/useContracts';
 
-import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';
+import { GATEWAY_REGISTRATION_CONTRACT_ABI } from '../abi/GatewayRegistration.abi';
 
 export function useComputationUnits({
   amount,

@@ -6,10 +6,7 @@ import { Link, Outlet } from 'react-router-dom';
 
 import { SortDir, useMyWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
-import { NoItems } from '@components/NoItems';
-import Placeholder from '@components/Placeholer';
-import { SortableHeaderCell } from '@components/Table/BorderedTable';
-import { DashboardTable } from '@components/Table/DashboardTable';
+import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
@@ -119,9 +116,7 @@ export function MyWorkers() {
                 );
               })
             ) : (
-              <Placeholder>
-                <NoItems />
-              </Placeholder>
+              <NoItems />
             )}
           </TableBody>
         </>

@@ -1,16 +1,13 @@
 import React from 'react';
 
-import { IconButton, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
+import { IconButton, Stack, styled, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
+import { GatewayFragmentFragment } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
-import { shortPeerId } from '@components/PeerId';
 import { EditIcon } from '@icons/EditIcon';
-
-import { GatewayStatus } from './GatewayStatus';
 
 export const PeerIdRow = styled(Box, {
   name: 'PeerIdRow',
@@ -29,43 +26,63 @@ export const GatewayDescription = styled(Box, {
   lineHeight: 1.8,
 }));
 
-function GatewayTitle({ gateway }: { gateway: BlockchainGateway }) {
+function GatewayTitle({
+  gateway,
+  canEdit,
+}: {
+  gateway: GatewayFragmentFragment;
+  canEdit: boolean;
+}) {
+  const theme = useTheme();
+
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ fontSize: '1.5rem', lineHeight: 1.4, overflowWrap: 'anywhere' }}>
-        {gateway.name || gateway.id}
-      </Box>
-      {gateway.ownedByMe ? (
-        <IconButton component={Link} to={`/gateways/${gateway.id}/edit`}>
-          <EditIcon size={18} color="#1D1D1F" />
-        </IconButton>
-      ) : null}
-    </Box>
+    <Stack spacing={0.5}>
+      <Stack direction="row" alignItems="center" spacing={0.5}>
+        <Typography variant="h4" sx={{ overflowWrap: 'anywhere' }}>
+          {gateway.name || gateway.id}
+        </Typography>
+        {canEdit ? (
+          <IconButton component={Link} to={`/portals/${gateway.id}/edit`} sx={{ padding: 0.5 }}>
+            <EditIcon />
+          </IconButton>
+        ) : null}
+      </Stack>
+      <CopyToClipboard
+        text={gateway.id}
+        content={
+          <Typography
+            variant="body2"
+            sx={{ overflowWrap: 'anywhere', color: theme.palette.text.secondary }}
+          >
+            {gateway.id}
+          </Typography>
+        }
+      />
+    </Stack>
   );
 }
 
-export const GatewayCard = ({ gateway }: { gateway: BlockchainGateway }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
-
+export const GatewayCard = ({
+  gateway,
+  canEdit,
+}: {
+  gateway: GatewayFragmentFragment;
+  canEdit: boolean;
+}) => {
   return (
-    <Stack spacing={3} direction="row">
-      <Avatar
-        variant="circular"
-        name={gateway.name || gateway.id}
-        colorDiscriminator={gateway.id}
-        size={100}
-      />
-      <Box sx={{ flex: 1 }}>
-        <GatewayTitle gateway={gateway} />
-        <PeerIdRow>
-          <CopyToClipboard
-            text={gateway.id}
-            content={isMobile ? shortPeerId(gateway.id) : gateway.id}
-          />
-        </PeerIdRow>
-        <GatewayStatus gateway={gateway} />
-      </Box>
+    <Stack direction="row" justifyContent="space-between">
+      <Stack spacing={2} direction="row" alignItems="center">
+        <Avatar
+          variant="circular"
+          name={gateway.name || gateway.id}
+          colorDiscriminator={gateway.id}
+          size={56}
+        />
+        {/* <Stack justifyContent="stretch" flex={1} spacing={0.125}> */}
+        <GatewayTitle gateway={gateway} canEdit={canEdit} />
+
+        {/* </Stack> */}
+      </Stack>
     </Stack>
   );
 };

@@ -6,10 +6,10 @@ import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 
 import { useRegisterGateway } from '@api/contracts/gateway-registration/useRegisterGateway';
-import { useMySources } from '@api/subsquid-network-squid';
+import { AccountType, useMySources } from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { Card } from '@components/Card';
-import { Form, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
+import { Form, FormikTextInput, FormRow } from '@components/Form';
 import { FormikSelect } from '@components/Form/FormikSelect';
 import { Loader } from '@components/Loader';
 import { SourceWalletOption } from '@components/SourceWallet';
@@ -77,7 +77,7 @@ function AddGatewayForm() {
         <Loader />
       ) : (
         <Form onSubmit={formik.handleSubmit}>
-          <Card>
+          <Card outlined>
             <FormRow>
               <FormikSelect
                 id="source"
@@ -86,6 +86,7 @@ function AddGatewayForm() {
                   return {
                     label: <SourceWalletOption source={s} />,
                     value: s.id,
+                    disabled: s.type !== AccountType.User,
                   };
                 })}
                 formik={formik}
@@ -103,9 +104,9 @@ function AddGatewayForm() {
               <FormikTextInput showErrorOnlyOfTouched id="peerId" label="Peer ID" formik={formik} />
             </FormRow>
 
-            <FormRow>
+            {/* <FormRow>
               <FormikSwitch id="public" label="Publicly available" formik={formik} />
-            </FormRow>
+            </FormRow> */}
 
             {formik.values.public ? (
               <>
@@ -149,8 +150,8 @@ function AddGatewayForm() {
             <BlockchainContractError error={error} />
           </Card>
           <Box mt={2.5} justifyContent="flex-end" display="flex">
-            <LoadingButton disabled={isRegistering} variant="contained" type="submit">
-              Register
+            <LoadingButton disabled={isRegistering} variant="contained" type="submit" color="info">
+              REGISTER
             </LoadingButton>
           </Box>
         </Form>
@@ -163,7 +164,7 @@ export function AddNewGateway() {
   return (
     <CenteredPageWrapper>
       <ConnectedWalletRequired>
-        <NetworkPageTitle backPath="/gateways" title="Gateway registration" />
+        <NetworkPageTitle backPath="/portals" />
         <AddGatewayForm />
       </ConnectedWalletRequired>
     </CenteredPageWrapper>

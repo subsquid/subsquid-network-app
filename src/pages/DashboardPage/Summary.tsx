@@ -134,7 +134,7 @@ function CurrentEpoch() {
   }, [curTime, epochEnd]);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || !data.epoch) return;
 
     const newEpochEnd =
       (data.epoch.end - data.lastBlockL1 + 1) * data.blockTimeL1 +

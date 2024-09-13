@@ -1,40 +1,43 @@
-import React from 'react';
-
 import { LoadingButton } from '@mui/lab';
 import { Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { useUnregisterGateway } from '@api/contracts/gateway-registration/useUnregisterGateway';
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
 import { BlockchainContractError } from '@components/BlockchainContractError';
+import { useAccount } from '@network/useAccount';
 
-export function GatewayUnregister({ gateway }: { gateway: BlockchainGateway }) {
+export function GatewayUnregister({
+  gateway,
+}: {
+  gateway: any; // PickDeep<Gateway, 'id' | 'owner.id' | 'owner.type' | 'realOwner.id' | 'realOwner.type'>;
+}) {
   const navigate = useNavigate();
   const {
     unregisterGateway,
     error: unregisterError,
-    isLoading: isUnregistering,
+    isLoading: isDeregistering,
   } = useUnregisterGateway();
+  const { address } = useAccount();
 
-  if (!gateway.ownedByMe) return null;
+  if (gateway.realOwner.id !== address) return null;
 
   return (
     <Box>
       <LoadingButton
-        loading={isUnregistering}
+        loading={isDeregistering}
         onClick={async e => {
           e.stopPropagation();
 
           const { failedReason } = await unregisterGateway({ gateway });
 
           if (!failedReason) {
-            navigate('/gateways');
+            navigate('/portals');
           }
         }}
-        variant="contained"
+        variant="outlined"
         color="error"
       >
-        Unregister
+        UNREGISTER
       </LoadingButton>
 
       <BlockchainContractError error={unregisterError} />

@@ -11,7 +11,7 @@ import { WriteContractRes, errorMessage } from './utils';
 export function useApproveSqd() {
   const client = useClient();
   const contracts = useContracts();
-  const { writeContractAsync } = useWriteContract({});
+  const { writeContractAsync } = useWriteContract();
 
   async function approve({
     contractAddress,
