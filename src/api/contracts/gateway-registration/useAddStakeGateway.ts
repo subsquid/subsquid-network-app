@@ -1,39 +1,35 @@
 import { useState } from 'react';
 
 import { logger } from '@logger';
-import { encodeFunctionData } from 'viem';
 import { usePublicClient, useWriteContract } from 'wagmi';
 
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
-import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
 import { GATEWAY_REGISTRATION_CONTRACT_ABI } from '../abi/GatewayRegistration.abi';
-import { VESTING_CONTRACT_ABI } from '../abi/vesting.abi';
 import { useApproveSqd } from '../sqd';
 import { errorMessage, TxResult, isApproveRequiredError, WriteContractRes } from '../utils';
 
-type StakeGatewayRequest = {
+type AddStakeGatewayRequest = {
   amount: string;
-  durationBlocks: number;
   wallet: SourceWallet;
 };
 
-function useStakeFromWallet() {
+function useAddStakeFromWallet() {
   const contracts = useContracts();
   const { writeContractAsync } = useWriteContract({});
 
   const [approveSqd] = useApproveSqd();
 
-  const tryCallContract = async ({ amount, durationBlocks }: StakeGatewayRequest) => {
+  const tryCallContract = async ({ amount }: AddStakeGatewayRequest) => {
     try {
       return {
         tx: await writeContractAsync({
           address: contracts.GATEWAY_REGISTRATION,
           abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
-          functionName: 'stake',
-          args: [BigInt(amount), BigInt(durationBlocks), false],
+          functionName: 'addStake',
+          args: [BigInt(amount)],
         }),
       };
     } catch (e) {
@@ -41,7 +37,7 @@ function useStakeFromWallet() {
     }
   };
 
-  return async (req: StakeGatewayRequest): Promise<TxResult> => {
+  return async (req: AddStakeGatewayRequest): Promise<TxResult> => {
     logger.debug(`stake to gateway via worker contract...`);
 
     const res = await tryCallContract(req);
@@ -64,50 +60,22 @@ function useStakeFromWallet() {
   };
 }
 
-function useStakeFromVestingContract() {
-  const contracts = useContracts();
-  const { address: account } = useAccount();
-  const { writeContractAsync } = useWriteContract({});
-
-  return async ({ amount, wallet, durationBlocks }: StakeGatewayRequest): Promise<TxResult> => {
-    try {
-      const data = encodeFunctionData({
-        abi: GATEWAY_REGISTRATION_CONTRACT_ABI,
-        functionName: 'stake',
-        args: [BigInt(amount), BigInt(durationBlocks), false],
-      });
-
-      return {
-        tx: await writeContractAsync({
-          account,
-          address: wallet.id as `0x${string}`,
-          abi: VESTING_CONTRACT_ABI,
-          functionName: 'execute',
-          args: [contracts.GATEWAY_REGISTRATION, data, BigInt(amount)],
-        }),
-      };
-    } catch (e: unknown) {
-      return { error: errorMessage(e) };
-    }
-  };
-}
-
-export function useStakeGateway() {
+export function useAddStakeGateway() {
   const client = usePublicClient();
   const { setWaitHeight } = useSquidNetworkHeight();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const stakeFromWallet = useStakeFromWallet();
-  const stakeFromVestingContract = useStakeFromVestingContract();
+  const stakeFromWallet = useAddStakeFromWallet();
 
-  const stakeToGateway = async (req: StakeGatewayRequest): Promise<WriteContractRes> => {
+  const addStakeToGateway = async (req: AddStakeGatewayRequest): Promise<WriteContractRes> => {
     setLoading(true);
 
-    const res =
-      req.wallet.type === AccountType.User
-        ? await stakeFromWallet(req)
-        : await stakeFromVestingContract(req);
+    if (req.wallet.type !== AccountType.User) {
+      throw new Error('Vesting contracts are not supported yet.');
+    }
+
+    const res = await stakeFromWallet(req);
 
     if (!res.tx) {
       setLoading(false);
@@ -129,7 +97,7 @@ export function useStakeGateway() {
   };
 
   return {
-    stakeToGateway,
+    addStakeToGateway,
     isLoading,
     error,
   };

@@ -1,18 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
+import { tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network/utils';
 import { Box, Button, Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
+import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
+import { useAddStakeGateway } from '@api/contracts/gateway-registration/useAddStakeGateway';
 import { useComputationUnits } from '@api/contracts/gateway-registration/useComputationUnits';
 import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
-import { useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
+import { AccountType } from '@api/subsquid-network-squid';
+import { useMyGatewayStake } from '@api/subsquid-network-squid/gateways-graphql';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form, FormikSelect, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
+import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
@@ -38,19 +42,32 @@ export const stakeSchema = yup.object({
 });
 
 export function GatewayStake({ disabled }: { disabled?: boolean }) {
-  const { data } = useMyGatewayStakes();
-  const { stakeToGateway, error, isLoading } = useStakeGateway();
+  const { data, isLoading: isStakeLoading } = useMyGatewayStake();
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const stakeGateway = useStakeGateway();
+  const addStakeGateway = useAddStakeGateway();
+  const { stakeToGateway, error, isLoading } = useMemo(() => {
+    if (BigNumber(data?.stake?.amount || 0).gt(0)) {
+      return {
+        stakeToGateway: addStakeGateway.addStakeToGateway,
+        error: addStakeGateway.error,
+        isLoading: addStakeGateway.isLoading,
+      };
+    } else {
+      return stakeGateway;
+    }
+  }, [addStakeGateway, data?.stake?.amount, stakeGateway]);
 
   const {
     sources,
     options,
     isPending: isSourceLoading,
   } = useMySourceOptions({
-    sourceDisabled: s => s.balance === '0' || !!data?.operators.some(o => o.account.id === s.id),
+    sourceDisabled: s => s.balance === '0' || s.type !== AccountType.User,
   });
 
   const formik = useFormik({
@@ -73,7 +90,6 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
       const { failedReason } = await stakeToGateway({
         amount: toSqd(values.amount),
         durationBlocks: Number(values.durationBlocks),
-        autoExtension: values.autoExtension,
         wallet,
       });
 
@@ -105,12 +121,10 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
   }, [source]);
 
   const [lockDuration] = useDebounce(formik.values.durationBlocks, 500);
-  const [amount] = useDebounce(formik.values.amount, 500);
+  const [amount] = useDebounce(fromSqd(data?.stake?.amount || 0).plus(formik.values.amount), 500);
   const unlockAt = useMemo(() => {
     if (!data) return Date.now();
-    return (
-      (Number(lockDuration) + 1) * data.blockTimeL1 + new Date(data.lastBlockTimestampL1).getTime()
-    );
+    return (Number(lockDuration) + 1) * 12_000 + new Date(data.lastBlockTimestampL1).getTime();
   }, [data, lockDuration]);
   const { data: computationUnits, isPending: isComputationUnitsLoading } = useComputationUnits({
     amount: toSqd(amount),
@@ -122,9 +136,10 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
       <Button
         onClick={handleOpen}
         variant="contained"
-        disabled={disabled || data?.operators.length === sources.length}
+        color="info"
+        disabled={disabled || !!data?.stake?.computationUnitsPending || isStakeLoading}
       >
-        Add lock
+        LOCK
       </Button>
       <ContractCallDialog
         title="Lock"
@@ -189,22 +204,27 @@ export function GatewayStake({ disabled }: { disabled?: boolean }) {
                 formik={formik}
                 showErrorOnlyOfTouched
                 autoComplete="off"
+                disabled={!!data?.stake?.lockEnd}
               />
             </FormRow>
-            <FormRow>
+            {/* <FormRow>
               <FormikSwitch id="autoExtension" label="Auto extension" formik={formik} />
-            </FormRow>
+            </FormRow> */}
             <Stack spacing={2}>
               <Stack direction="row" justifyContent="space-between" alignContent="center">
-                <Box>Unlock at</Box>
-                <Stack direction="row">
-                  ~{dateFormat(unlockAt, 'dateTime')}
-                  <HelpTooltip title="Automatically relocked if auto extension is enabled" />
-                </Stack>
+                <Box>Total amount</Box>
+                {tokenFormatter(amount, 'SQD', 6)}
               </Stack>
               <Stack direction="row" justifyContent="space-between" alignContent="center">
                 <Box>Expected CU</Box>
                 {isComputationUnitsLoading ? '-' : computationUnits}
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" alignContent="center">
+                <Box>Unlock at</Box>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <span>~{dateFormat(unlockAt, 'dateTime')}</span>
+                  <HelpTooltip title="Automatically relocked if auto extension is enabled" />
+                </Stack>
               </Stack>
             </Stack>
 

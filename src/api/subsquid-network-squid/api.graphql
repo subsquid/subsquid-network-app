@@ -258,21 +258,14 @@ fragment GatewayFragment on Gateway {
   email
   endpointUrl
   website
+  createdAt
   owner {
     id
     type
   }
-  operator {
-    stake {
-      locked
-    }
-  }
-  createdAt
-}
-
-query myGateways($address: String!) {
-  gateways(orderBy: id_ASC, where: { owner: { id_eq: $address }, status_eq: REGISTERED }) {
-    ...GatewayFragment
+  realOwner {
+    id
+    type
   }
 }
 
@@ -282,28 +275,32 @@ query gatewayByPeerId($peerId: String!) {
   }
 }
 
-fragment GatewayStakeFragment on GatewayOperator {
-  account {
+fragment GatewayStakeFragment on GatewayStake {
+  owner {
+    id
+    type
+  }
+  realOwner {
     id
     type
   }
   autoExtension
-  stake {
-    amount
-    locked
-    lockStart
-    lockEnd
-  }
-  pendingStake {
-    amount
-    locked
-    lockStart
-    lockEnd
+  amount
+  computationUnits
+  computationUnitsPending
+  locked
+  lockStart
+  lockEnd
+}
+
+query myGateways($address: String!) {
+  gateways(where: { realOwner: { id_eq: $address } }) {
+    ...GatewayFragment
   }
 }
 
 query myGatewayStakes($address: String!) {
-  gatewayOperators(where: { account: { id_eq: $address, OR: { owner: { id_eq: $address } } } }) {
+  gatewayStakes(where: { realOwner: { id_eq: $address }, amount_gt: "0" }) {
     ...GatewayStakeFragment
   }
 

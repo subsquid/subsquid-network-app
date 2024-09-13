@@ -14,14 +14,14 @@ import {
 } from 'wagmi';
 
 import { useApproveSqd } from '@api/contracts/sqd';
-import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
+import { VESTING_CONTRACT_ABI } from '@api/contracts/abi/vesting.abi';
 import { AccountType, Worker, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
-import { SOFT_CAP_ABI } from './soft-cap.abi';
-import { STAKING_CONTRACT_ABI } from './staking.abi';
+import { SOFT_CAP_ABI } from './abi/soft-cap.abi';
+import { STAKING_CONTRACT_ABI } from './abi/staking.abi';
 import { errorMessage, TxResult, isApproveRequiredError, WriteContractRes } from './utils';
 
 type WorkerDepositRequest = {

@@ -18,7 +18,7 @@ import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
 
 const network = getSubsquidNetwork();
 
-export const wagmiConfig = getDefaultConfig({
+export const rainbowConfig = getDefaultConfig({
   appName: `Subsquid Network ${upperFirst(network)}`,
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
   chains:

@@ -6,7 +6,7 @@ import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, useClient } from 'wagmi';
 
-import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
+import { VESTING_CONTRACT_ABI } from '@api/contracts/abi/vesting.abi';
 import { UnregisterWorkerRequest } from '@api/contracts/worker-registration/useUnregisterWorker';
 import { AccountType } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
@@ -15,7 +15,7 @@ import { useContracts } from '@network/useContracts.ts';
 
 import { TxResult, errorMessage, WriteContractRes } from '../utils';
 
-import { WORKER_REGISTRATION_CONTRACT_ABI } from './WorkerRegistration.abi';
+import { WORKER_REGISTRATION_CONTRACT_ABI } from '../abi/WorkerRegistration.abi';
 
 function useWithdrawWorkerFromWallet() {
   const contracts = useContracts();
