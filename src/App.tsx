@@ -10,7 +10,7 @@ import { WagmiProvider } from 'wagmi';
 import { queryClient } from '@api/client';
 import { Alert } from '@components/Alert';
 import { SquidHeightProvider } from '@hooks/useSquidNetworkHeightHooks';
-import { wagmiConfig } from '@network/config';
+import { rainbowConfig } from '@network/config';
 
 import { AppRoutes } from './AppRoutes';
 import { useCreateRainbowKitTheme, useCreateTheme, useThemeState } from './theme';
@@ -21,7 +21,7 @@ function App() {
   const rainbowkitTheme = useCreateRainbowKitTheme(themeName);
 
   return (
-    <WagmiProvider config={wagmiConfig}>
+    <WagmiProvider config={rainbowConfig}>
       <QueryClientProvider client={queryClient}>
         <SquidHeightProvider>
           <ThemeProvider theme={theme}>

@@ -72,10 +72,6 @@ export const AppToolbarSidebar = styled('div', {
     stroke: '#fff',
   },
 
-  [theme.breakpoints.down('xl')]: {
-    width: theme.spacing(7),
-  },
-
   [theme.breakpoints.down('md')]: {
     // width: 'auto',
     '&:after': {
@@ -111,13 +107,9 @@ export const Content = styled('div', {
     alignItems: 'stretch',
     justifyContent: 'center',
     paddingTop: APP_BAR_HEIGHT + bannerHeight,
-    paddingLeft: SIDEBAR_WIDTH.M,
+    paddingLeft: 0,
     paddingBottom: theme.spacing(8),
     minWidth: 350,
-
-    '&.narrow': {
-      paddingLeft: 0,
-    },
 
     [theme.breakpoints.up('xl')]: {
       paddingLeft: SIDEBAR_WIDTH.L,
@@ -157,6 +149,7 @@ const Sidebar = styled('div', {
   const bannerHeight = useBannerHeight();
 
   return {
+    // borderRight: `solid ${theme.palette.divider} 1px`,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
@@ -170,13 +163,13 @@ const Sidebar = styled('div', {
     // paddingBottom: theme.spacing(3),
     zIndex: theme.zIndex.appBar + 1,
     // boxShadow: '-5px 4px 20px rgba(0, 0, 0, 0.25)',
-    width: SIDEBAR_WIDTH.M,
+    width: SIDEBAR_WIDTH.L,
     overflowY: 'auto',
     overflowX: 'hidden',
 
-    [theme.breakpoints.up('xl')]: {
-      width: SIDEBAR_WIDTH.L,
-    },
+    // [theme.breakpoints.up('xl')]: {
+    //   width: SIDEBAR_WIDTH.L,
+    // },
 
     '&.guideActive': {
       zIndex: theme.zIndex.guide.highlight,
@@ -263,9 +256,7 @@ export const NetworkLayout = ({
   stretchContent?: boolean;
 }>) => {
   const theme = useTheme();
-  const narrowLg = useMediaQuery(theme.breakpoints.down('lg'));
-  const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
-  const isMobile = useMediaQuery(theme.breakpoints.down('xxs'));
+  const narrow = useMediaQuery(theme.breakpoints.down('xl'));
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -308,7 +299,7 @@ export const NetworkLayout = ({
           <AppToolbarContent></AppToolbarContent>
           {/* <NetworkSwitcher hideText={isMobile} /> */}
           {/*{narrowXs ? null : <AppToolbarDivider />}*/}
-          {narrowXs ? <AppToolbarContent /> : null}
+          {narrow ? <AppToolbarContent /> : null}
           <UserMenu />
           <Backdrop
             open={isMenuOpen}
@@ -318,7 +309,7 @@ export const NetworkLayout = ({
         </AppToolbar>
       </AppBar>
 
-      <Slide direction="right" in={!narrowLg || isMenuOpen} appear={false}>
+      <Slide direction="right" in={!narrow || isMenuOpen} appear={false}>
         <Sidebar>
           <SidebarLogo>
             <Logo />
@@ -326,7 +317,7 @@ export const NetworkLayout = ({
           <NetworkMenu onItemClick={() => setIsMenuOpen(false)} />
         </Sidebar>
       </Slide>
-      <Content className={classnames({ narrow: narrowLg })}>
+      <Content>
         <ContentWrapper sx={centeredSx}>
           {children}
           <Outlet />

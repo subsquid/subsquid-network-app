@@ -11,10 +11,10 @@ import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
 import { TxResult, errorMessage, WriteContractRes } from '../utils';
-import { VESTING_CONTRACT_ABI } from '../vesting.abi';
+import { VESTING_CONTRACT_ABI } from '../abi/vesting.abi';
 
 import { encodeGatewayMetadata, GetawayMetadata } from './GatewayMetadata';
-import { GATEWAY_REGISTRATION_CONTRACT_ABI } from './GatewayRegistration.abi';
+import { GATEWAY_REGISTRATION_CONTRACT_ABI } from '../abi/GatewayRegistration.abi';
 
 export interface RegisterGatewayRequest extends GetawayMetadata {
   peerId: string;

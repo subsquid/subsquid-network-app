@@ -2,9 +2,6 @@ import React from 'react';
 
 import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
 
-import { getSubsquidNetwork } from '@network/useSubsquidNetwork';
-
-import { LogoCompact } from './LogoCompact';
 import { LogoFull } from './LogoFull';
 
 export const LogoWrapper = styled('div', {
@@ -46,7 +43,8 @@ export function Logo({ color = '#fff' }: { color?: string }) {
 
   return (
     <LogoWrapper>
-      {compact ? <LogoCompact /> : <LogoFull />}
+      <LogoFull />
+      {/* {compact ? <LogoCompact /> : <LogoFull />} */}
       {/* <img width={size} height={size} src="/logo.png" /> */}
       {/* {!narrow ? (
         <>

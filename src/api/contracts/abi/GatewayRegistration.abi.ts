@@ -102,4 +102,31 @@ export const GATEWAY_REGISTRATION_CONTRACT_ABI = [
     ],
     stateMutability: 'view',
   },
+  {
+    type: 'function',
+    name: 'addStake',
+    inputs: [
+      {
+        name: 'amount',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'disableAutoExtension',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'enableAutoExtension',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
 ] as const;

@@ -1,4 +1,4 @@
-import { IconButton, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { IconButton, Stack, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
@@ -28,12 +28,12 @@ function WorkerTitle({
 
   return (
     <Stack spacing={0.5}>
-      <Stack direction="row" alignItems="center" spacing={1}>
+      <Stack direction="row" alignItems="center" spacing={0.5}>
         <Typography variant="h4" sx={{ overflowWrap: 'anywhere' }}>
           {worker.name || worker.peerId}
         </Typography>
         {canEdit ? (
-          <IconButton component={Link} to={`/workers/${worker.peerId}/edit`} sx={{ padding: 0 }}>
+          <IconButton component={Link} to={`/workers/${worker.peerId}/edit`} sx={{ padding: 0.5 }}>
             <EditIcon />
           </IconButton>
         ) : null}
@@ -60,9 +60,6 @@ export const WorkerCard = ({
   worker: Pick<Worker, 'id' | 'status' | 'peerId' | 'name'> & WorkerStatusFragmentFragment;
   canEdit: boolean;
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
-
   return (
     <>
       <Stack direction="row" justifyContent="space-between">

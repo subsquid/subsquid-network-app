@@ -41,7 +41,7 @@ export function useNetworkSummary() {
       select: res => {
         return {
           ...res.networkStats,
-          epoch: res.epoches[0],
+          epoch: res.epoches.length ? res.epoches[0] : undefined,
         };
       },
       refetchInterval: 6000, // a half of block time in l1

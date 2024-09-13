@@ -12,10 +12,10 @@ import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
 import { TxResult, errorMessage, WriteContractRes } from '../utils';
-import { VESTING_CONTRACT_ABI } from '../vesting.abi';
+import { VESTING_CONTRACT_ABI } from '../abi/vesting.abi';
 
 import { encodeWorkerMetadata, WorkerMetadata } from './WorkerMetadata';
-import { WORKER_REGISTRATION_CONTRACT_ABI } from './WorkerRegistration.abi';
+import { WORKER_REGISTRATION_CONTRACT_ABI } from '../abi/WorkerRegistration.abi';
 
 export interface UpdateWorkerRequest extends WorkerMetadata {
   peerId: string;

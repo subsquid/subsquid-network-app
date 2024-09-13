@@ -10,7 +10,7 @@ import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
 
 import { errorMessage, WriteContractRes } from './utils';
-import { VESTING_CONTRACT_ABI } from './vesting.abi';
+import { VESTING_CONTRACT_ABI } from './abi/vesting.abi';
 
 export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[] }) {
   const contracts = useContracts();

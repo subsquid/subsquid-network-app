@@ -5,9 +5,7 @@ import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { useVestingContracts } from '@api/contracts/vesting';
 import { useMyAssets } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
-import { NoItems } from '@components/NoItems';
-import Placeholder from '@components/Placeholer';
-import { DashboardTable } from '@components/Table/DashboardTable';
+import { DashboardTable, NoItems } from '@components/Table';
 import { useContracts } from '@network/useContracts';
 
 import { ReleaseButton } from './ReleaseButton';
@@ -57,9 +55,7 @@ export function MyVestings() {
             })}
           </>
         ) : (
-          <Placeholder>
-            <NoItems />
-          </Placeholder>
+          <NoItems />
         )}
       </TableBody>
     </DashboardTable>

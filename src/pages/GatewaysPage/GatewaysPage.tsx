@@ -1,164 +1,179 @@
-import React, { useCallback } from 'react';
+import React, { useMemo } from 'react';
 
 import { dateFormat } from '@i18n';
-import { tokenFormatter } from '@lib/formatters/formatters';
+import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
-import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Add } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
 
-import { GatewayStake as GatewayStakeGraphql } from '@api/subsquid-network-squid';
-import { useMyGateways, useMyGatewayStakes } from '@api/subsquid-network-squid/gateways-graphql';
-import { Card } from '@components/Card';
-import { Loader } from '@components/Loader';
-import { BorderedTable } from '@components/Table/BorderedTable';
-import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
+import { useMyGateways, useMyGatewayStake } from '@api/subsquid-network-squid/gateways-graphql';
+import SquaredChip from '@components/Chip/SquaredChip';
+import { DashboardTable, NoItems } from '@components/Table';
+import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
-import { SourceWalletName } from '@pages/AssetsPage/VestingName';
-import { GatewayName } from '@pages/GatewaysPage/GatewayName';
+import { ColumnLabel, ColumnValue, SummarySection } from '@pages/DashboardPage/Summary';
 
+import { AutoExtension } from './AutoExtension';
+import { GatewayName } from './GatewayName';
 import { GatewayStake } from './GatewayStake';
-import { GatewayStatus } from './GatewayStatus';
 import { GatewayUnregister } from './GatewayUnregister';
 import { GatewayUnstake } from './GatewayUnstake';
 
 export function MyStakes() {
-  const { data, isLoading } = useMyGatewayStakes();
+  const theme = useTheme();
+  const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
+
+  const { data: stake, isLoading: isStakeLoading } = useMyGatewayStake();
   const { SQD_TOKEN } = useContracts();
 
-  const getUnlockAt = useCallback(
-    (o: {
-      pendingStake?: Pick<GatewayStakeGraphql, 'lockEnd'>;
-      stake?: Pick<GatewayStakeGraphql, 'lockEnd'>;
-      autoExtension: boolean;
-    }) => {
-      if (!data) return;
+  const unlockDate = useMemo(() => {
+    if (!stake?.stake) return;
+    if (!stake.stake.lockEnd) return;
 
-      const stake = o.pendingStake || o.stake;
-      if (!stake) return;
-
-      return (
-        (Number(stake.lockEnd) - data.lastBlockL1 + 1) * data.blockTimeL1 +
-        new Date(data.lastBlockTimestampL1).getTime()
-      );
-    },
-    [data],
-  );
+    return (
+      (Number(stake.stake.lockEnd) - stake.lastBlockL1 + 1) * 12_000 +
+      new Date(stake.lastBlockTimestampL1).getTime()
+    );
+  }, [stake]);
 
   return (
-    <Box>
-      <NetworkPageTitle title="My Locks" endAdornment={<GatewayStake />} />
-      {isLoading ? (
-        <Loader />
-      ) : data?.operators.length ? (
-        <Card noPadding>
-          <BorderedTable>
-            <TableHead>
-              <TableRow>
-                <TableCell>Operator</TableCell>
-                <TableCell>Pending</TableCell>
-                <TableCell>Active</TableCell>
-                <TableCell>Expired</TableCell>
-                <TableCell>Unlock at</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data?.operators.map((o, i) => {
-                return (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <SourceWalletName source={o.account} />
-                    </TableCell>
-                    <TableCell>
-                      {o.pendingStake
-                        ? tokenFormatter(fromSqd(o.pendingStake?.amount), SQD_TOKEN)
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {o.stake && o.stake.locked
-                        ? tokenFormatter(fromSqd(o.stake?.amount), SQD_TOKEN)
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {o.stake && !o.stake.locked
-                        ? tokenFormatter(fromSqd(o.stake?.amount), SQD_TOKEN)
-                        : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {o.autoExtension ? '-' : dateFormat(getUnlockAt(o), 'dateTime')}
-                    </TableCell>
-                    <TableCell>
-                      <Box display="flex" justifyContent="flex-end">
-                        <GatewayUnstake operator={o} />
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </BorderedTable>
-        </Card>
-      ) : (
-        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
-      )}
-    </Box>
+    <>
+      <Box minHeight={256} mb={2} display="flex">
+        <SummarySection
+          loading={isStakeLoading}
+          sx={{ width: 1 }}
+          title={<SquaredChip label="Lock Info" color="primary" />}
+          action={
+            <Stack direction="row" spacing={2}>
+              <GatewayStake />
+              <GatewayUnstake />
+            </Stack>
+          }
+        >
+          <Stack direction="column" flex={1}>
+            <Box alignSelf="end">
+              <AutoExtension stake={stake?.stake} />
+            </Box>
+            <Stack
+              divider={<Divider flexItem />}
+              spacing={1}
+              direction={narrowXs ? 'column' : 'row'}
+              alignItems={narrowXs ? 'stretch' : 'flex-end'}
+              height={1}
+              justifyContent="stretch"
+              width={0.75}
+            >
+              <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
+                <Box>
+                  <ColumnLabel>Amount</ColumnLabel>
+                  <ColumnValue>
+                    {tokenFormatter(fromSqd(stake?.stake?.amount), SQD_TOKEN, 3)}
+                  </ColumnValue>
+                </Box>
+                <Box>
+                  <ColumnLabel>
+                    <Stack direction="row" spacing={1}>
+                      <span>Allocated CUs</span>
+                      {stake?.stake?.computationUnitsPending ? (
+                        <SquaredChip label="Pending" color="warning" />
+                      ) : stake?.stake?.locked ? (
+                        <SquaredChip label="Active" color="info" />
+                      ) : (
+                        <SquaredChip label="Expired" color="error" />
+                      )}
+                    </Stack>
+                  </ColumnLabel>
+                  <ColumnValue>
+                    {numberWithCommasFormatter(stake?.stake?.computationUnits || 0)}
+                    {stake?.stake?.computationUnitsPending
+                      ? ` (${numberWithCommasFormatter(stake?.stake?.computationUnitsPending)})`
+                      : ``}
+                  </ColumnValue>
+                </Box>
+              </Stack>
+              <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
+                <Box>
+                  <ColumnLabel>Unlocked At</ColumnLabel>
+                  <ColumnValue>
+                    {unlockDate && !stake?.stake?.autoExtension
+                      ? dateFormat(unlockDate, narrowXs ? 'date' : 'dateTime')
+                      : '-'}
+                  </ColumnValue>
+                </Box>
+              </Stack>
+            </Stack>
+          </Stack>
+        </SummarySection>
+      </Box>
+    </>
   );
 }
 
 export function MyGateways() {
-  const { data, isLoading } = useMyGateways();
+  const { data: gateways, isLoading: isGatewaysLoading } = useMyGateways();
 
   return (
-    <Box>
-      <NetworkPageTitle
-        title="My Gateways"
-        endAdornment={
-          <Stack direction="row" spacing={2}>
-            <Button variant="contained" component={Link} to="/gateways/add">
-              Add gateway
-            </Button>
-          </Stack>
-        }
-      />
-      {isLoading ? (
-        <Loader />
-      ) : data.length ? (
-        <Card noPadding>
-          <BorderedTable>
-            <TableHead>
-              <TableRow>
-                <TableCell>Gateway</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Created</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map(gateway => {
-                return (
-                  <TableRow key={gateway.id}>
-                    <TableCell>
-                      <GatewayName gateway={gateway} to={`/gateways/${gateway.id}`} />
-                    </TableCell>
-                    <TableCell>
-                      <GatewayStatus gateway={gateway} />
-                    </TableCell>
-                    <TableCell>{dateFormat(gateway.createdAt, 'date')}</TableCell>
-                    <TableCell>
-                      <Box display="flex" justifyContent="flex-end">
-                        <GatewayUnregister gateway={gateway} />
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </BorderedTable>
-        </Card>
-      ) : (
-        <Card sx={{ textAlign: 'center' }}>No items to show</Card>
-      )}
-    </Box>
+    <DashboardTable
+      loading={isGatewaysLoading}
+      title={
+        <>
+          <SquaredChip label="My Portals" color="primary" />
+          <Button
+            color="info"
+            startIcon={<Add />}
+            variant="contained"
+            component={Link}
+            to="/portals/add"
+          >
+            ADD PORTAL
+          </Button>
+        </>
+      }
+    >
+      <TableHead>
+        <TableRow>
+          <TableCell>Gateway</TableCell>
+          <TableCell>Registered</TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {gateways.length ? (
+          <>
+            {gateways.map(gateway => {
+              return (
+                <TableRow key={gateway.id}>
+                  <TableCell>
+                    <GatewayName gateway={gateway} to={`/portals/${gateway.id}`} />
+                  </TableCell>
+                  <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
+                  <TableCell>
+                    <Box display="flex" justifyContent="flex-end">
+                      <GatewayUnregister gateway={gateway} />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </>
+        ) : (
+          <NoItems />
+        )}
+      </TableBody>
+    </DashboardTable>
   );
 }
 
@@ -167,7 +182,6 @@ export function GatewaysPage() {
     <CenteredPageWrapper className="wide">
       <ConnectedWalletRequired>
         <MyStakes />
-        <Box sx={{ height: 64 }} />
         <MyGateways />
       </ConnectedWalletRequired>
       <Outlet />

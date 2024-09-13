@@ -4,8 +4,8 @@ import { encodeFunctionData } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useWriteContract, useClient } from 'wagmi';
 
-import { REWARD_TREASURY_CONTRACT_ABI } from '@api/contracts/reaward-treasury.abi';
-import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
+import { REWARD_TREASURY_CONTRACT_ABI } from '@api/contracts/abi/reaward-treasury.abi';
+import { VESTING_CONTRACT_ABI } from '@api/contracts/abi/vesting.abi';
 import { AccountType, SourceWallet } from '@api/subsquid-network-squid';
 import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount.ts';
