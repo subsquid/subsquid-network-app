@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig, splitVendorChunkPlugin } from 'vite';
+import { createHtmlPlugin } from 'vite-plugin-html';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 import 'dotenv/config';
@@ -44,6 +45,7 @@ export default defineConfig({
   plugins: [
     tsconfigPaths(),
     react(),
+    createHtmlPlugin({}),
     process.env.NODE_ENV === 'production' ? splitVendorChunkPlugin() : undefined,
   ],
 });
