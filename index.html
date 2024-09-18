@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
+
 <head>
+  <% if (process.env.APP_ENV==='prod' ) { %>
+    <!-- Google Tag Manager -->
+    <script>
+      (function(w,d,s,l,i) {
+        w[l] = w[l] || []; w[l].push({
+          'gtm.start':
+            new Date().getTime(),event: 'gtm.js'
+        }); var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j,f)
+      })(window,document,'script','dataLayer','GTM-MBVP9WJH');
+    </script>
+    <!-- End Google Tag Manager -->
+  <% } %>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
 
@@ -8,21 +24,11 @@
 
   <link rel="icon" type="image/png" href="/favicon.v3.png" />
 
-  <meta property="og:title" content="Subsquid Network App"/>
-<!--  <meta property="og:image" content="/aquarium-social.png"/>-->
-<!--  <meta property="og:description" content="Join thousands of developers who use Subsquid Cloud to deploy GraphQL APIs and sophisticated indexers for Web3 apps"/>-->
-<!--  <meta property="og:image:width" content="1200"/>-->
-<!--  <meta property="og:image:height" content="630"/>-->
-
-    <!-- Google tag (gtag.js) -->
-<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6JBS6RNP90"></script>-->
-<!--    <script>-->
-<!--    window.dataLayer = window.dataLayer || [];-->
-<!--    function gtag(){dataLayer.push(arguments);}-->
-<!--    gtag('js', new Date());-->
-
-<!--    gtag('config', 'G-6JBS6RNP90');-->
-<!--    </script>-->
+  <meta property="og:title" content="Subsquid Network App" />
+  <!--  <meta property="og:image" content="/aquarium-social.png"/>-->
+  <!--  <meta property="og:description" content="Join thousands of developers who use Subsquid Cloud to deploy GraphQL APIs and sophisticated indexers for Web3 apps"/>-->
+  <!--  <meta property="og:image:width" content="1200"/>-->
+  <!--  <meta property="og:image:height" content="630"/>-->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,6 +57,7 @@
       opacity: 1;
       background: rgba(255, 255, 255, 0.4);
     }
+
     .subsquid-loader {
       width: 48px;
       height: 48px;
@@ -88,25 +95,32 @@
       17% {
         border-bottom-right-radius: 3px;
       }
+
       25% {
         transform: translateY(9px) rotate(22.5deg);
       }
+
       50% {
         transform: translateY(18px) scale(1, .9) rotate(45deg);
         border-bottom-right-radius: 40px;
       }
+
       75% {
         transform: translateY(9px) rotate(67.5deg);
       }
+
       100% {
         transform: translateY(0) rotate(90deg);
       }
     }
 
     @keyframes shadow {
-      0%, 100% {
+
+      0%,
+      100% {
         transform: scale(1, 1);
       }
+
       50% {
         transform: scale(1.2, 1);
       }
@@ -115,38 +129,40 @@
     @font-face {
       font-family: 'Matter';
       font-weight: 500;
-      src: 
-          url(/fonts/Matter-Medium.woff2) format('woff2'),
-          url(/fonts/Matter-Medium.woff) format('woff'),
-          url(/fonts/Matter-Medium.otf) format('opentype'),
-          url(/fonts/Matter-Medium.ttf) format('truetype');
+      src:
+        url(/fonts/Matter-Medium.woff2) format('woff2'),
+        url(/fonts/Matter-Medium.woff) format('woff'),
+        url(/fonts/Matter-Medium.otf) format('opentype'),
+        url(/fonts/Matter-Medium.ttf) format('truetype');
       letter-spacing: normal;
     }
 
     @font-face {
       font-family: 'Matter';
       font-weight: 400;
-      src: 
-          url(/fonts/Matter-Regular.woff2) format('woff2'),
-          url(/fonts/Matter-Regular.woff) format('woff'),
-          url(/fonts/Matter-Regular.otf) format('opentype'),
-          url(/fonts/Matter-Regular.ttf) format('truetype');
+      src:
+        url(/fonts/Matter-Regular.woff2) format('woff2'),
+        url(/fonts/Matter-Regular.woff) format('woff'),
+        url(/fonts/Matter-Regular.otf) format('opentype'),
+        url(/fonts/Matter-Regular.ttf) format('truetype');
       letter-spacing: normal;
     }
 
     @font-face {
       font-family: 'Matter';
       font-weight: 600;
-      src: 
-          url(/fonts/Matter-SemiBold.woff2) format('woff2'),
-          url(/fonts/Matter-SemiBold.woff) format('woff'),
-          url(/fonts/Matter-SemiBold.otf) format('opentype'),
-          url(/fonts/Matter-SemiBold.ttf) format('truetype');
+      src:
+        url(/fonts/Matter-SemiBold.woff2) format('woff2'),
+        url(/fonts/Matter-SemiBold.woff) format('woff'),
+        url(/fonts/Matter-SemiBold.otf) format('opentype'),
+        url(/fonts/Matter-SemiBold.ttf) format('truetype');
       letter-spacing: normal;
     }
 
 
-    body, html, #root {
+    body,
+    html,
+    #root {
       min-height: 100%;
       height: 100%;
       font-family: 'Matter', 'Inter', sans-serif;
@@ -154,25 +170,35 @@
     }
   </style>
 </head>
+
 <body>
-<div id="root"></div>
-<div id="loader" class="show visible">
-  <div class="subsquid-loader"></div>
-</div>
-<script>
-  const theme = localStorage.getItem("theme") || 'light';
-  const loader = document.getElementById('loader')
-  if(theme === 'dark') {
-    loader?.classList.add("dark")
-  } else {
-    loader?.classList.remove("dark")
-  }
-</script>
-<script>
-  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-  posthog.init('phc_fTe8YFz8YP8IZG5pALV2HhbiJoFGcyHcyW2xtt8RWjD',{api_host:'https://eu.i.posthog.com', person_profiles: 'identified_only' // or 'always' to create profiles for anonymous users as well
-      })
-</script>
-<script type="module" src="/src/index.tsx"></script>
+  <% if (process.env.APP_ENV==='prod' ) { %>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MBVP9WJH" height="0" width="0"
+        style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  <% } %>
+
+  <div id="root"></div>
+  <div id="loader" class="show visible">
+    <div class="subsquid-loader"></div>
+  </div>
+  <script>
+    const theme = localStorage.getItem("theme") || 'light'
+    const loader = document.getElementById('loader')
+    if(theme === 'dark') {
+      loader?.classList.add("dark")
+    } else {
+      loader?.classList.remove("dark")
+    }
+  </script>
+  <script>
+    !function(t,e) {var o,n,p,r; e.__SV || (window.posthog = e,e._i = [],e.init = function(i,s,a) {function g(t,e) {var o = e.split("."); 2 == o.length && (t = t[o[0]],e = o[1]),t[e] = function() {t.push([e].concat(Array.prototype.slice.call(arguments,0)))}} (p = t.createElement("script")).type = "text/javascript",p.async = !0,p.src = s.api_host.replace(".i.posthog.com","-assets.i.posthog.com") + "/static/array.js",(r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r); var u = e; for(void 0 !== a ? u = e[a] = [] : a = "posthog",u.people = u.people || [],u.toString = function(t) {var e = "posthog"; return "posthog" !== a && (e += "." + a),t || (e += " (stub)"),e},u.people.toString = function() {return u.toString(1) + ".people (stub)"},o = "capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId".split(" "),n = 0;n < o.length;n++)g(u,o[n]); e._i.push([i,s,a])},e.__SV = 1)}(document,window.posthog || [])
+    posthog.init('phc_fTe8YFz8YP8IZG5pALV2HhbiJoFGcyHcyW2xtt8RWjD',{
+      api_host: 'https://eu.i.posthog.com',person_profiles: 'identified_only' // or 'always' to create profiles for anonymous users as well
+    })
+  </script>
+  <script type="module" src="/src/index.tsx"></script>
 </body>
+
 </html>
