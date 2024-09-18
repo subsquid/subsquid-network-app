@@ -91,9 +91,9 @@ export function MyStakes() {
                         <SquaredChip label="Pending" color="warning" />
                       ) : stake?.stake?.locked ? (
                         <SquaredChip label="Active" color="info" />
-                      ) : (
+                      ) : BigInt(stake?.stake?.amount || 0) > 0n ? (
                         <SquaredChip label="Expired" color="error" />
-                      )}
+                      ) : null}
                     </Stack>
                   </ColumnLabel>
                   <ColumnValue>
