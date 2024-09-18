@@ -54,7 +54,7 @@ function AddGatewayForm() {
       });
       if (!success) return;
 
-      navigate('/gateways');
+      navigate('/portals');
     },
   });
 
@@ -96,7 +96,7 @@ function AddGatewayForm() {
               <FormikTextInput
                 showErrorOnlyOfTouched
                 id="name"
-                label="Gateway name"
+                label="Portal name"
                 formik={formik}
               />
             </FormRow>

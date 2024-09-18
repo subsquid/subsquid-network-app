@@ -145,7 +145,7 @@ export function MyGateways() {
     >
       <TableHead>
         <TableRow>
-          <TableCell>Gateway</TableCell>
+          <TableCell>Portal</TableCell>
           <TableCell>Registered</TableCell>
           <TableCell></TableCell>
         </TableRow>
