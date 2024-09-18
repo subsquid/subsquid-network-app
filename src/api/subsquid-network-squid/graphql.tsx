@@ -6354,7 +6354,7 @@ export const useGatewayByPeerIdQuery = <TData = GatewayByPeerIdQuery, TError = u
 
 export const MyGatewaysDocument = `
     query myGateways($address: String!) {
-  gateways(where: {realOwner: {id_eq: $address}}) {
+  gateways(where: {realOwner: {id_eq: $address}, status_not_eq: DEREGISTERED}) {
     ...GatewayFragment
   }
 }
