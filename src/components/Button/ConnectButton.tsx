@@ -1,12 +1,11 @@
 import { MouseEventHandler } from 'react';
 
+import { LoginOutlined } from '@mui/icons-material';
 import { Button } from '@mui/material';
-
-import { WalletIcon } from '@icons/WalletIcon';
 
 function ConnectButton({ onClick }: { onClick?: MouseEventHandler }) {
   return (
-    <Button startIcon={<WalletIcon />} onClick={onClick} variant="contained" color="info">
+    <Button startIcon={<LoginOutlined />} onClick={onClick} variant="contained" color="info">
       CONNECT WALLET
     </Button>
   );

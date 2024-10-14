@@ -52,7 +52,7 @@ export function FormikTextInput({
   disabled,
 }: {
   id: string;
-  label?: string;
+  label?: React.ReactNode;
   formik?: any;
   multiline?: boolean;
   rows?: number;

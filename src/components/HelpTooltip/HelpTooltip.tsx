@@ -1,8 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 
-import { Box, Tooltip } from '@mui/material';
-
-import { InfoIcon } from '@icons/InfoIcon';
+import { InfoOutlined } from '@mui/icons-material';
+import { Stack, Tooltip } from '@mui/material';
 
 // export const Help = styled(Box)(({ theme, color }) => ({
 //   width: 15,
@@ -21,14 +20,19 @@ import { InfoIcon } from '@icons/InfoIcon';
 
 export const HelpTooltip = ({
   title,
+  children,
+  placement = 'end',
 }: PropsWithChildren<{
   title: React.ReactNode;
+  placement?: 'start' | 'end';
 }>) => {
   return (
-    <Tooltip title={title} placement="top">
-      <Box display="flex">
-        <InfoIcon />
-      </Box>
-    </Tooltip>
+    <Stack direction="row" spacing={0.5} alignItems="center">
+      {placement === 'end' && children}
+      <Tooltip title={title} placement="top">
+        <InfoOutlined fontSize="small" />
+      </Tooltip>
+      {placement === 'start' && children}
+    </Stack>
   );
 };

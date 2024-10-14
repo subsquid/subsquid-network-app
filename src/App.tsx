@@ -3,12 +3,11 @@ import React from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { SnackbarProvider } from 'notistack';
 import { BrowserRouter } from 'react-router-dom';
 import { WagmiProvider } from 'wagmi';
 
 import { queryClient } from '@api/client';
-import { Alert } from '@components/Alert';
+import { Toaster } from '@components/Toaster';
 import { SquidHeightProvider } from '@hooks/useSquidNetworkHeightHooks';
 import { rainbowConfig } from '@network/config';
 
@@ -21,30 +20,24 @@ function App() {
   const rainbowkitTheme = useCreateRainbowKitTheme(themeName);
 
   return (
-    <WagmiProvider config={rainbowConfig}>
-      <QueryClientProvider client={queryClient}>
-        <SquidHeightProvider>
+    <>
+      <WagmiProvider config={rainbowConfig}>
+        <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>
             <RainbowKitProvider modalSize="compact" theme={rainbowkitTheme}>
-              <SnackbarProvider
-                hideIconVariant
-                preventDuplicate
-                maxSnack={3}
-                Components={{
-                  subsquid: Alert,
-                }}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              >
+              <SquidHeightProvider>
                 <CssBaseline />
                 <BrowserRouter>
                   <AppRoutes />
                 </BrowserRouter>
-              </SnackbarProvider>
+              </SquidHeightProvider>
+              {/* </SnackbarProvider> */}
             </RainbowKitProvider>
+            <Toaster />
           </ThemeProvider>
-        </SquidHeightProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </>
   );
 }
 

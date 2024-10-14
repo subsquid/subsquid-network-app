@@ -1,6 +1,6 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { upperFirst } from 'lodash-es';
-import { arbitrumSepolia, arbitrum } from 'wagmi/chains';
+import { arbitrumSepolia, arbitrum, sepolia } from 'wagmi/chains';
 
 import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
 
@@ -44,5 +44,6 @@ export const rainbowConfig = getDefaultConfig({
             //   },
             // },
           },
+          sepolia,
         ],
 });

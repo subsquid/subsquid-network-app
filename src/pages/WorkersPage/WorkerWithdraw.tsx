@@ -15,7 +15,7 @@ import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 
-export function WorkerUnregisterButton({
+export function WorkerWithdrawButton({
   worker,
   source,
   disabled,
@@ -31,7 +31,7 @@ export function WorkerUnregisterButton({
   return (
     <>
       <LoadingButton
-        // startIcon={<Remove />}
+        // startIcon={<ArrowUpwardOutlined />}
         sx={sx}
         loading={open}
         onClick={() => setOpen(true)}
@@ -39,9 +39,9 @@ export function WorkerUnregisterButton({
         color="error"
         disabled={disabled}
       >
-        DELETE
+        WITHDRAW
       </LoadingButton>
-      <WorkerUnregisterDialog
+      <WorkerWithdrawDialog
         open={open}
         onClose={() => setOpen(false)}
         worker={worker}
@@ -51,7 +51,7 @@ export function WorkerUnregisterButton({
   );
 }
 
-export function WorkerUnregisterDialog({
+export function WorkerWithdrawDialog({
   open,
   onClose,
   worker,
@@ -64,7 +64,6 @@ export function WorkerUnregisterDialog({
 }) {
   const client = useClient();
   const account = useAccount();
-
   const { setWaitHeight } = useSquidHeight();
 
   const contracts = useContracts();
@@ -75,7 +74,8 @@ export function WorkerUnregisterDialog({
   });
 
   const handleSubmit = async () => {
-    if (!client || !account.address || !registrationAddress) return;
+    if (!client) return;
+    if (!account.address || !registrationAddress) return;
 
     try {
       const peerIdHex = peerIdToHex(worker.peerId);
@@ -83,15 +83,15 @@ export function WorkerUnregisterDialog({
       const receipt = await contractWriter.writeTransactionAsync({
         address: registrationAddress,
         abi: workerRegistryAbi,
-        functionName: 'deregister',
+        functionName: 'withdraw',
         args: [peerIdHex],
         vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
       });
       setWaitHeight(receipt.blockNumber, []);
 
       onClose();
-    } catch (error) {
-      toast.error(errorMessage(error));
+    } catch (e: unknown) {
+      toast.error(errorMessage(e));
     }
   };
 
@@ -101,14 +101,13 @@ export function WorkerUnregisterDialog({
       open={open}
       onResult={confirmed => {
         if (!confirmed) return onClose();
+
         handleSubmit();
       }}
       loading={contractWriter.isPending}
       hideCancelButton={false}
     >
-      Are you sure you want to unregister this worker? This will disable the worker, but you can
-      re-register it later. You will be able to withdraw your tokens after the end of the lock
-      period.
+      Are you sure you want to withdraw your tokens from this worker?
     </ContractCallDialog>
   );
 }

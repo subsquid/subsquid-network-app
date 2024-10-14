@@ -1,7 +1,10 @@
+import { mainnet, sepolia } from 'viem/chains';
+
 import { NetworkName, getSubsquidNetwork } from './useSubsquidNetwork.ts';
 
 export function useContracts(): {
   SQD: `0x${string}`;
+  ROUTER: `0x${string}`;
   WORKER_REGISTRATION: `0x${string}`;
   STAKING: `0x${string}`;
   REWARD_TREASURY: `0x${string}`;
@@ -9,6 +12,7 @@ export function useContracts(): {
   GATEWAY_REGISTRATION: `0x${string}`;
   SOFT_CAP: `0x${string}`;
   SQD_TOKEN: string;
+  l1ChainId: number;
 } {
   const network = getSubsquidNetwork();
 
@@ -23,6 +27,8 @@ export function useContracts(): {
         GATEWAY_REGISTRATION: `0xAB46F688AbA4FcD1920F21E9BD16B229316D8b0a`,
         SOFT_CAP: `0x52f31c9c019f840A9C0e74F66ACc95455B254BeA`,
         SQD_TOKEN: 'tSQD',
+        ROUTER: '0xD2093610c5d27c201CD47bCF1Df4071610114b64',
+        l1ChainId: sepolia.id,
       };
     }
     case NetworkName.Mainnet: {
@@ -35,6 +41,8 @@ export function useContracts(): {
         GATEWAY_REGISTRATION: `0x8a90a1ce5fa8cf71de9e6f76b7d3c0b72feb8c4b`,
         SOFT_CAP: `0x0eb27b1cbba04698dd7ce0f2364584d33a616545`,
         SQD_TOKEN: 'SQD',
+        ROUTER: '0x67F56D27dab93eEb07f6372274aCa277F49dA941',
+        l1ChainId: mainnet.id,
       };
     }
   }

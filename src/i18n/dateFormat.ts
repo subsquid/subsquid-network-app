@@ -1,7 +1,7 @@
 import { format, isValid } from 'date-fns';
 
 export function dateFormat(
-  value: Date | string | number | undefined,
+  value: Date | string | number | bigint | undefined,
   tpl: 'dateTime' | 'date' | string = 'date',
 ) {
   if (!value) return null;
@@ -12,7 +12,11 @@ export function dateFormat(
     tpl = 'dd.MM.yyyy';
   }
 
-  if (value.valueOf() === 0) return null;
+  if (value.valueOf() == 0) return null;
+
+  if (typeof value === 'bigint') {
+    value = Number(value);
+  }
 
   const date = new Date(value);
   if (!isValid(date)) return null;

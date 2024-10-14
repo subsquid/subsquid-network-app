@@ -1,28 +1,77 @@
-import { LoadingButton } from '@mui/lab';
-import { Box } from '@mui/material';
-import { useFormik } from 'formik';
-import { useParams } from 'react-router-dom';
+import { useState } from 'react';
 
-import { useUpdateWorker } from '@api/contracts/worker-registration/useUpdateWorker';
-import { Worker, Account, useWorkerByPeerId } from '@api/subsquid-network-squid';
-import { BlockchainContractError } from '@components/BlockchainContractError';
-import { Card } from '@components/Card';
+import { peerIdToHex } from '@lib/network';
+import { EditOutlined } from '@mui/icons-material';
+import { IconButton, SxProps } from '@mui/material';
+import { useFormik } from 'formik';
+import toast from 'react-hot-toast';
+import { useClient } from 'wagmi';
+
+import { useReadRouterWorkerRegistration, workerRegistryAbi } from '@api/contracts';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
+import { encodeWorkerMetadata } from '@api/contracts/worker-registration/WorkerMetadata';
+import { Account, AccountType, Worker } from '@api/subsquid-network-squid';
+import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikTextInput, FormRow } from '@components/Form';
-import { Loader } from '@components/Loader';
-import { NotFound } from '@components/NotFound';
-import { NetworkPageTitle, CenteredPageWrapper } from '@layouts/NetworkLayout';
-import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
+import { useContracts } from '@network/useContracts';
 import { editWorkerSchema } from '@pages/WorkersPage/worker-schema';
 
-function WorkerForm({
+export function WorkerEdit({
+  sx,
+  disabled,
   worker,
+  owner,
 }: {
-  worker: Pick<Worker, 'name' | 'description' | 'website' | 'email' | 'peerId'> & {
-    owner: Pick<Account, 'id' | 'type'>;
-  };
+  sx?: SxProps;
+  disabled?: boolean;
+  worker: Pick<Worker, 'peerId' | 'name' | 'website' | 'description' | 'email'>;
+  owner: Pick<Account, 'id' | 'type'>;
 }) {
-  const { updateWorker, isLoading: isUpdating, error } = useUpdateWorker();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <IconButton
+        color="inherit"
+        sx={{ padding: 0, ...sx }}
+        onClick={() => setOpen(true)}
+        disabled={disabled}
+      >
+        <EditOutlined fontSize="inherit" />
+      </IconButton>
+      <WorkerEditDialog worker={worker} owner={owner} open={open} onResult={() => setOpen(false)} />
+    </>
+  );
+}
+
+function WorkerEditDialog({
+  worker,
+  owner,
+  open,
+  onResult,
+}: {
+  worker: Pick<Worker, 'name' | 'description' | 'website' | 'email' | 'peerId'>;
+  owner: Pick<Account, 'id' | 'type'>;
+  open: boolean;
+  onResult: (confirmed: boolean) => void;
+}) {
+  const client = useClient();
+  const account = useAccount();
+
+  const { setWaitHeight } = useSquidHeight();
+
+  const contracts = useContracts();
+  const contractWriter = useWriteSQDTransaction();
+
+  const { data: registrationAddress, isLoading: isRegistrationAddressLoading } =
+    useReadRouterWorkerRegistration({
+      address: contracts.ROUTER,
+    });
+
+  const isLoading = isRegistrationAddressLoading;
 
   const formik = useFormik({
     initialValues: {
@@ -30,25 +79,59 @@ function WorkerForm({
       description: worker.description || '',
       website: worker.website || '',
       email: worker.email || '',
+      peerId: worker.peerId || '',
     },
     validationSchema: editWorkerSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
+    enableReinitialize: true,
 
     onSubmit: async values => {
-      const { success } = await updateWorker({
-        ...values,
-        peerId: worker.peerId,
-        source: worker.owner,
-      });
-      if (!success) return;
+      if (!client || !account.address || !registrationAddress) return;
+
+      try {
+        const metadata = editWorkerSchema.cast(values);
+
+        const peerIdHex = peerIdToHex(worker.peerId);
+
+        const receipt = await contractWriter.writeTransactionAsync({
+          address: registrationAddress,
+          abi: workerRegistryAbi,
+          functionName: 'updateMetadata',
+          args: [peerIdHex, encodeWorkerMetadata(metadata)],
+          vesting: owner.type === AccountType.Vesting ? (owner.id as `0x${string}`) : undefined,
+        });
+        setWaitHeight(receipt.blockNumber, []);
+
+        onResult(true);
+      } catch (error) {
+        toast.error(errorMessage(error));
+      }
     },
   });
 
   return (
-    <Form onSubmit={formik.handleSubmit}>
-      <Card outlined>
+    <ContractCallDialog
+      title="Worker edit"
+      open={open}
+      onResult={confirmed => {
+        if (!confirmed) return onResult(confirmed);
+
+        formik.handleSubmit();
+      }}
+      loading={isLoading}
+    >
+      <Form onSubmit={formik.handleSubmit}>
+        <FormRow>
+          <FormikTextInput
+            showErrorOnlyOfTouched
+            id="peerId"
+            label="Peer ID"
+            formik={formik}
+            disabled
+          />
+        </FormRow>
         <FormRow>
           <FormikTextInput showErrorOnlyOfTouched id="name" label="Worker name" formik={formik} />
         </FormRow>
@@ -65,35 +148,33 @@ function WorkerForm({
         <FormRow>
           <FormikTextInput showErrorOnlyOfTouched id="website" label="Website" formik={formik} />
         </FormRow>
-
-        <BlockchainContractError error={error} />
-      </Card>
-      <Box mt={3} justifyContent="flex-end" display="flex">
+        {/* <Box mt={3} justifyContent="flex-end" display="flex">
         <LoadingButton disabled={isUpdating} variant="contained" type="submit" color="info">
           APPLY
         </LoadingButton>
-      </Box>
-    </Form>
+      </Box> */}
+      </Form>
+    </ContractCallDialog>
   );
 }
 
-export function WorkerEdit() {
-  const { peerId } = useParams<{ peerId: string }>();
-  const { data: worker, isPending } = useWorkerByPeerId(peerId);
-  const { address } = useAccount();
+// export function WorkerEdit() {
+//   const { peerId } = useParams<{ peerId: string }>();
+//   const { data: worker, isPending } = useWorkerByPeerId(peerId);
+//   const { address } = useAccount();
 
-  return (
-    <CenteredPageWrapper>
-      <ConnectedWalletRequired>
-        <NetworkPageTitle backPath={`/workers/${peerId}`} />
-        {isPending ? (
-          <Loader />
-        ) : !worker || worker.realOwner.id !== address ? (
-          <NotFound id={peerId} item="worker" />
-        ) : (
-          <WorkerForm worker={worker} />
-        )}
-      </ConnectedWalletRequired>
-    </CenteredPageWrapper>
-  );
-}
+//   return (
+//     <CenteredPageWrapper>
+//       <ConnectedWalletRequired>
+//         <NetworkPageTitle backPath={`/workers/${peerId}`} />
+//         {isPending ? (
+//           <Loader />
+//         ) : !worker || worker.realOwner.id !== address ? (
+//           <NotFound id={peerId} item="worker" />
+//         ) : (
+//           <WorkerForm worker={worker} />
+//         )}
+//       </ConnectedWalletRequired>
+//     </CenteredPageWrapper>
+//   );
+// }

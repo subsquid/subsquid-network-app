@@ -139,7 +139,7 @@ export function ConfirmDialog({
         </Content>
         <Actions>
           {!hideCancelButton ? (
-            <Button onClick={onReject} fullWidth variant="contained" color="primary">
+            <Button onClick={onReject} variant="contained" color="primary">
               {cancelButtonText}
             </Button>
           ) : null}

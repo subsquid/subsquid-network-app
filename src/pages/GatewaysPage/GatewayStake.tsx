@@ -1,25 +1,40 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
-import { tokenFormatter } from '@lib/formatters/formatters';
-import { fromSqd, toSqd } from '@lib/network/utils';
-import { Box, Button, Chip, Stack } from '@mui/material';
+import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
+import { fromSqd, toSqd, unwrapMulticallResult } from '@lib/network/utils';
+import { LockOutlined as LockIcon } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import { Box, Chip, InputAdornment, Stack, SxProps } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
+import toast from 'react-hot-toast';
 import { useDebounce } from 'use-debounce';
+import { useBlock, useReadContracts } from 'wagmi';
 
-import { useAddStakeGateway } from '@api/contracts/gateway-registration/useAddStakeGateway';
-import { useComputationUnits } from '@api/contracts/gateway-registration/useComputationUnits';
-import { useStakeGateway } from '@api/contracts/gateway-registration/useStakeGateway';
-import { AccountType } from '@api/subsquid-network-squid';
-import { useMyGatewayStake } from '@api/subsquid-network-squid/gateways-graphql';
-import { BlockchainContractError } from '@components/BlockchainContractError';
+import {
+  gatewayRegistryAbi,
+  useReadNetworkControllerWorkerEpochLength,
+  useReadRouterNetworkController,
+} from '@api/contracts';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
+import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
-import { Form, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
+import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
-import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
+import { SourceWalletOption } from '@components/SourceWallet';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useContracts } from '@network/useContracts';
+
+export type SourceWalletWithStake = SourceWalletWithBalance & {
+  stake: {
+    amount: bigint;
+    duration: bigint;
+  };
+};
 
 const MIN_BLOCKS_LOCK = 1000;
 
@@ -41,197 +56,297 @@ export const stakeSchema = yup.object({
     .required('Lock min blocks is required'),
 });
 
-export function GatewayStake({ disabled }: { disabled?: boolean }) {
-  const { data, isLoading: isStakeLoading } = useMyGatewayStake();
-
+export function GatewayStakeButton({
+  sx,
+  disabled,
+  sources,
+}: {
+  sx?: SxProps;
+  disabled?: boolean;
+  sources?: SourceWalletWithStake[];
+}) {
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
-  const stakeGateway = useStakeGateway();
-  const addStakeGateway = useAddStakeGateway();
-  const { stakeToGateway, error, isLoading } = useMemo(() => {
-    if (BigNumber(data?.stake?.amount || 0).gt(0)) {
-      return {
-        stakeToGateway: addStakeGateway.addStakeToGateway,
-        error: addStakeGateway.error,
-        isLoading: addStakeGateway.isLoading,
-      };
-    } else {
-      return stakeGateway;
-    }
-  }, [addStakeGateway, data?.stake?.amount, stakeGateway]);
+  return (
+    <>
+      <LoadingButton
+        loading={open}
+        startIcon={<LockIcon />}
+        onClick={() => setOpen(true)}
+        variant="contained"
+        color="info"
+        disabled={disabled}
+        sx={sx}
+      >
+        LOCK
+      </LoadingButton>
+      <GatewayStakeDialog open={open} onClose={() => setOpen(false)} sources={sources} />
+    </>
+  );
+}
 
-  const {
-    sources,
-    options,
-    isPending: isSourceLoading,
-  } = useMySourceOptions({
-    sourceDisabled: s => s.balance === '0' || s.type !== AccountType.User,
+export function GatewayStakeDialog({
+  open,
+  onClose,
+  sources,
+}: {
+  open: boolean;
+  onClose: () => void;
+  sources?: SourceWalletWithStake[];
+}) {
+  const { setWaitHeight } = useSquidHeight();
+
+  const { GATEWAY_REGISTRATION, ROUTER, l1ChainId } = useContracts();
+
+  const networkController = useReadRouterNetworkController({
+    address: ROUTER,
+  });
+  const workerEpochLength = useReadNetworkControllerWorkerEpochLength({
+    address: networkController.data,
   });
 
-  const formik = useFormik({
-    initialValues: {
-      source: '',
+  // const myGatewaysStake = useMyGatewayStake();
+  const gatewayRegistryContract = useWriteSQDTransaction();
+
+  const { data: lastL1Block, isLoading: isLastL1BlockLoading } = useBlock({
+    chainId: l1ChainId,
+  });
+
+  const isLoading = isLastL1BlockLoading;
+
+  const isSourceDisabled = (source: SourceWalletWithBalance) =>
+    source.balance === '0' || source.type === AccountType.Vesting;
+  const hasAvailableSource = useMemo(() => !!sources?.some(s => !isSourceDisabled(s)), [sources]);
+
+  const initialValues = useMemo(() => {
+    const source = sources?.find(s => !isSourceDisabled(s)) || sources?.[0];
+
+    return {
+      source: source?.id || '0x',
       amount: '0',
-      max: '0',
-      autoExtension: false,
-      durationBlocks: MIN_BLOCKS_LOCK.toString(),
-    },
+      max: fromSqd(source?.balance)?.toString() || '0',
+      durationBlocks: (source?.stake.duration || MIN_BLOCKS_LOCK).toString(),
+    };
+  }, [sources]);
+
+  const formik = useFormik({
+    initialValues,
     validationSchema: stakeSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
+    enableReinitialize: true,
 
     onSubmit: async values => {
-      const wallet = sources.find(w => w?.id === values.source);
-      if (!wallet) return;
+      try {
+        const { amount, durationBlocks, source: sourceId } = stakeSchema.cast(values);
 
-      const { failedReason } = await stakeToGateway({
-        amount: toSqd(values.amount),
-        durationBlocks: Number(values.durationBlocks),
-        wallet,
-      });
+        const source = sources?.find(s => s.id === sourceId);
+        if (!source) return;
 
-      if (!failedReason) {
-        handleClose();
+        const sqdAmount = BigInt(toSqd(amount));
+
+        const functionData = {
+          abi: gatewayRegistryAbi,
+          address: GATEWAY_REGISTRATION,
+          approve: sqdAmount,
+        };
+
+        const receipt = await gatewayRegistryContract.writeTransactionAsync(
+          source.stake.amount > 0n
+            ? {
+                ...functionData,
+                functionName: 'addStake',
+                args: [sqdAmount],
+              }
+            : {
+                ...functionData,
+                functionName: 'stake',
+                args: [sqdAmount, BigInt(durationBlocks), false],
+              },
+        );
+        setWaitHeight(receipt.blockNumber, []);
+
+        onClose();
+      } catch (e: unknown) {
+        toast.error(errorMessage(e));
       }
     },
   });
 
-  const source = useMemo(() => {
-    if (isSourceLoading) return;
+  const selectedSource = useMemo(
+    () => sources?.find(s => s.id === formik.values.source),
+    [sources, formik.values.source],
+  );
+  const [debouncedValues] = useDebounce(stakeSchema.cast(formik.values), 500);
 
-    return (
-      (formik.values.source
-        ? sources.find(c => c.id === formik.values.source)
-        : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
-    );
-  }, [formik.values.source, isSourceLoading, sources]);
+  const newContractValues = useReadContracts({
+    contracts: [
+      {
+        address: GATEWAY_REGISTRATION,
+        abi: gatewayRegistryAbi,
+        functionName: 'computationUnitsAmount',
+        args: [
+          (selectedSource?.stake.amount || 0n) + BigInt(toSqd(debouncedValues.amount)),
+          BigInt(debouncedValues.durationBlocks),
+        ],
+      },
+    ],
+    query: {
+      select: res => {
+        if (!res) return;
 
-  useEffect(() => {
-    if (!source) return;
-
-    formik.setValues({
-      ...formik.values,
-      source: source.id,
-      max: fromSqd(source.balance).toFixed(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source]);
-
-  const [lockDuration] = useDebounce(formik.values.durationBlocks, 500);
-  const [amount] = useDebounce(fromSqd(data?.stake?.amount || 0).plus(formik.values.amount), 500);
-  const unlockAt = useMemo(() => {
-    if (!data) return Date.now();
-    return (Number(lockDuration) + 1) * 12_000 + new Date(data.lastBlockTimestampL1).getTime();
-  }, [data, lockDuration]);
-  const { data: computationUnits, isPending: isComputationUnitsLoading } = useComputationUnits({
-    amount: toSqd(amount),
-    lockDuration: Number(lockDuration),
+        return {
+          computationUnitsAmount: unwrapMulticallResult(res[0]) || 0n,
+        };
+      },
+    },
   });
 
+  const preview = useMemo(() => {
+    if (!newContractValues.data || !lastL1Block || !selectedSource) return;
+
+    const workerEpochLengthValue = workerEpochLength.data || 0n;
+
+    const epochCount = Math.ceil(debouncedValues.durationBlocks / Number(workerEpochLengthValue));
+
+    const cuPerEpoch = Number(
+      epochCount <= 1
+        ? newContractValues.data.computationUnitsAmount
+        : (newContractValues.data.computationUnitsAmount * workerEpochLengthValue) /
+            BigInt(debouncedValues.durationBlocks),
+    );
+
+    const unlockAt =
+      (BigInt(debouncedValues.durationBlocks + 1) * 12n + lastL1Block.timestamp) * 1000n;
+
+    const totalAmount = new BigNumber(selectedSource.stake.amount.toString())
+      .plus(toSqd(debouncedValues.amount))
+      .toString();
+
+    return {
+      epochCount,
+      cuPerEpoch,
+      unlockAt,
+      totalAmount,
+    };
+  }, [
+    debouncedValues,
+    lastL1Block,
+    newContractValues.data,
+    selectedSource,
+    workerEpochLength.data,
+  ]);
+
   return (
-    <>
-      <Button
-        onClick={handleOpen}
-        variant="contained"
-        color="info"
-        disabled={disabled || !!data?.stake?.computationUnitsPending || isStakeLoading}
-      >
-        LOCK
-      </Button>
-      <ContractCallDialog
-        title="Lock"
-        open={open}
-        onResult={confirmed => {
-          if (!confirmed) return handleClose();
+    <ContractCallDialog
+      title="Lock"
+      open={open}
+      onResult={confirmed => {
+        if (!confirmed) return onClose();
 
-          formik.handleSubmit();
-        }}
-        loading={isLoading}
-        confirmButtonText="Lock"
-      >
-        {isSourceLoading ? (
-          <Loader />
-        ) : (
-          <Form onSubmit={formik.handleSubmit}>
-            <FormRow>
-              <FormikSelect
-                id="source"
-                showErrorOnlyOfTouched
-                options={options}
-                formik={formik}
-                onChange={e => {
-                  const wallet = sources.find(w => w?.id === e.target.value);
-                  if (!wallet) return;
+        formik.handleSubmit();
+      }}
+      disableConfirmButton={!formik.isValid || isLoading || !hasAvailableSource}
+      loading={gatewayRegistryContract.isPending}
+    >
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <Form onSubmit={formik.handleSubmit}>
+          <FormRow>
+            <FormikSelect
+              id="source"
+              showErrorOnlyOfTouched
+              options={
+                sources?.map(source => {
+                  return {
+                    label: <SourceWalletOption source={source} />,
+                    value: source.id,
+                    disabled: source.balance === '0' || source.type !== AccountType.User,
+                    max: fromSqd(source.balance).toString(),
+                  };
+                }) || []
+              }
+              formik={formik}
+              onChange={e => {
+                const wallet = sources?.find(w => w?.id === e.target.value);
+                if (!wallet) return;
 
-                  formik.setFieldValue('source', wallet.id);
-
-                  const balance = fromSqd(wallet.balance).toNumber();
-                  formik.setFieldValue('max', balance);
-                }}
-              />
-            </FormRow>
-            <FormRow>
-              <FormikTextInput
-                id="amount"
-                label="Amount"
-                formik={formik}
-                showErrorOnlyOfTouched
-                autoComplete="off"
-                InputProps={{
-                  endAdornment: (
+                formik.setFieldValue('source', wallet.id);
+                formik.setFieldValue('max', fromSqd(wallet.balance).toString());
+              }}
+            />
+          </FormRow>
+          <FormRow>
+            <FormikTextInput
+              id="amount"
+              label="Amount"
+              formik={formik}
+              showErrorOnlyOfTouched
+              autoComplete="off"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
                     <Chip
                       clickable
                       disabled={formik.values.max === formik.values.amount}
                       onClick={() => {
                         formik.setValues({
                           ...formik.values,
-                          amount: formik.values.max,
+                          amount: formik.values.max || '0',
                         });
                       }}
                       label="Max"
                     />
-                  ),
-                }}
-              />
-            </FormRow>
-            <FormRow>
-              <FormikTextInput
-                id="durationBlocks"
-                label="Lock blocks duration"
-                formik={formik}
-                showErrorOnlyOfTouched
-                autoComplete="off"
-                disabled={!!data?.stake?.lockEnd}
-              />
-            </FormRow>
-            {/* <FormRow>
-              <FormikSwitch id="autoExtension" label="Auto extension" formik={formik} />
-            </FormRow> */}
-            <Stack spacing={2}>
-              <Stack direction="row" justifyContent="space-between" alignContent="center">
-                <Box>Total amount</Box>
-                {tokenFormatter(amount, 'SQD', 6)}
-              </Stack>
-              <Stack direction="row" justifyContent="space-between" alignContent="center">
-                <Box>Expected CU</Box>
-                {isComputationUnitsLoading ? '-' : computationUnits}
-              </Stack>
-              <Stack direction="row" justifyContent="space-between" alignContent="center">
-                <Box>Unlock at</Box>
-                <Stack direction="row" alignItems="center" spacing={0.5}>
-                  <span>~{dateFormat(unlockAt, 'dateTime')}</span>
-                  <HelpTooltip title="Automatically relocked if auto extension is enabled" />
-                </Stack>
-              </Stack>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </FormRow>
+          <FormRow>
+            <FormikTextInput
+              id="durationBlocks"
+              label={
+                // TODO: add tooltip text
+                <HelpTooltip title="Lorem ipsum dolor">
+                  <span>Duration</span>
+                </HelpTooltip>
+              }
+              formik={formik}
+              showErrorOnlyOfTouched
+              autoComplete="off"
+              disabled={!!selectedSource?.stake.amount}
+            />
+          </FormRow>
+          {/* <FormRow>
+            <FormikSwitch id="autoExtension" label="Auto extension" formik={formik} />
+          </FormRow> */}
+          <FormDivider />
+          <Stack spacing={2}>
+            <Stack direction="row" justifyContent="space-between" alignContent="center">
+              <Box>Total amount</Box>
+              {tokenFormatter(fromSqd(preview?.totalAmount), 'SQD', 6)}
             </Stack>
-
-            <BlockchainContractError error={error} />
-          </Form>
-        )}
-      </ContractCallDialog>
-    </>
+            <Stack direction="row" justifyContent="space-between" alignContent="center">
+              <Box>Epoch count</Box>
+              {numberWithCommasFormatter(preview?.epochCount)}
+            </Stack>
+            <Stack direction="row" justifyContent="space-between" alignContent="center">
+              <HelpTooltip title="Lorem ipsum dolor">
+                <span>Available CUs</span>
+              </HelpTooltip>
+              {numberWithCommasFormatter(preview?.cuPerEpoch)}
+            </Stack>
+            <Stack direction="row" justifyContent="space-between" alignContent="center">
+              <HelpTooltip title="Automatically relocked if auto extension is enabled">
+                <span>Unlocked at</span>
+              </HelpTooltip>
+              <span>~{dateFormat(preview?.unlockAt, 'dateTime')}</span>
+            </Stack>
+          </Stack>
+        </Form>
+      )}
+    </ContractCallDialog>
   );
 }

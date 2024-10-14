@@ -53,6 +53,7 @@ export type Account = {
   claimableDelegationCount: Scalars['Int']['output'];
   claims: Array<Claim>;
   delegations: Array<Delegation>;
+  delegations2: Array<Delegation>;
   gatewayStakes: Array<GatewayStake>;
   gateways: Array<Gateway>;
   id: Scalars['String']['output'];
@@ -63,6 +64,7 @@ export type Account = {
   transfersTo: Array<Transfer>;
   type: AccountType;
   workers: Array<Worker>;
+  workers2: Array<Worker>;
 };
 
 export type AccountClaimsArgs = {
@@ -73,6 +75,13 @@ export type AccountClaimsArgs = {
 };
 
 export type AccountDelegationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<DelegationOrderByInput>>;
+  where?: InputMaybe<DelegationWhereInput>;
+};
+
+export type AccountDelegations2Args = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<DelegationOrderByInput>>;
@@ -122,6 +131,13 @@ export type AccountTransfersToArgs = {
 };
 
 export type AccountWorkersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<WorkerOrderByInput>>;
+  where?: InputMaybe<WorkerWhereInput>;
+};
+
+export type AccountWorkers2Args = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<WorkerOrderByInput>>;
@@ -329,6 +345,9 @@ export type AccountWhereInput = {
   claims_every?: InputMaybe<ClaimWhereInput>;
   claims_none?: InputMaybe<ClaimWhereInput>;
   claims_some?: InputMaybe<ClaimWhereInput>;
+  delegations2_every?: InputMaybe<DelegationWhereInput>;
+  delegations2_none?: InputMaybe<DelegationWhereInput>;
+  delegations2_some?: InputMaybe<DelegationWhereInput>;
   delegations_every?: InputMaybe<DelegationWhereInput>;
   delegations_none?: InputMaybe<DelegationWhereInput>;
   delegations_some?: InputMaybe<DelegationWhereInput>;
@@ -374,6 +393,9 @@ export type AccountWhereInput = {
   type_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   type_not_eq?: InputMaybe<AccountType>;
   type_not_in?: InputMaybe<Array<AccountType>>;
+  workers2_every?: InputMaybe<WorkerWhereInput>;
+  workers2_none?: InputMaybe<WorkerWhereInput>;
+  workers2_some?: InputMaybe<WorkerWhereInput>;
   workers_every?: InputMaybe<WorkerWhereInput>;
   workers_none?: InputMaybe<WorkerWhereInput>;
   workers_some?: InputMaybe<WorkerWhereInput>;
@@ -5229,19 +5251,69 @@ export type SettingsQuery = {
   };
 };
 
-export type AccountQueryVariables = Exact<{
+export type AccountFragmentFragment = {
+  __typename?: 'Account';
+  id: string;
+  type: AccountType;
+  balance: string;
+};
+
+export type SourcesQueryVariables = Exact<{
   address: Scalars['String']['input'];
 }>;
 
-export type AccountQuery = {
+export type SourcesQuery = {
   __typename?: 'Query';
-  accountById?: {
+  accounts: Array<{ __typename?: 'Account'; id: string; type: AccountType; balance: string }>;
+};
+
+export type SourcesWithAssetsQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+}>;
+
+export type SourcesWithAssetsQuery = {
+  __typename?: 'Query';
+  accounts: Array<{
     __typename?: 'Account';
     id: string;
     type: AccountType;
     balance: string;
-    owned: Array<{ __typename?: 'Account'; id: string; type: AccountType; balance: string }>;
-  };
+    workers2: Array<{
+      __typename?: 'Worker';
+      bond: string;
+      claimableReward: string;
+      id: string;
+      name?: string;
+      peerId: string;
+    }>;
+    delegations2: Array<{
+      __typename?: 'Delegation';
+      deposit: string;
+      claimableReward: string;
+      worker: { __typename?: 'Worker'; id: string; name?: string; peerId: string };
+    }>;
+  }>;
+};
+
+export type SourcesWithDelegationsQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+  peerId?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+export type SourcesWithDelegationsQuery = {
+  __typename?: 'Query';
+  accounts: Array<{
+    __typename?: 'Account';
+    id: string;
+    type: AccountType;
+    balance: string;
+    delegations2: Array<{
+      __typename?: 'Delegation';
+      deposit: string;
+      claimableReward: string;
+      worker: { __typename?: 'Worker'; id: string; name?: string; peerId: string };
+    }>;
+  }>;
 };
 
 export type WorkerBaseFragmentFragment = {
@@ -5277,6 +5349,8 @@ export type WorkerFragmentFragment = {
   jailed?: boolean;
   dialOk?: boolean;
   jailReason?: string;
+  owner: { __typename?: 'Account'; id: string; type: AccountType };
+  realOwner: { __typename?: 'Account'; id: string };
 };
 
 export type WorkerFullFragmentFragment = {
@@ -5339,6 +5413,8 @@ export type AllWorkersQuery = {
     jailed?: boolean;
     dialOk?: boolean;
     jailReason?: string;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
 
@@ -5437,6 +5513,8 @@ export type MyWorkersQuery = {
     jailed?: boolean;
     dialOk?: boolean;
     jailReason?: string;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
 
@@ -5480,15 +5558,30 @@ export type WorkerOwnerQuery = {
   };
 };
 
-export type MyWorkerDelegationsQueryVariables = Exact<{
+export type MyDelegationsQueryVariables = Exact<{
   address: Scalars['String']['input'];
-  workerId: Scalars['String']['input'];
+  workerId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
-export type MyWorkerDelegationsQuery = {
+export type MyDelegationsQuery = {
   __typename?: 'Query';
-  workerById?: {
+  workers: Array<{
     __typename?: 'Worker';
+    version?: string;
+    createdAt: string;
+    uptime90Days?: number;
+    apr?: number;
+    stakerApr?: number;
+    totalDelegation: string;
+    capedDelegation: string;
+    id: string;
+    name?: string;
+    peerId: string;
+    status: WorkerStatus;
+    online?: boolean;
+    jailed?: boolean;
+    dialOk?: boolean;
+    jailReason?: string;
     delegations: Array<{
       __typename?: 'Delegation';
       claimableReward: string;
@@ -5497,7 +5590,9 @@ export type MyWorkerDelegationsQuery = {
       locked?: boolean;
       owner: { __typename?: 'Account'; id: string; type: AccountType };
     }>;
-  };
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
+  }>;
 };
 
 export type MyAssetsQueryVariables = Exact<{
@@ -5520,40 +5615,6 @@ export type MyAssetsQuery = {
     peerId: string;
   }>;
   delegations: Array<{ __typename?: 'Delegation'; claimableReward: string; deposit: string }>;
-};
-
-export type MyDelegationsQueryVariables = Exact<{
-  address: Scalars['String']['input'];
-}>;
-
-export type MyDelegationsQuery = {
-  __typename?: 'Query';
-  delegations: Array<{
-    __typename?: 'Delegation';
-    claimableReward: string;
-    claimedReward: string;
-    deposit: string;
-    locked?: boolean;
-    owner: { __typename?: 'Account'; id: string; type: AccountType };
-    worker: {
-      __typename?: 'Worker';
-      totalDelegation: string;
-      capedDelegation: string;
-      version?: string;
-      createdAt: string;
-      uptime90Days?: number;
-      apr?: number;
-      stakerApr?: number;
-      id: string;
-      name?: string;
-      peerId: string;
-      status: WorkerStatus;
-      online?: boolean;
-      jailed?: boolean;
-      dialOk?: boolean;
-      jailReason?: string;
-    };
-  }>;
 };
 
 export type MyClaimsQueryVariables = Exact<{
@@ -5736,6 +5797,13 @@ export type CurrentEpochQuery = {
   epoches: Array<{ __typename?: 'Epoch'; number: number; start: number; end: number }>;
 };
 
+export const AccountFragmentFragmentDoc = `
+    fragment AccountFragment on Account {
+  id
+  type
+  balance
+}
+    `;
 export const WorkerBaseFragmentFragmentDoc = `
     fragment WorkerBaseFragment on Worker {
   id
@@ -5763,6 +5831,13 @@ export const WorkerFragmentFragmentDoc = `
   stakerApr
   totalDelegation
   capedDelegation
+  owner {
+    id
+    type
+  }
+  realOwner {
+    id
+  }
 }
     ${WorkerBaseFragmentFragmentDoc}
 ${WorkerStatusFragmentFragmentDoc}`;
@@ -5789,13 +5864,6 @@ export const WorkerFullFragmentFragmentDoc = `
   dayUptimes {
     timestamp
     uptime
-  }
-  owner {
-    id
-    type
-  }
-  realOwner {
-    id
   }
 }
     ${WorkerFragmentFragmentDoc}`;
@@ -5910,34 +5978,116 @@ export const useSettingsQuery = <TData = SettingsQuery, TError = unknown>(
   });
 };
 
-export const AccountDocument = `
-    query account($address: String!) {
-  accountById(id: $address) {
-    id
-    type
-    balance
-    owned {
-      id
-      type
-      balance
+export const SourcesDocument = `
+    query sources($address: String!) {
+  accounts(
+    where: {OR: [{id_eq: $address}, {owner: {id_eq: $address}}]}
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+  }
+}
+    ${AccountFragmentFragmentDoc}`;
+
+export const useSourcesQuery = <TData = SourcesQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: SourcesQueryVariables,
+  options?: Omit<UseQueryOptions<SourcesQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<SourcesQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<SourcesQuery, TError, TData>({
+    queryKey: ['sources', variables],
+    queryFn: fetcher<SourcesQuery, SourcesQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      SourcesDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const SourcesWithAssetsDocument = `
+    query sourcesWithAssets($address: String!) {
+  accounts(
+    where: {OR: [{id_eq: $address}, {owner: {id_eq: $address}}]}
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+    workers2(where: {OR: [{bond_gt: 0}, {claimableReward_gt: 0}]}) {
+      ...WorkerBaseFragment
+      bond
+      claimableReward
+    }
+    delegations2(where: {OR: [{deposit_gt: 0}, {claimableReward_gt: 0}]}) {
+      deposit
+      claimableReward
+      worker {
+        ...WorkerBaseFragment
+      }
     }
   }
 }
-    `;
+    ${AccountFragmentFragmentDoc}
+${WorkerBaseFragmentFragmentDoc}`;
 
-export const useAccountQuery = <TData = AccountQuery, TError = unknown>(
+export const useSourcesWithAssetsQuery = <TData = SourcesWithAssetsQuery, TError = unknown>(
   dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables: AccountQueryVariables,
-  options?: Omit<UseQueryOptions<AccountQuery, TError, TData>, 'queryKey'> & {
-    queryKey?: UseQueryOptions<AccountQuery, TError, TData>['queryKey'];
+  variables: SourcesWithAssetsQueryVariables,
+  options?: Omit<UseQueryOptions<SourcesWithAssetsQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<SourcesWithAssetsQuery, TError, TData>['queryKey'];
   },
 ) => {
-  return useQuery<AccountQuery, TError, TData>({
-    queryKey: ['account', variables],
-    queryFn: fetcher<AccountQuery, AccountQueryVariables>(
+  return useQuery<SourcesWithAssetsQuery, TError, TData>({
+    queryKey: ['sourcesWithAssets', variables],
+    queryFn: fetcher<SourcesWithAssetsQuery, SourcesWithAssetsQueryVariables>(
       dataSource.endpoint,
       dataSource.fetchParams || {},
-      AccountDocument,
+      SourcesWithAssetsDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const SourcesWithDelegationsDocument = `
+    query sourcesWithDelegations($address: String!, $peerId: String) {
+  accounts(
+    where: {OR: [{id_eq: $address}, {owner: {id_eq: $address}}]}
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+    delegations2(
+      where: {OR: [{deposit_gt: 0}], AND: [{worker: {peerId_eq: $peerId}}]}
+    ) {
+      deposit
+      claimableReward
+      worker {
+        ...WorkerBaseFragment
+      }
+    }
+  }
+}
+    ${AccountFragmentFragmentDoc}
+${WorkerBaseFragmentFragmentDoc}`;
+
+export const useSourcesWithDelegationsQuery = <
+  TData = SourcesWithDelegationsQuery,
+  TError = unknown,
+>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: SourcesWithDelegationsQueryVariables,
+  options?: Omit<UseQueryOptions<SourcesWithDelegationsQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<SourcesWithDelegationsQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<SourcesWithDelegationsQuery, TError, TData>({
+    queryKey: ['sourcesWithDelegations', variables],
+    queryFn: fetcher<SourcesWithDelegationsQuery, SourcesWithDelegationsQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      SourcesWithDelegationsDocument,
       variables,
     ),
     ...options,
@@ -6165,9 +6315,13 @@ export const useWorkerOwnerQuery = <TData = WorkerOwnerQuery, TError = unknown>(
   });
 };
 
-export const MyWorkerDelegationsDocument = `
-    query myWorkerDelegations($address: String!, $workerId: String!) {
-  workerById(id: $workerId) {
+export const MyDelegationsDocument = `
+    query myDelegations($address: String!, $workerId: String) {
+  workers(
+    orderBy: id_ASC
+    where: {peerId_eq: $workerId, delegations_some: {realOwner: {id_eq: $address}, deposit_gt: 0}}
+  ) {
+    ...WorkerFragment
     delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
       claimableReward
       claimedReward
@@ -6180,21 +6334,21 @@ export const MyWorkerDelegationsDocument = `
     }
   }
 }
-    `;
+    ${WorkerFragmentFragmentDoc}`;
 
-export const useMyWorkerDelegationsQuery = <TData = MyWorkerDelegationsQuery, TError = unknown>(
+export const useMyDelegationsQuery = <TData = MyDelegationsQuery, TError = unknown>(
   dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables: MyWorkerDelegationsQueryVariables,
-  options?: Omit<UseQueryOptions<MyWorkerDelegationsQuery, TError, TData>, 'queryKey'> & {
-    queryKey?: UseQueryOptions<MyWorkerDelegationsQuery, TError, TData>['queryKey'];
+  variables: MyDelegationsQueryVariables,
+  options?: Omit<UseQueryOptions<MyDelegationsQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<MyDelegationsQuery, TError, TData>['queryKey'];
   },
 ) => {
-  return useQuery<MyWorkerDelegationsQuery, TError, TData>({
-    queryKey: ['myWorkerDelegations', variables],
-    queryFn: fetcher<MyWorkerDelegationsQuery, MyWorkerDelegationsQueryVariables>(
+  return useQuery<MyDelegationsQuery, TError, TData>({
+    queryKey: ['myDelegations', variables],
+    queryFn: fetcher<MyDelegationsQuery, MyDelegationsQueryVariables>(
       dataSource.endpoint,
       dataSource.fetchParams || {},
-      MyWorkerDelegationsDocument,
+      MyDelegationsDocument,
       variables,
     ),
     ...options,
@@ -6237,45 +6391,6 @@ export const useMyAssetsQuery = <TData = MyAssetsQuery, TError = unknown>(
       dataSource.endpoint,
       dataSource.fetchParams || {},
       MyAssetsDocument,
-      variables,
-    ),
-    ...options,
-  });
-};
-
-export const MyDelegationsDocument = `
-    query myDelegations($address: String!) {
-  delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
-    claimableReward
-    claimedReward
-    deposit
-    locked
-    owner {
-      id
-      type
-    }
-    worker {
-      ...WorkerFragment
-      totalDelegation
-      capedDelegation
-    }
-  }
-}
-    ${WorkerFragmentFragmentDoc}`;
-
-export const useMyDelegationsQuery = <TData = MyDelegationsQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables: MyDelegationsQueryVariables,
-  options?: Omit<UseQueryOptions<MyDelegationsQuery, TError, TData>, 'queryKey'> & {
-    queryKey?: UseQueryOptions<MyDelegationsQuery, TError, TData>['queryKey'];
-  },
-) => {
-  return useQuery<MyDelegationsQuery, TError, TData>({
-    queryKey: ['myDelegations', variables],
-    queryFn: fetcher<MyDelegationsQuery, MyDelegationsQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
-      MyDelegationsDocument,
       variables,
     ),
     ...options,
