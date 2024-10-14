@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network/utils';
@@ -10,18 +10,23 @@ import { useFormik } from 'formik';
 import { useDebounce } from 'use-debounce';
 
 import { useCapedStakeAfterDelegation, useWorkerDelegate } from '@api/contracts/staking';
-import { useWorkerDelegationInfo, Worker, WorkerStatus } from '@api/subsquid-network-squid';
+import {
+  useMySources,
+  useWorkerDelegationInfo,
+  Worker,
+  WorkerStatus,
+} from '@api/subsquid-network-squid';
 import { BlockchainContractError } from '@components/BlockchainContractError';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
-import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
+import { SourceWalletOption } from '@components/SourceWallet';
 
 export const EXPECTED_APR_TIP = (
-  <Box>
+  <span>
     An estimated delegation APR. The realized APR may differ significantly and depends on the worker
     uptime and the total amount of SQD delegated to the worker, which may change over time.
-  </Box>
+  </span>
 );
 
 export const delegateSchema = yup.object({
@@ -54,21 +59,31 @@ export function WorkerDelegate({
   };
   const handleClose = () => setOpen(false);
 
-  const {
-    sources,
-    options,
-    isPending: isSourceLoading,
-  } = useMySourceOptions({
-    enabled: open,
-    sourceDisabled: s => BigNumber(s.balance).lte(0),
-  });
+  const { sources, isPending: isSourceLoading } = useMySources({});
+
+  const options = useMemo(() => {
+    return sources.map(s => {
+      return {
+        label: <SourceWalletOption source={s} />,
+        value: s.id,
+        disabled: s.balance === '0',
+        max: fromSqd(s.balance).toString(),
+      };
+    });
+  }, [sources]);
+
+  const initialValues = useMemo(() => {
+    const option = options.find(c => !c.disabled) || options?.[0];
+
+    return {
+      source: option?.value || '',
+      amount: '0',
+      max: option?.max || '0',
+    };
+  }, [options]);
 
   const formik = useFormik({
-    initialValues: {
-      source: '',
-      amount: '',
-      max: '0',
-    },
+    initialValues,
     validationSchema: delegateSchema,
     validateOnChange: true,
     validateOnBlur: true,
@@ -89,27 +104,6 @@ export function WorkerDelegate({
       }
     },
   });
-
-  const source = useMemo(() => {
-    if (isSourceLoading) return;
-
-    return (
-      (formik.values.source
-        ? sources.find(c => c.id === formik.values.source)
-        : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
-    );
-  }, [formik.values.source, isSourceLoading, sources]);
-
-  useEffect(() => {
-    if (!source) return;
-
-    formik.setValues({
-      ...formik.values,
-      source: source.id,
-      max: fromSqd(source.balance).toFixed(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source]);
 
   const [delegation] = useDebounce(formik.values.amount, 500);
   const { isPending: isExpectedAprPending, stakerApr } = useExpectedAprAfterDelegation({
@@ -148,11 +142,11 @@ export function WorkerDelegate({
               options={options}
               formik={formik}
               onChange={e => {
-                const wallet = sources.find(w => w?.id === e.target.value);
-                if (!wallet) return;
+                const option = options.find(w => w?.value === e.target.value);
+                if (!option) return;
 
-                formik.setFieldValue('source', wallet.id);
-                formik.setFieldValue('max', fromSqd(wallet.balance).toFixed());
+                formik.setFieldValue('source', option.value);
+                formik.setFieldValue('max', option.max);
               }}
             />
           </FormRow>
@@ -183,10 +177,9 @@ export function WorkerDelegate({
           <FormDivider />
           <Stack direction="row" justifyContent="space-between" alignContent="center">
             <Box>Expected APR</Box>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
-              <HelpTooltip title={EXPECTED_APR_TIP} />
-            </Stack>
+            <HelpTooltip title={EXPECTED_APR_TIP}>
+              <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+            </HelpTooltip>
           </Stack>
 
           <BlockchainContractError error={error} />

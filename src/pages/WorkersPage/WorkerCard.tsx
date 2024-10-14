@@ -1,13 +1,12 @@
-import { IconButton, Stack, Typography, useTheme } from '@mui/material';
+import { Stack, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
-import { Link } from 'react-router-dom';
 
-import { Worker, WorkerStatusFragmentFragment } from '@api/subsquid-network-squid';
+import { Account, Worker, WorkerStatusFragmentFragment } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
-import { EditIcon } from '@icons/EditIcon';
 
-import { WorkerStatus } from './WorkerStatus';
+import { WorkerEdit } from './WorkerEdit';
+import { WorkerStatusChip } from './WorkerStatus';
 
 // export const PeerIdRow = styled(Box, {
 //   name: 'PeerIdRow',
@@ -19,9 +18,11 @@ import { WorkerStatus } from './WorkerStatus';
 
 function WorkerTitle({
   worker,
+  owner,
   canEdit,
 }: {
   worker: Pick<Worker, 'id' | 'status' | 'peerId' | 'name'>;
+  owner: Pick<Account, 'id' | 'type'>;
   canEdit: boolean;
 }) {
   const theme = useTheme();
@@ -32,32 +33,25 @@ function WorkerTitle({
         <Typography variant="h4" sx={{ overflowWrap: 'anywhere' }}>
           {worker.name || worker.peerId}
         </Typography>
-        {canEdit ? (
-          <IconButton component={Link} to={`/workers/${worker.peerId}/edit`} sx={{ padding: 0.5 }}>
-            <EditIcon />
-          </IconButton>
-        ) : null}
+        {canEdit ? <WorkerEdit worker={worker} owner={owner} disabled={!canEdit} /> : null}
       </Stack>
-      <CopyToClipboard
-        text={worker.peerId}
-        content={
-          <Typography
-            variant="body2"
-            sx={{ overflowWrap: 'anywhere', color: theme.palette.text.secondary }}
-          >
-            {worker.peerId}
-          </Typography>
-        }
-      />
+      <Typography
+        variant="body2"
+        sx={{ overflowWrap: 'anywhere', color: theme.palette.text.secondary }}
+      >
+        <CopyToClipboard text={worker.peerId} content={<span>{worker.peerId}</span>} />
+      </Typography>
     </Stack>
   );
 }
 
 export const WorkerCard = ({
   worker,
+  owner,
   canEdit,
 }: {
   worker: Pick<Worker, 'id' | 'status' | 'peerId' | 'name'> & WorkerStatusFragmentFragment;
+  owner: Pick<Account, 'id' | 'type'>;
   canEdit: boolean;
 }) => {
   return (
@@ -71,12 +65,12 @@ export const WorkerCard = ({
             size={56}
           />
           {/* <Stack justifyContent="stretch" flex={1} spacing={0.125}> */}
-          <WorkerTitle worker={worker} canEdit={canEdit} />
+          <WorkerTitle worker={worker} owner={owner} canEdit={canEdit} />
 
           {/* </Stack> */}
         </Stack>
         <Box>
-          <WorkerStatus worker={worker} />
+          <WorkerStatusChip worker={worker} />
         </Box>
       </Stack>
     </>

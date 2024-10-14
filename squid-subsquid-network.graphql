@@ -63,6 +63,13 @@ fragment WorkerFragment on Worker {
   stakerApr
   totalDelegation
   capedDelegation
+    owner {
+    id
+    type
+  }
+  realOwner {
+    id
+  }
 }
 
 fragment WorkerFullFragment on Worker {
@@ -87,13 +94,6 @@ fragment WorkerFullFragment on Worker {
   dayUptimes {
     timestamp
     uptime
-  }
-  owner {
-    id
-    type
-  }
-  realOwner {
-    id
   }
 }
 

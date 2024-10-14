@@ -40,7 +40,7 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    include: ['@mui/material', '@emotion/react', '@emotion/styled'],
+    include: ['@mui/material', '@emotion/react', '@emotion/styled', '@mui/material/Unstable_Grid2'],
   },
   plugins: [
     tsconfigPaths(),

@@ -21,7 +21,7 @@ import { Location, useLocationState } from '@hooks/useLocationState';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerVersion } from '@pages/WorkersPage/WorkerVersion';
 
 function TableNavigation({
@@ -45,6 +45,7 @@ function TableNavigation({
       justifyContent="flex-end"
     >
       <IconButton
+        size="small"
         onClick={() => {
           setPage?.(page - 1);
         }}
@@ -56,6 +57,7 @@ function TableNavigation({
         {page} / {totalPages}
       </Typography>
       <IconButton
+        size="small"
         onClick={() => {
           setPage?.(page + 1);
         }}
@@ -168,7 +170,7 @@ export function Workers() {
                     />
                   </TableCell>
                   <TableCell>
-                    <WorkerStatus worker={worker} />
+                    <WorkerStatusChip worker={worker} />
                   </TableCell>
                   <TableCell>
                     <WorkerVersion worker={worker} />

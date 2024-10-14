@@ -1,12 +1,15 @@
 import React from 'react';
 
-import { fromSqd } from '@lib/network';
 import { LoadingButton } from '@mui/lab';
+import { toast } from 'react-hot-toast';
 import * as yup from 'yup';
 
-import { useVestingContract, useVestingContractRelease } from '@api/contracts/vesting';
+import { vestingAbi } from '@api/contracts';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
 import { SourceWallet } from '@api/subsquid-network-squid';
-import { BlockchainContractError } from '@components/BlockchainContractError';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useContracts } from '@network/useContracts';
 
 export const claimSchema = yup.object({
   source: yup.string().label('Source').trim().required('Source is required'),
@@ -19,29 +22,36 @@ export function ReleaseButton({
   vesting: SourceWallet;
   disabled?: boolean;
 }) {
-  const { release, error, isLoading } = useVestingContractRelease();
-  const { data, isLoading: isVestingLoading } = useVestingContract({
-    address: vesting.id as `0x${string}`,
-  });
-  const isDisabled = isVestingLoading || fromSqd(data?.releasable).lte(0);
+  const { setWaitHeight } = useSquidHeight();
+  const { SQD } = useContracts();
+
+  const { writeTransactionAsync, isPending } = useWriteSQDTransaction({});
+
+  const onClick = async () => {
+    try {
+      const receipt = await writeTransactionAsync({
+        abi: vestingAbi,
+        functionName: 'release',
+        args: [SQD],
+        address: vesting.id as `0x${string}`,
+      });
+      setWaitHeight(receipt.blockNumber, []);
+    } catch (e: unknown) {
+      toast.error(errorMessage(e));
+    }
+  };
 
   return (
     <>
       <LoadingButton
-        loading={isLoading}
-        onClick={async e => {
-          e.stopPropagation();
-          await release({
-            address: vesting.id as `0x${string}`,
-          });
-        }}
+        loading={isPending}
+        onClick={onClick}
         variant="outlined"
         color="secondary"
-        disabled={disabled || isDisabled}
+        disabled={disabled}
       >
         RELEASE
       </LoadingButton>
-      <BlockchainContractError error={error} />
     </>
   );
 }

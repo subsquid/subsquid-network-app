@@ -2,18 +2,15 @@ import { useMemo } from 'react';
 
 import { calculateDelegationCapacity } from '@lib/network';
 import BigNumber from 'bignumber.js';
-import { groupBy, mapValues, values } from 'lodash-es';
 import { compare as compareSemver } from 'semver';
 import { PartialDeep, SimplifyDeep } from 'type-fest';
 
 import { useAccount } from '@network/useAccount.ts';
 
-import { useSquidDataSource } from './datasource';
+import { useSquid } from './datasource';
 import {
-  ClaimType,
   MyDelegationsQuery,
   useAllWorkersQuery,
-  useMyClaimsQuery,
   useMyDelegationsQuery,
   useMyWorkerDelegationsQuery,
   useMyWorkersCountQuery,
@@ -198,7 +195,7 @@ export function useWorkers({
   sortBy: WorkerSortBy;
   sortDir: SortDir;
 }) {
-  const dataSource = useSquidDataSource();
+  const dataSource = useSquid();
   const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const { data, isPending } = useAllWorkersQuery(dataSource, {});
@@ -244,7 +241,7 @@ export function useWorkers({
 }
 
 export function useMyWorkers({ sortBy, sortDir }: { sortBy: WorkerSortBy; sortDir: SortDir }) {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
 
@@ -278,7 +275,7 @@ export function useMyWorkers({ sortBy, sortDir }: { sortBy: WorkerSortBy; sortDi
 }
 
 export function useWorkerByPeerId(peerId?: string) {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const enabled = !!peerId;
   const { isPending: isSettingsLoading } = useNetworkSettings();
   const { address } = useAccount();
@@ -309,75 +306,68 @@ export function useWorkerByPeerId(peerId?: string) {
   };
 }
 
-export function useMyClaimsAvailable({ source }: { source?: string } = {}) {
-  const { address } = useAccount();
-  const datasource = useSquidDataSource();
+// export function useMyClaimsAvailable() {
+//   const { address } = useAccount();
+//   const datasource = useSquidDataSource();
 
-  const { data, isLoading } = useMyClaimsQuery(datasource, {
-    address: address || '',
-  });
+//   const { data, isLoading } = useMyClaimsQuery(datasource, {
+//     address: address || '',
+//   });
 
-  const { sources, claims, hasClaimsAvailable, currentSourceTotalClaimsAvailable } = useMemo(() => {
-    const allWorkers = [
-      ...(data?.workers || []).map(w => ({
-        ...w,
-        type: ClaimType.Worker,
-      })),
-      ...(data?.delegations || []).map(d => {
-        return {
-          ...d.worker,
-          type: ClaimType.Delegation,
-          owner: d.owner,
-          claimableReward: d.claimableReward,
-        };
-      }),
-    ];
+//   const { sources, claims } = useMemo(() => {
+//     const allWorkers = [
+//       ...(data?.workers || []).map(w => ({
+//         ...w,
+//         type: ClaimType.Worker,
+//       })),
+//       ...(data?.delegations || []).map(d => {
+//         return {
+//           ...d.worker,
+//           type: ClaimType.Delegation,
+//           owner: d.owner,
+//           claimableReward: d.claimableReward,
+//         };
+//       }),
+//     ];
 
-    const filteredWorkers = source ? allWorkers.filter(w => w.owner.id === source) : allWorkers;
+//     const filteredWorkers = source ? allWorkers.filter(w => w.owner.id === source) : allWorkers;
 
-    return {
-      hasClaimsAvailable: allWorkers.some(w => BigInt(w.claimableReward) > 0),
-      currentSourceTotalClaimsAvailable: filteredWorkers.reduce(
-        (t, i) => t.plus(i.claimableReward),
-        BigNumber(0),
-      ),
-      sources: values(
-        mapValues(groupBy(allWorkers, 'owner.id'), g => {
-          const total = g.reduce((t, i) => t.plus(i.claimableReward), BigNumber(0));
+//     return {
+//       sources: values(
+//         mapValues(groupBy(allWorkers, 'owner.id'), g => {
+//           const total = g.reduce((t, i) => t.plus(i.claimableReward), BigNumber(0));
 
-          return {
-            ...g[0].owner,
-            balance: total.toFixed(0),
-          };
-        }),
-      ),
+//           return {
+//             ...g[0].owner,
+//             balance: total.toFixed(0),
+//           };
+//         }),
+//       ),
 
-      claims: values(
-        mapValues(groupBy(filteredWorkers, 'id'), g => {
-          const total = g.reduce((t, i) => t.plus(i.claimableReward), BigNumber(0));
+//       claims: values(
+//         mapValues(groupBy(filteredWorkers, 'id'), g => {
+//           const total = g.reduce((t, i) => t.plus(i.claimableReward), BigNumber(0));
 
-          return {
-            ...g[0],
-            claimableReward: total.toFixed(0),
-          };
-        }),
-      ),
-    };
-  }, [data?.delegations, data?.workers, source]);
+//           return {
+//             ...g[0],
+//             claimableReward: total.toFixed(0),
+//           };
+//         }),
+//       ),
+//     };
+//   }, [data?.delegations, data?.workers, source]);
 
-  return {
-    isLoading,
-    hasClaimsAvailable,
-    currentSourceTotalClaimsAvailable,
-    sources,
-    claims,
-  };
-}
+//   return {
+//     isLoading,
+//     sources,
+//     claims,
+//   };
+// }
 
 export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; sortDir: SortDir }) {
   const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
 
   const { data, isLoading } = useMyDelegationsQuery(
     datasource,
@@ -443,7 +433,7 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
 
 export function useIsWorkerOperator() {
   const { address } = useAccount();
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { data, isLoading } = useMyWorkersCountQuery(
     datasource,
     {
@@ -469,7 +459,7 @@ export function useWorkerDelegationInfo({
   workerId?: string;
   enabled?: boolean;
 }) {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { data, isLoading } = useWorkerDelegationInfoQuery(
     datasource,
     {
@@ -493,7 +483,7 @@ export function useWorkerDelegationInfo({
 }
 
 export function useWorkerOwner({ workerId, enabled }: { workerId?: string; enabled?: boolean }) {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { data, isLoading } = useWorkerOwnerQuery(
     datasource,
     {
@@ -521,7 +511,7 @@ export function useMyWorkerDelegations({
   enabled?: boolean;
 }) {
   const { address } = useAccount();
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { data, isLoading } = useMyWorkerDelegationsQuery(
     datasource,
     {

@@ -198,10 +198,9 @@ export function WorkerUndelegate({
           <FormDivider />
           <Stack direction="row" justifyContent="space-between" alignContent="center">
             <Box>Expected APR</Box>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
-              <HelpTooltip title={EXPECTED_APR_TIP} />
-            </Stack>
+            <HelpTooltip title={EXPECTED_APR_TIP}>
+              <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+            </HelpTooltip>
           </Stack>
           <BlockchainContractError error={error} />
         </Form>

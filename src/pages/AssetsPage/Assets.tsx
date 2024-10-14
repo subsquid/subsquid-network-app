@@ -47,11 +47,12 @@ function TokenBalance({ sx, balance }: { sx?: SxProps<Theme>; balance?: TokenBal
   return (
     <Box sx={sx}>
       <ColumnLabel color={balance?.color}>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <CircleRounded sx={{ fontSize: 11 }} />
-          <Box>{balance?.name}</Box>
-          <HelpTooltip title={balance?.tip} />
-        </Stack>
+        <HelpTooltip title={balance?.tip}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <CircleRounded sx={{ fontSize: 11 }} />
+            <span>{balance?.name}</span>
+          </Stack>
+        </HelpTooltip>
       </ColumnLabel>
       <ColumnValue>{tokenFormatter(balance?.value || 0, SQD_TOKEN, 3)}</ColumnValue>
     </Box>

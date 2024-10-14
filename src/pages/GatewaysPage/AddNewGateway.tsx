@@ -1,27 +1,56 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { peerIdToHex } from '@lib/network';
+import { Add } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Box } from '@mui/material';
+import { Alert, SxProps } from '@mui/material';
 import { useFormik } from 'formik';
-import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useClient } from 'wagmi';
 
-import { useRegisterGateway } from '@api/contracts/gateway-registration/useRegisterGateway';
+import { gatewayRegistryAbi } from '@api/contracts';
+import { encodeGatewayMetadata } from '@api/contracts/gateway-registration/GatewayMetadata';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
 import { AccountType, useMySources } from '@api/subsquid-network-squid';
-import { BlockchainContractError } from '@components/BlockchainContractError';
-import { Card } from '@components/Card';
-import { Form, FormikTextInput, FormRow } from '@components/Form';
+import { ContractCallDialog } from '@components/ContractCallDialog';
+import { Form, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
 import { FormikSelect } from '@components/Form/FormikSelect';
 import { Loader } from '@components/Loader';
 import { SourceWalletOption } from '@components/SourceWallet';
-import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useContracts } from '@network/useContracts';
 
 import { addGatewaySchema } from './gateway-schema';
 
-function AddGatewayForm() {
-  const navigate = useNavigate();
-  const { registerGateway, isLoading: isRegistering, error } = useRegisterGateway();
+export function AddGatewayButton({ sx, disabled }: { sx?: SxProps; disabled?: boolean }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <LoadingButton
+        disabled={disabled}
+        sx={sx}
+        loading={open}
+        color="info"
+        startIcon={<Add />}
+        variant="contained"
+        onClick={() => setOpen(true)}
+      >
+        ADD PORTAL
+      </LoadingButton>
+      <AddGatewayDialog open={open} onClose={() => setOpen(false)} />
+    </>
+  );
+}
+
+export function AddGatewayDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const client = useClient();
+  const contracts = useContracts();
+  // const { registerGateway, isLoading: isRegistering, error } = useRegisterGateway();
   const { sources, isPending: isDataLoading } = useMySources();
+  const { writeTransactionAsync, isPending } = useWriteSQDTransaction();
+  const { setWaitHeight } = useSquidHeight();
 
   const formik = useFormik({
     initialValues: {
@@ -40,21 +69,29 @@ function AddGatewayForm() {
     validateOnMount: true,
 
     onSubmit: async values => {
+      if (!client) return;
+
       const source = sources.find(s => s.id === values.source);
       if (!source) return;
 
-      const castedValues = addGatewaySchema.cast(values);
-      if (!castedValues.public) {
-        delete castedValues.email;
+      try {
+        const castedValues = addGatewaySchema.cast(values);
+        if (!castedValues.public) {
+          delete castedValues.email;
+        }
+
+        const receipt = await writeTransactionAsync({
+          address: contracts.GATEWAY_REGISTRATION,
+          abi: gatewayRegistryAbi,
+          functionName: 'register',
+          args: [peerIdToHex(castedValues.peerId), encodeGatewayMetadata(castedValues)],
+        });
+        setWaitHeight(receipt.blockNumber, []);
+
+        onClose();
+      } catch (e: unknown) {
+        toast.custom(<Alert color="error">{errorMessage(e)}</Alert>);
       }
-
-      const { success } = await registerGateway({
-        ...castedValues,
-        source,
-      });
-      if (!success) return;
-
-      navigate('/portals');
     },
   });
 
@@ -72,101 +109,86 @@ function AddGatewayForm() {
   }, [formik, isDataLoading, sources]);
 
   return (
-    <>
+    <ContractCallDialog
+      title="Lock"
+      open={open}
+      onResult={confirmed => {
+        if (!confirmed) return onClose();
+
+        formik.handleSubmit();
+      }}
+      loading={isPending}
+      confirmButtonText="Register"
+    >
       {isDataLoading ? (
         <Loader />
       ) : (
         <Form onSubmit={formik.handleSubmit}>
-          <Card outlined>
-            <FormRow>
-              <FormikSelect
-                id="source"
-                showErrorOnlyOfTouched
-                options={sources.map(s => {
-                  return {
-                    label: <SourceWalletOption source={s} />,
-                    value: s.id,
-                    disabled: s.type !== AccountType.User,
-                  };
-                })}
-                formik={formik}
-              />
-            </FormRow>
-            <FormRow>
-              <FormikTextInput
-                showErrorOnlyOfTouched
-                id="name"
-                label="Portal name"
-                formik={formik}
-              />
-            </FormRow>
-            <FormRow>
-              <FormikTextInput showErrorOnlyOfTouched id="peerId" label="Peer ID" formik={formik} />
-            </FormRow>
+          <FormRow>
+            <FormikSelect
+              id="source"
+              showErrorOnlyOfTouched
+              options={sources.map(s => {
+                return {
+                  label: <SourceWalletOption source={s} />,
+                  value: s.id,
+                  disabled: s.type !== AccountType.User,
+                };
+              })}
+              formik={formik}
+            />
+          </FormRow>
+          <FormRow>
+            <FormikTextInput showErrorOnlyOfTouched id="name" label="Portal name" formik={formik} />
+          </FormRow>
+          <FormRow>
+            <FormikTextInput showErrorOnlyOfTouched id="peerId" label="Peer ID" formik={formik} />
+          </FormRow>
 
-            {/* <FormRow>
-              <FormikSwitch id="public" label="Publicly available" formik={formik} />
-            </FormRow> */}
+          <FormRow>
+            <FormikSwitch id="public" label="Publicly available" formik={formik} />
+          </FormRow>
 
-            {formik.values.public ? (
-              <>
-                <FormRow>
-                  <FormikTextInput
-                    showErrorOnlyOfTouched
-                    id="endpointUrl"
-                    label="Public endpoint URL"
-                    formik={formik}
-                  />
-                </FormRow>
-                <FormRow>
-                  <FormikTextInput
-                    showErrorOnlyOfTouched
-                    id="email"
-                    label="Email address"
-                    formik={formik}
-                  />
-                </FormRow>
-                <FormRow>
-                  <FormikTextInput
-                    showErrorOnlyOfTouched
-                    id="website"
-                    label="Website"
-                    formik={formik}
-                  />
-                </FormRow>
-                <FormRow>
-                  <FormikTextInput
-                    showErrorOnlyOfTouched
-                    id="description"
-                    multiline
-                    minRows={3}
-                    label="Description"
-                    formik={formik}
-                  />
-                </FormRow>
-              </>
-            ) : null}
-
-            <BlockchainContractError error={error} />
-          </Card>
-          <Box mt={2.5} justifyContent="flex-end" display="flex">
-            <LoadingButton disabled={isRegistering} variant="contained" type="submit" color="info">
-              REGISTER
-            </LoadingButton>
-          </Box>
+          {formik.values.public ? (
+            <>
+              <FormRow>
+                <FormikTextInput
+                  showErrorOnlyOfTouched
+                  id="endpointUrl"
+                  label="Public endpoint URL"
+                  formik={formik}
+                />
+              </FormRow>
+              <FormRow>
+                <FormikTextInput
+                  showErrorOnlyOfTouched
+                  id="email"
+                  label="Email address"
+                  formik={formik}
+                />
+              </FormRow>
+              <FormRow>
+                <FormikTextInput
+                  showErrorOnlyOfTouched
+                  id="website"
+                  label="Website"
+                  formik={formik}
+                />
+              </FormRow>
+              <FormRow>
+                <FormikTextInput
+                  showErrorOnlyOfTouched
+                  id="description"
+                  multiline
+                  minRows={3}
+                  label="Description"
+                  formik={formik}
+                />
+              </FormRow>
+            </>
+          ) : null}
         </Form>
       )}
-    </>
-  );
-}
-
-export function AddNewGateway() {
-  return (
-    <CenteredPageWrapper>
-      <ConnectedWalletRequired>
-        <NetworkPageTitle backPath="/portals" />
-        <AddGatewayForm />
-      </ConnectedWalletRequired>
-    </CenteredPageWrapper>
+    </ContractCallDialog>
   );
 }

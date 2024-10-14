@@ -2,9 +2,9 @@ import { pickBy } from 'lodash-es';
 import isEmpty from 'lodash-es/isEmpty';
 
 export interface WorkerMetadata {
-  name: string;
-  email: string;
-  description: string;
+  name?: string;
+  email?: string;
+  description?: string;
   website?: string;
 }
 

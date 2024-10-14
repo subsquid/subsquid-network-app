@@ -166,9 +166,7 @@ function CurrentEpoch() {
         </Stack>
       }
     >
-      <Box fontSize={64} lineHeight="64px">
-        {data?.epoch?.number || 0}
-      </Box>
+      <Typography variant="h1">{data?.epoch?.number || 0}</Typography>
     </SummarySection>
   );
 }
@@ -304,10 +302,9 @@ function WorkersApr({ length }: { length?: number }) {
       sx={{ height: 1, overflow: 'visible' }}
       title={<SquaredChip label="Worker APR" color="primary" />}
       action={
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Typography>{`Last ${aprs.length} days`}</Typography>
-          <HelpTooltip title="Median value" />
-        </Stack>
+        <HelpTooltip title="Median value">
+          <span>{`Last ${aprs.length} days`}</span>
+        </HelpTooltip>
       }
     >
       <AprChart data={aprs} />

@@ -14,7 +14,7 @@ import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 
-export function WorkerUnregisterButton({
+export function WorkerWithdrawButton({
   worker,
   owner,
   disabled,
@@ -35,9 +35,9 @@ export function WorkerUnregisterButton({
         color="error"
         disabled={disabled}
       >
-        UNREGISTER
+        WITHDRAW
       </LoadingButton>
-      <WorkerUnregisterDialog
+      <WorkerWithdrawDialog
         open={open}
         onClose={() => setOpen(false)}
         worker={worker}
@@ -47,7 +47,7 @@ export function WorkerUnregisterButton({
   );
 }
 
-export function WorkerUnregisterDialog({
+export function WorkerWithdrawDialog({
   open,
   onClose,
   worker,
@@ -60,7 +60,6 @@ export function WorkerUnregisterDialog({
 }) {
   const client = useClient();
   const account = useAccount();
-
   const { setWaitHeight } = useSquidHeight();
 
   const contracts = useContracts();
@@ -71,7 +70,8 @@ export function WorkerUnregisterDialog({
   });
 
   const handleSubmit = async () => {
-    if (!client || !account.address || !registrationAddress) return;
+    if (!client) return;
+    if (!account.address || !registrationAddress) return;
 
     try {
       const peerIdHex = peerIdToHex(worker.peerId);
@@ -79,15 +79,15 @@ export function WorkerUnregisterDialog({
       const receipt = await contractWriter.writeTransactionAsync({
         address: registrationAddress,
         abi: workerRegistryAbi,
-        functionName: 'deregister',
+        functionName: 'withdraw',
         args: [peerIdHex],
         vesting: owner.type === AccountType.Vesting ? (owner.id as `0x${string}`) : undefined,
       });
       setWaitHeight(receipt.blockNumber, []);
 
       onClose();
-    } catch (error) {
-      toast.error(errorMessage(error));
+    } catch (e: unknown) {
+      toast.error(errorMessage(e));
     }
   };
 
@@ -97,69 +97,14 @@ export function WorkerUnregisterDialog({
       open={open}
       onResult={confirmed => {
         if (!confirmed) return onClose();
+
         handleSubmit();
       }}
       loading={contractWriter.isPending}
       confirmButtonText="Confirm"
       hideCancelButton={false}
     >
-      Are you sure you want to unregister this worker? This will disable the worker, but you can
-      re-register it later. You will be able to withdraw your tokens after the end of the lock
-      period.
+      Are you sure you want to withdraw your tokens from this worker?
     </ContractCallDialog>
   );
 }
-
-// export function WorkerUnregister({
-//   worker,
-//   disabled,
-// }: {
-//   worker: Pick<Worker, 'id' | 'status' | 'peerId'>;
-//   disabled?: boolean;
-// }) {
-//   const {
-//     unregisterWorker,
-//     error: unregisterError,
-//     isLoading: isDeregistering,
-//   } = useUnregisterWorker();
-//   const { withdrawWorker, error: withdrawError, isLoading: isWithdrawing } = useWithdrawWorker();
-//   const { data } = useWorkerOwner({ workerId: worker.id, enabled: !disabled });
-
-//   return (
-//     <>
-//       {worker.status === WorkerStatus.Deregistered || worker.status === WorkerStatus.Withdrawn ? (
-//         <LoadingButton
-//           loading={isWithdrawing}
-//           onClick={async e => {
-//             e.stopPropagation();
-//             await withdrawWorker({
-//               peerId: worker.peerId,
-//               source: data?.owner || { id: '', type: AccountType.User },
-//             });
-//           }}
-//           disabled={disabled || worker.status === WorkerStatus.Withdrawn}
-//           variant="outlined"
-//           color="error"
-//         >
-//           WITHDRAW
-//         </LoadingButton>
-//       ) : (
-//         <LoadingButton
-//           loading={isDeregistering}
-//           disabled={disabled || worker.status !== WorkerStatus.Active}
-//           onClick={async e => {
-//             e.stopPropagation();
-//             await unregisterWorker({
-//               peerId: worker.peerId,
-//               source: data?.owner || { id: '', type: AccountType.User },
-//             });
-//           }}
-//           variant="outlined"
-//           color="error"
-//         >
-//           UNREGISTER
-//         </LoadingButton>
-//       )}
-//     </>
-//   );
-// }

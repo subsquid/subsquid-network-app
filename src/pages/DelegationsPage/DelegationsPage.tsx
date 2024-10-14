@@ -13,7 +13,7 @@ import { useContracts } from '@network/useContracts';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 
 export function MyDelegations() {
@@ -95,7 +95,7 @@ export function MyDelegations() {
                     <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
                   </TableCell>
                   <TableCell>
-                    <WorkerStatus worker={worker} />
+                    <WorkerStatusChip worker={worker} />
                   </TableCell>
                   <TableCell>
                     {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}

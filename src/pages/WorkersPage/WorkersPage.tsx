@@ -1,10 +1,9 @@
 import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
 import { fromSqd } from '@lib/network';
-import { Add } from '@mui/icons-material';
-import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Link, Outlet } from 'react-router-dom';
+import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Outlet } from 'react-router-dom';
 
-import { SortDir, useMyWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
+import { SortDir, useMyWorkers, WorkerSortBy, WorkerStatus } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
@@ -13,10 +12,12 @@ import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
 
-import { WorkerUnregister } from './WorkerUnregister';
+import { AddNewWorker } from './AddNewWorker';
+import { WorkerUnregisterButton } from './WorkerUnregister';
 import { WorkerVersion } from './WorkerVersion';
+import { WorkerWithdrawButton } from './WorkerWithdraw';
 
 export function MyWorkers() {
   const [query, setQuery] = useLocationState({
@@ -37,16 +38,12 @@ export function MyWorkers() {
         title={
           <>
             <SquaredChip label="My Workers" color="primary" />
-            <Button
-              color="info"
-              startIcon={<Add />}
-              variant="contained"
-              disabled={!isConnected}
-              component={Link}
-              to="/workers/add"
-            >
-              ADD WORKER
-            </Button>
+            <Stack direction="row" spacing={1}>
+              <AddNewWorker />
+              <Button color="secondary" variant="outlined">
+                LEARN MORE
+              </Button>
+            </Stack>
           </>
         }
       >
@@ -93,7 +90,7 @@ export function MyWorkers() {
                       <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
                     </TableCell>
                     <TableCell>
-                      <WorkerStatus worker={worker} />
+                      <WorkerStatusChip worker={worker} />
                     </TableCell>
                     <TableCell>
                       <WorkerVersion worker={worker} />
@@ -109,7 +106,20 @@ export function MyWorkers() {
                     </TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
-                        <WorkerUnregister worker={worker} />
+                        {worker.status === WorkerStatus.Deregistered ||
+                        worker.status === WorkerStatus.Deregistering ? (
+                          <WorkerWithdrawButton
+                            worker={worker}
+                            owner={worker.owner}
+                            disabled={worker.status !== WorkerStatus.Deregistered}
+                          />
+                        ) : (
+                          <WorkerUnregisterButton
+                            worker={worker}
+                            owner={worker.owner}
+                            disabled={worker.status !== WorkerStatus.Active}
+                          />
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>

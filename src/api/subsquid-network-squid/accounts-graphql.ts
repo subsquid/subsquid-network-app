@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 
 import { useAccount } from '@network/useAccount';
 
-import { useSquidDataSource } from './datasource';
+import { useSquid } from './datasource';
 import {
   AccountType,
   useAccountQuery,
@@ -23,7 +23,7 @@ export type SourceWalletWithBalance = SourceWallet & {
 };
 
 export function useMySources({ enabled }: { enabled?: boolean } = {}) {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { address } = useAccount();
   const requestEnabled = enabled && !!address;
   const { data: data, isPending } = useAccountQuery(
@@ -40,33 +40,22 @@ export function useMySources({ enabled }: { enabled?: boolean } = {}) {
 
   const res = useMemo((): SourceWalletWithBalance[] => {
     return !wallet
-      ? [
-          {
-            type: AccountType.User,
-            id: address as string,
-            balance: '0',
-          },
-        ]
+      ? []
       : [wallet, ...wallet.owned].map(a => ({
           type: a.type,
           id: a.id,
           balance: a.balance,
         }));
-  }, [address, wallet]);
-
-  const vestingContracts = useMemo(() => {
-    return res.filter(a => a.type === AccountType.Vesting);
-  }, [res]);
+  }, [wallet]);
 
   return {
     sources: res,
-    vestingContracts,
     isPending,
   };
 }
 
 export function useMyAssets() {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { address } = useAccount();
 
   const enabled = !!address;
@@ -144,7 +133,7 @@ export class BlockchainApiVesting {
 }
 
 export function useVestingByAddress({ address }: { address?: string }) {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const account = useAccount();
 
   const { data, isPending } = useVestingByAddressQuery(

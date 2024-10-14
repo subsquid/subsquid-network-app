@@ -5277,6 +5277,8 @@ export type WorkerFragmentFragment = {
   jailed?: boolean;
   dialOk?: boolean;
   jailReason?: string;
+  owner: { __typename?: 'Account'; id: string; type: AccountType };
+  realOwner: { __typename?: 'Account'; id: string };
 };
 
 export type WorkerFullFragmentFragment = {
@@ -5339,6 +5341,8 @@ export type AllWorkersQuery = {
     jailed?: boolean;
     dialOk?: boolean;
     jailReason?: string;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
 
@@ -5437,6 +5441,8 @@ export type MyWorkersQuery = {
     jailed?: boolean;
     dialOk?: boolean;
     jailReason?: string;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
 
@@ -5552,6 +5558,8 @@ export type MyDelegationsQuery = {
       jailed?: boolean;
       dialOk?: boolean;
       jailReason?: string;
+      owner: { __typename?: 'Account'; id: string; type: AccountType };
+      realOwner: { __typename?: 'Account'; id: string };
     };
   }>;
 };
@@ -5763,6 +5771,13 @@ export const WorkerFragmentFragmentDoc = `
   stakerApr
   totalDelegation
   capedDelegation
+  owner {
+    id
+    type
+  }
+  realOwner {
+    id
+  }
 }
     ${WorkerBaseFragmentFragmentDoc}
 ${WorkerStatusFragmentFragmentDoc}`;
@@ -5789,13 +5804,6 @@ export const WorkerFullFragmentFragmentDoc = `
   dayUptimes {
     timestamp
     uptime
-  }
-  owner {
-    id
-    type
-  }
-  realOwner {
-    id
   }
 }
     ${WorkerFragmentFragmentDoc}`;

@@ -144,14 +144,14 @@ declare module '@mui/material/styles/createPalette' {
   }
 }
 
-declare module 'notistack' {
-  interface VariantOverrides {
-    subsquid: {
-      title: string;
-      severity: 'warning' | 'success' | 'error' | 'info';
-    };
-  }
-}
+// declare module 'notistack' {
+//   interface VariantOverrides {
+//     subsquid: {
+//       title: string;
+//       severity: 'warning' | 'success' | 'error' | 'info';
+//     };
+//   }
+// }
 
 const fontFamily = `'Matter', 'Inter', sans-serif`;
 
@@ -179,14 +179,14 @@ export const useCreateTheme = (mode: PaletteType) => {
         typography: {
           fontFamily,
           h1: {
-            fontSize: 64,
+            fontSize: 60,
             lineHeight: 1,
             fontWeight: 500,
             color: colors.text.primary,
             letterSpacing: '-0.01rem',
           },
           h2: {
-            fontSize: 40,
+            fontSize: 36,
             lineHeight: 1,
             fontWeight: 500,
             color: colors.text?.primary,
@@ -306,7 +306,7 @@ export const useCreateTheme = (mode: PaletteType) => {
             styleOverrides: {
               root: {
                 textTransform: 'none',
-                transition: 'all 300ms ease-out',
+                // transition: 'all 300ms ease-out',
                 borderRadius: 360,
                 boxShadow: 'none',
                 textShadow: 'none',

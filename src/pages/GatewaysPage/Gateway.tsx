@@ -14,7 +14,7 @@ import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { Title } from '@pages/WorkersPage/Worker';
 
 import { GatewayCard } from './GatewayCard';
-import { GatewayUnregister } from './GatewayUnregister';
+import { GatewayUnregisterButton } from './GatewayUnregister';
 
 export const DescLabel = styled(Box, {
   name: 'DescLabel',
@@ -99,7 +99,7 @@ export const Gateway = ({ backPath }: { backPath: string }) => {
         </Stack>
       </Card>
       <Box mt={3} display="flex" justifyContent="flex-end">
-        <GatewayUnregister gateway={gateway} />
+        <GatewayUnregisterButton gateway={gateway} />
       </Box>
     </CenteredPageWrapper>
   );

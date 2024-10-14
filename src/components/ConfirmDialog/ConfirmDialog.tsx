@@ -95,8 +95,8 @@ export function ConfirmDialog({
   maxWidth = 440,
   minWidth = 440,
   confirmColor = 'info',
-  confirmButtonText = 'CONFIRM',
-  cancelButtonText = 'CANCEL',
+  confirmButtonText = 'Confirm',
+  cancelButtonText = 'Cancel',
   disableBackdropClick = false,
   disableConfirmButton = false,
   hideCancelButton = false,
@@ -139,7 +139,7 @@ export function ConfirmDialog({
         </Content>
         <Actions>
           {!hideCancelButton ? (
-            <Button onClick={onReject} fullWidth variant="contained" color="primary">
+            <Button onClick={onReject} variant="contained" color="primary">
               {cancelButtonText}
             </Button>
           ) : null}
