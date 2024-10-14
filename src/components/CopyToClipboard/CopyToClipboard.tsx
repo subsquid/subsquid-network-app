@@ -1,19 +1,19 @@
 import React, { useRef, useState } from 'react';
 
-import { IconButton, Stack, styled } from '@mui/material';
-import { Box } from '@mui/system';
+import { ContentCopyOutlined } from '@mui/icons-material';
+import { Box, IconButton, Stack, styled } from '@mui/material';
 import { alpha } from '@mui/system/colorManipulator';
-import classnames from 'classnames';
-
-import { CopyIcon } from '@icons/CopyIcon';
+import classNames from 'classnames';
 
 import { CopyToClipboardTooltip } from './CopyToClipboardTooltip';
 
 export const Wrapper = styled(Stack)(({ theme }) => ({
   '& .copyButton': {
     // marginTop: theme.spacing(-1),
+    // margin: 0,
     padding: 0,
     backgroundColor: 'transparent',
+    fontSize: 'inherit',
   },
   '&.gutterBottom': {
     marginBottom: theme.spacing(1.5),
@@ -79,7 +79,7 @@ export const CopyToClipboard = ({
 
   return (
     <Wrapper
-      className={classnames({
+      className={classNames({
         bordered,
         fullWidth,
         gutterBottom,
@@ -97,8 +97,8 @@ export const CopyToClipboard = ({
         {content || text}
       </Box>
       <CopyToClipboardTooltip copied={copied} setCopied={setCopied}>
-        <IconButton size="small" className="copyButton" onClick={handleClick}>
-          <CopyIcon size={copyButtonSize} />
+        <IconButton size="small" className="copyButton" color="inherit" onClick={handleClick}>
+          <ContentCopyOutlined fontSize="inherit" sx={{ transform: 'scale(1, -1)' }} />
         </IconButton>
       </CopyToClipboardTooltip>
     </Wrapper>

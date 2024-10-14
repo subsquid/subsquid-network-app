@@ -24,15 +24,57 @@ query settings {
 
 ### ACCOUNT ###
 
-query account($address: String!) {
-  accountById(id: $address) {
-    id
-    type
-    balance
-    owned {
-      id
-      type
-      balance
+fragment AccountFragment on Account {
+  id
+  type
+  balance
+}
+
+query sources($address: String!) {
+  accounts(
+    where: { OR: [{ id_eq: $address }, { owner: { id_eq: $address } }] }
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+  }
+}
+
+query sourcesWithAssets($address: String!) {
+  accounts(
+    where: { OR: [{ id_eq: $address }, { owner: { id_eq: $address } }] }
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+
+    workers2(where: { OR: [{ bond_gt: 0 }, { claimableReward_gt: 0 }] }) {
+      ...WorkerBaseFragment
+      bond
+      claimableReward
+    }
+
+    delegations2(where: { OR: [{ deposit_gt: 0 }, { claimableReward_gt: 0 }] }) {
+      deposit
+      claimableReward
+      worker {
+        ...WorkerBaseFragment
+      }
+    }
+  }
+}
+
+query sourcesWithDelegations($address: String!, $peerId: String) {
+  accounts(
+    where: { OR: [{ id_eq: $address }, { owner: { id_eq: $address } }] }
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+
+    delegations2(where: { OR: [{ deposit_gt: 0 }], AND: [{ worker: { peerId_eq: $peerId } }] }) {
+      deposit
+      claimableReward
+      worker {
+        ...WorkerBaseFragment
+      }
     }
   }
 }
@@ -63,6 +105,13 @@ fragment WorkerFragment on Worker {
   stakerApr
   totalDelegation
   capedDelegation
+  owner {
+    id
+    type
+  }
+  realOwner {
+    id
+  }
 }
 
 fragment WorkerFullFragment on Worker {
@@ -87,13 +136,6 @@ fragment WorkerFullFragment on Worker {
   dayUptimes {
     timestamp
     uptime
-  }
-  owner {
-    id
-    type
-  }
-  realOwner {
-    id
   }
 }
 
@@ -169,8 +211,9 @@ query workerOwner($workerId: String!) {
   }
 }
 
-query myWorkerDelegations($address: String!, $workerId: String!) {
-  workerById(id: $workerId) {
+query myDelegations($address: String!, $workerId: String) {
+  workers(orderBy: id_ASC, where: {peerId_eq: $workerId, delegations_some: {realOwner: {id_eq: $address}, deposit_gt: 0}}) {
+    ...WorkerFragment
     delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
       claimableReward
       claimedReward
@@ -205,24 +248,6 @@ query myAssets($address: String!) {
   ) {
     claimableReward
     deposit
-  }
-}
-
-query myDelegations($address: String!) {
-  delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
-    claimableReward
-    claimedReward
-    deposit
-    locked
-    owner {
-      id
-      type
-    }
-    worker {
-      ...WorkerFragment
-      totalDelegation
-      capedDelegation
-    }
   }
 }
 

@@ -27,7 +27,6 @@ import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
 import { ColorVariant } from '../../theme';
 
 import { NetworkMenu } from './NetworkMenu';
-import { SyncSquidSnackbar } from './SyncSquidSnackbar';
 import { UserMenu } from './UserMenu';
 
 const APP_BAR_HEIGHT = 60;
@@ -278,7 +277,7 @@ export const NetworkLayout = ({
 
   return (
     <Main>
-      <SyncSquidSnackbar />
+      {/* <SyncSquidSnackbar /> */}
       {/* <TopBanner /> */}
       <AppBar>
         <AppToolbar>

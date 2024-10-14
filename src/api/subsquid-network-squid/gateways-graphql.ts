@@ -1,4 +1,4 @@
-import { useSquidDataSource } from '@api/subsquid-network-squid/datasource';
+import { useSquid } from '@api/subsquid-network-squid/datasource';
 import { useAccount } from '@network/useAccount';
 
 import { useGatewayByPeerIdQuery, useMyGatewaysQuery, useMyGatewayStakesQuery } from './graphql';
@@ -21,7 +21,7 @@ import { useGatewayByPeerIdQuery, useMyGatewaysQuery, useMyGatewayStakesQuery } 
 // }
 
 export function useMyGateways() {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { address } = useAccount();
 
   const enabled = !!address;
@@ -45,7 +45,7 @@ export function useMyGateways() {
 }
 
 export function useGatewayByPeerId(peerId?: string) {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const enabled = !!peerId;
 
   const { data, isLoading } = useGatewayByPeerIdQuery(
@@ -70,7 +70,7 @@ export function useGatewayByPeerId(peerId?: string) {
 }
 
 export function useMyGatewayStake() {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { address } = useAccount();
 
   const enabled = !!address;

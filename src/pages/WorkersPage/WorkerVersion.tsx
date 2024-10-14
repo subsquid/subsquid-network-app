@@ -1,8 +1,8 @@
-import { Box, Stack, styled } from '@mui/material';
+import { Report, Warning } from '@mui/icons-material';
+import { Box, Stack, styled, Tooltip } from '@mui/material';
 import { satisfies } from 'semver';
 
 import { Worker, useNetworkSettings } from '@api/subsquid-network-squid';
-import { WarningIcon } from '@icons/WarningIcon';
 
 export const WorkerVersionName = styled(Box, {
   name: 'WorkerVersionName',
@@ -22,9 +22,13 @@ export const WorkerVersion = ({ worker }: { worker: Pick<Worker, 'version'> }) =
           <Box display="flex">
             {!satisfies(worker.version, recommendedWorkerVersion, { includePrerelease: true }) ? (
               !satisfies(worker.version, minimalWorkerVersion, { includePrerelease: true }) ? (
-                <WarningIcon color="error" />
+                <Tooltip title="Unsupported" placement="top">
+                  <Report color="error" />
+                </Tooltip>
               ) : (
-                <WarningIcon color="warning" />
+                <Tooltip title="Outdated" placement="top">
+                  <Warning color="warning" />
+                </Tooltip>
               )
             ) : null}
           </Box>

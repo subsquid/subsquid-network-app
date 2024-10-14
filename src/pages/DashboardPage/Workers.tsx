@@ -14,14 +14,14 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/system';
 
-import { SortDir, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
+import { SortDir, useMySources, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
 import { Search } from '@components/Search/Search';
 import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerVersion } from '@pages/WorkersPage/WorkerVersion';
 
 function TableNavigation({
@@ -45,6 +45,7 @@ function TableNavigation({
       justifyContent="flex-end"
     >
       <IconButton
+        size="small"
         onClick={() => {
           setPage?.(page - 1);
         }}
@@ -56,6 +57,7 @@ function TableNavigation({
         {page} / {totalPages}
       </Typography>
       <IconButton
+        size="small"
         onClick={() => {
           setPage?.(page + 1);
         }}
@@ -90,13 +92,23 @@ export function Workers() {
     sortBy: new Location.Enum<WorkerSortBy>(WorkerSortBy.StakerAPR),
     sortDir: new Location.Enum<SortDir>(SortDir.Desc),
   });
-  const { workers, totalPages, page, isLoading } = useWorkers({
+
+  const { data: sources, isLoading: isSourcesLoading } = useMySources();
+
+  const {
+    workers,
+    totalPages,
+    page,
+    isLoading: isWorkersLoading,
+  } = useWorkers({
     search: query.search,
     page: query.page,
     perPage: 15,
     sortBy: query.sortBy as WorkerSortBy,
     sortDir: query.sortDir as SortDir,
   });
+
+  const isLoading = isSourcesLoading || isWorkersLoading;
 
   return (
     <Box>
@@ -168,7 +180,7 @@ export function Workers() {
                     />
                   </TableCell>
                   <TableCell>
-                    <WorkerStatus worker={worker} />
+                    <WorkerStatusChip worker={worker} />
                   </TableCell>
                   <TableCell>
                     <WorkerVersion worker={worker} />
@@ -185,7 +197,7 @@ export function Workers() {
                   <TableCell>{dateFormat(worker.createdAt)}</TableCell>
                   <TableCell className="pinned">
                     <Box display="flex" justifyContent="flex-end">
-                      <WorkerDelegate worker={worker} />
+                      <WorkerDelegate worker={worker} sources={sources} />
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -196,7 +208,7 @@ export function Workers() {
           )}
         </TableBody>
       </DashboardTable>
-      {isLoading ? null : (
+      {isWorkersLoading ? null : (
         <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
       )}
     </Box>

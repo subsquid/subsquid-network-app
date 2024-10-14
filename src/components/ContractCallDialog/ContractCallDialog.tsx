@@ -14,7 +14,7 @@ export function ContractCallDialog({
   maxWidth,
   minWidth = 600,
   confirmColor = 'info',
-  confirmButtonText = title.toUpperCase(),
+  confirmButtonText,
   cancelButtonText,
   hideCancelButton = true,
   disableBackdropClick = true,

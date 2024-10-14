@@ -7,12 +7,9 @@ import { AssetsPage } from '@pages/AssetsPage/AssetsPage.tsx';
 import { Vesting } from '@pages/AssetsPage/Vesting.tsx';
 import { DashboardPage } from '@pages/DashboardPage/DashboardPage.tsx';
 import { DelegationsPage } from '@pages/DelegationsPage/DelegationsPage.tsx';
-import { AddNewGateway } from '@pages/GatewaysPage/AddNewGateway.tsx';
 import { Gateway } from '@pages/GatewaysPage/Gateway.tsx';
 import { GatewaysPage } from '@pages/GatewaysPage/GatewaysPage.tsx';
-import { AddNewWorker } from '@pages/WorkersPage/AddNewWorker.tsx';
 import { Worker } from '@pages/WorkersPage/Worker.tsx';
-import { WorkerEdit } from '@pages/WorkersPage/WorkerEdit.tsx';
 import { WorkersPage } from '@pages/WorkersPage/WorkersPage.tsx';
 
 import { hideLoader } from './index.tsx';
@@ -35,16 +32,14 @@ export const AppRoutes = () => {
 
         <Route path="/workers">
           <Route element={<WorkersPage />} index />
-          <Route element={<AddNewWorker />} path="add" />
+          {/* <Route element={<AddNewWorker />} path="add" /> */}
           <Route element={<Worker backPath="/dashboard" />} path=":peerId" />
-          <Route element={<WorkerEdit />} path=":peerId/edit" />
         </Route>
         <Route path="/delegations">
           <Route element={<DelegationsPage />} index />
         </Route>
         <Route path="/portals">
           <Route element={<GatewaysPage />} index />
-          <Route element={<AddNewGateway />} path="add" />
           <Route element={<Gateway backPath="/portals" />} path=":peerId" />
         </Route>
         <Route element={<Navigate to="/dashboard" replace={true} />} path="*" />

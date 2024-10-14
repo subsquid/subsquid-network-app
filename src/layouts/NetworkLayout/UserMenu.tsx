@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 import { addressFormatter } from '@lib/formatters/formatters';
-import { ExpandMore } from '@mui/icons-material';
-import { Box, Button, Menu, Stack, styled, Typography } from '@mui/material';
+import { AccountBalanceWalletOutlined, ExpandMore } from '@mui/icons-material';
+import { Box, Button, Menu, styled, Typography } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
@@ -45,27 +45,27 @@ export function UserMenu() {
 
   return (
     <>
-      <Stack
-        component={Dropdown}
-        direction="row"
+      <Dropdown
         onClick={handleOpen}
-        alignItems="center"
         ref={ref}
         color="primary"
         variant="contained"
+        startIcon={<AccountBalanceWalletOutlined />}
+        endIcon={
+          <ExpandMore
+            sx={{
+              transition: 'transform 300ms ease-out',
+              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+              color: 'primary.contrastText',
+              // opacity: 0.2,
+              width: 20,
+              height: 20,
+            }}
+          />
+        }
       >
         <Typography variant="body2">{maskedAddress}</Typography>
-        <ExpandMore
-          sx={{
-            transition: 'transform 300ms ease-out',
-            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-            color: 'primary.contrastText',
-            // opacity: 0.2,
-            width: 20,
-            height: 20,
-          }}
-        />
-      </Stack>
+      </Dropdown>
       <UserMenuStyled
         anchorEl={ref.current}
         open={open}
@@ -76,7 +76,7 @@ export function UserMenu() {
           paper: {
             sx: {
               overflow: 'visible',
-              width: 261,
+              width: 256,
             },
           },
         }}

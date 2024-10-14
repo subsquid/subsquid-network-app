@@ -21,10 +21,10 @@ export const Chip = styled(MaterialChip)(({ theme }) => ({
   },
 }));
 
-export function WorkerStatus({ worker }: { worker: WorkerStatusFragmentFragment }) {
+export function WorkerStatusChip({ worker }: { worker: WorkerStatusFragmentFragment }) {
   const { label, color, tip } = useMemo((): {
     label: string;
-    color: 'error' | 'success' | 'primary';
+    color: 'error' | 'warning' | 'success' | 'primary';
     tip?: string;
   } => {
     if (!worker.status) return { label: 'Unknown', color: 'primary' };
@@ -32,9 +32,9 @@ export function WorkerStatus({ worker }: { worker: WorkerStatusFragmentFragment 
     switch (worker.status) {
       case Status.Active:
         if (worker.jailed) {
-          return { label: 'Jailed', color: 'error', tip: worker.jailReason || 'Unknown' };
+          return { label: 'Jailed', color: 'warning', tip: worker.jailReason || 'Unknown' };
         } else if (!worker.online) {
-          return { label: 'Offline', color: 'primary' };
+          return { label: 'Offline', color: 'error' };
         }
 
         return { label: 'Online', color: 'success' };

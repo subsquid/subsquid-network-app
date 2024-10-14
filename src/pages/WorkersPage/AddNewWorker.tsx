@@ -1,146 +1,216 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { fromSqd } from '@lib/network/utils';
+import { fromSqd, peerIdToHex } from '@lib/network/utils';
+import { Add } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Box } from '@mui/material';
-import BigNumber from 'bignumber.js';
+import { SxProps } from '@mui/material';
 import { useFormik } from 'formik';
-import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import useLocalStorageState from 'use-local-storage-state';
 
-import { useRegisterWorker } from '@api/contracts/worker-registration/useRegisterWorker';
-import { useMySources } from '@api/subsquid-network-squid';
-import { useNetworkSettings } from '@api/subsquid-network-squid/settings-graphql';
-import { BlockchainContractError } from '@components/BlockchainContractError';
-import { Card } from '@components/Card';
+import {
+  useReadRouterWorkerRegistration,
+  useReadWorkerRegistryBondAmount,
+  workerRegistryAbi,
+} from '@api/contracts';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
+import { encodeWorkerMetadata } from '@api/contracts/worker-registration/WorkerMetadata';
+import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
 import { ConfirmDialog } from '@components/ConfirmDialog';
+import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikCheckBoxInput, FormikTextInput, FormRow } from '@components/Form';
 import { FormikSelect } from '@components/Form/FormikSelect';
 import { Loader } from '@components/Loader';
 import { SourceWalletOption } from '@components/SourceWallet';
-import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
-import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useContracts } from '@network/useContracts';
 import { useWorkersChatUrl } from '@network/useWorkersChat';
 
 import { addWorkerSchema } from './worker-schema';
 
-function JoinChatDialog({ open, onResult }: { open: boolean; onResult: () => void }) {
-  const [, setSkipWorkerJoinChat] = useLocalStorageState<boolean>('skip_join_workers_chat');
-  const chatUrl = useWorkersChatUrl();
+export function AddWorkerButton({
+  sx,
+  disabled,
+  sources,
+}: {
+  sx?: SxProps;
+  disabled?: boolean;
+  sources?: SourceWalletWithBalance[];
+}) {
+  const [open, setOpen] = useState(false);
 
-  const formik = useFormik({
-    initialValues: {
-      doNotShow: false,
-    },
-
-    onSubmit: async values => {
-      setSkipWorkerJoinChat(values.doNotShow);
-      onResult();
-    },
-  });
+  const [isJoinChatOpen, setJoinChatOpen] = useState(false);
+  const [skipWorkerJoinChat] = useLocalStorageState<boolean>('sqd_skip_join_workers_chat');
 
   return (
-    <ConfirmDialog
-      open={open}
-      title="Registered"
-      confirmButtonText="Join chat"
-      confirmColor="success"
-      hideCancelButton
-      onApprove={() => window.open(chatUrl)}
-      onResult={formik.submitForm}
-    >
-      <Form onSubmit={formik.handleSubmit}>
-        Join the <b>Subsquid Network</b> node operators chat for support and updates on worker
-        images.
-        <FormRow>
-          <FormikCheckBoxInput id="doNotShow" label="Don't show this again" formik={formik} />
-        </FormRow>
-      </Form>
-    </ConfirmDialog>
+    <>
+      <LoadingButton
+        disabled={disabled}
+        sx={sx}
+        loading={open}
+        color="info"
+        startIcon={<Add />}
+        variant="contained"
+        onClick={() => setOpen(true)}
+      >
+        ADD WORKER
+      </LoadingButton>
+      <AddNewWorkerDialog
+        open={open}
+        onResult={confirmed => {
+          setOpen(false);
+
+          if (confirmed && !skipWorkerJoinChat) {
+            setJoinChatOpen(true);
+          }
+        }}
+        sources={sources}
+      />
+      <JoinChatDialog
+        open={isJoinChatOpen}
+        onResult={() => {
+          setJoinChatOpen(false);
+        }}
+      />
+    </>
   );
 }
 
-function AddWorkerForm() {
-  const navigate = useNavigate();
-  const { bondAmount, isPending: isSettingsLoading } = useNetworkSettings();
-  const { sources, isPending: isContractsLoading } = useMySources();
-  const { registerWorker, isLoading, error } = useRegisterWorker();
-  const [isJoinChatOpen, setJoinChatOpen] = useState(false);
-  const [skipWorkerJoinChat] = useLocalStorageState<boolean>('skip_join_workers_chat');
+export function AddNewWorkerDialog({
+  open,
+  onResult,
+  sources,
+}: {
+  open: boolean;
+  onResult: (confirmed: boolean) => void;
+  sources?: SourceWalletWithBalance[];
+}) {
+  const { setWaitHeight } = useSquidHeight();
 
-  const formik = useFormik({
-    initialValues: {
+  const contracts = useContracts();
+  const contractWriter = useWriteSQDTransaction();
+
+  const { data: workerRegistryAddress, isLoading: isWorkerRegistryAddressLoading } =
+    useReadRouterWorkerRegistration({
+      address: contracts.ROUTER,
+    });
+
+  const { data: bondAmount, isPending: isBondLoading } = useReadWorkerRegistryBondAmount({
+    address: workerRegistryAddress,
+  });
+
+  const isLoading = isWorkerRegistryAddressLoading || isBondLoading;
+
+  const isSourceDisabled = useCallback(
+    (source: SourceWalletWithBalance) => BigInt(source.balance) < (bondAmount || 0n),
+    [bondAmount],
+  );
+  const hasAvailableSource = useMemo(
+    () => !!sources?.some(s => !isSourceDisabled(s)),
+    [isSourceDisabled, sources],
+  );
+
+  const initialValues = useMemo(() => {
+    const source = sources?.find(s => !isSourceDisabled(s)) || sources?.[0];
+
+    return {
       name: '',
       description: '',
       website: '',
       email: '',
       peerId: '',
-      source: '',
-    },
+      source: source?.id || '',
+      bond: fromSqd(bondAmount).toString(),
+    };
+  }, [bondAmount, isSourceDisabled, sources]);
+
+  const formik = useFormik({
+    initialValues,
     validationSchema: addWorkerSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
+    enableReinitialize: true,
 
     onSubmit: async values => {
-      const source = sources.find(s => s.id === values.source);
-      if (!source) return;
+      if (!workerRegistryAddress || !bondAmount) return;
 
-      const { success } = await registerWorker({
-        ...values,
-        source,
-      });
-      if (!success) return;
+      try {
+        const { peerId, source: sourceId, ...metadata } = addWorkerSchema.cast(values);
 
-      if (skipWorkerJoinChat) {
-        navigate('/workers');
-      } else {
-        setJoinChatOpen(true);
+        const source = sources?.find(s => s.id === sourceId);
+        if (!source) return;
+
+        const peerIdHex = peerIdToHex(peerId);
+
+        const receipt = await contractWriter.writeTransactionAsync({
+          address: workerRegistryAddress,
+          abi: workerRegistryAbi,
+          functionName: 'register',
+          args: [peerIdHex, encodeWorkerMetadata(metadata)],
+          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+          approve: bondAmount,
+        });
+        setWaitHeight(receipt.blockNumber, []);
+
+        formik.resetForm();
+
+        onResult(true);
+      } catch (error) {
+        toast.error(errorMessage(error));
       }
     },
   });
 
-  const source = useMemo(() => {
-    if (isContractsLoading) return;
-    if (isSettingsLoading) return;
-
-    return (
-      (formik.values.source
-        ? sources.find(c => c.id === formik.values.source)
-        : sources.find(c => fromSqd(c.balance).gte(fromSqd(bondAmount)))) || sources?.[0]
-    );
-  }, [bondAmount, formik.values.source, isContractsLoading, isSettingsLoading, sources]);
-
-  useEffect(() => {
-    if (!source) return;
-
-    formik.setValues({
-      ...formik.values,
-      source: source.id,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source]);
-
   return (
     <>
-      {isContractsLoading ? (
-        <Loader />
-      ) : (
-        <>
-          <Form onSubmit={formik.handleSubmit}>
-            <Card outlined>
+      <ContractCallDialog
+        title="Worker registration"
+        open={open}
+        onResult={confirmed => {
+          if (!confirmed) return onResult(confirmed);
+
+          formik.handleSubmit();
+        }}
+        disableConfirmButton={isLoading || !hasAvailableSource}
+        loading={contractWriter.isPending}
+      >
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <>
+            <Form onSubmit={formik.handleSubmit}>
               <FormRow>
                 <FormikSelect
                   id="source"
-                  disabled={!sources.length}
                   showErrorOnlyOfTouched
-                  options={sources.map(s => {
-                    return {
-                      label: <SourceWalletOption source={s} />,
-                      value: s.id,
-                      disabled: BigNumber(s.balance).lt(bondAmount),
-                    };
-                  })}
+                  options={
+                    sources?.map(s => {
+                      return {
+                        label: <SourceWalletOption source={s} />,
+                        value: s.id,
+                        disabled: isSourceDisabled(s),
+                      };
+                    }) || []
+                  }
+                  formik={formik}
+                />
+              </FormRow>
+              <FormRow>
+                <FormikTextInput
+                  showErrorOnlyOfTouched
+                  id="bond"
+                  label="Bond amount"
+                  formik={formik}
+                  disabled
+                />
+              </FormRow>
+              <FormRow>
+                <FormikTextInput
+                  showErrorOnlyOfTouched
+                  id="peerId"
+                  label="Peer ID"
                   formik={formik}
                 />
               </FormRow>
@@ -149,14 +219,6 @@ function AddWorkerForm() {
                   showErrorOnlyOfTouched
                   id="name"
                   label="Worker name"
-                  formik={formik}
-                />
-              </FormRow>
-              <FormRow>
-                <FormikTextInput
-                  showErrorOnlyOfTouched
-                  id="peerId"
-                  label="Peer ID"
                   formik={formik}
                 />
               </FormRow>
@@ -178,39 +240,55 @@ function AddWorkerForm() {
                   formik={formik}
                 />
               </FormRow>
-              <BlockchainContractError error={error} />
-            </Card>
-            <Box mt={3} justifyContent="flex-end" display="flex">
-              <LoadingButton
-                disabled={isLoading || fromSqd(source?.balance || 0).lt(fromSqd(bondAmount))}
-                variant="contained"
-                type="submit"
-                color="info"
-              >
-                REGISTER
-              </LoadingButton>
-            </Box>
-          </Form>
-          <JoinChatDialog
-            open={isJoinChatOpen}
-            onResult={() => {
-              navigate('/workers');
-              setJoinChatOpen(false);
-            }}
-          />
-        </>
-      )}
+            </Form>
+          </>
+        )}
+      </ContractCallDialog>
     </>
   );
 }
 
-export function AddNewWorker() {
+function JoinChatDialog({
+  open,
+  onResult,
+}: {
+  open: boolean;
+  onResult: (confirmed: boolean) => void;
+}) {
+  const [, setSkipWorkerJoinChat] = useLocalStorageState<boolean>('sqd_skip_join_workers_chat');
+  const chatUrl = useWorkersChatUrl();
+
+  const formik = useFormik({
+    initialValues: {
+      doNotShow: false,
+    },
+
+    onSubmit: async values => {
+      setSkipWorkerJoinChat(values.doNotShow);
+      onResult(true);
+    },
+  });
+
   return (
-    <CenteredPageWrapper>
-      <ConnectedWalletRequired>
-        <NetworkPageTitle backPath="/workers"></NetworkPageTitle>
-        <AddWorkerForm />
-      </ConnectedWalletRequired>
-    </CenteredPageWrapper>
+    <ConfirmDialog
+      open={open}
+      title="Worker registered!"
+      confirmButtonText="JOIN CHAT"
+      confirmColor="success"
+      hideCancelButton
+      onApprove={() => window.open(chatUrl)}
+      onResult={(confirmed: boolean) => {
+        if (!confirmed) onResult(confirmed);
+
+        formik.handleSubmit();
+      }}
+    >
+      <Form onSubmit={formik.handleSubmit}>
+        Join the <b>SQD Network</b> node operators chat for support and updates on worker images.
+        <FormRow>
+          <FormikCheckBoxInput id="doNotShow" label="Don't show this again" formik={formik} />
+        </FormRow>
+      </Form>
+    </ConfirmDialog>
   );
 }

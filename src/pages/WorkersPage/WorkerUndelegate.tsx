@@ -1,23 +1,36 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
 import { LoadingButton } from '@mui/lab';
 import { Box, Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
-import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
+import toast from 'react-hot-toast';
 import { useDebounce } from 'use-debounce';
 
-import { useWorkerUndelegate } from '@api/contracts/staking';
-import { Account, Delegation, Worker } from '@api/subsquid-network-squid';
-import { BlockchainContractError } from '@components/BlockchainContractError';
+import { stakingAbi, useReadRouterStaking } from '@api/contracts';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
+import {
+  Account,
+  AccountType,
+  Delegation,
+  SourceWalletWithBalance,
+  Worker,
+} from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useContracts } from '@network/useContracts';
 
 import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegate';
+
+export type SourceWalletWithDelegation = SourceWalletWithBalance & {
+  locked: boolean;
+};
 
 export const undelegateSchema = yup.object({
   source: yup.string().label('Source').trim().required().typeError('${path} is invalid'),
@@ -34,7 +47,9 @@ export const undelegateSchema = yup.object({
 export function WorkerUndelegate({
   worker,
   disabled,
+  sources,
 }: {
+  sources?: SourceWalletWithDelegation[];
   worker?: Pick<Worker, 'id'> & {
     delegations: (Pick<Delegation, 'deposit' | 'locked'> & {
       owner: Pick<Account, 'id' | 'type'>;
@@ -42,8 +57,6 @@ export function WorkerUndelegate({
   };
   disabled?: boolean;
 }) {
-  const { undelegateFromWorker, error, isPending } = useWorkerUndelegate();
-
   const [open, setOpen] = useState(false);
   const handleOpen = (e: React.UIEvent) => {
     e.stopPropagation();
@@ -51,52 +64,60 @@ export function WorkerUndelegate({
   };
   const handleClose = () => setOpen(false);
 
-  const options = useMemo(
-    () =>
-      (worker?.delegations || [])
-        .filter(s => !BigNumber(s.deposit).isZero())
-        .map(s => {
-          return {
-            label: (
-              <SourceWalletOption
-                source={{
-                  id: s.owner.id,
-                  balance: s.deposit,
-                  type: s.owner.type,
-                }}
-              />
-            ),
-            value: s.owner.id,
-          };
-        }),
-    [worker?.delegations],
-  );
+  const { setWaitHeight } = useSquidHeight();
+
+  const contracts = useContracts();
+  const { writeTransactionAsync, isPending } = useWriteSQDTransaction();
+
+  const stakingAddress = useReadRouterStaking({
+    address: contracts.ROUTER,
+  });
+
+  const isSourceDisabled = (source: SourceWalletWithDelegation) =>
+    source.balance === '0' || source.locked;
+
+  const initialValues = useMemo(() => {
+    const source = sources?.find(c => !isSourceDisabled(c)) || sources?.[0];
+
+    return {
+      source: source?.id || '',
+      amount: '0',
+      max: fromSqd(source?.balance).toString(),
+    };
+  }, [sources]);
 
   const formik = useFormik({
-    initialValues: {
-      source: '',
-      amount: '',
-      max: '0',
-    },
+    initialValues,
     validationSchema: undelegateSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
+    enableReinitialize: true,
 
     onSubmit: async values => {
-      const wallet = worker?.delegations.find(w => w?.owner.id === values.source);
-      if (!wallet || !worker) return;
+      if (!stakingAddress.data) return;
+      if (!worker) return;
 
-      const { failedReason } = await undelegateFromWorker({
-        worker,
-        amount: toSqd(values.amount),
-        wallet: {
-          id: wallet.owner.id,
-          type: wallet.owner.type,
-        },
-      });
-      if (!failedReason) {
+      try {
+        const { amount, source: sourceId } = undelegateSchema.cast(values);
+
+        const source = sources?.find(w => w?.id === sourceId);
+        if (!source) return;
+
+        const sqdAmount = BigInt(toSqd(amount));
+
+        const receipt = await writeTransactionAsync({
+          abi: stakingAbi,
+          address: stakingAddress.data,
+          functionName: 'withdraw',
+          args: [BigInt(worker.id), sqdAmount],
+          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+        });
+        setWaitHeight(receipt.blockNumber, []);
+
         handleClose();
+      } catch (e) {
+        toast.error(errorMessage(e));
       }
     },
   });
@@ -108,35 +129,25 @@ export function WorkerUndelegate({
     enabled: open && !!worker,
   });
 
-  const source = useMemo(() => {
-    if (!worker) return;
+  // const source = useMemo(() => {
+  //   if (!worker) return;
 
-    return (
-      (formik.values.source
-        ? worker?.delegations.find(c => c.owner.id === formik.values.source)
-        : worker?.delegations.find(c => fromSqd(c.deposit).gte(0))) || worker?.delegations?.[0]
-    );
-  }, [formik.values.source, worker]);
+  //   return (
+  //     (formik.values.source
+  //       ? worker?.delegations.find(c => c.owner.id === formik.values.source)
+  //       : worker?.delegations.find(c => fromSqd(c.deposit).gte(0))) || worker?.delegations?.[0]
+  //   );
+  // }, [formik.values.source, worker]);
 
-  useEffect(() => {
-    if (!source) return;
-
-    formik.setValues({
-      ...formik.values,
-      source: source.owner.id,
-      max: fromSqd(source.deposit).toFixed(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source]);
-
-  const canUndelegate = useMemo(() => {
-    return !!worker?.delegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
-  }, [worker?.delegations]);
+  // const canUndelegate = useMemo(() => {
+  //   return !!worker?.delegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
+  // }, [worker?.delegations]);
 
   return (
     <>
       <LoadingButton
-        disabled={disabled || !canUndelegate}
+        loading={open}
+        disabled={disabled}
         color="error"
         onClick={handleOpen}
         variant="outlined"
@@ -144,7 +155,7 @@ export function WorkerUndelegate({
         UNDELEGATE
       </LoadingButton>
       <ContractCallDialog
-        title="Undelegate"
+        title="Undelegate worker"
         open={open}
         loading={isPending}
         onResult={confirmed => {
@@ -157,9 +168,16 @@ export function WorkerUndelegate({
         <Form onSubmit={formik.handleSubmit}>
           <FormRow>
             <FormikSelect
-              disabled={!options.length}
               showErrorOnlyOfTouched
-              options={options}
+              options={
+                sources?.map(s => {
+                  return {
+                    label: <SourceWalletOption source={s} />,
+                    value: s.id,
+                    disabled: isSourceDisabled(s),
+                  };
+                }) || []
+              }
               id="source"
               formik={formik}
               onChange={e => {
@@ -198,12 +216,10 @@ export function WorkerUndelegate({
           <FormDivider />
           <Stack direction="row" justifyContent="space-between" alignContent="center">
             <Box>Expected APR</Box>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
-              <HelpTooltip title={EXPECTED_APR_TIP} />
-            </Stack>
+            <HelpTooltip title={EXPECTED_APR_TIP}>
+              <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+            </HelpTooltip>
           </Stack>
-          <BlockchainContractError error={error} />
         </Form>
       </ContractCallDialog>
     </>
