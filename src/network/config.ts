@@ -26,23 +26,23 @@ export const wagmiConfig = getDefaultConfig({
       ? [
           {
             ...arbitrum,
-            rpcUrls: {
-              default: {
-                http: ['https://arbitrum-one.public.blastapi.io'],
-                webSocket: ['wss://arbitrum-one.public.blastapi.io'],
-              },
-            },
+            // rpcUrls: {
+            //   default: {
+            //     http: ['https://arbitrum-one.public.blastapi.io'],
+            //     webSocket: ['wss://arbitrum-one.public.blastapi.io'],
+            //   },
+            // },
           },
         ]
       : [
           {
             ...arbitrumSepolia,
-            rpcUrls: {
-              default: {
-                http: ['https://arbitrum-sepolia.public.blastapi.io'],
-                webSocket: ['wss://arbitrum-sepolia.public.blastapi.io'],
-              },
-            },
+            // rpcUrls: {
+            //   default: {
+            //     http: ['https://arbitrum-sepolia.public.blastapi.io'],
+            //     webSocket: ['wss://arbitrum-sepolia.public.blastapi.io'],
+            //   },
+            // },
           },
         ],
 });
