@@ -59,9 +59,9 @@ export function useVestingContracts({ addresses }: { addresses?: `0x${string}`[]
       ] as const;
     }),
     allowFailure: true,
-    blockNumber: BigInt(currentHeight),
+    // blockNumber: BigInt(currentHeight),
     query: {
-      enabled: !isSquidHeightLoading && !!addresses?.length,
+      // enabled: !isSquidHeightLoading && !!addresses?.length,
       placeholderData: keepPreviousData,
       select: res => {
         if (res?.some(r => r.status === 'success')) {
