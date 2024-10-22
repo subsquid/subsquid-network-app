@@ -1,12 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
+import { ExpandMore, Info } from '@mui/icons-material';
 import {
+  Alert,
+  Avatar,
   Box,
   Button,
+  Collapse,
   Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Stack,
   TableBody,
   TableCell,
@@ -231,19 +240,8 @@ export function MyGateways() {
       loading={isLoading}
       title={
         <>
-          <Stack direction="row" spacing={1.5}>
-            <SquaredChip label="My Portals" color="primary" />
-            {/* <Box pl={0.5} pr={0.5}>
-              <FormGroup>
-                <FormControlLabel
-                  checked={isProMode}
-                  control={<Switch size="small" onChange={() => setProMode(!isProMode)} />}
-                  label={<Typography variant="body2">Pro mode</Typography>}
-                  labelPlacement="end"
-                />
-              </FormGroup>
-            </Box> */}
-          </Stack>
+          <SquaredChip label="My Portals" color="primary" />
+
           <Stack direction="row" spacing={1}>
             <Button color="secondary" variant="outlined">
               LEARN MORE
@@ -295,10 +293,101 @@ export function MyGateways() {
   );
 }
 
+const GettingStartedAlert = () => {
+  const theme = useTheme();
+  const [open, setOpen] = useState(false);
+
+  const steps = [
+    {
+      primary: 'Get SQD tokens',
+      secondary: (
+        <>
+          Make sure you have enough SQD tokens. <a href="#">How much do I need?</a>
+        </>
+      ),
+    },
+    {
+      primary: 'Lock you tokens',
+      secondary: (
+        <>
+          Lock your tokens to obtain Compute Units (CUs). <a href="#">How do I lock my tokens?</a>
+        </>
+      ),
+    },
+    {
+      primary: 'Generate a Peer ID',
+      secondary: (
+        <>
+          Create a Peer ID to identify your portal. <a href="#">How do I generate a Peer ID?</a>
+        </>
+      ),
+    },
+    {
+      primary: 'Add your portal',
+      secondary: <>Register your portal on a chain.</>,
+    },
+  ];
+
+  return (
+    <Alert
+      sx={{ mb: 2 }}
+      color="info"
+      icon={<Info />}
+      action={
+        <IconButton color="inherit" sx={{ padding: 0.5 }} onClick={() => setOpen(!open)}>
+          <ExpandMore
+            sx={{
+              transition: 'transform 300ms ease-out',
+              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </IconButton>
+      }
+    >
+      <Typography>Getting started with your portal</Typography>
+
+      <Collapse in={open} unmountOnExit timeout={300}>
+        <Box pt={1.5}>
+          <List disablePadding>
+            {steps.map(({ primary, secondary }, i) => (
+              <ListItem
+                key={i}
+                sx={{ listStyle: 'list-item' }}
+                disablePadding
+                alignItems="flex-start"
+              >
+                <ListItemIcon>
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      fontSize: '16px',
+                      backgroundColor: theme.palette.info.main,
+                    }}
+                  >
+                    {i + 1}
+                  </Avatar>
+                </ListItemIcon>
+                <ListItemText primary={primary} secondary={secondary} />
+              </ListItem>
+            ))}
+          </List>
+          <Typography variant="body1" mt={1}>
+            That's it! You're ready to run your Portal. If you need more guidance read our{' '}
+            <a href="#">portal section</a> in our docs or reach out to our{' '}
+            <a href="#">support team</a> for help.
+          </Typography>
+        </Box>
+      </Collapse>
+    </Alert>
+  );
+};
+
 export function GatewaysPage() {
   return (
     <CenteredPageWrapper className="wide">
       <ConnectedWalletRequired>
+        <GettingStartedAlert />
         <MyStakes />
         <MyGateways />
       </ConnectedWalletRequired>
