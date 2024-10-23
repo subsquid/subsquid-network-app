@@ -23,7 +23,7 @@ function App() {
 
   return (
     <>
-      <WagmiProvider config={rainbowConfig} reconnectOnMount>
+      <WagmiProvider config={rainbowConfig}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>
             <RainbowKitProvider

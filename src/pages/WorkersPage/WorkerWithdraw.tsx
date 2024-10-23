@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 
+import { dateFormat, relativeDateFormat } from '@i18n';
 import { peerIdToHex } from '@lib/network';
+import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { Box, SxProps, Tooltip } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
 
@@ -22,7 +24,9 @@ export function WorkerWithdrawButton({
   sx,
 }: {
   sx?: SxProps;
-  worker: Pick<Worker, 'id' | 'status' | 'peerId'>;
+  worker: Pick<Worker, 'id' | 'status' | 'peerId' | 'locked'> & {
+    unlockedAt?: string;
+  };
   source: SourceWallet;
   disabled?: boolean;
 }) {
@@ -30,17 +34,38 @@ export function WorkerWithdrawButton({
 
   return (
     <>
-      <LoadingButton
-        // startIcon={<ArrowUpwardOutlined />}
-        sx={sx}
-        loading={open}
-        onClick={() => setOpen(true)}
-        variant="outlined"
-        color="error"
-        disabled={disabled}
-      >
-        WITHDRAW
-      </LoadingButton>
+      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+        {worker.locked && (
+          <Tooltip
+            title={`Unlocks in ${relativeDateFormat(Date.now(), worker.unlockedAt)} (${dateFormat(
+              worker.unlockedAt,
+              'dateTime',
+            )})`}
+            placement="top"
+          >
+            <Lock
+              fontSize="small"
+              color="error"
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 1,
+              }}
+            />
+          </Tooltip>
+        )}
+        <LoadingButton
+          loading={open}
+          onClick={() => setOpen(true)}
+          variant="outlined"
+          color="error"
+          disabled={disabled || worker.locked}
+        >
+          WITHDRAW
+        </LoadingButton>
+      </Box>
       <WorkerWithdrawDialog
         open={open}
         onClose={() => setOpen(false)}

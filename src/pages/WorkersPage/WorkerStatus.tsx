@@ -66,7 +66,7 @@ export function WorkerStatusChip({
     <Tooltip
       title={
         worker.statusChangeAt
-          ? `in ${timeLeft} (${dateFormat(worker.statusChangeAt, 'dateTime')})`
+          ? `Applies in ${timeLeft} (${dateFormat(worker.statusChangeAt, 'dateTime')})`
           : ''
       }
       placement="top"

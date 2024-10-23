@@ -55,31 +55,44 @@ export function useFixWorkers<T extends Pick<Worker, 'id' | 'status'>>({
     return workers?.map((worker, i) => {
       const workerInfo = workersInfo?.[i];
 
-      const registeredAt = workerInfo.registeredAt;
-      const deregisteredAt = workerInfo.deregisteredAt + (lockPeriod ?? 0n);
+      const registerBlock = workerInfo.registeredAt;
+      const deregisterBlock = workerInfo.deregisteredAt;
+      const unlockBlock = deregisterBlock + (lockPeriod ?? 0n);
       const timestamp = Number(lastL1Block.timestamp) * 1000;
 
       const { status, statusChangeAt } =
-        lastL1Block.number < registeredAt
+        lastL1Block.number < registerBlock
           ? {
               status: WorkerStatus.Registering,
               statusChangeAt: new Date(
-                timestamp + getBlockTime(registeredAt - lastL1Block.number),
+                timestamp + getBlockTime(registerBlock - lastL1Block.number),
               ).toString(),
             }
-          : lastL1Block.number < deregisteredAt
+          : lastL1Block.number < deregisterBlock
             ? {
                 status: WorkerStatus.Deregistering,
                 statusChangeAt: new Date(
-                  timestamp + getBlockTime(deregisteredAt - lastL1Block.number),
+                  timestamp + getBlockTime(deregisterBlock - lastL1Block.number),
                 ).toString(),
               }
             : { status: worker.status };
+
+      const { locked, unlockedAt } =
+        lastL1Block.number < unlockBlock
+          ? {
+              locked: true,
+              unlockedAt: new Date(
+                timestamp + getBlockTime(unlockBlock - lastL1Block.number),
+              ).toString(),
+            }
+          : { locked: false };
 
       return {
         ...worker,
         status,
         statusChangeAt,
+        locked,
+        unlockedAt,
       };
     });
   }, [workers, workersInfo, lastL1Block, lockPeriod]);

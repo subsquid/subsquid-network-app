@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react';
 
+import { dateFormat, relativeDateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
+import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Box, Chip, Stack } from '@mui/material';
+import { Box, Chip, Stack, Tooltip } from '@mui/material';
 import * as yup from '@schema';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
@@ -53,6 +55,7 @@ export function WorkerUndelegate({
   worker?: Pick<Worker, 'id'> & {
     delegations: (Pick<Delegation, 'deposit' | 'locked'> & {
       owner: Pick<Account, 'id' | 'type'>;
+      unlockedAt?: string;
     })[];
   };
   disabled?: boolean;
@@ -143,17 +146,48 @@ export function WorkerUndelegate({
   //   return !!worker?.delegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
   // }, [worker?.delegations]);
 
+  const isLocked = useMemo(
+    () => !!worker?.delegations.length && !worker.delegations.some(d => !d.locked),
+    [worker],
+  );
+  const unlockedAt = useMemo(() => {
+    return '';
+  }, []);
+
   return (
     <>
-      <LoadingButton
-        loading={open}
-        disabled={disabled}
-        color="error"
-        onClick={handleOpen}
-        variant="outlined"
-      >
-        UNDELEGATE
-      </LoadingButton>
+      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+        {isLocked && (
+          <Tooltip
+            title={`Unlocks in ${relativeDateFormat(Date.now(), unlockedAt)} (${dateFormat(
+              unlockedAt,
+              'dateTime',
+            )})`}
+            placement="top"
+          >
+            <Lock
+              fontSize="small"
+              color="error"
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 1,
+              }}
+            />
+          </Tooltip>
+        )}
+        <LoadingButton
+          loading={open}
+          onClick={() => setOpen(true)}
+          variant="outlined"
+          color="error"
+          disabled={disabled || isLocked}
+        >
+          UNDELEGATE
+        </LoadingButton>
+      </Box>
       <ContractCallDialog
         title="Undelegate worker"
         open={open}
