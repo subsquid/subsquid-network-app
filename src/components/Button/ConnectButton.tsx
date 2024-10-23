@@ -1,13 +1,22 @@
-import { MouseEventHandler } from 'react';
-
 import { LoginOutlined } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 
-function ConnectButton({ onClick }: { onClick?: MouseEventHandler }) {
+function ConnectButton() {
+  const { openConnectModal, connectModalOpen } = useConnectModal();
+
   return (
-    <Button startIcon={<LoginOutlined />} onClick={onClick} variant="contained" color="info">
+    <LoadingButton
+      loading={connectModalOpen}
+      startIcon={<LoginOutlined />}
+      onClick={() => {
+        openConnectModal?.();
+      }}
+      variant="contained"
+      color="info"
+    >
       CONNECT WALLET
-    </Button>
+    </LoadingButton>
   );
 }
 

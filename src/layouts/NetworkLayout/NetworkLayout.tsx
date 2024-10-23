@@ -269,7 +269,7 @@ export const NetworkLayout = ({
     if (chain?.id === getChainId(network)) return;
 
     disconnect();
-  }, [isConnected, chain, disconnect, walletClient, network]);
+  }, [isConnected, chain?.id, walletClient, network, disconnect]);
 
   const centeredSx = {
     alignSelf: stretchContent ? 'stretch' : 'flex-start',

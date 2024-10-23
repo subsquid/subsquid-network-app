@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { addressFormatter } from '@lib/formatters/formatters';
 import { AccountBalanceWalletOutlined, ExpandMore } from '@mui/icons-material';
 import { Box, Button, Menu, styled, Typography } from '@mui/material';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
 import ConnectButton from '@components/Button/ConnectButton';
@@ -24,7 +23,6 @@ export const Dropdown = styled(Button)(({ theme }) => ({
 
 export function UserMenu() {
   const { address, isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
   const ref = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -40,7 +38,7 @@ export function UserMenu() {
   }, [address]);
 
   if (!address || !isConnected) {
-    return <ConnectButton onClick={openConnectModal} />;
+    return <ConnectButton />;
   }
 
   return (

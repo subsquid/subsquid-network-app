@@ -1,6 +1,6 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { upperFirst } from 'lodash-es';
-import { arbitrumSepolia, arbitrum, sepolia } from 'wagmi/chains';
+import { arbitrumSepolia, arbitrum, sepolia, mainnet } from 'wagmi/chains';
 
 import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
 
@@ -21,29 +21,6 @@ const network = getSubsquidNetwork();
 export const rainbowConfig = getDefaultConfig({
   appName: `Subsquid Network ${upperFirst(network)}`,
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
-  chains:
-    network === NetworkName.Mainnet
-      ? [
-          {
-            ...arbitrum,
-            // rpcUrls: {
-            //   default: {
-            //     http: ['https://arbitrum-one.public.blastapi.io'],
-            //     webSocket: ['wss://arbitrum-one.public.blastapi.io'],
-            //   },
-            // },
-          },
-        ]
-      : [
-          {
-            ...arbitrumSepolia,
-            // rpcUrls: {
-            //   default: {
-            //     http: ['https://arbitrum-sepolia.public.blastapi.io'],
-            //     webSocket: ['wss://arbitrum-sepolia.public.blastapi.io'],
-            //   },
-            // },
-          },
-          sepolia,
-        ],
+  chains: network === NetworkName.Mainnet ? [arbitrum, mainnet] : [arbitrumSepolia, sepolia],
+  syncConnectedChain: true,
 });
