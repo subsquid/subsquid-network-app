@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
-import { fromSqd } from '@lib/network';
+import { fromSqd, getBlockTime } from '@lib/network';
 import { ExpandMore, Info } from '@mui/icons-material';
 import {
   Alert,
@@ -63,7 +63,7 @@ export function MyStakes() {
 
   const { address } = useAccount();
 
-  const { GATEWAY_REGISTRATION, ROUTER, SQD_TOKEN, l1ChainId } = useContracts();
+  const { GATEWAY_REGISTRATION, ROUTER, SQD_TOKEN, CHAIN_ID_L1: l1ChainId } = useContracts();
 
   const { data: stake, isLoading: isStakeLoading } = useReadGatewayRegistryGetStake({
     address: GATEWAY_REGISTRATION,
@@ -94,7 +94,6 @@ export function MyStakes() {
 
   const { data: lastL1Block, isLoading: isL1BlockLoading } = useBlock({
     chainId: l1ChainId,
-    includeTransactions: false,
   });
   const { data: unlockedAtL1Block, isLoading: isUnlockedAtBlockLoading } = useBlock({
     chainId: l1ChainId,
@@ -128,9 +127,12 @@ export function MyStakes() {
   const unlockDate = useMemo(() => {
     if (!stake || !lastL1Block) return;
 
-    if (stake.lockEnd < lastL1Block.number) return (unlockedAtL1Block?.timestamp || 0n) * 1000n;
+    if (stake.lockEnd < lastL1Block.number)
+      return Number(unlockedAtL1Block?.timestamp || 0n) * 1000;
 
-    return ((stake.lockEnd - lastL1Block.number + 1n) * 12n + lastL1Block.timestamp) * 1000n;
+    return (
+      Number(lastL1Block.timestamp) * 1000 + getBlockTime(stake.lockEnd - lastL1Block.number + 1n)
+    );
   }, [lastL1Block, stake, unlockedAtL1Block?.timestamp]);
 
   const cuPerEpoch = useMemo(() => {

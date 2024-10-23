@@ -87,7 +87,7 @@ export const Title = styled(SquaredChip)(({ theme }) => ({
 
 export const Worker = ({ backPath }: { backPath: string }) => {
   const { peerId } = useParams<{ peerId: string }>();
-  const { data: worker, isPending } = useWorkerByPeerId(peerId);
+  const { data: worker, isLoading: isPending } = useWorkerByPeerId(peerId);
   const { address } = useAccount();
   const { SQD_TOKEN } = useContracts();
 
@@ -144,7 +144,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                 <Title label="Info" />
                 <Stack spacing={2} direction="column">
                   <Stack direction="row">
-                    <WorkerDescLabel>Registered</WorkerDescLabel>
+                    <WorkerDescLabel>Created</WorkerDescLabel>
                     <WorkerDescValue>{dateFormat(worker.createdAt, 'dateTime')}</WorkerDescValue>
                   </Stack>
                   <Stack direction="row">

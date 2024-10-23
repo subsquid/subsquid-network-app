@@ -12,7 +12,8 @@ export function useContracts(): {
   GATEWAY_REGISTRATION: `0x${string}`;
   SOFT_CAP: `0x${string}`;
   SQD_TOKEN: string;
-  l1ChainId: number;
+  CHAIN_ID_L1: number;
+  MULTICALL: `0x${string}`;
 } {
   const network = getSubsquidNetwork();
 
@@ -28,7 +29,8 @@ export function useContracts(): {
         SOFT_CAP: `0x52f31c9c019f840A9C0e74F66ACc95455B254BeA`,
         SQD_TOKEN: 'tSQD',
         ROUTER: '0xD2093610c5d27c201CD47bCF1Df4071610114b64',
-        l1ChainId: sepolia.id,
+        CHAIN_ID_L1: sepolia.id,
+        MULTICALL: '0x7eCfBaa8742fDf5756DAC92fbc8b90a19b8815bF',
       };
     }
     case NetworkName.Mainnet: {
@@ -42,7 +44,8 @@ export function useContracts(): {
         SOFT_CAP: `0x0eb27b1cbba04698dd7ce0f2364584d33a616545`,
         SQD_TOKEN: 'SQD',
         ROUTER: '0x67F56D27dab93eEb07f6372274aCa277F49dA941',
-        l1ChainId: mainnet.id,
+        CHAIN_ID_L1: mainnet.id,
+        MULTICALL: '0x7eCfBaa8742fDf5756DAC92fbc8b90a19b8815bF',
       };
     }
   }

@@ -144,7 +144,6 @@ export default defineConfig({
           stateMutability: 'nonpayable',
           type: 'function',
         },
-
         {
           type: 'function',
           name: 'withdraw',
@@ -157,6 +156,34 @@ export default defineConfig({
           ],
           outputs: [],
           stateMutability: 'nonpayable',
+        },
+        {
+          type: 'function',
+          name: 'lockPeriod',
+          inputs: [],
+          outputs: [{ name: '', type: 'uint128', internalType: 'uint128' }],
+          stateMutability: 'view',
+        },
+        {
+          type: 'function',
+          name: 'getWorker',
+          inputs: [{ name: 'workerId', type: 'uint256', internalType: 'uint256' }],
+          outputs: [
+            {
+              name: '',
+              type: 'tuple',
+              internalType: 'struct WorkerRegistration.Worker',
+              components: [
+                { name: 'creator', type: 'address', internalType: 'address' },
+                { name: 'peerId', type: 'bytes', internalType: 'bytes' },
+                { name: 'bond', type: 'uint256', internalType: 'uint256' },
+                { name: 'registeredAt', type: 'uint128', internalType: 'uint128' },
+                { name: 'deregisteredAt', type: 'uint128', internalType: 'uint128' },
+                { name: 'metadata', type: 'string', internalType: 'string' },
+              ],
+            },
+          ],
+          stateMutability: 'view',
         },
       ],
     },
@@ -790,6 +817,25 @@ export default defineConfig({
             },
           ],
           stateMutability: 'view',
+        },
+      ],
+    },
+    {
+      name: 'ArbMulticall',
+      abi: [
+        {
+          inputs: [],
+          name: 'getCurrentBlockTimestamp',
+          outputs: [{ internalType: 'uint256', name: 'timestamp', type: 'uint256' }],
+          stateMutability: 'view',
+          type: 'function',
+        },
+        {
+          inputs: [],
+          name: 'getL1BlockNumber',
+          outputs: [{ internalType: 'uint256', name: 'l1BlockNumber', type: 'uint256' }],
+          stateMutability: 'view',
+          type: 'function',
         },
       ],
     },

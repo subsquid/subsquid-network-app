@@ -34,7 +34,7 @@ export function MyWorkers() {
 
   const { data: sources, isLoading: isSourcesLoading } = useMySources();
 
-  const { data, isLoading: isWorkersLoading } = useMyWorkers({
+  const { data: workers, isLoading: isWorkersLoading } = useMyWorkers({
     sortBy: query.sortBy as WorkerSortBy,
     sortDir: query.sortDir as SortDir,
   });
@@ -52,7 +52,7 @@ export function MyWorkers() {
               <Button color="secondary" variant="outlined">
                 LEARN MORE
               </Button>
-              <AddWorkerButton sources={sources} />
+              <AddWorkerButton sources={sources} disabled={isLoading} />
             </Stack>
           </>
         }
@@ -92,8 +92,8 @@ export function MyWorkers() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.length ? (
-              data.map(worker => {
+            {workers?.length ? (
+              workers.map(worker => {
                 return (
                   <TableRow key={worker.peerId}>
                     <TableCell>

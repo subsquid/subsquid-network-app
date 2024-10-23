@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
-import { fromSqd, toSqd, unwrapMulticallResult } from '@lib/network/utils';
+import { fromSqd, getBlockTime, toSqd, unwrapMulticallResult } from '@lib/network/utils';
 import { LockOutlined as LockIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Box, Chip, InputAdornment, Stack, SxProps } from '@mui/material';
@@ -96,7 +96,7 @@ export function GatewayStakeDialog({
 }) {
   const { setWaitHeight } = useSquidHeight();
 
-  const { GATEWAY_REGISTRATION, ROUTER, l1ChainId } = useContracts();
+  const { GATEWAY_REGISTRATION, ROUTER, CHAIN_ID_L1 } = useContracts();
 
   const networkController = useReadRouterNetworkController({
     address: ROUTER,
@@ -109,7 +109,7 @@ export function GatewayStakeDialog({
   const gatewayRegistryContract = useWriteSQDTransaction();
 
   const { data: lastL1Block, isLoading: isLastL1BlockLoading } = useBlock({
-    chainId: l1ChainId,
+    chainId: CHAIN_ID_L1,
   });
 
   const isLoading = isLastL1BlockLoading;
@@ -218,7 +218,7 @@ export function GatewayStakeDialog({
     );
 
     const unlockAt =
-      (BigInt(debouncedValues.durationBlocks + 1) * 12n + lastL1Block.timestamp) * 1000n;
+      Number(lastL1Block.timestamp) * 1000 + getBlockTime(debouncedValues.durationBlocks);
 
     const totalAmount = new BigNumber(selectedSource.stake.amount.toString())
       .plus(toSqd(debouncedValues.amount))

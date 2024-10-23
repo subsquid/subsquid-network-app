@@ -27,3 +27,7 @@ export function peerIdToHex(peerId: string) {
 export function unwrapMulticallResult<T>(result?: MulticallResponse<T>): T | undefined {
   return result?.status === 'success' ? (result.result as T) : undefined;
 }
+
+export function getBlockTime(blocksCount: number | bigint) {
+  return Number(blocksCount) * 12_000;
+}

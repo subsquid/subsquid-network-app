@@ -163,7 +163,7 @@ export function Workers() {
               Delegation capacity
             </SortableHeaderCell>
             <SortableHeaderCell sort={WorkerSortBy.JoinedAt} query={query} setQuery={setQuery}>
-              Registered
+              Created
             </SortableHeaderCell>
             <TableCell className="pinned"></TableCell>
           </TableRow>

@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 
+import { relativeDateFormat } from '@i18n';
 import {
   bytesFormatter,
   numberWithCommasFormatter,
@@ -20,6 +21,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
+import { useDebounce } from 'use-debounce';
 
 import { useNetworkSummary } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
@@ -109,29 +111,10 @@ function CurrentEpoch() {
   const { data, isLoading } = useNetworkSummary();
 
   const [epochEnd, setEpochEnd] = useState<number>(Date.now());
-  const [curTime, setCurTime] = useState(Date.now());
 
-  const epochEndsIn = useMemo(() => {
-    const secondsLeft = Math.ceil(Math.max(epochEnd - curTime, 0) / 1000);
-    const { hours, minutes, seconds } = {
-      hours: Math.floor((secondsLeft % (60 * 60 * 24)) / (60 * 60)),
-      minutes: Math.floor((secondsLeft % (60 * 60)) / 60),
-      seconds: Math.floor(secondsLeft % 60),
-    };
+  const [curTime] = useDebounce(Date.now(), 1000);
 
-    let res = '';
-    if (hours) {
-      res += `${hours}h `;
-    }
-    if (minutes) {
-      res += `${minutes}m `;
-    }
-    if (!hours) {
-      res += `${seconds}s`;
-    }
-
-    return res;
-  }, [curTime, epochEnd]);
+  const epochEndsIn = useMemo(() => relativeDateFormat(curTime, epochEnd), [curTime, epochEnd]);
 
   useEffect(() => {
     if (!data || !data.epoch) return;
@@ -142,14 +125,6 @@ function CurrentEpoch() {
 
     setEpochEnd(newEpochEnd);
   }, [data, epochEnd]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurTime(Date.now());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <SummarySection

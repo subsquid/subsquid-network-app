@@ -6,6 +6,29 @@ import {
 } from 'wagmi/codegen'
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ArbMulticall
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const arbMulticallAbi = [
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getCurrentBlockTimestamp',
+    outputs: [{ name: 'timestamp', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getL1BlockNumber',
+    outputs: [
+      { name: 'l1BlockNumber', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GatewayRegistry
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -569,11 +592,64 @@ export const workerRegistryAbi = [
     outputs: [],
     stateMutability: 'nonpayable',
   },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'lockPeriod',
+    outputs: [{ name: '', internalType: 'uint128', type: 'uint128' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'workerId', internalType: 'uint256', type: 'uint256' }],
+    name: 'getWorker',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct WorkerRegistration.Worker',
+        type: 'tuple',
+        components: [
+          { name: 'creator', internalType: 'address', type: 'address' },
+          { name: 'peerId', internalType: 'bytes', type: 'bytes' },
+          { name: 'bond', internalType: 'uint256', type: 'uint256' },
+          { name: 'registeredAt', internalType: 'uint128', type: 'uint128' },
+          { name: 'deregisteredAt', internalType: 'uint128', type: 'uint128' },
+          { name: 'metadata', internalType: 'string', type: 'string' },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link arbMulticallAbi}__
+ */
+export const useReadArbMulticall = /*#__PURE__*/ createUseReadContract({
+  abi: arbMulticallAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link arbMulticallAbi}__ and `functionName` set to `"getCurrentBlockTimestamp"`
+ */
+export const useReadArbMulticallGetCurrentBlockTimestamp =
+  /*#__PURE__*/ createUseReadContract({
+    abi: arbMulticallAbi,
+    functionName: 'getCurrentBlockTimestamp',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link arbMulticallAbi}__ and `functionName` set to `"getL1BlockNumber"`
+ */
+export const useReadArbMulticallGetL1BlockNumber =
+  /*#__PURE__*/ createUseReadContract({
+    abi: arbMulticallAbi,
+    functionName: 'getL1BlockNumber',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link gatewayRegistryAbi}__
@@ -1276,6 +1352,24 @@ export const useReadWorkerRegistryBondAmount =
   /*#__PURE__*/ createUseReadContract({
     abi: workerRegistryAbi,
     functionName: 'bondAmount',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link workerRegistryAbi}__ and `functionName` set to `"lockPeriod"`
+ */
+export const useReadWorkerRegistryLockPeriod =
+  /*#__PURE__*/ createUseReadContract({
+    abi: workerRegistryAbi,
+    functionName: 'lockPeriod',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link workerRegistryAbi}__ and `functionName` set to `"getWorker"`
+ */
+export const useReadWorkerRegistryGetWorker =
+  /*#__PURE__*/ createUseReadContract({
+    abi: workerRegistryAbi,
+    functionName: 'getWorker',
   })
 
 /**

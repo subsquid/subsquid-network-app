@@ -21,6 +21,7 @@ import {
   Worker,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
+import { useFixWorkers } from './useFixWorkers';
 
 // inherit API interface for internal class
 // export interface BlockchainApiWorker extends Omit<WorkerFragmentFragment, 'createdAt'> {
@@ -246,7 +247,7 @@ export function useMyWorkers({ sortBy, sortDir }: { sortBy: WorkerSortBy; sortDi
   const { isPending: isSettingsLoading } = useNetworkSettings();
 
   const enabled = !!address;
-  const { data, isLoading } = useMyWorkersQuery(
+  const { data: workers, isLoading } = useMyWorkersQuery(
     datasource,
     {
       address: address || '',
@@ -264,13 +265,15 @@ export function useMyWorkers({ sortBy, sortDir }: { sortBy: WorkerSortBy; sortDi
     },
   );
 
-  const workers = useMemo(() => {
-    return sortWorkers(data || [], sortBy, sortDir);
-  }, [data, sortBy, sortDir]);
+  const { data: fixedWorkers, isLoading: isFixedWorkersLoading } = useFixWorkers({ workers });
+
+  const data = useMemo(() => {
+    return sortWorkers(fixedWorkers || [], sortBy, sortDir);
+  }, [fixedWorkers, sortBy, sortDir]);
 
   return {
-    data: workers,
-    isLoading: enabled ? isSettingsLoading || isLoading : false,
+    data,
+    isLoading: isSettingsLoading || isLoading || isFixedWorkersLoading,
   };
 }
 
@@ -280,7 +283,7 @@ export function useWorkerByPeerId(peerId?: string) {
   const { isPending: isSettingsLoading } = useNetworkSettings();
   const { address } = useAccount();
 
-  const { data, isPending } = useWorkerByPeerIdQuery(
+  const { data: worker, isLoading } = useWorkerByPeerIdQuery(
     datasource,
     { peerId: peerId || '', address },
     {
@@ -300,9 +303,13 @@ export function useWorkerByPeerId(peerId?: string) {
     },
   );
 
+  const { data: fixedWorker, isLoading: isFixedWorkerLoading } = useFixWorkers({
+    workers: worker ? [worker] : undefined,
+  });
+
   return {
-    data,
-    isPending: enabled ? isSettingsLoading || isPending : false,
+    data: fixedWorker?.[0],
+    isLoading: isSettingsLoading || isLoading || isFixedWorkerLoading,
   };
 }
 
@@ -374,6 +381,10 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
     { address: address || '0x' },
   );
 
+  const { data: fixedDelegations, isLoading: isFixedDelegationsLoading } = useFixWorkers({
+    workers: delegationsQuery?.workers,
+  });
+
   const data = useMemo(() => {
     type W = SimplifyDeep<
       Pick<
@@ -395,7 +406,7 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
         }
     >;
 
-    const workers = delegationsQuery?.workers.map(w => {
+    const workers = fixedDelegations?.map(w => {
       const worker: W = {
         id: w.id,
         name: w.name,
@@ -436,10 +447,10 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
     });
 
     return sortWorkers(workers || [], sortBy, sortDir);
-  }, [delegationsQuery?.workers, sortBy, sortDir]);
+  }, [fixedDelegations, sortBy, sortDir]);
 
   return {
-    isLoading: isSettingsLoading || isDelegationsQueryLoading,
+    isLoading: isSettingsLoading || isDelegationsQueryLoading || isFixedDelegationsLoading,
     data,
   };
 }
