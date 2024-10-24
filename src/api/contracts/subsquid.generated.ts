@@ -405,6 +405,19 @@ export const stakingAbi = [
   {
     type: 'function',
     inputs: [
+      { name: 'staker', internalType: 'address', type: 'address' },
+      { name: 'worker', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'getDeposit',
+    outputs: [
+      { name: 'depositAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'withdrawAllowed', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
       { name: 'worker', internalType: 'uint256', type: 'uint256' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
     ],
@@ -1142,6 +1155,14 @@ export const useReadSoftCapCapedStakeAfterDelegation =
  */
 export const useReadStaking = /*#__PURE__*/ createUseReadContract({
   abi: stakingAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link stakingAbi}__ and `functionName` set to `"getDeposit"`
+ */
+export const useReadStakingGetDeposit = /*#__PURE__*/ createUseReadContract({
+  abi: stakingAbi,
+  functionName: 'getDeposit',
 })
 
 /**

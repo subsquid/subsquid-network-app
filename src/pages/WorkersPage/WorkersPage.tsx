@@ -120,7 +120,12 @@ export function MyWorkers() {
                         worker.status === WorkerStatus.Deregistering ? (
                           <WorkerWithdrawButton
                             worker={worker}
-                            source={worker.owner}
+                            source={{
+                              ...worker.owner,
+                              // FIXME: some types issue
+                              locked: (worker as any).locked,
+                              unlockedAt: (worker as any).unlockedAt,
+                            }}
                             disabled={worker.status !== WorkerStatus.Deregistered}
                           />
                         ) : (

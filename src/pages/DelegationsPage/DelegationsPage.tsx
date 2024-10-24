@@ -103,6 +103,7 @@ export function MyDelegations() {
                           type: d.owner.type,
                           balance: d.deposit,
                           locked: d.locked || false,
+                          unlockedAt: d.unlockedAt || '',
                         }))}
                         disabled={!worker.delegations.some(d => !d.locked)}
                       />

@@ -1,12 +1,15 @@
 import { useMemo } from 'react';
 
 import { getBlockTime } from '@lib/network';
+import { Simplify } from 'type-fest';
 import { useBlock, useReadContracts } from 'wagmi';
 
 import { Worker, WorkerStatus } from '@api/subsquid-network-squid';
 import { useContracts } from '@network/useContracts';
 
 import {
+  stakingAbi,
+  useReadRouterStaking,
   useReadRouterWorkerRegistration,
   useReadWorkerRegistryLockPeriod,
   workerRegistryAbi,
@@ -83,7 +86,7 @@ export function useFixWorkers<T extends Pick<Worker, 'id' | 'status'>>({
               locked: true,
               unlockedAt: new Date(
                 timestamp + getBlockTime(unlockBlock - lastL1Block.number),
-              ).toString(),
+              ).toISOString(),
             }
           : { locked: false };
 
@@ -104,5 +107,70 @@ export function useFixWorkers<T extends Pick<Worker, 'id' | 'status'>>({
       isLastL1BlockLoading ||
       isWorkersInfoLoading,
     data,
+  };
+}
+
+export function useFixDelegations<
+  T extends { id: string; delegations: { owner: { id: string } }[] },
+>({ workers }: { workers?: T[] }) {
+  const { ROUTER, CHAIN_ID_L1 } = useContracts();
+
+  const { data: stakingAddress, isLoading: isStakingAddressLoading } = useReadRouterStaking({
+    address: ROUTER,
+    query: { enabled: !!ROUTER },
+  });
+
+  const { data: lastL1Block, isLoading: isLastL1BlockLoading } = useBlock({
+    chainId: CHAIN_ID_L1,
+    includeTransactions: false,
+  });
+
+  const { data: delegationsInfo, isLoading: isDelegationsInfoLoading } = useReadContracts({
+    contracts: workers?.flatMap(worker =>
+      worker.delegations.map(
+        delegation =>
+          ({
+            abi: stakingAbi,
+            address: stakingAddress || '0x',
+            functionName: 'getDeposit',
+            args: [delegation.owner.id as `0x${string}`, worker.id],
+          }) as const,
+      ),
+    ),
+    allowFailure: false,
+    query: { enabled: !!workers && !!stakingAddress },
+  });
+
+  type R = Simplify<
+    Omit<T, 'delegations'> & {
+      delegations: Simplify<T['delegations'][number] & { unlockedAt?: string }>[];
+    }
+  >;
+
+  const data = useMemo(() => {
+    if (!delegationsInfo || !lastL1Block || !workers) return workers;
+
+    let index = 0;
+    return workers.map(
+      worker =>
+        ({
+          ...worker,
+          delegations: worker.delegations.map(delegation => {
+            const [, unlockBlock] = delegationsInfo[index++];
+            const timestamp = Number(lastL1Block.timestamp) * 1000;
+            const locked = lastL1Block.number < unlockBlock;
+            const unlockedAt = locked
+              ? new Date(timestamp + getBlockTime(unlockBlock - lastL1Block.number)).toISOString()
+              : undefined;
+
+            return { ...delegation, locked, unlockedAt };
+          }),
+        }) as R,
+    );
+  }, [delegationsInfo, lastL1Block, workers]);
+
+  return {
+    data,
+    isLoading: isDelegationsInfoLoading || isLastL1BlockLoading || isStakingAddressLoading,
   };
 }

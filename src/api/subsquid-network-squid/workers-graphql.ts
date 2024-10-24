@@ -8,6 +8,7 @@ import { PartialDeep, SimplifyDeep } from 'type-fest';
 import { useAccount } from '@network/useAccount.ts';
 
 import { useSquid } from './datasource';
+import { useFixDelegations, useFixWorkers } from './fixes';
 import {
   AccountType,
   Delegation,
@@ -21,7 +22,6 @@ import {
   Worker,
 } from './graphql';
 import { useNetworkSettings } from './settings-graphql';
-import { useFixWorkers } from './useFixWorkers';
 
 // inherit API interface for internal class
 // export interface BlockchainApiWorker extends Omit<WorkerFragmentFragment, 'createdAt'> {
@@ -381,8 +381,12 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
     { address: address || '0x' },
   );
 
-  const { data: fixedDelegations, isLoading: isFixedDelegationsLoading } = useFixWorkers({
+  const { data: fixedWorkers, isLoading: isFixedWorkersLoading } = useFixWorkers({
     workers: delegationsQuery?.workers,
+  });
+
+  const { data: fixedDelegations, isLoading: isFixedDelegationsLoading } = useFixDelegations({
+    workers: fixedWorkers,
   });
 
   const data = useMemo(() => {
@@ -402,6 +406,7 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
         Pick<WorkerExtended, 'delegationCapacity' | 'myDelegation' | 'myTotalDelegationReward'> & {
           delegations: (Pick<Delegation, 'deposit' | 'locked'> & {
             owner: { id: string; type: AccountType };
+            unlockedAt?: string;
           })[];
         }
     >;
@@ -434,12 +439,7 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
           .toFixed();
 
         worker.delegations.push({
-          deposit: d.deposit,
-          locked: d.locked,
-          owner: {
-            id: d.owner.id,
-            type: d.owner.type,
-          },
+          ...d,
         });
       });
 
@@ -450,7 +450,11 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
   }, [fixedDelegations, sortBy, sortDir]);
 
   return {
-    isLoading: isSettingsLoading || isDelegationsQueryLoading || isFixedDelegationsLoading,
+    isLoading:
+      isSettingsLoading ||
+      isDelegationsQueryLoading ||
+      isFixedWorkersLoading ||
+      isFixedDelegationsLoading,
     data,
   };
 }
@@ -536,7 +540,7 @@ export function useMyWorkerDelegations({
 }) {
   const { address } = useAccount();
   const datasource = useSquid();
-  const { data, isLoading } = useMyDelegationsQuery(
+  const { data: delegations, isLoading: isDelegationsLoading } = useMyDelegationsQuery(
     datasource,
     {
       workerId: peerId || '',
@@ -544,14 +548,18 @@ export function useMyWorkerDelegations({
     },
     {
       select: res => {
-        return res.workers[0]?.delegations || [];
+        return res.workers;
       },
       enabled,
     },
   );
 
+  const { data: fixedDelegations, isLoading: isFixedDelegationsLoading } = useFixDelegations({
+    workers: delegations,
+  });
+
   return {
-    isLoading: isLoading,
-    data,
+    isLoading: isDelegationsLoading || isFixedDelegationsLoading,
+    data: fixedDelegations?.[0]?.delegations,
   };
 }

@@ -117,6 +117,8 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                 type: d.owner.type,
                 balance: d.deposit,
                 locked: d.locked || false,
+                // FIXME: some issue with types
+                unlockedAt: (d as any).unlockedAt,
               }))}
               disabled={isLoading || !delegations?.some(d => !d.locked)}
             />
@@ -272,7 +274,12 @@ export const Worker = ({ backPath }: { backPath: string }) => {
               worker.status === WorkerStatus.Deregistering ? (
                 <WorkerWithdrawButton
                   worker={worker}
-                  source={worker.owner}
+                  source={{
+                    ...worker.owner,
+                    // FIXME: some types issue
+                    locked: (worker as any).locked,
+                    unlockedAt: (worker as any).unlockedAt,
+                  }}
                   disabled={worker.status !== WorkerStatus.Deregistered}
                 />
               ) : (

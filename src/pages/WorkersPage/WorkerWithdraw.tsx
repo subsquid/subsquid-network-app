@@ -24,10 +24,11 @@ export function WorkerWithdrawButton({
   sx,
 }: {
   sx?: SxProps;
-  worker: Pick<Worker, 'id' | 'status' | 'peerId' | 'locked'> & {
+  worker: Pick<Worker, 'id' | 'status' | 'peerId'>;
+  source: SourceWallet & {
+    locked: boolean;
     unlockedAt?: string;
   };
-  source: SourceWallet;
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -35,18 +36,19 @@ export function WorkerWithdrawButton({
   return (
     <>
       <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-        {worker.locked && (
+        {source.locked && (
           <Tooltip
-            title={`Unlocks in ${relativeDateFormat(Date.now(), worker.unlockedAt)} (${dateFormat(
-              worker.unlockedAt,
+            title={`Unlocks in ${relativeDateFormat(Date.now(), source.unlockedAt)} (${dateFormat(
+              source.unlockedAt,
               'dateTime',
             )})`}
             placement="top"
           >
             <Lock
               fontSize="small"
-              color="error"
+              // color="secondary"
               sx={{
+                color: '#3e4a5c',
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
@@ -61,7 +63,7 @@ export function WorkerWithdrawButton({
           onClick={() => setOpen(true)}
           variant="outlined"
           color="error"
-          disabled={disabled || worker.locked}
+          disabled={disabled || source.locked}
         >
           WITHDRAW
         </LoadingButton>

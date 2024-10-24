@@ -445,6 +445,7 @@ export const useCreateTheme = (mode: PaletteType) => {
                   // fontFamily,
                 },
 
+                borderRadius: 4,
                 backgroundColor: colors.background.paper,
               },
               inputHiddenLabel: {

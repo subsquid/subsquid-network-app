@@ -14,13 +14,7 @@ import { useDebounce } from 'use-debounce';
 import { stakingAbi, useReadRouterStaking } from '@api/contracts';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
-import {
-  Account,
-  AccountType,
-  Delegation,
-  SourceWalletWithBalance,
-  Worker,
-} from '@api/subsquid-network-squid';
+import { AccountType, SourceWalletWithBalance, Worker } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
@@ -32,6 +26,7 @@ import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegat
 
 export type SourceWalletWithDelegation = SourceWalletWithBalance & {
   locked: boolean;
+  unlockedAt?: string;
 };
 
 export const undelegateSchema = yup.object({
@@ -52,21 +47,89 @@ export function WorkerUndelegate({
   sources,
 }: {
   sources?: SourceWalletWithDelegation[];
-  worker?: Pick<Worker, 'id'> & {
-    delegations: (Pick<Delegation, 'deposit' | 'locked'> & {
-      owner: Pick<Account, 'id' | 'type'>;
-      unlockedAt?: string;
-    })[];
-  };
+  worker?: Pick<Worker, 'id'>;
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const handleOpen = (e: React.UIEvent) => {
-    e.stopPropagation();
-    setOpen(true);
-  };
-  const handleClose = () => setOpen(false);
 
+  const isSourceDisabled = (source: SourceWalletWithDelegation) =>
+    source.balance === '0' || source.locked;
+
+  const isLocked = useMemo(() => !!sources?.length && !sources?.some(d => !d.locked), [sources]);
+
+  const [curTimestamp] = useDebounce(Date.now(), 1000);
+  const { unlockedAt, timeLeft } = useMemo(() => {
+    const min = sources?.reduce(
+      (r, d) => {
+        if (!d.unlockedAt) return r;
+
+        const ms = new Date(d.unlockedAt).getTime();
+        return !r || ms < r ? ms : r;
+      },
+      undefined as number | undefined,
+    );
+
+    return {
+      unlockedAt: min ? new Date(min).toISOString() : undefined,
+      timeLeft: min ? relativeDateFormat(curTimestamp, min) : undefined,
+    };
+  }, [curTimestamp, sources]);
+
+  return (
+    <>
+      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+        {isLocked && (
+          <Tooltip
+            title={unlockedAt && `Unlocks in ${timeLeft} (${dateFormat(unlockedAt, 'dateTime')})`}
+            placement="top"
+          >
+            <Lock
+              fontSize="small"
+              sx={{
+                color: '#3e4a5c',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 1,
+              }}
+            />
+          </Tooltip>
+        )}
+        <LoadingButton
+          loading={open}
+          onClick={() => setOpen(true)}
+          variant="outlined"
+          color="error"
+          disabled={disabled || isLocked}
+        >
+          UNDELEGATE
+        </LoadingButton>
+      </Box>
+      <WorkerUndelegateDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        worker={worker}
+        sources={sources}
+        isSourceDisabled={isSourceDisabled}
+      />
+    </>
+  );
+}
+
+function WorkerUndelegateDialog({
+  open,
+  onClose,
+  worker,
+  sources,
+  isSourceDisabled,
+}: {
+  open: boolean;
+  onClose: () => void;
+  worker?: Pick<Worker, 'id'>;
+  sources?: SourceWalletWithDelegation[];
+  isSourceDisabled: (source: SourceWalletWithDelegation) => boolean;
+}) {
   const { setWaitHeight } = useSquidHeight();
 
   const contracts = useContracts();
@@ -76,9 +139,6 @@ export function WorkerUndelegate({
     address: contracts.ROUTER,
   });
 
-  const isSourceDisabled = (source: SourceWalletWithDelegation) =>
-    source.balance === '0' || source.locked;
-
   const initialValues = useMemo(() => {
     const source = sources?.find(c => !isSourceDisabled(c)) || sources?.[0];
 
@@ -87,7 +147,7 @@ export function WorkerUndelegate({
       amount: '0',
       max: fromSqd(source?.balance).toString(),
     };
-  }, [sources]);
+  }, [sources, isSourceDisabled]);
 
   const formik = useFormik({
     initialValues,
@@ -118,7 +178,7 @@ export function WorkerUndelegate({
         });
         setWaitHeight(receipt.blockNumber, []);
 
-        handleClose();
+        onClose();
       } catch (e) {
         toast.error(errorMessage(e));
       }
@@ -132,130 +192,74 @@ export function WorkerUndelegate({
     enabled: open && !!worker,
   });
 
-  // const source = useMemo(() => {
-  //   if (!worker) return;
-
-  //   return (
-  //     (formik.values.source
-  //       ? worker?.delegations.find(c => c.owner.id === formik.values.source)
-  //       : worker?.delegations.find(c => fromSqd(c.deposit).gte(0))) || worker?.delegations?.[0]
-  //   );
-  // }, [formik.values.source, worker]);
-
-  // const canUndelegate = useMemo(() => {
-  //   return !!worker?.delegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
-  // }, [worker?.delegations]);
-
-  const isLocked = useMemo(
-    () => !!worker?.delegations.length && !worker.delegations.some(d => !d.locked),
-    [worker],
-  );
-  const unlockedAt = useMemo(() => {
-    return '';
-  }, []);
-
   return (
-    <>
-      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-        {isLocked && (
-          <Tooltip
-            title={`Unlocks in ${relativeDateFormat(Date.now(), unlockedAt)} (${dateFormat(
-              unlockedAt,
-              'dateTime',
-            )})`}
-            placement="top"
-          >
-            <Lock
-              fontSize="small"
-              color="error"
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 1,
-              }}
-            />
-          </Tooltip>
-        )}
-        <LoadingButton
-          loading={open}
-          onClick={() => setOpen(true)}
-          variant="outlined"
-          color="error"
-          disabled={disabled || isLocked}
-        >
-          UNDELEGATE
-        </LoadingButton>
-      </Box>
-      <ContractCallDialog
-        title="Undelegate worker"
-        open={open}
-        loading={isPending}
-        onResult={confirmed => {
-          if (!confirmed) return handleClose();
+    <ContractCallDialog
+      title="Undelegate worker"
+      open={open}
+      loading={isPending}
+      onResult={confirmed => {
+        if (!confirmed) return onClose();
 
-          formik.handleSubmit();
-        }}
-        confirmColor="error"
-      >
-        <Form onSubmit={formik.handleSubmit}>
-          <FormRow>
-            <FormikSelect
-              showErrorOnlyOfTouched
-              options={
-                sources?.map(s => {
-                  return {
-                    label: <SourceWalletOption source={s} />,
-                    value: s.id,
-                    disabled: isSourceDisabled(s),
-                  };
-                }) || []
-              }
-              id="source"
-              formik={formik}
-              onChange={e => {
-                const wallet = worker?.delegations.find(s => s.owner.id === e.target.value);
-                if (!wallet) return;
+        formik.handleSubmit();
+      }}
+      confirmColor="error"
+    >
+      <Form onSubmit={formik.handleSubmit}>
+        <FormRow>
+          <FormikSelect
+            showErrorOnlyOfTouched
+            options={
+              sources?.map(s => {
+                return {
+                  label: <SourceWalletOption source={s} />,
+                  value: s.id,
+                  disabled: isSourceDisabled(s),
+                };
+              }) || []
+            }
+            id="source"
+            formik={formik}
+            onChange={e => {
+              const wallet = sources?.find(s => s.id === e.target.value);
+              if (!wallet) return;
 
-                formik.setFieldValue('source', wallet.owner.id);
-                formik.setFieldValue('max', fromSqd(wallet.deposit).toFixed());
-              }}
-            />
-          </FormRow>
-          <FormRow>
-            <FormikTextInput
-              showErrorOnlyOfTouched
-              id="amount"
-              label="Amount"
-              formik={formik}
-              autoComplete="off"
-              InputProps={{
-                endAdornment: (
-                  <Chip
-                    clickable
-                    disabled={formik.values.max === formik.values.amount}
-                    onClick={() => {
-                      formik.setValues({
-                        ...formik.values,
-                        amount: formik.values.max,
-                      });
-                    }}
-                    label="Max"
-                  />
-                ),
-              }}
-            />
-          </FormRow>
-          <FormDivider />
-          <Stack direction="row" justifyContent="space-between" alignContent="center">
-            <Box>Expected APR</Box>
-            <HelpTooltip title={EXPECTED_APR_TIP}>
-              <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
-            </HelpTooltip>
-          </Stack>
-        </Form>
-      </ContractCallDialog>
-    </>
+              formik.setFieldValue('source', wallet.id);
+              formik.setFieldValue('max', fromSqd(wallet.balance).toFixed());
+            }}
+          />
+        </FormRow>
+        <FormRow>
+          <FormikTextInput
+            showErrorOnlyOfTouched
+            id="amount"
+            label="Amount"
+            formik={formik}
+            autoComplete="off"
+            InputProps={{
+              endAdornment: (
+                <Chip
+                  clickable
+                  disabled={formik.values.max === formik.values.amount}
+                  onClick={() => {
+                    formik.setValues({
+                      ...formik.values,
+                      amount: formik.values.max,
+                    });
+                  }}
+                  label="Max"
+                />
+              ),
+            }}
+          />
+        </FormRow>
+        <FormDivider />
+        <Stack direction="row" justifyContent="space-between" alignContent="center">
+          <Box>Expected APR</Box>
+          <HelpTooltip title={EXPECTED_APR_TIP}>
+            <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+          </HelpTooltip>
+        </Stack>
+      </Form>
+    </ContractCallDialog>
   );
 }

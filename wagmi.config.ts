@@ -192,6 +192,19 @@ export default defineConfig({
       abi: [
         {
           type: 'function',
+          name: 'getDeposit',
+          inputs: [
+            { name: 'staker', type: 'address', internalType: 'address' },
+            { name: 'worker', type: 'uint256', internalType: 'uint256' },
+          ],
+          outputs: [
+            { name: 'depositAmount', type: 'uint256', internalType: 'uint256' },
+            { name: 'withdrawAllowed', type: 'uint256', internalType: 'uint256' },
+          ],
+          stateMutability: 'view',
+        },
+        {
+          type: 'function',
           name: 'deposit',
           inputs: [
             {
