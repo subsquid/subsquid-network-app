@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
 import { dateFormat, relativeDateFormat } from '@i18n';
-import { percentFormatter } from '@lib/formatters/formatters';
+import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
 import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
@@ -254,10 +254,10 @@ function WorkerUndelegateDialog({
         </FormRow>
         <FormDivider />
         <Stack direction="row" justifyContent="space-between" alignContent="center">
-          <Box>Expected APR</Box>
           <HelpTooltip title={EXPECTED_APR_TIP}>
-            <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+            <Box>Expected APR</Box>
           </HelpTooltip>
+          <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
         </Stack>
       </Form>
     </ContractCallDialog>

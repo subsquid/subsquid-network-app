@@ -1,7 +1,7 @@
 import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
 import { fromSqd } from '@lib/network';
 import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 import {
   SortDir,
@@ -49,7 +49,13 @@ export function MyWorkers() {
           <>
             <SquaredChip label="My Workers" color="primary" />
             <Stack direction="row" spacing={1}>
-              <Button color="secondary" variant="outlined">
+              <Button
+                color="secondary"
+                variant="outlined"
+                component={Link}
+                target="_blank"
+                to="https://docs.sqd.dev/subsquid-network/participate/worker/"
+              >
                 LEARN MORE
               </Button>
               <AddWorkerButton sources={sources} disabled={isLoading} />

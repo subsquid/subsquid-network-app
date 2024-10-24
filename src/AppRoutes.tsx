@@ -42,6 +42,7 @@ export const AppRoutes = () => {
           <Route element={<GatewaysPage />} index />
           <Route element={<Gateway backPath="/portals" />} path=":peerId" />
         </Route>
+        <Route path="/gateways" element={<Navigate to="/portals" replace={true} />} />
         <Route element={<Navigate to="/dashboard" replace={true} />} path="*" />
       </Route>
     </Routes>

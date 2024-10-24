@@ -288,10 +288,6 @@ fragment GatewayFragment on Gateway {
     id
     type
   }
-  realOwner {
-    id
-    type
-  }
 }
 
 query gatewayByPeerId($peerId: String!) {
@@ -305,10 +301,6 @@ fragment GatewayStakeFragment on GatewayStake {
     id
     type
   }
-  realOwner {
-    id
-    type
-  }
   autoExtension
   amount
   computationUnits
@@ -319,7 +311,7 @@ fragment GatewayStakeFragment on GatewayStake {
 }
 
 query myGateways($address: String!) {
-  gateways(where: { realOwner: { id_eq: $address }, status_not_eq: DEREGISTERED }) {
+  gateways(where: { owner: { id_eq: $address }, status_not_eq: DEREGISTERED }) {
     ...GatewayFragment
   }
 }

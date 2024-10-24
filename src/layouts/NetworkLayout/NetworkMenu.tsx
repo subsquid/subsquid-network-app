@@ -18,6 +18,7 @@ import { Button, styled } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useIsWorkerOperator } from '@api/subsquid-network-squid';
+import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { useWorkersChatUrl } from '@network/useWorkersChat';
 
 interface NetworkMenuProps {
@@ -131,12 +132,14 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
         onClick={onItemClick}
         path="/delegations"
       />
-      <Item
-        LeftIcon={active => (active ? <SensorDoor /> : <SensorDoorOutlined />)}
-        label="Portals"
-        onClick={onItemClick}
-        path="/portals"
-      />
+      {demoFeaturesEnabled() && (
+        <Item
+          LeftIcon={active => (active ? <SensorDoor /> : <SensorDoorOutlined />)}
+          label="Portals"
+          onClick={onItemClick}
+          path="/portals"
+        />
+      )}
 
       <div style={{ flex: 1 }} />
 

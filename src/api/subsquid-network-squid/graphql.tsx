@@ -5651,7 +5651,6 @@ export type GatewayFragmentFragment = {
   website?: string;
   createdAt: string;
   owner: { __typename?: 'Account'; id: string; type: AccountType };
-  realOwner: { __typename?: 'Account'; id: string; type: AccountType };
 };
 
 export type GatewayByPeerIdQueryVariables = Exact<{
@@ -5671,7 +5670,6 @@ export type GatewayByPeerIdQuery = {
     website?: string;
     createdAt: string;
     owner: { __typename?: 'Account'; id: string; type: AccountType };
-    realOwner: { __typename?: 'Account'; id: string; type: AccountType };
   };
 };
 
@@ -5685,7 +5683,6 @@ export type GatewayStakeFragmentFragment = {
   lockStart?: number;
   lockEnd?: number;
   owner: { __typename?: 'Account'; id: string; type: AccountType };
-  realOwner: { __typename?: 'Account'; id: string; type: AccountType };
 };
 
 export type MyGatewaysQueryVariables = Exact<{
@@ -5705,7 +5702,6 @@ export type MyGatewaysQuery = {
     website?: string;
     createdAt: string;
     owner: { __typename?: 'Account'; id: string; type: AccountType };
-    realOwner: { __typename?: 'Account'; id: string; type: AccountType };
   }>;
 };
 
@@ -5725,7 +5721,6 @@ export type MyGatewayStakesQuery = {
     lockStart?: number;
     lockEnd?: number;
     owner: { __typename?: 'Account'; id: string; type: AccountType };
-    realOwner: { __typename?: 'Account'; id: string; type: AccountType };
   }>;
   networkStats: {
     __typename?: 'NetworkStats';
@@ -5881,19 +5876,11 @@ export const GatewayFragmentFragmentDoc = `
     id
     type
   }
-  realOwner {
-    id
-    type
-  }
 }
     `;
 export const GatewayStakeFragmentFragmentDoc = `
     fragment GatewayStakeFragment on GatewayStake {
   owner {
-    id
-    type
-  }
-  realOwner {
     id
     type
   }
@@ -6469,7 +6456,7 @@ export const useGatewayByPeerIdQuery = <TData = GatewayByPeerIdQuery, TError = u
 
 export const MyGatewaysDocument = `
     query myGateways($address: String!) {
-  gateways(where: {realOwner: {id_eq: $address}, status_not_eq: DEREGISTERED}) {
+  gateways(where: {owner: {id_eq: $address}, status_not_eq: DEREGISTERED}) {
     ...GatewayFragment
   }
 }
