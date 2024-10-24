@@ -88,9 +88,9 @@ export function WorkerUndelegate({
               sx={{
                 color: '#3e4a5c',
                 position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
+                top: '0px',
+                right: '0px',
+                transform: 'translate(0%, -25%)',
                 zIndex: 1,
               }}
             />
