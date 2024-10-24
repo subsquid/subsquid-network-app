@@ -1,23 +1,33 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { percentFormatter } from '@lib/formatters/formatters';
+import { dateFormat, relativeDateFormat } from '@i18n';
+import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
+import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Box, Chip, Stack } from '@mui/material';
+import { Box, Chip, Stack, Tooltip } from '@mui/material';
 import * as yup from '@schema';
-import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
+import toast from 'react-hot-toast';
 import { useDebounce } from 'use-debounce';
 
-import { useWorkerUndelegate } from '@api/contracts/staking';
-import { Account, Delegation, Worker } from '@api/subsquid-network-squid';
-import { BlockchainContractError } from '@components/BlockchainContractError';
+import { stakingAbi, useReadRouterStaking } from '@api/contracts';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
+import { AccountType, SourceWalletWithBalance, Worker } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useContracts } from '@network/useContracts';
 
 import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegate';
+
+export type SourceWalletWithDelegation = SourceWalletWithBalance & {
+  locked: boolean;
+  unlockedAt?: string;
+};
 
 export const undelegateSchema = yup.object({
   source: yup.string().label('Source').trim().required().typeError('${path} is invalid'),
@@ -34,69 +44,143 @@ export const undelegateSchema = yup.object({
 export function WorkerUndelegate({
   worker,
   disabled,
+  sources,
 }: {
-  worker?: Pick<Worker, 'id'> & {
-    delegations: (Pick<Delegation, 'deposit' | 'locked'> & {
-      owner: Pick<Account, 'id' | 'type'>;
-    })[];
-  };
+  sources?: SourceWalletWithDelegation[];
+  worker?: Pick<Worker, 'id'>;
   disabled?: boolean;
 }) {
-  const { undelegateFromWorker, error, isPending } = useWorkerUndelegate();
-
   const [open, setOpen] = useState(false);
-  const handleOpen = (e: React.UIEvent) => {
-    e.stopPropagation();
-    setOpen(true);
-  };
-  const handleClose = () => setOpen(false);
 
-  const options = useMemo(
-    () =>
-      (worker?.delegations || [])
-        .filter(s => !BigNumber(s.deposit).isZero())
-        .map(s => {
-          return {
-            label: (
-              <SourceWalletOption
-                source={{
-                  id: s.owner.id,
-                  balance: s.deposit,
-                  type: s.owner.type,
-                }}
-              />
-            ),
-            value: s.owner.id,
-          };
-        }),
-    [worker?.delegations],
+  const isSourceDisabled = (source: SourceWalletWithDelegation) =>
+    source.balance === '0' || source.locked;
+
+  const isLocked = useMemo(() => !!sources?.length && !sources?.some(d => !d.locked), [sources]);
+
+  const [curTimestamp] = useDebounce(Date.now(), 1000);
+  const { unlockedAt, timeLeft } = useMemo(() => {
+    const min = sources?.reduce(
+      (r, d) => {
+        if (!d.unlockedAt) return r;
+
+        const ms = new Date(d.unlockedAt).getTime();
+        return !r || ms < r ? ms : r;
+      },
+      undefined as number | undefined,
+    );
+
+    return {
+      unlockedAt: min ? new Date(min).toISOString() : undefined,
+      timeLeft: min ? relativeDateFormat(curTimestamp, min) : undefined,
+    };
+  }, [curTimestamp, sources]);
+
+  return (
+    <>
+      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+        {isLocked && (
+          <Tooltip
+            title={unlockedAt && `Unlocks in ${timeLeft} (${dateFormat(unlockedAt, 'dateTime')})`}
+            placement="top"
+          >
+            <Lock
+              fontSize="small"
+              sx={{
+                color: '#3e4a5c',
+                position: 'absolute',
+                top: '0px',
+                right: '0px',
+                transform: 'translate(0%, -25%)',
+                zIndex: 1,
+              }}
+            />
+          </Tooltip>
+        )}
+        <LoadingButton
+          loading={open}
+          onClick={() => setOpen(true)}
+          variant="outlined"
+          color="error"
+          disabled={disabled || isLocked}
+        >
+          UNDELEGATE
+        </LoadingButton>
+      </Box>
+      <WorkerUndelegateDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        worker={worker}
+        sources={sources}
+        isSourceDisabled={isSourceDisabled}
+      />
+    </>
   );
+}
+
+function WorkerUndelegateDialog({
+  open,
+  onClose,
+  worker,
+  sources,
+  isSourceDisabled,
+}: {
+  open: boolean;
+  onClose: () => void;
+  worker?: Pick<Worker, 'id'>;
+  sources?: SourceWalletWithDelegation[];
+  isSourceDisabled: (source: SourceWalletWithDelegation) => boolean;
+}) {
+  const { setWaitHeight } = useSquidHeight();
+
+  const contracts = useContracts();
+  const { writeTransactionAsync, isPending } = useWriteSQDTransaction();
+
+  const stakingAddress = useReadRouterStaking({
+    address: contracts.ROUTER,
+  });
+
+  const initialValues = useMemo(() => {
+    const source = sources?.find(c => !isSourceDisabled(c)) || sources?.[0];
+
+    return {
+      source: source?.id || '',
+      amount: '0',
+      max: fromSqd(source?.balance).toString(),
+    };
+  }, [sources, isSourceDisabled]);
 
   const formik = useFormik({
-    initialValues: {
-      source: '',
-      amount: '',
-      max: '0',
-    },
+    initialValues,
     validationSchema: undelegateSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
+    enableReinitialize: true,
 
     onSubmit: async values => {
-      const wallet = worker?.delegations.find(w => w?.owner.id === values.source);
-      if (!wallet || !worker) return;
+      if (!stakingAddress.data) return;
+      if (!worker) return;
 
-      const { failedReason } = await undelegateFromWorker({
-        worker,
-        amount: toSqd(values.amount),
-        wallet: {
-          id: wallet.owner.id,
-          type: wallet.owner.type,
-        },
-      });
-      if (!failedReason) {
-        handleClose();
+      try {
+        const { amount, source: sourceId } = undelegateSchema.cast(values);
+
+        const source = sources?.find(w => w?.id === sourceId);
+        if (!source) return;
+
+        const sqdAmount = BigInt(toSqd(amount));
+
+        const receipt = await writeTransactionAsync({
+          abi: stakingAbi,
+          address: stakingAddress.data,
+          functionName: 'withdraw',
+          args: [BigInt(worker.id), sqdAmount],
+          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+        });
+        setWaitHeight(receipt.blockNumber, []);
+
+        onClose();
+      } catch (e) {
+        toast.error(errorMessage(e));
       }
     },
   });
@@ -108,104 +192,74 @@ export function WorkerUndelegate({
     enabled: open && !!worker,
   });
 
-  const source = useMemo(() => {
-    if (!worker) return;
-
-    return (
-      (formik.values.source
-        ? worker?.delegations.find(c => c.owner.id === formik.values.source)
-        : worker?.delegations.find(c => fromSqd(c.deposit).gte(0))) || worker?.delegations?.[0]
-    );
-  }, [formik.values.source, worker]);
-
-  useEffect(() => {
-    if (!source) return;
-
-    formik.setValues({
-      ...formik.values,
-      source: source.owner.id,
-      max: fromSqd(source.deposit).toFixed(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source]);
-
-  const canUndelegate = useMemo(() => {
-    return !!worker?.delegations.some(d => !d.locked && BigNumber(d.deposit).gt(0));
-  }, [worker?.delegations]);
-
   return (
-    <>
-      <LoadingButton
-        disabled={disabled || !canUndelegate}
-        color="error"
-        onClick={handleOpen}
-        variant="outlined"
-      >
-        UNDELEGATE
-      </LoadingButton>
-      <ContractCallDialog
-        title="Undelegate"
-        open={open}
-        loading={isPending}
-        onResult={confirmed => {
-          if (!confirmed) return handleClose();
+    <ContractCallDialog
+      title="Undelegate worker"
+      open={open}
+      loading={isPending}
+      onResult={confirmed => {
+        if (!confirmed) return onClose();
 
-          formik.handleSubmit();
-        }}
-        confirmColor="error"
-      >
-        <Form onSubmit={formik.handleSubmit}>
-          <FormRow>
-            <FormikSelect
-              disabled={!options.length}
-              showErrorOnlyOfTouched
-              options={options}
-              id="source"
-              formik={formik}
-              onChange={e => {
-                const wallet = worker?.delegations.find(s => s.owner.id === e.target.value);
-                if (!wallet) return;
+        formik.handleSubmit();
+      }}
+      confirmColor="error"
+    >
+      <Form onSubmit={formik.handleSubmit}>
+        <FormRow>
+          <FormikSelect
+            showErrorOnlyOfTouched
+            options={
+              sources?.map(s => {
+                return {
+                  label: <SourceWalletOption source={s} />,
+                  value: s.id,
+                  disabled: isSourceDisabled(s),
+                };
+              }) || []
+            }
+            id="source"
+            formik={formik}
+            onChange={e => {
+              const wallet = sources?.find(s => s.id === e.target.value);
+              if (!wallet) return;
 
-                formik.setFieldValue('source', wallet.owner.id);
-                formik.setFieldValue('max', fromSqd(wallet.deposit).toFixed());
-              }}
-            />
-          </FormRow>
-          <FormRow>
-            <FormikTextInput
-              showErrorOnlyOfTouched
-              id="amount"
-              label="Amount"
-              formik={formik}
-              autoComplete="off"
-              InputProps={{
-                endAdornment: (
-                  <Chip
-                    clickable
-                    disabled={formik.values.max === formik.values.amount}
-                    onClick={() => {
-                      formik.setValues({
-                        ...formik.values,
-                        amount: formik.values.max,
-                      });
-                    }}
-                    label="Max"
-                  />
-                ),
-              }}
-            />
-          </FormRow>
-          <FormDivider />
-          <Stack direction="row" justifyContent="space-between" alignContent="center">
+              formik.setFieldValue('source', wallet.id);
+              formik.setFieldValue('max', fromSqd(wallet.balance).toFixed());
+            }}
+          />
+        </FormRow>
+        <FormRow>
+          <FormikTextInput
+            showErrorOnlyOfTouched
+            id="amount"
+            label="Amount"
+            formik={formik}
+            autoComplete="off"
+            InputProps={{
+              endAdornment: (
+                <Chip
+                  clickable
+                  disabled={formik.values.max === formik.values.amount}
+                  onClick={() => {
+                    formik.setValues({
+                      ...formik.values,
+                      amount: formik.values.max,
+                    });
+                  }}
+                  label="Max"
+                />
+              ),
+            }}
+          />
+        </FormRow>
+        <FormDivider />
+        <Stack direction="row" justifyContent="space-between" alignContent="center">
+          <HelpTooltip title={EXPECTED_APR_TIP}>
             <Box>Expected APR</Box>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
-              <HelpTooltip title={EXPECTED_APR_TIP} />
-            </Stack>
-          </Stack>
-          <BlockchainContractError error={error} />
-        </Form>
-      </ContractCallDialog>
-    </>
+          </HelpTooltip>
+          <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+        </Stack>
+      </Form>
+    </ContractCallDialog>
   );
 }

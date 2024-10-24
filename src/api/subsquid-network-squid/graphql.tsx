@@ -53,7 +53,7 @@ export type Account = {
   claimableDelegationCount: Scalars['Int']['output'];
   claims: Array<Claim>;
   delegations: Array<Delegation>;
-  gatewayOperator?: Maybe<GatewayOperator>;
+  delegations2: Array<Delegation>;
   gatewayStakes: Array<GatewayStake>;
   gateways: Array<Gateway>;
   id: Scalars['String']['output'];
@@ -64,6 +64,7 @@ export type Account = {
   transfersTo: Array<Transfer>;
   type: AccountType;
   workers: Array<Worker>;
+  workers2: Array<Worker>;
 };
 
 export type AccountClaimsArgs = {
@@ -74,6 +75,13 @@ export type AccountClaimsArgs = {
 };
 
 export type AccountDelegationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<DelegationOrderByInput>>;
+  where?: InputMaybe<DelegationWhereInput>;
+};
+
+export type AccountDelegations2Args = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<DelegationOrderByInput>>;
@@ -129,6 +137,13 @@ export type AccountWorkersArgs = {
   where?: InputMaybe<WorkerWhereInput>;
 };
 
+export type AccountWorkers2Args = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<WorkerOrderByInput>>;
+  where?: InputMaybe<WorkerWhereInput>;
+};
+
 export type AccountEdge = {
   __typename?: 'AccountEdge';
   cursor: Scalars['String']['output'];
@@ -148,18 +163,6 @@ export enum AccountOrderByInput {
   ClaimableDelegationCountDesc = 'claimableDelegationCount_DESC',
   ClaimableDelegationCountDescNullsFirst = 'claimableDelegationCount_DESC_NULLS_FIRST',
   ClaimableDelegationCountDescNullsLast = 'claimableDelegationCount_DESC_NULLS_LAST',
-  GatewayOperatorAutoExtensionAsc = 'gatewayOperator_autoExtension_ASC',
-  GatewayOperatorAutoExtensionAscNullsFirst = 'gatewayOperator_autoExtension_ASC_NULLS_FIRST',
-  GatewayOperatorAutoExtensionAscNullsLast = 'gatewayOperator_autoExtension_ASC_NULLS_LAST',
-  GatewayOperatorAutoExtensionDesc = 'gatewayOperator_autoExtension_DESC',
-  GatewayOperatorAutoExtensionDescNullsFirst = 'gatewayOperator_autoExtension_DESC_NULLS_FIRST',
-  GatewayOperatorAutoExtensionDescNullsLast = 'gatewayOperator_autoExtension_DESC_NULLS_LAST',
-  GatewayOperatorIdAsc = 'gatewayOperator_id_ASC',
-  GatewayOperatorIdAscNullsFirst = 'gatewayOperator_id_ASC_NULLS_FIRST',
-  GatewayOperatorIdAscNullsLast = 'gatewayOperator_id_ASC_NULLS_LAST',
-  GatewayOperatorIdDesc = 'gatewayOperator_id_DESC',
-  GatewayOperatorIdDescNullsFirst = 'gatewayOperator_id_DESC_NULLS_FIRST',
-  GatewayOperatorIdDescNullsLast = 'gatewayOperator_id_DESC_NULLS_LAST',
   IdAsc = 'id_ASC',
   IdAscNullsFirst = 'id_ASC_NULLS_FIRST',
   IdAscNullsLast = 'id_ASC_NULLS_LAST',
@@ -342,11 +345,12 @@ export type AccountWhereInput = {
   claims_every?: InputMaybe<ClaimWhereInput>;
   claims_none?: InputMaybe<ClaimWhereInput>;
   claims_some?: InputMaybe<ClaimWhereInput>;
+  delegations2_every?: InputMaybe<DelegationWhereInput>;
+  delegations2_none?: InputMaybe<DelegationWhereInput>;
+  delegations2_some?: InputMaybe<DelegationWhereInput>;
   delegations_every?: InputMaybe<DelegationWhereInput>;
   delegations_none?: InputMaybe<DelegationWhereInput>;
   delegations_some?: InputMaybe<DelegationWhereInput>;
-  gatewayOperator?: InputMaybe<GatewayOperatorWhereInput>;
-  gatewayOperator_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   gatewayStakes_every?: InputMaybe<GatewayStakeWhereInput>;
   gatewayStakes_none?: InputMaybe<GatewayStakeWhereInput>;
   gatewayStakes_some?: InputMaybe<GatewayStakeWhereInput>;
@@ -389,6 +393,9 @@ export type AccountWhereInput = {
   type_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   type_not_eq?: InputMaybe<AccountType>;
   type_not_in?: InputMaybe<Array<AccountType>>;
+  workers2_every?: InputMaybe<WorkerWhereInput>;
+  workers2_none?: InputMaybe<WorkerWhereInput>;
+  workers2_some?: InputMaybe<WorkerWhereInput>;
   workers_every?: InputMaybe<WorkerWhereInput>;
   workers_none?: InputMaybe<WorkerWhereInput>;
   workers_some?: InputMaybe<WorkerWhereInput>;
@@ -1808,8 +1815,9 @@ export type Gateway = {
   endpointUrl?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   name?: Maybe<Scalars['String']['output']>;
-  operator?: Maybe<GatewayOperator>;
-  owner?: Maybe<Account>;
+  owner: Account;
+  realOwner: Account;
+  stake: GatewayStake;
   status: GatewayStatus;
   statusHistory: Array<GatewayStatusChange>;
   website?: Maybe<Scalars['String']['output']>;
@@ -1826,193 +1834,6 @@ export type GatewayEdge = {
   __typename?: 'GatewayEdge';
   cursor: Scalars['String']['output'];
   node: Gateway;
-};
-
-export type GatewayOperator = {
-  __typename?: 'GatewayOperator';
-  account: Account;
-  autoExtension: Scalars['Boolean']['output'];
-  gateways: Array<Gateway>;
-  id: Scalars['String']['output'];
-  pendingStake?: Maybe<GatewayStake>;
-  stake?: Maybe<GatewayStake>;
-};
-
-export type GatewayOperatorGatewaysArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Array<GatewayOrderByInput>>;
-  where?: InputMaybe<GatewayWhereInput>;
-};
-
-export type GatewayOperatorEdge = {
-  __typename?: 'GatewayOperatorEdge';
-  cursor: Scalars['String']['output'];
-  node: GatewayOperator;
-};
-
-export enum GatewayOperatorOrderByInput {
-  AccountBalanceAsc = 'account_balance_ASC',
-  AccountBalanceAscNullsFirst = 'account_balance_ASC_NULLS_FIRST',
-  AccountBalanceAscNullsLast = 'account_balance_ASC_NULLS_LAST',
-  AccountBalanceDesc = 'account_balance_DESC',
-  AccountBalanceDescNullsFirst = 'account_balance_DESC_NULLS_FIRST',
-  AccountBalanceDescNullsLast = 'account_balance_DESC_NULLS_LAST',
-  AccountClaimableDelegationCountAsc = 'account_claimableDelegationCount_ASC',
-  AccountClaimableDelegationCountAscNullsFirst = 'account_claimableDelegationCount_ASC_NULLS_FIRST',
-  AccountClaimableDelegationCountAscNullsLast = 'account_claimableDelegationCount_ASC_NULLS_LAST',
-  AccountClaimableDelegationCountDesc = 'account_claimableDelegationCount_DESC',
-  AccountClaimableDelegationCountDescNullsFirst = 'account_claimableDelegationCount_DESC_NULLS_FIRST',
-  AccountClaimableDelegationCountDescNullsLast = 'account_claimableDelegationCount_DESC_NULLS_LAST',
-  AccountIdAsc = 'account_id_ASC',
-  AccountIdAscNullsFirst = 'account_id_ASC_NULLS_FIRST',
-  AccountIdAscNullsLast = 'account_id_ASC_NULLS_LAST',
-  AccountIdDesc = 'account_id_DESC',
-  AccountIdDescNullsFirst = 'account_id_DESC_NULLS_FIRST',
-  AccountIdDescNullsLast = 'account_id_DESC_NULLS_LAST',
-  AccountTypeAsc = 'account_type_ASC',
-  AccountTypeAscNullsFirst = 'account_type_ASC_NULLS_FIRST',
-  AccountTypeAscNullsLast = 'account_type_ASC_NULLS_LAST',
-  AccountTypeDesc = 'account_type_DESC',
-  AccountTypeDescNullsFirst = 'account_type_DESC_NULLS_FIRST',
-  AccountTypeDescNullsLast = 'account_type_DESC_NULLS_LAST',
-  AutoExtensionAsc = 'autoExtension_ASC',
-  AutoExtensionAscNullsFirst = 'autoExtension_ASC_NULLS_FIRST',
-  AutoExtensionAscNullsLast = 'autoExtension_ASC_NULLS_LAST',
-  AutoExtensionDesc = 'autoExtension_DESC',
-  AutoExtensionDescNullsFirst = 'autoExtension_DESC_NULLS_FIRST',
-  AutoExtensionDescNullsLast = 'autoExtension_DESC_NULLS_LAST',
-  IdAsc = 'id_ASC',
-  IdAscNullsFirst = 'id_ASC_NULLS_FIRST',
-  IdAscNullsLast = 'id_ASC_NULLS_LAST',
-  IdDesc = 'id_DESC',
-  IdDescNullsFirst = 'id_DESC_NULLS_FIRST',
-  IdDescNullsLast = 'id_DESC_NULLS_LAST',
-  PendingStakeAmountAsc = 'pendingStake_amount_ASC',
-  PendingStakeAmountAscNullsFirst = 'pendingStake_amount_ASC_NULLS_FIRST',
-  PendingStakeAmountAscNullsLast = 'pendingStake_amount_ASC_NULLS_LAST',
-  PendingStakeAmountDesc = 'pendingStake_amount_DESC',
-  PendingStakeAmountDescNullsFirst = 'pendingStake_amount_DESC_NULLS_FIRST',
-  PendingStakeAmountDescNullsLast = 'pendingStake_amount_DESC_NULLS_LAST',
-  PendingStakeComputationUnitsAsc = 'pendingStake_computationUnits_ASC',
-  PendingStakeComputationUnitsAscNullsFirst = 'pendingStake_computationUnits_ASC_NULLS_FIRST',
-  PendingStakeComputationUnitsAscNullsLast = 'pendingStake_computationUnits_ASC_NULLS_LAST',
-  PendingStakeComputationUnitsDesc = 'pendingStake_computationUnits_DESC',
-  PendingStakeComputationUnitsDescNullsFirst = 'pendingStake_computationUnits_DESC_NULLS_FIRST',
-  PendingStakeComputationUnitsDescNullsLast = 'pendingStake_computationUnits_DESC_NULLS_LAST',
-  PendingStakeIdAsc = 'pendingStake_id_ASC',
-  PendingStakeIdAscNullsFirst = 'pendingStake_id_ASC_NULLS_FIRST',
-  PendingStakeIdAscNullsLast = 'pendingStake_id_ASC_NULLS_LAST',
-  PendingStakeIdDesc = 'pendingStake_id_DESC',
-  PendingStakeIdDescNullsFirst = 'pendingStake_id_DESC_NULLS_FIRST',
-  PendingStakeIdDescNullsLast = 'pendingStake_id_DESC_NULLS_LAST',
-  PendingStakeIndexAsc = 'pendingStake_index_ASC',
-  PendingStakeIndexAscNullsFirst = 'pendingStake_index_ASC_NULLS_FIRST',
-  PendingStakeIndexAscNullsLast = 'pendingStake_index_ASC_NULLS_LAST',
-  PendingStakeIndexDesc = 'pendingStake_index_DESC',
-  PendingStakeIndexDescNullsFirst = 'pendingStake_index_DESC_NULLS_FIRST',
-  PendingStakeIndexDescNullsLast = 'pendingStake_index_DESC_NULLS_LAST',
-  PendingStakeLockEndAsc = 'pendingStake_lockEnd_ASC',
-  PendingStakeLockEndAscNullsFirst = 'pendingStake_lockEnd_ASC_NULLS_FIRST',
-  PendingStakeLockEndAscNullsLast = 'pendingStake_lockEnd_ASC_NULLS_LAST',
-  PendingStakeLockEndDesc = 'pendingStake_lockEnd_DESC',
-  PendingStakeLockEndDescNullsFirst = 'pendingStake_lockEnd_DESC_NULLS_FIRST',
-  PendingStakeLockEndDescNullsLast = 'pendingStake_lockEnd_DESC_NULLS_LAST',
-  PendingStakeLockStartAsc = 'pendingStake_lockStart_ASC',
-  PendingStakeLockStartAscNullsFirst = 'pendingStake_lockStart_ASC_NULLS_FIRST',
-  PendingStakeLockStartAscNullsLast = 'pendingStake_lockStart_ASC_NULLS_LAST',
-  PendingStakeLockStartDesc = 'pendingStake_lockStart_DESC',
-  PendingStakeLockStartDescNullsFirst = 'pendingStake_lockStart_DESC_NULLS_FIRST',
-  PendingStakeLockStartDescNullsLast = 'pendingStake_lockStart_DESC_NULLS_LAST',
-  PendingStakeLockedAsc = 'pendingStake_locked_ASC',
-  PendingStakeLockedAscNullsFirst = 'pendingStake_locked_ASC_NULLS_FIRST',
-  PendingStakeLockedAscNullsLast = 'pendingStake_locked_ASC_NULLS_LAST',
-  PendingStakeLockedDesc = 'pendingStake_locked_DESC',
-  PendingStakeLockedDescNullsFirst = 'pendingStake_locked_DESC_NULLS_FIRST',
-  PendingStakeLockedDescNullsLast = 'pendingStake_locked_DESC_NULLS_LAST',
-  StakeAmountAsc = 'stake_amount_ASC',
-  StakeAmountAscNullsFirst = 'stake_amount_ASC_NULLS_FIRST',
-  StakeAmountAscNullsLast = 'stake_amount_ASC_NULLS_LAST',
-  StakeAmountDesc = 'stake_amount_DESC',
-  StakeAmountDescNullsFirst = 'stake_amount_DESC_NULLS_FIRST',
-  StakeAmountDescNullsLast = 'stake_amount_DESC_NULLS_LAST',
-  StakeComputationUnitsAsc = 'stake_computationUnits_ASC',
-  StakeComputationUnitsAscNullsFirst = 'stake_computationUnits_ASC_NULLS_FIRST',
-  StakeComputationUnitsAscNullsLast = 'stake_computationUnits_ASC_NULLS_LAST',
-  StakeComputationUnitsDesc = 'stake_computationUnits_DESC',
-  StakeComputationUnitsDescNullsFirst = 'stake_computationUnits_DESC_NULLS_FIRST',
-  StakeComputationUnitsDescNullsLast = 'stake_computationUnits_DESC_NULLS_LAST',
-  StakeIdAsc = 'stake_id_ASC',
-  StakeIdAscNullsFirst = 'stake_id_ASC_NULLS_FIRST',
-  StakeIdAscNullsLast = 'stake_id_ASC_NULLS_LAST',
-  StakeIdDesc = 'stake_id_DESC',
-  StakeIdDescNullsFirst = 'stake_id_DESC_NULLS_FIRST',
-  StakeIdDescNullsLast = 'stake_id_DESC_NULLS_LAST',
-  StakeIndexAsc = 'stake_index_ASC',
-  StakeIndexAscNullsFirst = 'stake_index_ASC_NULLS_FIRST',
-  StakeIndexAscNullsLast = 'stake_index_ASC_NULLS_LAST',
-  StakeIndexDesc = 'stake_index_DESC',
-  StakeIndexDescNullsFirst = 'stake_index_DESC_NULLS_FIRST',
-  StakeIndexDescNullsLast = 'stake_index_DESC_NULLS_LAST',
-  StakeLockEndAsc = 'stake_lockEnd_ASC',
-  StakeLockEndAscNullsFirst = 'stake_lockEnd_ASC_NULLS_FIRST',
-  StakeLockEndAscNullsLast = 'stake_lockEnd_ASC_NULLS_LAST',
-  StakeLockEndDesc = 'stake_lockEnd_DESC',
-  StakeLockEndDescNullsFirst = 'stake_lockEnd_DESC_NULLS_FIRST',
-  StakeLockEndDescNullsLast = 'stake_lockEnd_DESC_NULLS_LAST',
-  StakeLockStartAsc = 'stake_lockStart_ASC',
-  StakeLockStartAscNullsFirst = 'stake_lockStart_ASC_NULLS_FIRST',
-  StakeLockStartAscNullsLast = 'stake_lockStart_ASC_NULLS_LAST',
-  StakeLockStartDesc = 'stake_lockStart_DESC',
-  StakeLockStartDescNullsFirst = 'stake_lockStart_DESC_NULLS_FIRST',
-  StakeLockStartDescNullsLast = 'stake_lockStart_DESC_NULLS_LAST',
-  StakeLockedAsc = 'stake_locked_ASC',
-  StakeLockedAscNullsFirst = 'stake_locked_ASC_NULLS_FIRST',
-  StakeLockedAscNullsLast = 'stake_locked_ASC_NULLS_LAST',
-  StakeLockedDesc = 'stake_locked_DESC',
-  StakeLockedDescNullsFirst = 'stake_locked_DESC_NULLS_FIRST',
-  StakeLockedDescNullsLast = 'stake_locked_DESC_NULLS_LAST',
-}
-
-export type GatewayOperatorWhereInput = {
-  AND?: InputMaybe<Array<GatewayOperatorWhereInput>>;
-  OR?: InputMaybe<Array<GatewayOperatorWhereInput>>;
-  account?: InputMaybe<AccountWhereInput>;
-  account_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  autoExtension_eq?: InputMaybe<Scalars['Boolean']['input']>;
-  autoExtension_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  autoExtension_not_eq?: InputMaybe<Scalars['Boolean']['input']>;
-  gateways_every?: InputMaybe<GatewayWhereInput>;
-  gateways_none?: InputMaybe<GatewayWhereInput>;
-  gateways_some?: InputMaybe<GatewayWhereInput>;
-  id_contains?: InputMaybe<Scalars['String']['input']>;
-  id_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
-  id_endsWith?: InputMaybe<Scalars['String']['input']>;
-  id_eq?: InputMaybe<Scalars['String']['input']>;
-  id_gt?: InputMaybe<Scalars['String']['input']>;
-  id_gte?: InputMaybe<Scalars['String']['input']>;
-  id_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  id_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  id_lt?: InputMaybe<Scalars['String']['input']>;
-  id_lte?: InputMaybe<Scalars['String']['input']>;
-  id_not_contains?: InputMaybe<Scalars['String']['input']>;
-  id_not_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
-  id_not_endsWith?: InputMaybe<Scalars['String']['input']>;
-  id_not_eq?: InputMaybe<Scalars['String']['input']>;
-  id_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  id_not_startsWith?: InputMaybe<Scalars['String']['input']>;
-  id_startsWith?: InputMaybe<Scalars['String']['input']>;
-  pendingStake?: InputMaybe<GatewayStakeWhereInput>;
-  pendingStake_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  stake?: InputMaybe<GatewayStakeWhereInput>;
-  stake_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-export type GatewayOperatorsConnection = {
-  __typename?: 'GatewayOperatorsConnection';
-  edges: Array<GatewayOperatorEdge>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export enum GatewayOrderByInput {
@@ -2052,18 +1873,6 @@ export enum GatewayOrderByInput {
   NameDesc = 'name_DESC',
   NameDescNullsFirst = 'name_DESC_NULLS_FIRST',
   NameDescNullsLast = 'name_DESC_NULLS_LAST',
-  OperatorAutoExtensionAsc = 'operator_autoExtension_ASC',
-  OperatorAutoExtensionAscNullsFirst = 'operator_autoExtension_ASC_NULLS_FIRST',
-  OperatorAutoExtensionAscNullsLast = 'operator_autoExtension_ASC_NULLS_LAST',
-  OperatorAutoExtensionDesc = 'operator_autoExtension_DESC',
-  OperatorAutoExtensionDescNullsFirst = 'operator_autoExtension_DESC_NULLS_FIRST',
-  OperatorAutoExtensionDescNullsLast = 'operator_autoExtension_DESC_NULLS_LAST',
-  OperatorIdAsc = 'operator_id_ASC',
-  OperatorIdAscNullsFirst = 'operator_id_ASC_NULLS_FIRST',
-  OperatorIdAscNullsLast = 'operator_id_ASC_NULLS_LAST',
-  OperatorIdDesc = 'operator_id_DESC',
-  OperatorIdDescNullsFirst = 'operator_id_DESC_NULLS_FIRST',
-  OperatorIdDescNullsLast = 'operator_id_DESC_NULLS_LAST',
   OwnerBalanceAsc = 'owner_balance_ASC',
   OwnerBalanceAscNullsFirst = 'owner_balance_ASC_NULLS_FIRST',
   OwnerBalanceAscNullsLast = 'owner_balance_ASC_NULLS_LAST',
@@ -2088,6 +1897,78 @@ export enum GatewayOrderByInput {
   OwnerTypeDesc = 'owner_type_DESC',
   OwnerTypeDescNullsFirst = 'owner_type_DESC_NULLS_FIRST',
   OwnerTypeDescNullsLast = 'owner_type_DESC_NULLS_LAST',
+  RealOwnerBalanceAsc = 'realOwner_balance_ASC',
+  RealOwnerBalanceAscNullsFirst = 'realOwner_balance_ASC_NULLS_FIRST',
+  RealOwnerBalanceAscNullsLast = 'realOwner_balance_ASC_NULLS_LAST',
+  RealOwnerBalanceDesc = 'realOwner_balance_DESC',
+  RealOwnerBalanceDescNullsFirst = 'realOwner_balance_DESC_NULLS_FIRST',
+  RealOwnerBalanceDescNullsLast = 'realOwner_balance_DESC_NULLS_LAST',
+  RealOwnerClaimableDelegationCountAsc = 'realOwner_claimableDelegationCount_ASC',
+  RealOwnerClaimableDelegationCountAscNullsFirst = 'realOwner_claimableDelegationCount_ASC_NULLS_FIRST',
+  RealOwnerClaimableDelegationCountAscNullsLast = 'realOwner_claimableDelegationCount_ASC_NULLS_LAST',
+  RealOwnerClaimableDelegationCountDesc = 'realOwner_claimableDelegationCount_DESC',
+  RealOwnerClaimableDelegationCountDescNullsFirst = 'realOwner_claimableDelegationCount_DESC_NULLS_FIRST',
+  RealOwnerClaimableDelegationCountDescNullsLast = 'realOwner_claimableDelegationCount_DESC_NULLS_LAST',
+  RealOwnerIdAsc = 'realOwner_id_ASC',
+  RealOwnerIdAscNullsFirst = 'realOwner_id_ASC_NULLS_FIRST',
+  RealOwnerIdAscNullsLast = 'realOwner_id_ASC_NULLS_LAST',
+  RealOwnerIdDesc = 'realOwner_id_DESC',
+  RealOwnerIdDescNullsFirst = 'realOwner_id_DESC_NULLS_FIRST',
+  RealOwnerIdDescNullsLast = 'realOwner_id_DESC_NULLS_LAST',
+  RealOwnerTypeAsc = 'realOwner_type_ASC',
+  RealOwnerTypeAscNullsFirst = 'realOwner_type_ASC_NULLS_FIRST',
+  RealOwnerTypeAscNullsLast = 'realOwner_type_ASC_NULLS_LAST',
+  RealOwnerTypeDesc = 'realOwner_type_DESC',
+  RealOwnerTypeDescNullsFirst = 'realOwner_type_DESC_NULLS_FIRST',
+  RealOwnerTypeDescNullsLast = 'realOwner_type_DESC_NULLS_LAST',
+  StakeAmountAsc = 'stake_amount_ASC',
+  StakeAmountAscNullsFirst = 'stake_amount_ASC_NULLS_FIRST',
+  StakeAmountAscNullsLast = 'stake_amount_ASC_NULLS_LAST',
+  StakeAmountDesc = 'stake_amount_DESC',
+  StakeAmountDescNullsFirst = 'stake_amount_DESC_NULLS_FIRST',
+  StakeAmountDescNullsLast = 'stake_amount_DESC_NULLS_LAST',
+  StakeAutoExtensionAsc = 'stake_autoExtension_ASC',
+  StakeAutoExtensionAscNullsFirst = 'stake_autoExtension_ASC_NULLS_FIRST',
+  StakeAutoExtensionAscNullsLast = 'stake_autoExtension_ASC_NULLS_LAST',
+  StakeAutoExtensionDesc = 'stake_autoExtension_DESC',
+  StakeAutoExtensionDescNullsFirst = 'stake_autoExtension_DESC_NULLS_FIRST',
+  StakeAutoExtensionDescNullsLast = 'stake_autoExtension_DESC_NULLS_LAST',
+  StakeComputationUnitsPendingAsc = 'stake_computationUnitsPending_ASC',
+  StakeComputationUnitsPendingAscNullsFirst = 'stake_computationUnitsPending_ASC_NULLS_FIRST',
+  StakeComputationUnitsPendingAscNullsLast = 'stake_computationUnitsPending_ASC_NULLS_LAST',
+  StakeComputationUnitsPendingDesc = 'stake_computationUnitsPending_DESC',
+  StakeComputationUnitsPendingDescNullsFirst = 'stake_computationUnitsPending_DESC_NULLS_FIRST',
+  StakeComputationUnitsPendingDescNullsLast = 'stake_computationUnitsPending_DESC_NULLS_LAST',
+  StakeComputationUnitsAsc = 'stake_computationUnits_ASC',
+  StakeComputationUnitsAscNullsFirst = 'stake_computationUnits_ASC_NULLS_FIRST',
+  StakeComputationUnitsAscNullsLast = 'stake_computationUnits_ASC_NULLS_LAST',
+  StakeComputationUnitsDesc = 'stake_computationUnits_DESC',
+  StakeComputationUnitsDescNullsFirst = 'stake_computationUnits_DESC_NULLS_FIRST',
+  StakeComputationUnitsDescNullsLast = 'stake_computationUnits_DESC_NULLS_LAST',
+  StakeIdAsc = 'stake_id_ASC',
+  StakeIdAscNullsFirst = 'stake_id_ASC_NULLS_FIRST',
+  StakeIdAscNullsLast = 'stake_id_ASC_NULLS_LAST',
+  StakeIdDesc = 'stake_id_DESC',
+  StakeIdDescNullsFirst = 'stake_id_DESC_NULLS_FIRST',
+  StakeIdDescNullsLast = 'stake_id_DESC_NULLS_LAST',
+  StakeLockEndAsc = 'stake_lockEnd_ASC',
+  StakeLockEndAscNullsFirst = 'stake_lockEnd_ASC_NULLS_FIRST',
+  StakeLockEndAscNullsLast = 'stake_lockEnd_ASC_NULLS_LAST',
+  StakeLockEndDesc = 'stake_lockEnd_DESC',
+  StakeLockEndDescNullsFirst = 'stake_lockEnd_DESC_NULLS_FIRST',
+  StakeLockEndDescNullsLast = 'stake_lockEnd_DESC_NULLS_LAST',
+  StakeLockStartAsc = 'stake_lockStart_ASC',
+  StakeLockStartAscNullsFirst = 'stake_lockStart_ASC_NULLS_FIRST',
+  StakeLockStartAscNullsLast = 'stake_lockStart_ASC_NULLS_LAST',
+  StakeLockStartDesc = 'stake_lockStart_DESC',
+  StakeLockStartDescNullsFirst = 'stake_lockStart_DESC_NULLS_FIRST',
+  StakeLockStartDescNullsLast = 'stake_lockStart_DESC_NULLS_LAST',
+  StakeLockedAsc = 'stake_locked_ASC',
+  StakeLockedAscNullsFirst = 'stake_locked_ASC_NULLS_FIRST',
+  StakeLockedAscNullsLast = 'stake_locked_ASC_NULLS_LAST',
+  StakeLockedDesc = 'stake_locked_DESC',
+  StakeLockedDescNullsFirst = 'stake_locked_DESC_NULLS_FIRST',
+  StakeLockedDescNullsLast = 'stake_locked_DESC_NULLS_LAST',
   StatusAsc = 'status_ASC',
   StatusAscNullsFirst = 'status_ASC_NULLS_FIRST',
   StatusAscNullsLast = 'status_ASC_NULLS_LAST',
@@ -2105,14 +1986,23 @@ export enum GatewayOrderByInput {
 export type GatewayStake = {
   __typename?: 'GatewayStake';
   amount: Scalars['BigInt']['output'];
+  autoExtension: Scalars['Boolean']['output'];
   computationUnits: Scalars['BigInt']['output'];
+  computationUnitsPending?: Maybe<Scalars['BigInt']['output']>;
+  gateways: Array<Gateway>;
   id: Scalars['String']['output'];
-  index: Scalars['Int']['output'];
-  lockEnd: Scalars['Int']['output'];
-  lockStart: Scalars['Int']['output'];
+  lockEnd?: Maybe<Scalars['Int']['output']>;
+  lockStart?: Maybe<Scalars['Int']['output']>;
   locked: Scalars['Boolean']['output'];
-  operator: GatewayOperator;
   owner: Account;
+  realOwner: Account;
+};
+
+export type GatewayStakeGatewaysArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<GatewayOrderByInput>>;
+  where?: InputMaybe<GatewayWhereInput>;
 };
 
 export type GatewayStakeEdge = {
@@ -2128,6 +2018,18 @@ export enum GatewayStakeOrderByInput {
   AmountDesc = 'amount_DESC',
   AmountDescNullsFirst = 'amount_DESC_NULLS_FIRST',
   AmountDescNullsLast = 'amount_DESC_NULLS_LAST',
+  AutoExtensionAsc = 'autoExtension_ASC',
+  AutoExtensionAscNullsFirst = 'autoExtension_ASC_NULLS_FIRST',
+  AutoExtensionAscNullsLast = 'autoExtension_ASC_NULLS_LAST',
+  AutoExtensionDesc = 'autoExtension_DESC',
+  AutoExtensionDescNullsFirst = 'autoExtension_DESC_NULLS_FIRST',
+  AutoExtensionDescNullsLast = 'autoExtension_DESC_NULLS_LAST',
+  ComputationUnitsPendingAsc = 'computationUnitsPending_ASC',
+  ComputationUnitsPendingAscNullsFirst = 'computationUnitsPending_ASC_NULLS_FIRST',
+  ComputationUnitsPendingAscNullsLast = 'computationUnitsPending_ASC_NULLS_LAST',
+  ComputationUnitsPendingDesc = 'computationUnitsPending_DESC',
+  ComputationUnitsPendingDescNullsFirst = 'computationUnitsPending_DESC_NULLS_FIRST',
+  ComputationUnitsPendingDescNullsLast = 'computationUnitsPending_DESC_NULLS_LAST',
   ComputationUnitsAsc = 'computationUnits_ASC',
   ComputationUnitsAscNullsFirst = 'computationUnits_ASC_NULLS_FIRST',
   ComputationUnitsAscNullsLast = 'computationUnits_ASC_NULLS_LAST',
@@ -2140,12 +2042,6 @@ export enum GatewayStakeOrderByInput {
   IdDesc = 'id_DESC',
   IdDescNullsFirst = 'id_DESC_NULLS_FIRST',
   IdDescNullsLast = 'id_DESC_NULLS_LAST',
-  IndexAsc = 'index_ASC',
-  IndexAscNullsFirst = 'index_ASC_NULLS_FIRST',
-  IndexAscNullsLast = 'index_ASC_NULLS_LAST',
-  IndexDesc = 'index_DESC',
-  IndexDescNullsFirst = 'index_DESC_NULLS_FIRST',
-  IndexDescNullsLast = 'index_DESC_NULLS_LAST',
   LockEndAsc = 'lockEnd_ASC',
   LockEndAscNullsFirst = 'lockEnd_ASC_NULLS_FIRST',
   LockEndAscNullsLast = 'lockEnd_ASC_NULLS_LAST',
@@ -2164,18 +2060,6 @@ export enum GatewayStakeOrderByInput {
   LockedDesc = 'locked_DESC',
   LockedDescNullsFirst = 'locked_DESC_NULLS_FIRST',
   LockedDescNullsLast = 'locked_DESC_NULLS_LAST',
-  OperatorAutoExtensionAsc = 'operator_autoExtension_ASC',
-  OperatorAutoExtensionAscNullsFirst = 'operator_autoExtension_ASC_NULLS_FIRST',
-  OperatorAutoExtensionAscNullsLast = 'operator_autoExtension_ASC_NULLS_LAST',
-  OperatorAutoExtensionDesc = 'operator_autoExtension_DESC',
-  OperatorAutoExtensionDescNullsFirst = 'operator_autoExtension_DESC_NULLS_FIRST',
-  OperatorAutoExtensionDescNullsLast = 'operator_autoExtension_DESC_NULLS_LAST',
-  OperatorIdAsc = 'operator_id_ASC',
-  OperatorIdAscNullsFirst = 'operator_id_ASC_NULLS_FIRST',
-  OperatorIdAscNullsLast = 'operator_id_ASC_NULLS_LAST',
-  OperatorIdDesc = 'operator_id_DESC',
-  OperatorIdDescNullsFirst = 'operator_id_DESC_NULLS_FIRST',
-  OperatorIdDescNullsLast = 'operator_id_DESC_NULLS_LAST',
   OwnerBalanceAsc = 'owner_balance_ASC',
   OwnerBalanceAscNullsFirst = 'owner_balance_ASC_NULLS_FIRST',
   OwnerBalanceAscNullsLast = 'owner_balance_ASC_NULLS_LAST',
@@ -2200,6 +2084,30 @@ export enum GatewayStakeOrderByInput {
   OwnerTypeDesc = 'owner_type_DESC',
   OwnerTypeDescNullsFirst = 'owner_type_DESC_NULLS_FIRST',
   OwnerTypeDescNullsLast = 'owner_type_DESC_NULLS_LAST',
+  RealOwnerBalanceAsc = 'realOwner_balance_ASC',
+  RealOwnerBalanceAscNullsFirst = 'realOwner_balance_ASC_NULLS_FIRST',
+  RealOwnerBalanceAscNullsLast = 'realOwner_balance_ASC_NULLS_LAST',
+  RealOwnerBalanceDesc = 'realOwner_balance_DESC',
+  RealOwnerBalanceDescNullsFirst = 'realOwner_balance_DESC_NULLS_FIRST',
+  RealOwnerBalanceDescNullsLast = 'realOwner_balance_DESC_NULLS_LAST',
+  RealOwnerClaimableDelegationCountAsc = 'realOwner_claimableDelegationCount_ASC',
+  RealOwnerClaimableDelegationCountAscNullsFirst = 'realOwner_claimableDelegationCount_ASC_NULLS_FIRST',
+  RealOwnerClaimableDelegationCountAscNullsLast = 'realOwner_claimableDelegationCount_ASC_NULLS_LAST',
+  RealOwnerClaimableDelegationCountDesc = 'realOwner_claimableDelegationCount_DESC',
+  RealOwnerClaimableDelegationCountDescNullsFirst = 'realOwner_claimableDelegationCount_DESC_NULLS_FIRST',
+  RealOwnerClaimableDelegationCountDescNullsLast = 'realOwner_claimableDelegationCount_DESC_NULLS_LAST',
+  RealOwnerIdAsc = 'realOwner_id_ASC',
+  RealOwnerIdAscNullsFirst = 'realOwner_id_ASC_NULLS_FIRST',
+  RealOwnerIdAscNullsLast = 'realOwner_id_ASC_NULLS_LAST',
+  RealOwnerIdDesc = 'realOwner_id_DESC',
+  RealOwnerIdDescNullsFirst = 'realOwner_id_DESC_NULLS_FIRST',
+  RealOwnerIdDescNullsLast = 'realOwner_id_DESC_NULLS_LAST',
+  RealOwnerTypeAsc = 'realOwner_type_ASC',
+  RealOwnerTypeAscNullsFirst = 'realOwner_type_ASC_NULLS_FIRST',
+  RealOwnerTypeAscNullsLast = 'realOwner_type_ASC_NULLS_LAST',
+  RealOwnerTypeDesc = 'realOwner_type_DESC',
+  RealOwnerTypeDescNullsFirst = 'realOwner_type_DESC_NULLS_FIRST',
+  RealOwnerTypeDescNullsLast = 'realOwner_type_DESC_NULLS_LAST',
 }
 
 export type GatewayStakeWhereInput = {
@@ -2214,6 +2122,18 @@ export type GatewayStakeWhereInput = {
   amount_lte?: InputMaybe<Scalars['BigInt']['input']>;
   amount_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
   amount_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  autoExtension_eq?: InputMaybe<Scalars['Boolean']['input']>;
+  autoExtension_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  autoExtension_not_eq?: InputMaybe<Scalars['Boolean']['input']>;
+  computationUnitsPending_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  computationUnitsPending_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  computationUnitsPending_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  computationUnitsPending_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  computationUnitsPending_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  computationUnitsPending_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  computationUnitsPending_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  computationUnitsPending_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
+  computationUnitsPending_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   computationUnits_eq?: InputMaybe<Scalars['BigInt']['input']>;
   computationUnits_gt?: InputMaybe<Scalars['BigInt']['input']>;
   computationUnits_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -2223,6 +2143,9 @@ export type GatewayStakeWhereInput = {
   computationUnits_lte?: InputMaybe<Scalars['BigInt']['input']>;
   computationUnits_not_eq?: InputMaybe<Scalars['BigInt']['input']>;
   computationUnits_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  gateways_every?: InputMaybe<GatewayWhereInput>;
+  gateways_none?: InputMaybe<GatewayWhereInput>;
+  gateways_some?: InputMaybe<GatewayWhereInput>;
   id_contains?: InputMaybe<Scalars['String']['input']>;
   id_containsInsensitive?: InputMaybe<Scalars['String']['input']>;
   id_endsWith?: InputMaybe<Scalars['String']['input']>;
@@ -2240,15 +2163,6 @@ export type GatewayStakeWhereInput = {
   id_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
   id_not_startsWith?: InputMaybe<Scalars['String']['input']>;
   id_startsWith?: InputMaybe<Scalars['String']['input']>;
-  index_eq?: InputMaybe<Scalars['Int']['input']>;
-  index_gt?: InputMaybe<Scalars['Int']['input']>;
-  index_gte?: InputMaybe<Scalars['Int']['input']>;
-  index_in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  index_isNull?: InputMaybe<Scalars['Boolean']['input']>;
-  index_lt?: InputMaybe<Scalars['Int']['input']>;
-  index_lte?: InputMaybe<Scalars['Int']['input']>;
-  index_not_eq?: InputMaybe<Scalars['Int']['input']>;
-  index_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
   lockEnd_eq?: InputMaybe<Scalars['Int']['input']>;
   lockEnd_gt?: InputMaybe<Scalars['Int']['input']>;
   lockEnd_gte?: InputMaybe<Scalars['Int']['input']>;
@@ -2270,10 +2184,10 @@ export type GatewayStakeWhereInput = {
   locked_eq?: InputMaybe<Scalars['Boolean']['input']>;
   locked_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   locked_not_eq?: InputMaybe<Scalars['Boolean']['input']>;
-  operator?: InputMaybe<GatewayOperatorWhereInput>;
-  operator_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   owner?: InputMaybe<AccountWhereInput>;
   owner_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  realOwner?: InputMaybe<AccountWhereInput>;
+  realOwner_isNull?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type GatewayStakesConnection = {
@@ -2530,10 +2444,12 @@ export type GatewayWhereInput = {
   name_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
   name_not_startsWith?: InputMaybe<Scalars['String']['input']>;
   name_startsWith?: InputMaybe<Scalars['String']['input']>;
-  operator?: InputMaybe<GatewayOperatorWhereInput>;
-  operator_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   owner?: InputMaybe<AccountWhereInput>;
   owner_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  realOwner?: InputMaybe<AccountWhereInput>;
+  realOwner_isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  stake?: InputMaybe<GatewayStakeWhereInput>;
+  stake_isNull?: InputMaybe<Scalars['Boolean']['input']>;
   statusHistory_every?: InputMaybe<GatewayStatusChangeWhereInput>;
   statusHistory_none?: InputMaybe<GatewayStatusChangeWhereInput>;
   statusHistory_some?: InputMaybe<GatewayStatusChangeWhereInput>;
@@ -2601,61 +2517,34 @@ export type PageInfo = {
 export type Query = {
   __typename?: 'Query';
   accountById?: Maybe<Account>;
-  /** @deprecated Use accountById */
-  accountByUniqueInput?: Maybe<Account>;
   accountTransferById?: Maybe<AccountTransfer>;
-  /** @deprecated Use accountTransferById */
-  accountTransferByUniqueInput?: Maybe<AccountTransfer>;
   accountTransfers: Array<AccountTransfer>;
   accountTransfersConnection: AccountTransfersConnection;
   accounts: Array<Account>;
   accountsConnection: AccountsConnection;
   blockById?: Maybe<Block>;
-  /** @deprecated Use blockById */
-  blockByUniqueInput?: Maybe<Block>;
   blocks: Array<Block>;
   blocksConnection: BlocksConnection;
   claimById?: Maybe<Claim>;
-  /** @deprecated Use claimById */
-  claimByUniqueInput?: Maybe<Claim>;
   claims: Array<Claim>;
   claimsConnection: ClaimsConnection;
   commitmentById?: Maybe<Commitment>;
-  /** @deprecated Use commitmentById */
-  commitmentByUniqueInput?: Maybe<Commitment>;
   commitments: Array<Commitment>;
   commitmentsConnection: CommitmentsConnection;
   delegationById?: Maybe<Delegation>;
-  /** @deprecated Use delegationById */
-  delegationByUniqueInput?: Maybe<Delegation>;
   delegationRewardById?: Maybe<DelegationReward>;
-  /** @deprecated Use delegationRewardById */
-  delegationRewardByUniqueInput?: Maybe<DelegationReward>;
   delegationRewards: Array<DelegationReward>;
   delegationRewardsConnection: DelegationRewardsConnection;
   delegations: Array<Delegation>;
   delegationsConnection: DelegationsConnection;
   epochById?: Maybe<Epoch>;
-  /** @deprecated Use epochById */
-  epochByUniqueInput?: Maybe<Epoch>;
   epoches: Array<Epoch>;
   epochesConnection: EpochesConnection;
   gatewayById?: Maybe<Gateway>;
-  /** @deprecated Use gatewayById */
-  gatewayByUniqueInput?: Maybe<Gateway>;
-  gatewayOperatorById?: Maybe<GatewayOperator>;
-  /** @deprecated Use gatewayOperatorById */
-  gatewayOperatorByUniqueInput?: Maybe<GatewayOperator>;
-  gatewayOperators: Array<GatewayOperator>;
-  gatewayOperatorsConnection: GatewayOperatorsConnection;
   gatewayStakeById?: Maybe<GatewayStake>;
-  /** @deprecated Use gatewayStakeById */
-  gatewayStakeByUniqueInput?: Maybe<GatewayStake>;
   gatewayStakes: Array<GatewayStake>;
   gatewayStakesConnection: GatewayStakesConnection;
   gatewayStatusChangeById?: Maybe<GatewayStatusChange>;
-  /** @deprecated Use gatewayStatusChangeById */
-  gatewayStatusChangeByUniqueInput?: Maybe<GatewayStatusChange>;
   gatewayStatusChanges: Array<GatewayStatusChange>;
   gatewayStatusChangesConnection: GatewayStatusChangesConnection;
   gateways: Array<Gateway>;
@@ -2663,37 +2552,23 @@ export type Query = {
   networkStats: NetworkStats;
   settings: Array<Settings>;
   settingsById?: Maybe<Settings>;
-  /** @deprecated Use settingsById */
-  settingsByUniqueInput?: Maybe<Settings>;
   settingsConnection: SettingsConnection;
   squidStatus: SquidStatus;
   statistics: Array<Statistics>;
   statisticsById?: Maybe<Statistics>;
-  /** @deprecated Use statisticsById */
-  statisticsByUniqueInput?: Maybe<Statistics>;
   statisticsConnection: StatisticsConnection;
   transferById?: Maybe<Transfer>;
-  /** @deprecated Use transferById */
-  transferByUniqueInput?: Maybe<Transfer>;
   transfers: Array<Transfer>;
   transfersConnection: TransfersConnection;
   workerById?: Maybe<Worker>;
-  /** @deprecated Use workerById */
-  workerByUniqueInput?: Maybe<Worker>;
   workerRewardById?: Maybe<WorkerReward>;
-  /** @deprecated Use workerRewardById */
-  workerRewardByUniqueInput?: Maybe<WorkerReward>;
   workerRewards: Array<WorkerReward>;
   workerRewardsConnection: WorkerRewardsConnection;
   workerSnapshotById?: Maybe<WorkerSnapshot>;
-  /** @deprecated Use workerSnapshotById */
-  workerSnapshotByUniqueInput?: Maybe<WorkerSnapshot>;
   workerSnapshots: Array<WorkerSnapshot>;
   workerSnapshotsByDay: Array<WorkerSnapshotDay>;
   workerSnapshotsConnection: WorkerSnapshotsConnection;
   workerStatusChangeById?: Maybe<WorkerStatusChange>;
-  /** @deprecated Use workerStatusChangeById */
-  workerStatusChangeByUniqueInput?: Maybe<WorkerStatusChange>;
   workerStatusChanges: Array<WorkerStatusChange>;
   workerStatusChangesConnection: WorkerStatusChangesConnection;
   workers: Array<Worker>;
@@ -2704,16 +2579,8 @@ export type QueryAccountByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryAccountByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QueryAccountTransferByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryAccountTransferByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryAccountTransfersArgs = {
@@ -2748,10 +2615,6 @@ export type QueryBlockByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryBlockByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QueryBlocksArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2768,10 +2631,6 @@ export type QueryBlocksConnectionArgs = {
 
 export type QueryClaimByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryClaimByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryClaimsArgs = {
@@ -2792,10 +2651,6 @@ export type QueryCommitmentByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryCommitmentByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QueryCommitmentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2814,16 +2669,8 @@ export type QueryDelegationByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryDelegationByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QueryDelegationRewardByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryDelegationRewardByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryDelegationRewardsArgs = {
@@ -2858,10 +2705,6 @@ export type QueryEpochByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryEpochByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QueryEpochesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2880,38 +2723,8 @@ export type QueryGatewayByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryGatewayByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
-export type QueryGatewayOperatorByIdArgs = {
-  id: Scalars['String']['input'];
-};
-
-export type QueryGatewayOperatorByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
-export type QueryGatewayOperatorsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Array<GatewayOperatorOrderByInput>>;
-  where?: InputMaybe<GatewayOperatorWhereInput>;
-};
-
-export type QueryGatewayOperatorsConnectionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy: Array<GatewayOperatorOrderByInput>;
-  where?: InputMaybe<GatewayOperatorWhereInput>;
-};
-
 export type QueryGatewayStakeByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryGatewayStakeByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryGatewayStakesArgs = {
@@ -2930,10 +2743,6 @@ export type QueryGatewayStakesConnectionArgs = {
 
 export type QueryGatewayStatusChangeByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryGatewayStatusChangeByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryGatewayStatusChangesArgs = {
@@ -2975,10 +2784,6 @@ export type QuerySettingsByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QuerySettingsByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QuerySettingsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2997,10 +2802,6 @@ export type QueryStatisticsByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryStatisticsByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QueryStatisticsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3010,10 +2811,6 @@ export type QueryStatisticsConnectionArgs = {
 
 export type QueryTransferByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryTransferByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryTransfersArgs = {
@@ -3034,16 +2831,8 @@ export type QueryWorkerByIdArgs = {
   id: Scalars['String']['input'];
 };
 
-export type QueryWorkerByUniqueInputArgs = {
-  where: WhereIdInput;
-};
-
 export type QueryWorkerRewardByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryWorkerRewardByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryWorkerRewardsArgs = {
@@ -3062,10 +2851,6 @@ export type QueryWorkerRewardsConnectionArgs = {
 
 export type QueryWorkerSnapshotByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryWorkerSnapshotByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryWorkerSnapshotsArgs = {
@@ -3090,10 +2875,6 @@ export type QueryWorkerSnapshotsConnectionArgs = {
 
 export type QueryWorkerStatusChangeByIdArgs = {
   id: Scalars['String']['input'];
-};
-
-export type QueryWorkerStatusChangeByUniqueInputArgs = {
-  where: WhereIdInput;
 };
 
 export type QueryWorkerStatusChangesArgs = {
@@ -3638,10 +3419,6 @@ export type TransfersConnection = {
   edges: Array<TransferEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
-};
-
-export type WhereIdInput = {
-  id: Scalars['String']['input'];
 };
 
 export type Worker = {
@@ -5474,19 +5251,69 @@ export type SettingsQuery = {
   };
 };
 
-export type AccountQueryVariables = Exact<{
+export type AccountFragmentFragment = {
+  __typename?: 'Account';
+  id: string;
+  type: AccountType;
+  balance: string;
+};
+
+export type SourcesQueryVariables = Exact<{
   address: Scalars['String']['input'];
 }>;
 
-export type AccountQuery = {
+export type SourcesQuery = {
   __typename?: 'Query';
-  accountById?: {
+  accounts: Array<{ __typename?: 'Account'; id: string; type: AccountType; balance: string }>;
+};
+
+export type SourcesWithAssetsQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+}>;
+
+export type SourcesWithAssetsQuery = {
+  __typename?: 'Query';
+  accounts: Array<{
     __typename?: 'Account';
     id: string;
     type: AccountType;
     balance: string;
-    owned: Array<{ __typename?: 'Account'; id: string; type: AccountType; balance: string }>;
-  };
+    workers2: Array<{
+      __typename?: 'Worker';
+      bond: string;
+      claimableReward: string;
+      id: string;
+      name?: string;
+      peerId: string;
+    }>;
+    delegations2: Array<{
+      __typename?: 'Delegation';
+      deposit: string;
+      claimableReward: string;
+      worker: { __typename?: 'Worker'; id: string; name?: string; peerId: string };
+    }>;
+  }>;
+};
+
+export type SourcesWithDelegationsQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+  peerId?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+export type SourcesWithDelegationsQuery = {
+  __typename?: 'Query';
+  accounts: Array<{
+    __typename?: 'Account';
+    id: string;
+    type: AccountType;
+    balance: string;
+    delegations2: Array<{
+      __typename?: 'Delegation';
+      deposit: string;
+      claimableReward: string;
+      worker: { __typename?: 'Worker'; id: string; name?: string; peerId: string };
+    }>;
+  }>;
 };
 
 export type WorkerBaseFragmentFragment = {
@@ -5522,6 +5349,8 @@ export type WorkerFragmentFragment = {
   jailed?: boolean;
   dialOk?: boolean;
   jailReason?: string;
+  owner: { __typename?: 'Account'; id: string; type: AccountType };
+  realOwner: { __typename?: 'Account'; id: string };
 };
 
 export type WorkerFullFragmentFragment = {
@@ -5584,6 +5413,8 @@ export type AllWorkersQuery = {
     jailed?: boolean;
     dialOk?: boolean;
     jailReason?: string;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
 
@@ -5682,6 +5513,8 @@ export type MyWorkersQuery = {
     jailed?: boolean;
     dialOk?: boolean;
     jailReason?: string;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
   }>;
 };
 
@@ -5725,15 +5558,30 @@ export type WorkerOwnerQuery = {
   };
 };
 
-export type MyWorkerDelegationsQueryVariables = Exact<{
+export type MyDelegationsQueryVariables = Exact<{
   address: Scalars['String']['input'];
-  workerId: Scalars['String']['input'];
+  workerId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
-export type MyWorkerDelegationsQuery = {
+export type MyDelegationsQuery = {
   __typename?: 'Query';
-  workerById?: {
+  workers: Array<{
     __typename?: 'Worker';
+    version?: string;
+    createdAt: string;
+    uptime90Days?: number;
+    apr?: number;
+    stakerApr?: number;
+    totalDelegation: string;
+    capedDelegation: string;
+    id: string;
+    name?: string;
+    peerId: string;
+    status: WorkerStatus;
+    online?: boolean;
+    jailed?: boolean;
+    dialOk?: boolean;
+    jailReason?: string;
     delegations: Array<{
       __typename?: 'Delegation';
       claimableReward: string;
@@ -5742,7 +5590,9 @@ export type MyWorkerDelegationsQuery = {
       locked?: boolean;
       owner: { __typename?: 'Account'; id: string; type: AccountType };
     }>;
-  };
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+    realOwner: { __typename?: 'Account'; id: string };
+  }>;
 };
 
 export type MyAssetsQueryVariables = Exact<{
@@ -5765,40 +5615,6 @@ export type MyAssetsQuery = {
     peerId: string;
   }>;
   delegations: Array<{ __typename?: 'Delegation'; claimableReward: string; deposit: string }>;
-};
-
-export type MyDelegationsQueryVariables = Exact<{
-  address: Scalars['String']['input'];
-}>;
-
-export type MyDelegationsQuery = {
-  __typename?: 'Query';
-  delegations: Array<{
-    __typename?: 'Delegation';
-    claimableReward: string;
-    claimedReward: string;
-    deposit: string;
-    locked?: boolean;
-    owner: { __typename?: 'Account'; id: string; type: AccountType };
-    worker: {
-      __typename?: 'Worker';
-      totalDelegation: string;
-      capedDelegation: string;
-      version?: string;
-      createdAt: string;
-      uptime90Days?: number;
-      apr?: number;
-      stakerApr?: number;
-      id: string;
-      name?: string;
-      peerId: string;
-      status: WorkerStatus;
-      online?: boolean;
-      jailed?: boolean;
-      dialOk?: boolean;
-      jailReason?: string;
-    };
-  }>;
 };
 
 export type MyClaimsQueryVariables = Exact<{
@@ -5834,35 +5650,7 @@ export type GatewayFragmentFragment = {
   endpointUrl?: string;
   website?: string;
   createdAt: string;
-  owner?: { __typename?: 'Account'; id: string; type: AccountType };
-  operator?: {
-    __typename?: 'GatewayOperator';
-    stake?: { __typename?: 'GatewayStake'; locked: boolean };
-  };
-};
-
-export type MyGatewaysQueryVariables = Exact<{
-  address: Scalars['String']['input'];
-}>;
-
-export type MyGatewaysQuery = {
-  __typename?: 'Query';
-  gateways: Array<{
-    __typename?: 'Gateway';
-    id: string;
-    name?: string;
-    status: GatewayStatus;
-    description?: string;
-    email?: string;
-    endpointUrl?: string;
-    website?: string;
-    createdAt: string;
-    owner?: { __typename?: 'Account'; id: string; type: AccountType };
-    operator?: {
-      __typename?: 'GatewayOperator';
-      stake?: { __typename?: 'GatewayStake'; locked: boolean };
-    };
-  }>;
+  owner: { __typename?: 'Account'; id: string; type: AccountType };
 };
 
 export type GatewayByPeerIdQueryVariables = Exact<{
@@ -5881,32 +5669,40 @@ export type GatewayByPeerIdQuery = {
     endpointUrl?: string;
     website?: string;
     createdAt: string;
-    owner?: { __typename?: 'Account'; id: string; type: AccountType };
-    operator?: {
-      __typename?: 'GatewayOperator';
-      stake?: { __typename?: 'GatewayStake'; locked: boolean };
-    };
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
   };
 };
 
 export type GatewayStakeFragmentFragment = {
-  __typename?: 'GatewayOperator';
+  __typename?: 'GatewayStake';
   autoExtension: boolean;
-  account: { __typename?: 'Account'; id: string; type: AccountType };
-  stake?: {
-    __typename?: 'GatewayStake';
-    amount: string;
-    locked: boolean;
-    lockStart: number;
-    lockEnd: number;
-  };
-  pendingStake?: {
-    __typename?: 'GatewayStake';
-    amount: string;
-    locked: boolean;
-    lockStart: number;
-    lockEnd: number;
-  };
+  amount: string;
+  computationUnits: string;
+  computationUnitsPending?: string;
+  locked: boolean;
+  lockStart?: number;
+  lockEnd?: number;
+  owner: { __typename?: 'Account'; id: string; type: AccountType };
+};
+
+export type MyGatewaysQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+}>;
+
+export type MyGatewaysQuery = {
+  __typename?: 'Query';
+  gateways: Array<{
+    __typename?: 'Gateway';
+    id: string;
+    name?: string;
+    status: GatewayStatus;
+    description?: string;
+    email?: string;
+    endpointUrl?: string;
+    website?: string;
+    createdAt: string;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
+  }>;
 };
 
 export type MyGatewayStakesQueryVariables = Exact<{
@@ -5915,24 +5711,16 @@ export type MyGatewayStakesQueryVariables = Exact<{
 
 export type MyGatewayStakesQuery = {
   __typename?: 'Query';
-  gatewayOperators: Array<{
-    __typename?: 'GatewayOperator';
+  gatewayStakes: Array<{
+    __typename?: 'GatewayStake';
     autoExtension: boolean;
-    account: { __typename?: 'Account'; id: string; type: AccountType };
-    stake?: {
-      __typename?: 'GatewayStake';
-      amount: string;
-      locked: boolean;
-      lockStart: number;
-      lockEnd: number;
-    };
-    pendingStake?: {
-      __typename?: 'GatewayStake';
-      amount: string;
-      locked: boolean;
-      lockStart: number;
-      lockEnd: number;
-    };
+    amount: string;
+    computationUnits: string;
+    computationUnitsPending?: string;
+    locked: boolean;
+    lockStart?: number;
+    lockEnd?: number;
+    owner: { __typename?: 'Account'; id: string; type: AccountType };
   }>;
   networkStats: {
     __typename?: 'NetworkStats';
@@ -6004,6 +5792,13 @@ export type CurrentEpochQuery = {
   epoches: Array<{ __typename?: 'Epoch'; number: number; start: number; end: number }>;
 };
 
+export const AccountFragmentFragmentDoc = `
+    fragment AccountFragment on Account {
+  id
+  type
+  balance
+}
+    `;
 export const WorkerBaseFragmentFragmentDoc = `
     fragment WorkerBaseFragment on Worker {
   id
@@ -6031,6 +5826,13 @@ export const WorkerFragmentFragmentDoc = `
   stakerApr
   totalDelegation
   capedDelegation
+  owner {
+    id
+    type
+  }
+  realOwner {
+    id
+  }
 }
     ${WorkerBaseFragmentFragmentDoc}
 ${WorkerStatusFragmentFragmentDoc}`;
@@ -6058,13 +5860,6 @@ export const WorkerFullFragmentFragmentDoc = `
     timestamp
     uptime
   }
-  owner {
-    id
-    type
-  }
-  realOwner {
-    id
-  }
 }
     ${WorkerFragmentFragmentDoc}`;
 export const GatewayFragmentFragmentDoc = `
@@ -6076,37 +5871,26 @@ export const GatewayFragmentFragmentDoc = `
   email
   endpointUrl
   website
+  createdAt
   owner {
     id
     type
   }
-  operator {
-    stake {
-      locked
-    }
-  }
-  createdAt
 }
     `;
 export const GatewayStakeFragmentFragmentDoc = `
-    fragment GatewayStakeFragment on GatewayOperator {
-  account {
+    fragment GatewayStakeFragment on GatewayStake {
+  owner {
     id
     type
   }
   autoExtension
-  stake {
-    amount
-    locked
-    lockStart
-    lockEnd
-  }
-  pendingStake {
-    amount
-    locked
-    lockStart
-    lockEnd
-  }
+  amount
+  computationUnits
+  computationUnitsPending
+  locked
+  lockStart
+  lockEnd
 }
     `;
 export const VestingFragmentFragmentDoc = `
@@ -6181,34 +5965,116 @@ export const useSettingsQuery = <TData = SettingsQuery, TError = unknown>(
   });
 };
 
-export const AccountDocument = `
-    query account($address: String!) {
-  accountById(id: $address) {
-    id
-    type
-    balance
-    owned {
-      id
-      type
-      balance
+export const SourcesDocument = `
+    query sources($address: String!) {
+  accounts(
+    where: {OR: [{id_eq: $address}, {owner: {id_eq: $address}}]}
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+  }
+}
+    ${AccountFragmentFragmentDoc}`;
+
+export const useSourcesQuery = <TData = SourcesQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: SourcesQueryVariables,
+  options?: Omit<UseQueryOptions<SourcesQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<SourcesQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<SourcesQuery, TError, TData>({
+    queryKey: ['sources', variables],
+    queryFn: fetcher<SourcesQuery, SourcesQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      SourcesDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const SourcesWithAssetsDocument = `
+    query sourcesWithAssets($address: String!) {
+  accounts(
+    where: {OR: [{id_eq: $address}, {owner: {id_eq: $address}}]}
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+    workers2(where: {OR: [{bond_gt: 0}, {claimableReward_gt: 0}]}) {
+      ...WorkerBaseFragment
+      bond
+      claimableReward
+    }
+    delegations2(where: {OR: [{deposit_gt: 0}, {claimableReward_gt: 0}]}) {
+      deposit
+      claimableReward
+      worker {
+        ...WorkerBaseFragment
+      }
     }
   }
 }
-    `;
+    ${AccountFragmentFragmentDoc}
+${WorkerBaseFragmentFragmentDoc}`;
 
-export const useAccountQuery = <TData = AccountQuery, TError = unknown>(
+export const useSourcesWithAssetsQuery = <TData = SourcesWithAssetsQuery, TError = unknown>(
   dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables: AccountQueryVariables,
-  options?: Omit<UseQueryOptions<AccountQuery, TError, TData>, 'queryKey'> & {
-    queryKey?: UseQueryOptions<AccountQuery, TError, TData>['queryKey'];
+  variables: SourcesWithAssetsQueryVariables,
+  options?: Omit<UseQueryOptions<SourcesWithAssetsQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<SourcesWithAssetsQuery, TError, TData>['queryKey'];
   },
 ) => {
-  return useQuery<AccountQuery, TError, TData>({
-    queryKey: ['account', variables],
-    queryFn: fetcher<AccountQuery, AccountQueryVariables>(
+  return useQuery<SourcesWithAssetsQuery, TError, TData>({
+    queryKey: ['sourcesWithAssets', variables],
+    queryFn: fetcher<SourcesWithAssetsQuery, SourcesWithAssetsQueryVariables>(
       dataSource.endpoint,
       dataSource.fetchParams || {},
-      AccountDocument,
+      SourcesWithAssetsDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
+export const SourcesWithDelegationsDocument = `
+    query sourcesWithDelegations($address: String!, $peerId: String) {
+  accounts(
+    where: {OR: [{id_eq: $address}, {owner: {id_eq: $address}}]}
+    orderBy: [type_ASC, id_ASC]
+  ) {
+    ...AccountFragment
+    delegations2(
+      where: {OR: [{deposit_gt: 0}], AND: [{worker: {peerId_eq: $peerId}}]}
+    ) {
+      deposit
+      claimableReward
+      worker {
+        ...WorkerBaseFragment
+      }
+    }
+  }
+}
+    ${AccountFragmentFragmentDoc}
+${WorkerBaseFragmentFragmentDoc}`;
+
+export const useSourcesWithDelegationsQuery = <
+  TData = SourcesWithDelegationsQuery,
+  TError = unknown,
+>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: SourcesWithDelegationsQueryVariables,
+  options?: Omit<UseQueryOptions<SourcesWithDelegationsQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<SourcesWithDelegationsQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<SourcesWithDelegationsQuery, TError, TData>({
+    queryKey: ['sourcesWithDelegations', variables],
+    queryFn: fetcher<SourcesWithDelegationsQuery, SourcesWithDelegationsQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      SourcesWithDelegationsDocument,
       variables,
     ),
     ...options,
@@ -6436,9 +6302,13 @@ export const useWorkerOwnerQuery = <TData = WorkerOwnerQuery, TError = unknown>(
   });
 };
 
-export const MyWorkerDelegationsDocument = `
-    query myWorkerDelegations($address: String!, $workerId: String!) {
-  workerById(id: $workerId) {
+export const MyDelegationsDocument = `
+    query myDelegations($address: String!, $workerId: String) {
+  workers(
+    orderBy: id_ASC
+    where: {peerId_eq: $workerId, delegations_some: {realOwner: {id_eq: $address}, deposit_gt: 0}}
+  ) {
+    ...WorkerFragment
     delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
       claimableReward
       claimedReward
@@ -6451,21 +6321,21 @@ export const MyWorkerDelegationsDocument = `
     }
   }
 }
-    `;
+    ${WorkerFragmentFragmentDoc}`;
 
-export const useMyWorkerDelegationsQuery = <TData = MyWorkerDelegationsQuery, TError = unknown>(
+export const useMyDelegationsQuery = <TData = MyDelegationsQuery, TError = unknown>(
   dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables: MyWorkerDelegationsQueryVariables,
-  options?: Omit<UseQueryOptions<MyWorkerDelegationsQuery, TError, TData>, 'queryKey'> & {
-    queryKey?: UseQueryOptions<MyWorkerDelegationsQuery, TError, TData>['queryKey'];
+  variables: MyDelegationsQueryVariables,
+  options?: Omit<UseQueryOptions<MyDelegationsQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<MyDelegationsQuery, TError, TData>['queryKey'];
   },
 ) => {
-  return useQuery<MyWorkerDelegationsQuery, TError, TData>({
-    queryKey: ['myWorkerDelegations', variables],
-    queryFn: fetcher<MyWorkerDelegationsQuery, MyWorkerDelegationsQueryVariables>(
+  return useQuery<MyDelegationsQuery, TError, TData>({
+    queryKey: ['myDelegations', variables],
+    queryFn: fetcher<MyDelegationsQuery, MyDelegationsQueryVariables>(
       dataSource.endpoint,
       dataSource.fetchParams || {},
-      MyWorkerDelegationsDocument,
+      MyDelegationsDocument,
       variables,
     ),
     ...options,
@@ -6508,45 +6378,6 @@ export const useMyAssetsQuery = <TData = MyAssetsQuery, TError = unknown>(
       dataSource.endpoint,
       dataSource.fetchParams || {},
       MyAssetsDocument,
-      variables,
-    ),
-    ...options,
-  });
-};
-
-export const MyDelegationsDocument = `
-    query myDelegations($address: String!) {
-  delegations(where: {realOwner: {id_eq: $address}, deposit_gt: 0}) {
-    claimableReward
-    claimedReward
-    deposit
-    locked
-    owner {
-      id
-      type
-    }
-    worker {
-      ...WorkerFragment
-      totalDelegation
-      capedDelegation
-    }
-  }
-}
-    ${WorkerFragmentFragmentDoc}`;
-
-export const useMyDelegationsQuery = <TData = MyDelegationsQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables: MyDelegationsQueryVariables,
-  options?: Omit<UseQueryOptions<MyDelegationsQuery, TError, TData>, 'queryKey'> & {
-    queryKey?: UseQueryOptions<MyDelegationsQuery, TError, TData>['queryKey'];
-  },
-) => {
-  return useQuery<MyDelegationsQuery, TError, TData>({
-    queryKey: ['myDelegations', variables],
-    queryFn: fetcher<MyDelegationsQuery, MyDelegationsQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
-      MyDelegationsDocument,
       variables,
     ),
     ...options,
@@ -6596,36 +6427,6 @@ export const useMyClaimsQuery = <TData = MyClaimsQuery, TError = unknown>(
   });
 };
 
-export const MyGatewaysDocument = `
-    query myGateways($address: String!) {
-  gateways(
-    orderBy: id_ASC
-    where: {owner: {id_eq: $address}, status_eq: REGISTERED}
-  ) {
-    ...GatewayFragment
-  }
-}
-    ${GatewayFragmentFragmentDoc}`;
-
-export const useMyGatewaysQuery = <TData = MyGatewaysQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
-  variables: MyGatewaysQueryVariables,
-  options?: Omit<UseQueryOptions<MyGatewaysQuery, TError, TData>, 'queryKey'> & {
-    queryKey?: UseQueryOptions<MyGatewaysQuery, TError, TData>['queryKey'];
-  },
-) => {
-  return useQuery<MyGatewaysQuery, TError, TData>({
-    queryKey: ['myGateways', variables],
-    queryFn: fetcher<MyGatewaysQuery, MyGatewaysQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
-      MyGatewaysDocument,
-      variables,
-    ),
-    ...options,
-  });
-};
-
 export const GatewayByPeerIdDocument = `
     query gatewayByPeerId($peerId: String!) {
   gatewayById(id: $peerId) {
@@ -6653,11 +6454,36 @@ export const useGatewayByPeerIdQuery = <TData = GatewayByPeerIdQuery, TError = u
   });
 };
 
+export const MyGatewaysDocument = `
+    query myGateways($address: String!) {
+  gateways(where: {owner: {id_eq: $address}, status_not_eq: DEREGISTERED}) {
+    ...GatewayFragment
+  }
+}
+    ${GatewayFragmentFragmentDoc}`;
+
+export const useMyGatewaysQuery = <TData = MyGatewaysQuery, TError = unknown>(
+  dataSource: { endpoint: string; fetchParams?: RequestInit },
+  variables: MyGatewaysQueryVariables,
+  options?: Omit<UseQueryOptions<MyGatewaysQuery, TError, TData>, 'queryKey'> & {
+    queryKey?: UseQueryOptions<MyGatewaysQuery, TError, TData>['queryKey'];
+  },
+) => {
+  return useQuery<MyGatewaysQuery, TError, TData>({
+    queryKey: ['myGateways', variables],
+    queryFn: fetcher<MyGatewaysQuery, MyGatewaysQueryVariables>(
+      dataSource.endpoint,
+      dataSource.fetchParams || {},
+      MyGatewaysDocument,
+      variables,
+    ),
+    ...options,
+  });
+};
+
 export const MyGatewayStakesDocument = `
     query myGatewayStakes($address: String!) {
-  gatewayOperators(
-    where: {account: {id_eq: $address, OR: {owner: {id_eq: $address}}}}
-  ) {
+  gatewayStakes(where: {realOwner: {id_eq: $address}, amount_gt: "0"}) {
     ...GatewayStakeFragment
   }
   networkStats {

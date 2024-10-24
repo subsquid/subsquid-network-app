@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { trimEnd } from 'lodash-es';
 import prettyBytes from 'pretty-bytes';
 import { zeroAddress } from 'viem';
 import { getAddress } from 'viem/utils';
@@ -16,16 +15,16 @@ const formatter8 = new Intl.NumberFormat('en', {
   maximumFractionDigits: 8,
 });
 
-export function numberWithCommasFormatter(val?: number | string) {
+export function numberWithCommasFormatter(val?: number | bigint | string) {
   if (val === undefined) return '';
 
-  return formatter8.format(Number(val));
+  return formatter8.format(typeof val === 'string' ? Number(val) : val);
 }
 
 export function bytesFormatter(val?: number | string) {
-  if (!val) return '0 MB';
+  // if (!val) return '0 MB';
 
-  return prettyBytes(Number(val), { maximumFractionDigits: 0 });
+  return prettyBytes(Number(val || 0), { maximumFractionDigits: 0 });
 }
 
 export function addressFormatter(val?: string, compact?: boolean) {
@@ -42,19 +41,20 @@ export function urlFormatter(val: string) {
     : val.replace(/^(?!(?:\w+?:)?\/\/)/, 'https://');
 }
 
-export function tokenFormatter(val: number | BigNumber, currency: string, decimals?: number) {
+const tokenFormatOptions = {
+  decimalSeparator: '.',
+  groupSeparator: ',',
+  groupSize: 3,
+};
+
+export function tokenFormatter(val: number | BigNumber, currency: string, decimals = 3) {
   const bn = BigNumber(val);
-  return (
-    trimEnd(
-      trimEnd(
-        bn.toFormat(decimals ?? 6, BigNumber.ROUND_FLOOR, {
-          decimalSeparator: '.',
-          groupSeparator: ',',
-          groupSize: 3,
-        }),
-        '0',
-      ),
-      '.',
-    ) + ` ${currency}`
-  );
+  const rounded = bn.decimalPlaces(decimals, BigNumber.ROUND_FLOOR);
+
+  const res =
+    rounded.eq(0) && !bn.eq(0)
+      ? '< ' + BigNumber(1).shiftedBy(-decimals).toFormat(tokenFormatOptions)
+      : rounded.toFormat(tokenFormatOptions);
+
+  return res + ` ${currency}`;
 }

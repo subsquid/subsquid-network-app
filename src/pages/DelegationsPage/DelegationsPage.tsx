@@ -3,12 +3,9 @@ import { fromSqd } from '@lib/network';
 import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
-import { SortDir, useMyDelegations, WorkerSortBy } from '@api/subsquid-network-squid';
+import { SortDir, useMyDelegations, useMySources, WorkerSortBy } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
-import { NoItems } from '@components/NoItems';
-import Placeholder from '@components/Placeholer';
-import { SortableHeaderCell } from '@components/Table/BorderedTable';
-import { DashboardTable } from '@components/Table/DashboardTable';
+import { DashboardTable, NoItems, SortableHeaderCell } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
@@ -16,7 +13,7 @@ import { useContracts } from '@network/useContracts';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerUndelegate } from '@pages/WorkersPage/WorkerUndelegate';
 
 export function MyDelegations() {
@@ -24,30 +21,16 @@ export function MyDelegations() {
     sortBy: new Location.Enum<WorkerSortBy>(WorkerSortBy.MyDelegationReward),
     sortDir: new Location.Enum<SortDir>(SortDir.Desc),
   });
-  const { workers: delegations, isLoading } = useMyDelegations({
+
+  const { data: delegations, isLoading: isDelegationsLoading } = useMyDelegations({
     sortBy: query.sortBy as WorkerSortBy,
     sortDir: query.sortDir as SortDir,
   });
+  const { data: sources, isLoading: isSourcesLoading } = useMySources({});
+
   const { SQD_TOKEN } = useContracts();
 
-  // const groupedDelegations = useMemo(() => {
-  //   return mapValues(
-  //     keyBy(delegations, w => w.id),
-  //     w => {
-  //       return w.delegations.reduce(
-  //         (s, d) => {
-  //           s.deposit = s.deposit.plus(d.deposit);
-  //           s.reward = s.reward.plus(d.claimedReward).plus(d.claimableReward);
-  //           return s;
-  //         },
-  //         {
-  //           deposit: new BigNumber(0),
-  //           reward: new BigNumber(0),
-  //         },
-  //       );
-  //     },
-  //   );
-  // }, [delegations]);
+  const isLoading = isDelegationsLoading || isSourcesLoading;
 
   return (
     <Box>
@@ -98,7 +81,7 @@ export function MyDelegations() {
                     <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
                   </TableCell>
                   <TableCell>
-                    <WorkerStatus worker={worker} />
+                    <WorkerStatusChip worker={worker} />
                   </TableCell>
                   <TableCell>
                     {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
@@ -111,18 +94,26 @@ export function MyDelegations() {
                     {tokenFormatter(fromSqd(worker.myTotalDelegationReward), SQD_TOKEN)}
                   </TableCell>
                   <TableCell className="pinned">
-                    <Stack direction="row" spacing={2} justifyContent="flex-end">
-                      <WorkerDelegate worker={worker} />
-                      <WorkerUndelegate worker={worker} />
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <WorkerDelegate worker={worker} sources={sources} />
+                      <WorkerUndelegate
+                        worker={worker}
+                        sources={worker.delegations.map(d => ({
+                          id: d.owner.id,
+                          type: d.owner.type,
+                          balance: d.deposit,
+                          locked: d.locked || false,
+                          unlockedAt: d.unlockedAt || '',
+                        }))}
+                        disabled={!worker.delegations.some(d => !d.locked)}
+                      />
                     </Stack>
                   </TableCell>
                 </TableRow>
               );
             })
           ) : (
-            <Placeholder>
-              <NoItems />
-            </Placeholder>
+            <NoItems />
           )}
         </TableBody>
       </DashboardTable>

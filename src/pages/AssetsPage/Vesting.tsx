@@ -1,11 +1,13 @@
 import { dateFormat } from '@i18n';
 import { addressFormatter, percentFormatter, tokenFormatter } from '@lib/formatters/formatters';
-import { fromSqd } from '@lib/network/utils';
-import { Divider, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
+import { fromSqd, unwrapMulticallResult } from '@lib/network/utils';
+import { Divider, Stack, styled } from '@mui/material';
 import { Box } from '@mui/system';
+import { keepPreviousData } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { useReadContracts } from 'wagmi';
 
-import { useVestingContract } from '@api/contracts/vesting';
+import { sqdAbi, vestingAbi } from '@api/contracts';
 import { useVestingByAddress } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import SquaredChip from '@components/Chip/SquaredChip';
@@ -45,13 +47,71 @@ export const Title = styled(SquaredChip)(({ theme }) => ({
 }));
 
 export function Vesting({ backPath }: { backPath: string }) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
+  const { SQD_TOKEN, SQD } = useContracts();
 
   const { address } = useParams<{ address: `0x${string}` }>();
-  const { data: vestingInfo, isLoading: isVestingInfoLoading } = useVestingContract({ address });
+
+  const vestingContract = { abi: vestingAbi, address } as const;
+  const { data: vestingInfo, isLoading: isVestingInfoLoading } = useReadContracts({
+    contracts: [
+      {
+        ...vestingContract,
+        functionName: 'start',
+      },
+      {
+        ...vestingContract,
+        functionName: 'end',
+      },
+      {
+        ...vestingContract,
+        functionName: 'depositedIntoProtocol',
+      },
+      {
+        ...vestingContract,
+        functionName: 'releasable',
+        args: [SQD],
+      },
+      {
+        ...vestingContract,
+        functionName: 'released',
+        args: [SQD],
+      },
+      {
+        abi: sqdAbi,
+        address: SQD,
+        functionName: 'balanceOf',
+        args: [address || '0x'],
+      },
+      {
+        ...vestingContract,
+        functionName: 'immediateReleaseBIP',
+      },
+      {
+        ...vestingContract,
+        functionName: 'expectedTotalAmount',
+      },
+    ] as const,
+    query: {
+      placeholderData: keepPreviousData,
+      select: res => {
+        if (res?.some(r => r.status === 'success')) {
+          return {
+            start: Number(unwrapMulticallResult(res[0])) * 1000,
+            end: Number(unwrapMulticallResult(res[1])) * 1000,
+            deposited: unwrapMulticallResult(res[2]),
+            releasable: unwrapMulticallResult(res[3]),
+            released: unwrapMulticallResult(res[4]),
+            balance: unwrapMulticallResult(res[5]),
+            initialRelease: Number(unwrapMulticallResult(res[6]) || 0) / 100,
+            expectedTotal: unwrapMulticallResult(res[7]),
+          };
+        }
+
+        return undefined;
+      },
+    },
+  });
   const { data: vesting, isPending: isVestingLoading } = useVestingByAddress({ address });
-  const { SQD_TOKEN } = useContracts();
 
   const [searchParams] = useSearchParams();
 
@@ -94,9 +154,7 @@ export function Vesting({ backPath }: { backPath: string }) {
               <Stack direction="row">
                 <DescLabel>Deposited</DescLabel>
                 <DescValue>
-                  {vestingInfo?.deposited
-                    ? tokenFormatter(fromSqd(vestingInfo?.deposited), SQD_TOKEN, 8)
-                    : '-'}
+                  {tokenFormatter(fromSqd(vestingInfo?.deposited), SQD_TOKEN, 8)}
                 </DescValue>
               </Stack>
               <Stack direction="row">

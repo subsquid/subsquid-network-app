@@ -1,37 +1,45 @@
 import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts';
 import { fromSqd } from '@lib/network';
-import { Add } from '@mui/icons-material';
-import { Box, Button, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
 
-import { SortDir, useMyWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
+import {
+  SortDir,
+  useMySources,
+  useMyWorkers,
+  WorkerSortBy,
+  WorkerStatus,
+} from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
-import { NoItems } from '@components/NoItems';
-import Placeholder from '@components/Placeholer';
-import { SortableHeaderCell } from '@components/Table/BorderedTable';
-import { DashboardTable } from '@components/Table/DashboardTable';
+import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
-import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { WorkerStatus } from '@pages/WorkersPage/WorkerStatus';
+import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
 
-import { WorkerUnregister } from './WorkerUnregister';
+import { AddWorkerButton } from './AddNewWorker';
+import { WorkerUnregisterButton } from './WorkerUnregister';
 import { WorkerVersion } from './WorkerVersion';
+import { WorkerWithdrawButton } from './WorkerWithdraw';
 
 export function MyWorkers() {
   const [query, setQuery] = useLocationState({
     sortBy: new Location.Enum<WorkerSortBy>(WorkerSortBy.WorkerReward),
     sortDir: new Location.Enum<SortDir>(SortDir.Desc),
   });
-  const { data, isLoading } = useMyWorkers({
+
+  const { SQD_TOKEN } = useContracts();
+
+  const { data: sources, isLoading: isSourcesLoading } = useMySources();
+
+  const { data: workers, isLoading: isWorkersLoading } = useMyWorkers({
     sortBy: query.sortBy as WorkerSortBy,
     sortDir: query.sortDir as SortDir,
   });
-  const { isConnected } = useAccount();
-  const { SQD_TOKEN } = useContracts();
+
+  const isLoading = isSourcesLoading || isWorkersLoading;
 
   return (
     <Box>
@@ -40,16 +48,18 @@ export function MyWorkers() {
         title={
           <>
             <SquaredChip label="My Workers" color="primary" />
-            <Button
-              color="info"
-              startIcon={<Add />}
-              variant="contained"
-              disabled={!isConnected}
-              component={Link}
-              to="/workers/add"
-            >
-              ADD WORKER
-            </Button>
+            <Stack direction="row" spacing={1}>
+              <Button
+                color="secondary"
+                variant="outlined"
+                component={Link}
+                target="_blank"
+                to="https://docs.sqd.dev/subsquid-network/participate/worker/"
+              >
+                LEARN MORE
+              </Button>
+              <AddWorkerButton sources={sources} disabled={isLoading} />
+            </Stack>
           </>
         }
       >
@@ -88,15 +98,15 @@ export function MyWorkers() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.length ? (
-              data.map(worker => {
+            {workers?.length ? (
+              workers.map(worker => {
                 return (
                   <TableRow key={worker.peerId}>
                     <TableCell>
                       <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
                     </TableCell>
                     <TableCell>
-                      <WorkerStatus worker={worker} />
+                      <WorkerStatusChip worker={worker} />
                     </TableCell>
                     <TableCell>
                       <WorkerVersion worker={worker} />
@@ -112,16 +122,34 @@ export function MyWorkers() {
                     </TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
-                        <WorkerUnregister worker={worker} />
+                        {worker.status === WorkerStatus.Deregistered ||
+                        worker.status === WorkerStatus.Deregistering ? (
+                          <WorkerWithdrawButton
+                            worker={worker}
+                            source={{
+                              ...worker.owner,
+                              // FIXME: some types issue
+                              locked: (worker as any).locked,
+                              unlockedAt: (worker as any).unlockedAt,
+                            }}
+                            disabled={worker.status !== WorkerStatus.Deregistered}
+                          />
+                        ) : (
+                          <WorkerUnregisterButton
+                            worker={worker}
+                            source={worker.owner}
+                            disabled={worker.status !== WorkerStatus.Active}
+                          />
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>
                 );
               })
             ) : (
-              <Placeholder>
-                <NoItems />
-              </Placeholder>
+              <NoItems>
+                <span>No worker registered yet</span>
+              </NoItems>
             )}
           </TableBody>
         </>

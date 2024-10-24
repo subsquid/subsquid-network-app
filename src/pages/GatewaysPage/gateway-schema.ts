@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 export const editGatewaySchema = yup.object({
-  name: yup.string().label('Name').max(255).trim().required('Gateway name is required'),
+  name: yup.string().label('Name').max(255).trim().required('Portal name is required'),
   public: yup.boolean(),
   endpointUrl: yup
     .string()
@@ -27,8 +27,7 @@ export const addGatewaySchema = editGatewaySchema.shape({
   peerId: yup
     .string()
     .matches(/^[a-z1-9]+$/i, 'Peer ID must contains only base 58 symbols')
-    .max(52)
-    .min(52)
+    .length(52)
     .label('Peer ID')
     .trim()
     .required('Peer ID is required'),

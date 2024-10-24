@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 
+import { dateFormat, relativeDateFormat } from '@i18n';
 import { peerIdToHex } from '@lib/network';
+import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { Box, SxProps, Tooltip } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
 
@@ -15,7 +17,7 @@ import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 
-export function WorkerUnregisterButton({
+export function WorkerWithdrawButton({
   worker,
   source,
   disabled,
@@ -23,25 +25,50 @@ export function WorkerUnregisterButton({
 }: {
   sx?: SxProps;
   worker: Pick<Worker, 'id' | 'status' | 'peerId'>;
-  source: SourceWallet;
+  source: SourceWallet & {
+    locked: boolean;
+    unlockedAt?: string;
+  };
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <LoadingButton
-        // startIcon={<Remove />}
-        sx={sx}
-        loading={open}
-        onClick={() => setOpen(true)}
-        variant="outlined"
-        color="error"
-        disabled={disabled}
-      >
-        DELETE
-      </LoadingButton>
-      <WorkerUnregisterDialog
+      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+        {source.locked && (
+          <Tooltip
+            title={`Unlocks in ${relativeDateFormat(Date.now(), source.unlockedAt)} (${dateFormat(
+              source.unlockedAt,
+              'dateTime',
+            )})`}
+            placement="top"
+          >
+            <Lock
+              fontSize="small"
+              // color="secondary"
+              sx={{
+                color: '#3e4a5c',
+                position: 'absolute',
+                top: '0px',
+                right: '0px',
+                transform: 'translate(0%, -25%)',
+                zIndex: 1,
+              }}
+            />
+          </Tooltip>
+        )}
+        <LoadingButton
+          loading={open}
+          onClick={() => setOpen(true)}
+          variant="outlined"
+          color="error"
+          disabled={disabled || source.locked}
+        >
+          WITHDRAW
+        </LoadingButton>
+      </Box>
+      <WorkerWithdrawDialog
         open={open}
         onClose={() => setOpen(false)}
         worker={worker}
@@ -51,7 +78,7 @@ export function WorkerUnregisterButton({
   );
 }
 
-export function WorkerUnregisterDialog({
+export function WorkerWithdrawDialog({
   open,
   onClose,
   worker,
@@ -64,7 +91,6 @@ export function WorkerUnregisterDialog({
 }) {
   const client = useClient();
   const account = useAccount();
-
   const { setWaitHeight } = useSquidHeight();
 
   const contracts = useContracts();
@@ -75,7 +101,8 @@ export function WorkerUnregisterDialog({
   });
 
   const handleSubmit = async () => {
-    if (!client || !account.address || !registrationAddress) return;
+    if (!client) return;
+    if (!account.address || !registrationAddress) return;
 
     try {
       const peerIdHex = peerIdToHex(worker.peerId);
@@ -83,15 +110,15 @@ export function WorkerUnregisterDialog({
       const receipt = await contractWriter.writeTransactionAsync({
         address: registrationAddress,
         abi: workerRegistryAbi,
-        functionName: 'deregister',
+        functionName: 'withdraw',
         args: [peerIdHex],
         vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
       });
       setWaitHeight(receipt.blockNumber, []);
 
       onClose();
-    } catch (error) {
-      toast.error(errorMessage(error));
+    } catch (e: unknown) {
+      toast.error(errorMessage(e));
     }
   };
 
@@ -101,14 +128,13 @@ export function WorkerUnregisterDialog({
       open={open}
       onResult={confirmed => {
         if (!confirmed) return onClose();
+
         handleSubmit();
       }}
       loading={contractWriter.isPending}
       hideCancelButton={false}
     >
-      Are you sure you want to unregister this worker? This will disable the worker, but you can
-      re-register it later. You will be able to withdraw your tokens after the end of the lock
-      period.
+      Are you sure you want to withdraw your tokens from this worker?
     </ContractCallDialog>
   );
 }

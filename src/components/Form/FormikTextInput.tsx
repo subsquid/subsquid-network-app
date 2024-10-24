@@ -49,9 +49,10 @@ export function FormikTextInput({
   onFocus,
   onBlur,
   showErrorOnlyOfTouched = false,
+  disabled,
 }: {
   id: string;
-  label?: string;
+  label?: React.ReactNode;
   formik?: any;
   multiline?: boolean;
   rows?: number;
@@ -68,6 +69,7 @@ export function FormikTextInput({
   autoComplete?: string;
   onFocus?: () => unknown;
   onBlur?: () => unknown;
+  disabled?: boolean;
 }) {
   const [visible, setVisible] = useState(false);
 
@@ -114,6 +116,7 @@ export function FormikTextInput({
               ) : undefined,
           }
         }
+        disabled={disabled}
       />
     </FormControl>
   );

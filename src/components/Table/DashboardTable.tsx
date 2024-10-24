@@ -32,7 +32,7 @@ export const DashboardTableBase = styled(Table)(({ theme }) => ({
     height: 200,
   },
 
-  '& tbody .placeholder': {
+  '& tbody .no-items': {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -59,7 +59,7 @@ export function DashboardTable({
         </Box>
       ) : null}
       <Box sx={{ overflowX: 'auto', scrollbarWidth: 'thin', overflowY: 'clip' }}>
-        {loading ? <Loader /> : <DashboardTableBase>{children}</DashboardTableBase>}
+        <DashboardTableBase>{loading ? <Loader /> : children}</DashboardTableBase>
       </Box>
     </Box>
   );

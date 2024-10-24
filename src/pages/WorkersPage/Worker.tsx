@@ -10,7 +10,13 @@ import { fromSqd } from '@lib/network';
 import { Box, Divider, Stack, styled } from '@mui/material';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { useWorkerByPeerId, WorkerStatus as ApiWorkerStatus } from '@api/subsquid-network-squid';
+import {
+  useWorkerByPeerId,
+  WorkerStatus as ApiWorkerStatus,
+  WorkerStatus,
+  useMySources,
+  useMyWorkerDelegations,
+} from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { Loader } from '@components/Loader';
@@ -18,13 +24,14 @@ import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
-import { WorkerUnregister } from '@pages/WorkersPage/WorkerUnregister';
+import { WorkerUnregisterButton } from '@pages/WorkersPage/WorkerUnregister';
 
 import { DelegationCapacity } from './DelegationCapacity';
 import { WorkerCard } from './WorkerCard';
 import { WorkerDelegate } from './WorkerDelegate';
 import { WorkerUndelegate } from './WorkerUndelegate';
 import { WorkerVersion } from './WorkerVersion';
+import { WorkerWithdrawButton } from './WorkerWithdraw';
 
 // const sx = {
 //   background: '#000',
@@ -80,11 +87,16 @@ export const Title = styled(SquaredChip)(({ theme }) => ({
 
 export const Worker = ({ backPath }: { backPath: string }) => {
   const { peerId } = useParams<{ peerId: string }>();
-  const { data: worker, isPending } = useWorkerByPeerId(peerId);
+  const { data: worker, isLoading: isPending } = useWorkerByPeerId(peerId);
   const { address } = useAccount();
   const { SQD_TOKEN } = useContracts();
 
   const [searchParams] = useSearchParams();
+
+  const { data: sources, isLoading: isSourcesLoading } = useMySources();
+  const { data: delegations, isLoading: isDelegationsLoading } = useMyWorkerDelegations({ peerId });
+
+  const isLoading = isSourcesLoading || isDelegationsLoading;
 
   return (
     <CenteredPageWrapper className="wide">
@@ -92,8 +104,24 @@ export const Worker = ({ backPath }: { backPath: string }) => {
         backPath={searchParams.get('backPath') || backPath}
         endAdornment={
           <Stack direction="row" spacing={2}>
-            <WorkerDelegate worker={worker} variant="outlined" />
-            <WorkerUndelegate worker={worker} />
+            <WorkerDelegate
+              worker={worker}
+              variant="outlined"
+              sources={sources}
+              disabled={isLoading}
+            />
+            <WorkerUndelegate
+              worker={worker}
+              sources={delegations?.map(d => ({
+                id: d.owner.id,
+                type: d.owner.type,
+                balance: d.deposit,
+                locked: d.locked || false,
+                // FIXME: some issue with types
+                unlockedAt: (d as any).unlockedAt,
+              }))}
+              disabled={isLoading || !delegations?.some(d => !d.locked)}
+            />
           </Stack>
         }
       />
@@ -108,6 +136,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
             <Stack spacing={3} divider={<Divider orientation="horizontal" flexItem />}>
               <WorkerCard
                 worker={worker}
+                owner={worker.owner}
                 canEdit={
                   worker.realOwner.id === address &&
                   [ApiWorkerStatus.Active, ApiWorkerStatus.Registering].includes(worker.status)
@@ -117,7 +146,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                 <Title label="Info" />
                 <Stack spacing={2} direction="column">
                   <Stack direction="row">
-                    <WorkerDescLabel>Registered</WorkerDescLabel>
+                    <WorkerDescLabel>Created</WorkerDescLabel>
                     <WorkerDescValue>{dateFormat(worker.createdAt, 'dateTime')}</WorkerDescValue>
                   </Stack>
                   <Stack direction="row">
@@ -240,8 +269,26 @@ export const Worker = ({ backPath }: { backPath: string }) => {
           </Card>
 
           {worker.realOwner.id === address && worker.status !== ApiWorkerStatus.Withdrawn ? (
-            <Box mt={3}>
-              <WorkerUnregister worker={worker} />
+            <Box mt={3} display="flex" justifyContent="flex-end">
+              {worker.status === WorkerStatus.Deregistered ||
+              worker.status === WorkerStatus.Deregistering ? (
+                <WorkerWithdrawButton
+                  worker={worker}
+                  source={{
+                    ...worker.owner,
+                    // FIXME: some types issue
+                    locked: (worker as any).locked,
+                    unlockedAt: (worker as any).unlockedAt,
+                  }}
+                  disabled={worker.status !== WorkerStatus.Deregistered}
+                />
+              ) : (
+                <WorkerUnregisterButton
+                  worker={worker}
+                  source={worker.owner}
+                  disabled={worker.status !== WorkerStatus.Active}
+                />
+              )}
             </Box>
           ) : null}
         </>

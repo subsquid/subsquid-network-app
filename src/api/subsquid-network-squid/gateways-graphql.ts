@@ -1,32 +1,27 @@
-import { useSquidDataSource } from '@api/subsquid-network-squid/datasource';
+import { useSquid } from '@api/subsquid-network-squid/datasource';
 import { useAccount } from '@network/useAccount';
 
-import {
-  GatewayFragmentFragment,
-  useGatewayByPeerIdQuery,
-  useMyGatewaysQuery,
-  useMyGatewayStakesQuery,
-} from './graphql';
+import { useGatewayByPeerIdQuery, useMyGatewaysQuery, useMyGatewayStakesQuery } from './graphql';
 
 // inherit API interface for internal class
-export interface BlockchainGateway extends GatewayFragmentFragment {
-  owner: Exclude<GatewayFragmentFragment['owner'], undefined>;
-}
+// export interface BlockchainGateway extends GatewayFragmentFragment {
+//   owner: Exclude<GatewayFragmentFragment['owner'], undefined>;
+// }
 
-export class BlockchainGateway {
-  ownedByMe?: boolean;
+// export class BlockchainGateway {
+//   ownedByMe?: boolean;
 
-  constructor({ gateway, address }: { gateway: GatewayFragmentFragment; address?: `0x${string}` }) {
-    Object.assign(this, {
-      ...gateway,
-      createdAt: new Date(),
-      ownedByMe: gateway?.owner?.id === address,
-    });
-  }
-}
+//   constructor({ gateway, address }: { gateway: GatewayFragmentFragment; address?: `0x${string}` }) {
+//     Object.assign(this, {
+//       ...gateway,
+//       createdAt: new Date(),
+//       ownedByMe: gateway?.owner?.id === address,
+//     });
+//   }
+// }
 
 export function useMyGateways() {
-  const datasource = useSquidDataSource();
+  const datasource = useSquid();
   const { address } = useAccount();
 
   const enabled = !!address;
@@ -37,13 +32,7 @@ export function useMyGateways() {
     },
     {
       select: res => {
-        return res.gateways.map(
-          gateway =>
-            new BlockchainGateway({
-              gateway,
-              address,
-            }),
-        );
+        return res.gateways;
       },
       enabled,
     },
@@ -56,8 +45,7 @@ export function useMyGateways() {
 }
 
 export function useGatewayByPeerId(peerId?: string) {
-  const datasource = useSquidDataSource();
-  const { address } = useAccount();
+  const datasource = useSquid();
   const enabled = !!peerId;
 
   const { data, isLoading } = useGatewayByPeerIdQuery(
@@ -69,10 +57,7 @@ export function useGatewayByPeerId(peerId?: string) {
       select: res => {
         if (!res.gatewayById) return;
 
-        return new BlockchainGateway({
-          gateway: res.gatewayById,
-          address,
-        });
+        return res.gatewayById;
       },
       enabled,
     },
@@ -84,8 +69,8 @@ export function useGatewayByPeerId(peerId?: string) {
   };
 }
 
-export function useMyGatewayStakes() {
-  const datasource = useSquidDataSource();
+export function useMyGatewayStake() {
+  const datasource = useSquid();
   const { address } = useAccount();
 
   const enabled = !!address;
@@ -97,7 +82,7 @@ export function useMyGatewayStakes() {
     {
       select: res => {
         return {
-          operators: res.gatewayOperators.filter(o => o.pendingStake || o.stake),
+          stake: res.gatewayStakes.length ? res.gatewayStakes[0] : undefined,
           ...res.networkStats,
         };
       },

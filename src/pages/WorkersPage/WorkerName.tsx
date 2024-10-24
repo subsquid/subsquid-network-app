@@ -27,11 +27,7 @@ export const WorkerName = ({
 }) => {
   return (
     <Stack spacing={1.5} direction="row" alignItems="center">
-      <Avatar
-        // online={!!worker.online}
-        name={worker.name || worker.peerId}
-        colorDiscriminator={worker.peerId}
-      />
+      <Avatar name={worker.name || worker.peerId} colorDiscriminator={worker.peerId} />
       <Box overflow="clip">
         {worker.name ? (
           <Name>{worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}</Name>

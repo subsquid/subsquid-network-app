@@ -10,9 +10,11 @@ import {
 import { logger } from '@logger';
 import { useQueryClient } from '@tanstack/react-query';
 import { max, partition } from 'lodash-es';
+// import { useSnackbar,  } from 'notistack';
+import { toast } from 'react-hot-toast';
 import { useBlockNumber } from 'wagmi';
 
-import { useSquidDataSource, useSquidNetworkHeightQuery } from '@api/subsquid-network-squid';
+import { useSquid, useSquidNetworkHeightQuery } from '@api/subsquid-network-squid';
 import { localStorageStringSerializer, useLocalStorageState } from '@hooks/useLocalStorageState';
 
 type HeightHook = { height: number; invalidateQueries: unknown[] };
@@ -31,7 +33,7 @@ const SquidHeightContext = createContext<{
   setWaitHeight: () => {},
 });
 
-export function useSquidNetworkHeight() {
+export function useSquidHeight() {
   const { isLoading, currentHeight, waitHeight, setWaitHeight } = useContext(SquidHeightContext);
 
   return {
@@ -45,8 +47,8 @@ export function useSquidNetworkHeight() {
 
 export function SquidHeightProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
-  const dataSource = useSquidDataSource();
-  const [heightHooksRaw, setHeightHooksRaw] = useLocalStorageState<string>('squid_height_hooks', {
+  const dataSource = useSquid();
+  const [heightHooksRaw, setHeightHooksRaw] = useLocalStorageState<string>('sqd_height_hooks', {
     defaultValue: '[]',
     serializer: localStorageStringSerializer,
     storageSync: false,
@@ -58,6 +60,7 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
       refetchInterval: 2000,
     },
   );
+  // const { enqueueSnackbar } = useSnackbar();
 
   const currentHeight = data?.squidStatus?.height || 0;
 
@@ -89,6 +92,21 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
     });
   }, [currentHeight, heightHooks, queryClient, setHeightHooksRaw]);
 
+  const maxWaitHeight = useMemo(() => {
+    return max(heightHooks.map(h => h.height)) || 0;
+  }, [heightHooks]);
+
+  useEffect(() => {
+    if (maxWaitHeight > 0) {
+      toast.loading(`Syncing ${currentHeight} block of ${maxWaitHeight}`, {
+        id: 'squid-sync',
+        duration: Infinity,
+      });
+    } else {
+      toast.remove('squid-sync');
+    }
+  }, [maxWaitHeight, currentHeight]);
+
   const setWaitHeight = useCallback(
     (height: bigint | string, invalidateQueries: unknown[] = []) => {
       heightHooks.push({
@@ -101,10 +119,6 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
     },
     [heightHooks, setHeightHooksRaw],
   );
-
-  const maxWaitHeight = useMemo(() => {
-    return max(heightHooks.map(h => h.height)) || 0;
-  }, [heightHooks]);
 
   const { data: chainHeight } = useBlockNumber();
   useEffect(() => {

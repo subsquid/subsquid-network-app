@@ -14,14 +14,12 @@ import {
 } from 'wagmi';
 
 import { useApproveSqd } from '@api/contracts/sqd';
-import { VESTING_CONTRACT_ABI } from '@api/contracts/vesting.abi';
 import { AccountType, Worker, SourceWallet } from '@api/subsquid-network-squid';
-import { useSquidNetworkHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts.ts';
 
-import { SOFT_CAP_ABI } from './soft-cap.abi';
-import { STAKING_CONTRACT_ABI } from './staking.abi';
+import { softCapAbi, stakingAbi, vestingAbi } from './subsquid.generated';
 import { errorMessage, TxResult, isApproveRequiredError, WriteContractRes } from './utils';
 
 type WorkerDepositRequest = {
@@ -41,7 +39,7 @@ function useDelegateFromWallet() {
       return {
         tx: await writeContractAsync({
           address: contracts.STAKING,
-          abi: STAKING_CONTRACT_ABI,
+          abi: stakingAbi,
           functionName: 'deposit',
           args: [BigInt(worker.id), BigInt(amount)],
         }),
@@ -82,7 +80,7 @@ function useDepositFromVestingContract() {
   return async ({ worker, amount, wallet }: WorkerDepositRequest): Promise<TxResult> => {
     try {
       const data = encodeFunctionData({
-        abi: STAKING_CONTRACT_ABI,
+        abi: stakingAbi,
         functionName: 'deposit',
         args: [BigInt(worker.id), BigInt(amount)],
       });
@@ -91,7 +89,7 @@ function useDepositFromVestingContract() {
         tx: await writeContractAsync({
           account,
           address: wallet.id as `0x${string}`,
-          abi: VESTING_CONTRACT_ABI,
+          abi: vestingAbi,
           functionName: 'execute',
           args: [contracts.STAKING, data, BigInt(amount)],
         }),
@@ -104,7 +102,7 @@ function useDepositFromVestingContract() {
 
 export function useWorkerDelegate() {
   const client = useClient();
-  const { setWaitHeight } = useSquidNetworkHeight();
+  const { setWaitHeight } = useSquidHeight();
   const [isPending, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -154,7 +152,7 @@ function useUndelegateFromWallet() {
       return {
         tx: await writeContractAsync({
           address: contracts.STAKING,
-          abi: STAKING_CONTRACT_ABI,
+          abi: stakingAbi,
           functionName: 'withdraw',
           args: [BigInt(worker.id), BigInt(amount)],
         }),
@@ -173,7 +171,7 @@ function useUndelegateFromVestingContract() {
   return async ({ worker, amount, wallet }: WorkerDepositRequest): Promise<TxResult> => {
     try {
       const data = encodeFunctionData({
-        abi: STAKING_CONTRACT_ABI,
+        abi: stakingAbi,
         functionName: 'withdraw',
         args: [BigInt(worker.id), BigInt(amount)],
       });
@@ -182,7 +180,7 @@ function useUndelegateFromVestingContract() {
         tx: await writeContractAsync({
           account,
           address: wallet.id as `0x${string}`,
-          abi: VESTING_CONTRACT_ABI,
+          abi: vestingAbi,
           functionName: 'execute',
           args: [contracts.STAKING, data, BigInt(amount)],
         }),
@@ -195,7 +193,7 @@ function useUndelegateFromVestingContract() {
 
 export function useWorkerUndelegate() {
   const client = usePublicClient();
-  const { setWaitHeight } = useSquidNetworkHeight();
+  const { setWaitHeight } = useSquidHeight();
   const [isPending, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -238,11 +236,11 @@ export function useWorkerUndelegate() {
 
 export function useCapedStake({ workerId }: { workerId?: string }) {
   const contracts = useContracts();
-  const { currentHeight, isLoading: isHeightLoading } = useSquidNetworkHeight();
+  const { currentHeight, isLoading: isHeightLoading } = useSquidHeight();
 
   const { data, isLoading } = useReadContract({
     address: contracts.SOFT_CAP,
-    abi: SOFT_CAP_ABI,
+    abi: softCapAbi,
     functionName: 'capedStake',
     args: [BigInt(workerId || -1)],
     blockNumber: BigInt(currentHeight),
@@ -279,13 +277,13 @@ export function useCapedStakeAfterDelegation({
     contracts: [
       {
         address: contracts.SOFT_CAP,
-        abi: SOFT_CAP_ABI,
+        abi: softCapAbi,
         functionName: 'capedStakeAfterDelegation',
         args: [BigInt(workerId), BigInt(amount || 0n) * (undelegate ? -1n : 1n)],
       },
       {
         address: contracts.STAKING,
-        abi: STAKING_CONTRACT_ABI,
+        abi: stakingAbi,
         functionName: 'delegated',
         args: [BigInt(workerId)],
       },

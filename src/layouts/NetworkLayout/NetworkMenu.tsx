@@ -1,79 +1,39 @@
 import React, { ForwardedRef, forwardRef } from 'react';
 
-import { Box, Button, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  ArrowOutwardOutlined,
+  BackHand,
+  BackHandOutlined,
+  Dashboard,
+  DashboardOutlined,
+  Lan,
+  LanOutlined,
+  Savings,
+  SavingsOutlined,
+  SensorDoor,
+  SensorDoorOutlined,
+  SmsOutlined,
+} from '@mui/icons-material';
+import { Button, styled } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useIsWorkerOperator } from '@api/subsquid-network-squid';
-import { ContactsIcon } from '@icons/ContactsIcon';
-import { DashboardIcon } from '@icons/DashboardIcon';
-import { HandIcon } from '@icons/HandIcon';
-import { NetworkNodeIcon } from '@icons/NetworkNodeIcon';
-import { OpenInNewIcon } from '@icons/OpenInNewIcon';
-import { SavingsIcon } from '@icons/SavingsIcon';
+import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { useWorkersChatUrl } from '@network/useWorkersChat';
 
 interface NetworkMenuProps {
   onItemClick: () => void;
 }
 
-const MenuItem = styled(Button)(({ theme: { palette, spacing, breakpoints } }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+const MenuItem = styled(Button)(({ theme: { palette, spacing, breakpoints, typography } }) => ({
+  ...typography.subtitle2,
+
   height: spacing(7),
-  minWidth: 0,
+  display: 'flex',
+  justifyContent: 'flex-start',
 
-  padding: spacing(0),
-  [breakpoints.up('xl')]: {
-    justifyContent: 'flex-start',
-    padding: spacing(0, 2.5),
-  },
-
+  padding: spacing(0, 3),
   borderRadius: 0,
-  '& .leftIcon': {
-    display: 'flex',
-    alignItems: 'center',
-    marginRight: spacing(0),
-
-    [breakpoints.up('xl')]: {
-      marginRight: spacing(1.5),
-    },
-  },
-
-  '& .rightIcon': {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: spacing(1),
-  },
-  // '& svg:not(.badge) path': {
-  //   transition: 'fill 300ms ease-out',
-  // },
-  // ['&:hover']: {
-  //   backgroundColor: palette.background.paper,
-  //   color: palette.info.contrastText,
-  //   // '& svg:not(.badge) path': {
-  //   //   fill: 'red',
-  //   // },
-  //   // '& svg.badge path': {
-  //   //   fill: 'inherit',
-  //   // },
-  // },
-  // [`&.selected`]: {
-  //   // backgroundColor: palette.info.main,
-  //   // color: palette.info.contrastText,
-  //   // '& svg:not(.badge) path': {
-  //   //   fill: palette.info.contrastText,
-  //   // },
-  // },
-
-  // [`&.${buttonClasses.disabled}`]: {
-  //   opacity: 0.4,
-  //   backgroundColor: 'transparent',
-  //   color: palette.text.secondary,
-  //   '& svg:not(.badge) path': {
-  //     fill: palette.text.secondary,
-  //   },
-  // },
 }));
 
 export const Item = forwardRef(
@@ -94,8 +54,8 @@ export const Item = forwardRef(
       path: string;
       target?: string;
       disabled?: boolean;
-      LeftIcon: any;
-      RightIcon?: any;
+      LeftIcon: React.ReactNode | ((active: boolean) => React.ReactNode);
+      RightIcon?: React.ReactNode | ((active: boolean) => React.ReactNode);
       label?: string;
       onClick?: () => void;
     },
@@ -104,11 +64,19 @@ export const Item = forwardRef(
     const location = useLocation();
     const active = forceActive || (!forceInactive && location.pathname.startsWith(path));
 
-    const theme = useTheme();
-    const compact = useMediaQuery(theme.breakpoints.down('xl'));
+    // const theme = useTheme();
+    // const compact = useMediaQuery(theme.breakpoints.down('xl'));
+    // const mobile = useMediaQuery(theme.breakpoints.down('xs'));
 
-    const button = (
+    // LeftIcon.props.on = active;
+
+    const startIcon = typeof LeftIcon === 'function' ? LeftIcon(active) : LeftIcon;
+    const endIcon = typeof RightIcon === 'function' ? RightIcon(active) : RightIcon;
+
+    return (
       <MenuItem
+        startIcon={<span>{startIcon}</span>}
+        endIcon={<span>{endIcon}</span>}
         ref={ref}
         onClick={onClick}
         className={active ? 'selected' : undefined}
@@ -119,29 +87,19 @@ export const Item = forwardRef(
         target={target}
         rel={target ? 'noreferrer' : undefined}
       >
-        <Box className="leftIcon">
-          <LeftIcon variant={active ? 'filled' : 'outlined'} />
-        </Box>
-        {!compact ? (
-          <>
-            <Typography variant="subtitle2">{label}</Typography>
-            {RightIcon ? (
-              <Box className="rightIcon">
-                <RightIcon />
-              </Box>
-            ) : null}
-          </>
+        {/* {!compact || mobile ? (
+      <>
+        
         ) : null}
+      </>
+     */}
+        {label}
       </MenuItem>
     );
-
-    if (disabled) return button;
-
-    return button;
-    // <Link to={path} target={target} rel={target ? 'noreferrer' : undefined}>
-    // { button }
-    // </Link>
   },
+  // <Link to={path} target={target} rel={target ? 'noreferrer' : undefined}>
+  // { button }
+  // </Link>
 );
 
 export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
@@ -150,11 +108,38 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
 
   return (
     <>
-      <Item LeftIcon={DashboardIcon} label="Dashboard" onClick={onItemClick} path="/dashboard" />
-      <Item LeftIcon={SavingsIcon} label="Assets" onClick={onItemClick} path="/assets" />
-      <Item LeftIcon={NetworkNodeIcon} label="Workers" onClick={onItemClick} path="/workers" />
-      <Item LeftIcon={HandIcon} label="Delegations" onClick={onItemClick} path="/delegations" />
-      {/* <Item LeftIcon={DoorIcon} label="Gateways" onClick={onItemClick} path="/gateways" /> */}
+      <Item
+        LeftIcon={active => (active ? <Dashboard /> : <DashboardOutlined />)}
+        label="Dashboard"
+        onClick={onItemClick}
+        path="/dashboard"
+      />
+      <Item
+        LeftIcon={active => (active ? <Savings /> : <SavingsOutlined />)}
+        label="Assets"
+        onClick={onItemClick}
+        path="/assets"
+      />
+      <Item
+        LeftIcon={active => (active ? <Lan /> : <LanOutlined />)}
+        label="Workers"
+        onClick={onItemClick}
+        path="/workers"
+      />
+      <Item
+        LeftIcon={active => (active ? <BackHand /> : <BackHandOutlined />)}
+        label="Delegations"
+        onClick={onItemClick}
+        path="/delegations"
+      />
+      {demoFeaturesEnabled() && (
+        <Item
+          LeftIcon={active => (active ? <SensorDoor /> : <SensorDoorOutlined />)}
+          label="Portals"
+          onClick={onItemClick}
+          path="/portals"
+        />
+      )}
 
       <div style={{ flex: 1 }} />
 
@@ -170,16 +155,16 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
           label="Operators Chat"
           path={workersChatUrl || '/null'}
           target="_blank"
-          LeftIcon={ContactsIcon}
-          RightIcon={OpenInNewIcon}
+          LeftIcon={<SmsOutlined />}
+          RightIcon={<ArrowOutwardOutlined />}
         />
       ) : null}
       <Item
         label="Community Chat"
         path={process.env.DISCORD_API_URL || '/null'}
         target="_blank"
-        LeftIcon={ContactsIcon}
-        RightIcon={OpenInNewIcon}
+        LeftIcon={<SmsOutlined />}
+        RightIcon={<ArrowOutwardOutlined />}
       />
     </>
   );

@@ -1,6 +1,6 @@
 import { chipClasses, Chip as MaterialChip, styled } from '@mui/material';
 
-import { BlockchainGateway } from '@api/subsquid-network-squid/gateways-graphql';
+import { GatewayFragmentFragment } from '@api/subsquid-network-squid';
 
 export const Chip = styled(MaterialChip)(({ theme: { spacing } }) => ({
   fontSize: '0.75rem',
@@ -23,14 +23,14 @@ export const Chip = styled(MaterialChip)(({ theme: { spacing } }) => ({
   },
 }));
 
-export function GatewayStatus({ gateway }: { gateway: BlockchainGateway }) {
+export function GatewayStatus({ gateway }: { gateway: GatewayFragmentFragment }) {
   return (
-    <>
-      {gateway.operator?.stake?.locked ? (
-        <Chip color="success" label="Active" />
-      ) : (
-        <Chip color="default" label="Idle" />
-      )}
-    </>
+    <Chip color="success" label="Active" />
+    // <>
+    //   {gateway?.stake?.locked ? (
+    //   ) : (
+    //     <Chip color="default" label="Idle" />
+    //   )}
+    // </>
   );
 }

@@ -3,14 +3,14 @@ import React from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { SnackbarProvider } from 'notistack';
 import { BrowserRouter } from 'react-router-dom';
 import { WagmiProvider } from 'wagmi';
 
 import { queryClient } from '@api/client';
-import { Alert } from '@components/Alert';
+import { Toaster } from '@components/Toaster';
 import { SquidHeightProvider } from '@hooks/useSquidNetworkHeightHooks';
-import { wagmiConfig } from '@network/config';
+import { rainbowConfig } from '@network/config';
+import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { AppRoutes } from './AppRoutes';
 import { useCreateRainbowKitTheme, useCreateTheme, useThemeState } from './theme';
@@ -19,32 +19,31 @@ function App() {
   const [themeName] = useThemeState();
   const theme = useCreateTheme(themeName);
   const rainbowkitTheme = useCreateRainbowKitTheme(themeName);
+  const network = getSubsquidNetwork();
 
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <SquidHeightProvider>
+    <>
+      <WagmiProvider config={rainbowConfig}>
+        <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>
-            <RainbowKitProvider modalSize="compact" theme={rainbowkitTheme}>
-              <SnackbarProvider
-                hideIconVariant
-                preventDuplicate
-                maxSnack={3}
-                Components={{
-                  subsquid: Alert,
-                }}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              >
+            <RainbowKitProvider
+              modalSize="compact"
+              theme={rainbowkitTheme}
+              initialChain={getChainId(network)}
+            >
+              <SquidHeightProvider>
                 <CssBaseline />
                 <BrowserRouter>
                   <AppRoutes />
                 </BrowserRouter>
-              </SnackbarProvider>
+              </SquidHeightProvider>
+              {/* </SnackbarProvider> */}
             </RainbowKitProvider>
+            <Toaster />
           </ThemeProvider>
-        </SquidHeightProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </>
   );
 }
 

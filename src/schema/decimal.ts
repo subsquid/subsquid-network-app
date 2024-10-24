@@ -57,7 +57,8 @@ class DecimalSchema<
 
     this.withMutation(() => {
       this.transform(value => {
-        return BigNumber(value);
+        const res = BigNumber(value || 0);
+        return res.isNaN() ? BigNumber(0) : res;
       });
     });
   }

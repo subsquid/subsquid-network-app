@@ -1,27 +1,38 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network/utils';
 import { LoadingButton } from '@mui/lab';
-import { Box, Chip, Stack } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
+import toast from 'react-hot-toast';
 import { useDebounce } from 'use-debounce';
 
-import { useCapedStakeAfterDelegation, useWorkerDelegate } from '@api/contracts/staking';
-import { useWorkerDelegationInfo, Worker, WorkerStatus } from '@api/subsquid-network-squid';
-import { BlockchainContractError } from '@components/BlockchainContractError';
+import { stakingAbi, useReadRouterStaking } from '@api/contracts';
+import { useCapedStakeAfterDelegation } from '@api/contracts/staking';
+import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
+import { errorMessage } from '@api/contracts/utils';
+import {
+  AccountType,
+  SourceWalletWithBalance,
+  useWorkerDelegationInfo,
+  Worker,
+  WorkerStatus,
+} from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
-import { useMySourceOptions } from '@components/SourceWallet/useMySourceOptions';
+import { SourceWalletOption } from '@components/SourceWallet';
+import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useContracts } from '@network/useContracts';
 
 export const EXPECTED_APR_TIP = (
-  <Box>
+  <span>
     An estimated delegation APR. The realized APR may differ significantly and depends on the worker
     uptime and the total amount of SQD delegated to the worker, which may change over time.
-  </Box>
+  </span>
 );
 
 export const delegateSchema = yup.object({
@@ -37,79 +48,107 @@ export const delegateSchema = yup.object({
 });
 
 export function WorkerDelegate({
+  sources,
   worker,
   disabled,
   variant = 'outlined',
 }: {
+  sources?: SourceWalletWithBalance[];
   worker?: Pick<Worker, 'id' | 'status'>;
   variant?: 'outlined' | 'contained';
   disabled?: boolean;
 }) {
-  const { delegateToWorker, error, isPending } = useWorkerDelegate();
-
   const [open, setOpen] = useState(false);
-  const handleOpen = (event: React.UIEvent) => {
-    event.stopPropagation();
-    setOpen(true);
-  };
-  const handleClose = () => setOpen(false);
 
-  const {
-    sources,
-    options,
-    isPending: isSourceLoading,
-  } = useMySourceOptions({
-    enabled: open,
-    sourceDisabled: s => BigNumber(s.balance).lte(0),
+  return (
+    <>
+      <LoadingButton
+        loading={open}
+        disabled={disabled || !worker || worker.status !== WorkerStatus.Active}
+        onClick={() => setOpen(true)}
+        variant={variant}
+        color={variant === 'contained' ? 'info' : 'secondary'}
+      >
+        DELEGATE
+      </LoadingButton>
+      <WorkerDelegateDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        sources={sources}
+        worker={worker}
+      />
+    </>
+  );
+}
+
+export function WorkerDelegateDialog({
+  open,
+  sources,
+  worker,
+  onClose,
+}: {
+  open: boolean;
+  sources?: SourceWalletWithBalance[];
+  worker?: Pick<Worker, 'id' | 'status'>;
+  onClose: () => void;
+}) {
+  const contracts = useContracts();
+  const { writeTransactionAsync, isPending } = useWriteSQDTransaction();
+
+  const { setWaitHeight } = useSquidHeight();
+
+  const stakingAddress = useReadRouterStaking({
+    address: contracts.ROUTER,
   });
 
+  const isSourceDisabled = (source: SourceWalletWithBalance) => source.balance === '0';
+
+  const initialValues = useMemo(() => {
+    const source = sources?.find(c => !isSourceDisabled(c)) || sources?.[0];
+
+    return {
+      source: source?.id || '',
+      amount: '0',
+      max: fromSqd(source?.balance).toString(),
+    };
+  }, [sources]);
+
   const formik = useFormik({
-    initialValues: {
-      source: '',
-      amount: '',
-      max: '0',
-    },
+    initialValues,
     validationSchema: delegateSchema,
     validateOnChange: true,
     validateOnBlur: true,
     validateOnMount: true,
+    enableReinitialize: true,
 
     onSubmit: async values => {
-      const wallet = sources.find(w => w?.id === values.source);
-      if (!wallet || !worker) return;
+      if (!stakingAddress.data) return;
+      if (!worker) return;
 
-      const { failedReason } = await delegateToWorker({
-        worker,
-        amount: toSqd(values.amount),
-        wallet,
-      });
+      try {
+        const { amount, source: sourceId } = delegateSchema.cast(values);
 
-      if (!failedReason) {
-        handleClose();
+        const source = sources?.find(w => w?.id === sourceId);
+        if (!source) return;
+
+        const sqdAmount = BigInt(toSqd(amount));
+
+        const receipt = await writeTransactionAsync({
+          abi: stakingAbi,
+          address: stakingAddress.data,
+          functionName: 'deposit',
+          args: [BigInt(worker.id), sqdAmount],
+          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+          approve: sqdAmount,
+        });
+        setWaitHeight(receipt.blockNumber, []);
+
+        onClose();
+      } catch (e) {
+        toast.error(errorMessage(e));
       }
     },
   });
-
-  const source = useMemo(() => {
-    if (isSourceLoading) return;
-
-    return (
-      (formik.values.source
-        ? sources.find(c => c.id === formik.values.source)
-        : sources.find(c => fromSqd(c.balance).gte(0))) || sources?.[0]
-    );
-  }, [formik.values.source, isSourceLoading, sources]);
-
-  useEffect(() => {
-    if (!source) return;
-
-    formik.setValues({
-      ...formik.values,
-      source: source.id,
-      max: fromSqd(source.balance).toFixed(),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source]);
 
   const [delegation] = useDebounce(formik.values.amount, 500);
   const { isPending: isExpectedAprPending, stakerApr } = useExpectedAprAfterDelegation({
@@ -119,80 +158,73 @@ export function WorkerDelegate({
   });
 
   return (
-    <>
-      <LoadingButton
-        disabled={disabled || !worker || worker.status !== WorkerStatus.Active}
-        onClick={handleOpen}
-        variant={variant}
-        color={variant === 'contained' ? 'info' : 'secondary'}
-      >
-        DELEGATE
-      </LoadingButton>
-      <ContractCallDialog
-        title="Delegate"
-        confirmButtonText="DELEGATE"
-        open={open}
-        onResult={confirmed => {
-          if (!confirmed) return handleClose();
+    <ContractCallDialog
+      title="Delegate worker"
+      open={open}
+      onResult={confirmed => {
+        if (!confirmed) return onClose();
 
-          formik.handleSubmit();
-        }}
-        loading={isPending}
-      >
-        <Form onSubmit={formik.handleSubmit}>
-          <FormRow>
-            <FormikSelect
-              id="source"
-              disabled={!options.length}
-              showErrorOnlyOfTouched
-              options={options}
-              formik={formik}
-              onChange={e => {
-                const wallet = sources.find(w => w?.id === e.target.value);
-                if (!wallet) return;
+        formik.handleSubmit();
+      }}
+      loading={isPending}
+    >
+      <Form onSubmit={formik.handleSubmit}>
+        <FormRow>
+          <FormikSelect
+            id="source"
+            showErrorOnlyOfTouched
+            options={
+              sources?.map(s => {
+                return {
+                  label: <SourceWalletOption source={s} />,
+                  value: s.id,
+                  disabled: isSourceDisabled(s),
+                };
+              }) || []
+            }
+            formik={formik}
+            onChange={e => {
+              const source = sources?.find(w => w?.id === e.target.value);
+              if (!source) return;
 
-                formik.setFieldValue('source', wallet.id);
-                formik.setFieldValue('max', fromSqd(wallet.balance).toFixed());
-              }}
-            />
-          </FormRow>
-          <FormRow>
-            <FormikTextInput
-              id="amount"
-              label="Amount"
-              formik={formik}
-              showErrorOnlyOfTouched
-              autoComplete="off"
-              InputProps={{
-                endAdornment: (
-                  <Chip
-                    clickable
-                    disabled={formik.values.max === formik.values.amount}
-                    onClick={() => {
-                      formik.setValues({
-                        ...formik.values,
-                        amount: formik.values.max,
-                      });
-                    }}
-                    label="Max"
-                  />
-                ),
-              }}
-            />
-          </FormRow>
-          <FormDivider />
-          <Stack direction="row" justifyContent="space-between" alignContent="center">
-            <Box>Expected APR</Box>
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Box>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</Box>
-              <HelpTooltip title={EXPECTED_APR_TIP} />
-            </Stack>
-          </Stack>
-
-          <BlockchainContractError error={error} />
-        </Form>
-      </ContractCallDialog>
-    </>
+              formik.setFieldValue('source', source.id);
+              formik.setFieldValue('max', fromSqd(source.balance).toString());
+            }}
+          />
+        </FormRow>
+        <FormRow>
+          <FormikTextInput
+            id="amount"
+            label="Amount"
+            formik={formik}
+            showErrorOnlyOfTouched
+            autoComplete="off"
+            InputProps={{
+              endAdornment: (
+                <Chip
+                  clickable
+                  disabled={formik.values.max === formik.values.amount}
+                  onClick={() => {
+                    formik.setValues({
+                      ...formik.values,
+                      amount: formik.values.max,
+                    });
+                  }}
+                  label="Max"
+                />
+              ),
+            }}
+          />
+        </FormRow>
+        <FormDivider />
+        <Stack direction="row" justifyContent="space-between" alignContent="center">
+          <HelpTooltip title={EXPECTED_APR_TIP}>
+            <span>Expected APR</span>
+          </HelpTooltip>
+          <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+        </Stack>
+      </Form>
+    </ContractCallDialog>
   );
 }
 

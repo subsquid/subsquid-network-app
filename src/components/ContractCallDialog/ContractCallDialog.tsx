@@ -1,7 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 
 import { Box } from '@mui/material';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 
 import ConnectButton from '@components/Button/ConnectButton';
@@ -14,7 +13,7 @@ export function ContractCallDialog({
   maxWidth,
   minWidth = 600,
   confirmColor = 'info',
-  confirmButtonText = title.toUpperCase(),
+  confirmButtonText,
   cancelButtonText,
   hideCancelButton = true,
   disableBackdropClick = true,
@@ -24,7 +23,6 @@ export function ContractCallDialog({
   onApprove,
 }: PropsWithChildren<ConfirmDialogProps>) {
   const { isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
 
   if (!isConnected) {
     return (
@@ -54,7 +52,7 @@ export function ContractCallDialog({
         >
           <Box sx={{ textAlign: 'center' }}>
             <Box sx={{ mb: 2 }}>Connect your wallet to proceed</Box>
-            <ConnectButton onClick={openConnectModal} />
+            <ConnectButton />
           </Box>
         </Box>
       </ConfirmDialog>
