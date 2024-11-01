@@ -16,7 +16,7 @@ export function ContractCallDialog({
   confirmButtonText,
   cancelButtonText,
   hideCancelButton = true,
-  disableBackdropClick = true,
+  disableBackdropClick = false,
   disableConfirmButton = false,
   loading = false,
   onResult,

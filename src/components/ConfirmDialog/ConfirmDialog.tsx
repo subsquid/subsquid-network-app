@@ -4,6 +4,7 @@ import { LoadingButton } from '@mui/lab';
 import {
   Box,
   Button,
+  Dialog,
   DialogContent,
   DialogContentText,
   IconButton,
@@ -13,7 +14,6 @@ import {
 } from '@mui/material';
 
 import SquaredChip from '@components/Chip/SquaredChip.tsx';
-import { Dialog } from '@components/Dialog';
 import { CloseIcon } from '@icons/CloseIcon.tsx';
 
 export const ConfirmWrapper = styled(Box, {
@@ -121,7 +121,7 @@ export function ConfirmDialog({
   };
 
   return (
-    <Dialog open={open} onClick={onClick} onClose={onReject} disableAutoFocus disableEnforceFocus>
+    <Dialog open={open} onClick={onClick} onClose={onReject}>
       <ConfirmWrapper
         sx={{
           maxWidth: !mobile ? maxWidth : undefined,

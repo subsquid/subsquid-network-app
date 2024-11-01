@@ -539,6 +539,16 @@ export const useCreateTheme = (mode: PaletteType) => {
                 background: colors.background.default,
               },
             },
+            defaultProps: {
+              slotProps: {
+                backdrop: {
+                  sx: {
+                    backdropFilter: 'blur(0.5px)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  },
+                },
+              },
+            },
           },
           MuiMenu: {
             styleOverrides: {

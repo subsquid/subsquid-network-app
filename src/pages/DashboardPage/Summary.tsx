@@ -217,6 +217,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
           left: 0,
           bottom: 0,
         }}
+        style={{ cursor: 'pointer' }}
       >
         <defs>
           <linearGradient id="area-gradient" x2="0" y2="1">
@@ -226,6 +227,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
         </defs>
         {data.length ? (
           <Tooltip
+            // contentStyle={{ transition: 'all ease-out 5500ms' }}
             content={<AprTooltip />}
             animationDuration={0}
             cursor={{
@@ -241,11 +243,12 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
               zIndex: theme.zIndex.appBar - 1,
             }}
             offset={0}
+            trigger="click"
+            filterNull
           />
         ) : null}
         <Area
           animationDuration={0}
-          // type="linear"
           dataKey="value"
           stroke={theme.palette.info.main}
           strokeWidth={theme.spacing(0.5)}

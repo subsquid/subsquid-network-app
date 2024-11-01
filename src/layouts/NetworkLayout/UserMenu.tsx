@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 
 import { addressFormatter } from '@lib/formatters/formatters';
 import { AccountBalanceWalletOutlined, ExpandMore } from '@mui/icons-material';
-import { Box, Button, Menu, styled, Typography } from '@mui/material';
+import { Button, Menu, styled, Typography } from '@mui/material';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useAccount } from 'wagmi';
 
 import ConnectButton from '@components/Button/ConnectButton';
@@ -24,14 +25,11 @@ export const Dropdown = styled(Button)(({ theme }) => ({
 export function UserMenu() {
   const { address, isConnected } = useAccount();
   const ref = useRef<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = useCallback(() => {
-    setOpen(true);
-  }, []);
-  const handleClose = useCallback(() => {
-    setOpen(false);
-  }, []);
+  const popupState = usePopupState({
+    variant: 'popover',
+    popupId: 'filter',
+    disableAutoFocus: true,
+  });
 
   const maskedAddress = useMemo(() => {
     return address ? addressFormatter(address, true) : '';
@@ -44,7 +42,7 @@ export function UserMenu() {
   return (
     <>
       <Dropdown
-        onClick={handleOpen}
+        {...bindTrigger(popupState)}
         ref={ref}
         color="primary"
         variant="contained"
@@ -53,7 +51,7 @@ export function UserMenu() {
           <ExpandMore
             sx={{
               transition: 'transform 300ms ease-out',
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+              transform: popupState.isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
               color: 'primary.contrastText',
               // opacity: 0.2,
               width: 20,
@@ -65,16 +63,14 @@ export function UserMenu() {
         <Typography variant="body2">{maskedAddress}</Typography>
       </Dropdown>
       <UserMenuStyled
+        {...bindMenu(popupState)}
         anchorEl={ref.current}
-        open={open}
-        onClose={handleClose}
         disableEscapeKeyDown
-        disableAutoFocus
         slotProps={{
           paper: {
             sx: {
               overflow: 'visible',
-              width: 256,
+              width: 192,
             },
           },
         }}
@@ -87,9 +83,7 @@ export function UserMenu() {
           vertical: 'bottom',
         }}
       >
-        <Box sx={{ m: 1 }}>
-          <LogoutMenuItem />
-        </Box>
+        <LogoutMenuItem />
       </UserMenuStyled>
     </>
   );

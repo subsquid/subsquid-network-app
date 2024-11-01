@@ -3,32 +3,26 @@ import React, { forwardRef } from 'react';
 import {
   ListItemIcon,
   ListItemText,
-  listItemTextClasses,
   MenuItem,
   menuItemClasses,
   styled,
+  Typography,
 } from '@mui/material';
 import classnames from 'classnames';
 
 const Item = styled(MenuItem)(({ theme }) => ({
-  height: '40px',
-
-  marginTop: theme.spacing(1.5),
+  // height: '40px',
   transition: 'all ease-out 150ms',
-  paddingLeft: theme.spacing(1.5),
-  paddingRight: theme.spacing(1),
-  borderRadius: '2px',
+  // paddingLeft: theme.spacing(1.5),
+  // paddingRight: theme.spacing(1),
+  // borderRadius: '2px',
   '& path': {
     transition: 'fill ease-out 150ms',
   },
   [`&:hover, &.hovered`]: {
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    '& path': {
-      fill: theme.palette.primary.contrastText,
-    },
+    // color: theme.palette.primary.contrastText,
   },
-
   [`& .${menuItemClasses.selected}`]: {},
   [`& .MuiListItemIcon-root`]: {
     minWidth: 32,
@@ -36,9 +30,9 @@ const Item = styled(MenuItem)(({ theme }) => ({
 }));
 
 const Text = styled(ListItemText)(() => ({
-  [`& .${listItemTextClasses.primary}`]: {
-    fontSize: '0.875rem',
-  },
+  // [`& .${listItemTextClasses.primary}`]: {
+  //   fontSize: '0.875rem',
+  // },
 }));
 
 export const BasicMenuItem = forwardRef(
@@ -72,7 +66,7 @@ export const BasicMenuItem = forwardRef(
         <ListItemIcon>
           <LeftIcon />
         </ListItemIcon>
-        <Text>{label}</Text>
+        <Typography>{label}</Typography>
         {RightIcon ? <RightIcon sx={{ opacity: 0.4 }} /> : null}
       </Item>
     );
