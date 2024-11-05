@@ -20,6 +20,7 @@ import {
   Config,
   ResolvedRegister,
   useAccount,
+  useBalance,
   useConfig,
   useWriteContract,
   UseWriteContractParameters,
@@ -78,6 +79,11 @@ export function useWriteSQDTransaction<
   parameters: UseWriteTransactionParameters<config, context> = {},
 ): UseWriteTransactionReturnType<config, context> {
   const account = useAccount();
+  const { data: ethBalance } = useBalance({
+    address: account.address,
+    query: { enabled: !!account.address },
+  });
+
   const config = useConfig(parameters);
   const { writeContractAsync, ...result } = useWriteContract(parameters);
   const [isPending, setPending] = useState<boolean>(false);
@@ -94,6 +100,10 @@ export function useWriteSQDTransaction<
     ) => {
       setPending(true);
       try {
+        if (!ethBalance?.value) {
+          throw new Error('Insufficient ETH balance');
+        }
+
         const address =
           (typeof args[0].account === 'string' ? args[0].account : args[0].account?.address) ||
           account.address;
