@@ -15,6 +15,7 @@ import { useBlock, useReadContracts } from 'wagmi';
 
 import {
   gatewayRegistryAbi,
+  useReadGatewayRegistryMinStake,
   useReadNetworkControllerWorkerEpochLength,
   useReadRouterNetworkController,
 } from '@api/contracts';
@@ -46,8 +47,10 @@ export const stakeSchema = yup.object({
     .required()
     .positive()
     .max(yup.ref('max'))
+    .min(yup.ref('min'))
     .typeError('${path} is invalid'),
   max: yup.string().label('Max').required().typeError('${path} is invalid'),
+  min: yup.string().label('Min').required().typeError('${path} is invalid'),
   autoExtension: yup.boolean().label('Auto extend').default(true),
   durationBlocks: yup
     .number()
@@ -98,11 +101,16 @@ export function GatewayStakeDialog({
 
   const { GATEWAY_REGISTRATION, ROUTER, CHAIN_ID_L1 } = useContracts();
 
-  const networkController = useReadRouterNetworkController({
-    address: ROUTER,
-  });
-  const workerEpochLength = useReadNetworkControllerWorkerEpochLength({
-    address: networkController.data,
+  const { data: networkController, isLoading: isNetworkControllerLoading } =
+    useReadRouterNetworkController({
+      address: ROUTER,
+    });
+  const { data: workerEpochLength, isLoading: isWorkerEpochLengthLoading } =
+    useReadNetworkControllerWorkerEpochLength({
+      address: networkController,
+    });
+  const { data: minStake, isLoading: isMinStakeLoading } = useReadGatewayRegistryMinStake({
+    address: GATEWAY_REGISTRATION,
   });
 
   // const myGatewaysStake = useMyGatewayStake();
@@ -112,7 +120,11 @@ export function GatewayStakeDialog({
     chainId: CHAIN_ID_L1,
   });
 
-  const isLoading = isLastL1BlockLoading;
+  const isLoading =
+    isLastL1BlockLoading ||
+    isNetworkControllerLoading ||
+    isWorkerEpochLengthLoading ||
+    isMinStakeLoading;
 
   const isSourceDisabled = (source: SourceWalletWithBalance) =>
     source.balance === '0' || source.type === AccountType.Vesting;
@@ -123,11 +135,12 @@ export function GatewayStakeDialog({
 
     return {
       source: source?.id || '0x',
-      amount: '0',
-      max: fromSqd(source?.balance)?.toString() || '0',
+      amount: !!source?.stake.amount ? '0' : fromSqd(minStake).toFixed() || '0',
+      max: fromSqd(source?.balance)?.toFixed() || '0',
+      min: fromSqd(minStake)?.toFixed() || '0',
       durationBlocks: (source?.stake.duration || MIN_BLOCKS_LOCK).toString(),
     };
-  }, [sources]);
+  }, [sources, minStake]);
 
   const formik = useFormik({
     initialValues,
@@ -206,7 +219,7 @@ export function GatewayStakeDialog({
   const preview = useMemo(() => {
     if (!newContractValues.data || !lastL1Block || !selectedSource) return;
 
-    const workerEpochLengthValue = workerEpochLength.data || 0n;
+    const workerEpochLengthValue = workerEpochLength || 0n;
 
     const epochCount = Math.ceil(debouncedValues.durationBlocks / Number(workerEpochLengthValue));
 
@@ -231,11 +244,12 @@ export function GatewayStakeDialog({
       totalAmount,
     };
   }, [
-    debouncedValues,
+    debouncedValues.amount,
+    debouncedValues.durationBlocks,
     lastL1Block,
     newContractValues.data,
     selectedSource,
-    workerEpochLength.data,
+    workerEpochLength,
   ]);
 
   return (

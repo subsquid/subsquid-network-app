@@ -107,14 +107,25 @@ function OnlineInfo() {
   );
 }
 
+function CurrentEpochEstimation({ epochEnd }: { epochEnd: number }) {
+  const curTime = useTicker(() => Date.now(), 1000);
+  const epochEndsIn = useMemo(() => relativeDateFormat(curTime, epochEnd), [curTime, epochEnd]);
+
+  return (
+    <Stack direction="row" spacing={1}>
+      <span>Ends in</span>
+      <SquaredChip
+        label={<Typography variant="subtitle1">~{epochEndsIn}</Typography>}
+        color="warning"
+      />
+    </Stack>
+  );
+}
+
 function CurrentEpoch() {
   const { data, isLoading } = useNetworkSummary();
 
   const [epochEnd, setEpochEnd] = useState<number>(Date.now());
-
-  const curTime = useTicker(() => Date.now(), 1000);
-  const epochEndsIn = useMemo(() => relativeDateFormat(curTime, epochEnd), [curTime, epochEnd]);
-
   useEffect(() => {
     if (!data || !data.epoch) return;
 
@@ -130,15 +141,7 @@ function CurrentEpoch() {
       sx={{ height: 1 }}
       loading={isLoading}
       title={<SquaredChip label="Current epoch" color="primary" />}
-      action={
-        <Stack direction="row" spacing={1}>
-          <span>Ends in</span>
-          <SquaredChip
-            label={<Typography variant="subtitle1">~{epochEndsIn}</Typography>}
-            color="warning"
-          />
-        </Stack>
-      }
+      action={<CurrentEpochEstimation epochEnd={epochEnd} />}
     >
       <Typography variant="h1">{data?.epoch?.number || 0}</Typography>
     </SummarySection>
