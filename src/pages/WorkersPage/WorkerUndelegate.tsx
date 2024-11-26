@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
 import { dateFormat, relativeDateFormat } from '@i18n';
-import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters';
+import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
 import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
@@ -20,6 +20,7 @@ import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@comp
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
+import { useTicker } from '@hooks/useTicker';
 import { useContracts } from '@network/useContracts';
 
 import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegate';
@@ -57,7 +58,7 @@ export function WorkerUndelegate({
 
   const isLocked = useMemo(() => !!sources?.length && !sources?.some(d => !d.locked), [sources]);
 
-  const [curTimestamp] = useDebounce(Date.now(), 1000);
+  const curTimestamp = useTicker(() => Date.now(), 1000);
   const { unlockedAt, timeLeft } = useMemo(() => {
     const min = sources?.reduce(
       (r, d) => {

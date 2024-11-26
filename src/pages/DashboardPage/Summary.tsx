@@ -21,12 +21,12 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
-import { useDebounce } from 'use-debounce';
 
 import { useNetworkSummary } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
+import { useTicker } from '@hooks/useTicker';
 import { useContracts } from '@network/useContracts';
 
 export function ColumnLabel({ children, color }: PropsWithChildren<{ color?: string }>) {
@@ -112,8 +112,7 @@ function CurrentEpoch() {
 
   const [epochEnd, setEpochEnd] = useState<number>(Date.now());
 
-  const [curTime] = useDebounce(Date.now(), 1000);
-
+  const curTime = useTicker(() => Date.now(), 1000);
   const epochEndsIn = useMemo(() => relativeDateFormat(curTime, epochEnd), [curTime, epochEnd]);
 
   useEffect(() => {
@@ -230,10 +229,14 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
             // contentStyle={{ transition: 'all ease-out 5500ms' }}
             content={<AprTooltip />}
             animationDuration={0}
+            // animationEasing="ease-out"
             cursor={{
               stroke: theme.palette.text.secondary,
               strokeWidth: 2,
               strokeDasharray: 6,
+            }}
+            cursorStyle={{
+              transition: 'all ease-out 300ms !important',
             }}
             defaultIndex={Math.max(data.length - 2, 0)}
             active

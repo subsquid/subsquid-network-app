@@ -4,9 +4,9 @@ import { dateFormat, relativeDateFormat } from '@i18n';
 import { CircleRounded } from '@mui/icons-material';
 import { Box, Chip as MaterialChip, Tooltip, chipClasses, styled } from '@mui/material';
 import capitalize from 'lodash-es/capitalize';
-import { useDebounce } from 'use-debounce';
 
 import { WorkerStatus as Status, Worker } from '@api/subsquid-network-squid';
+import { useTicker } from '@hooks/useTicker';
 
 export const Chip = styled(MaterialChip)(({ theme }) => ({
   // [`&.${chipClasses.colorSuccess}`]: {
@@ -55,7 +55,7 @@ export function WorkerStatusChip({
     return { label: capitalize(worker.status), color: 'primary' };
   }, [worker.jailReason, worker.jailed, worker.online, worker.status]);
 
-  const [curTimestamp] = useDebounce(Date.now(), 1000);
+  const curTimestamp = useTicker(() => Date.now(), 1000);
   const timeLeft = useMemo(
     () =>
       worker.statusChangeAt ? relativeDateFormat(curTimestamp, worker.statusChangeAt) : undefined,
