@@ -323,13 +323,13 @@ const GettingStarted = () => {
       ),
     },
     {
-      primary: 'Lock you tokens',
+      primary: 'Lock your tokens',
       secondary: (
         <>
           Lock your SQD tokens to generate Compute Units (CUs), which are used to handle SQD Network
           queries.{' '}
           <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#staking-requirements-and-compute-units">
-            How do I lock my tokens?
+            How do CUs transfer to SQD?
           </a>
         </>
       ),
@@ -340,7 +340,7 @@ const GettingStarted = () => {
         <>
           Create a Peer ID to identify your portal.{' '}
           <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#generate-peer-id">
-            How do I generate a Peer ID?
+            How to generate a Peer ID?
           </a>
         </>
       ),

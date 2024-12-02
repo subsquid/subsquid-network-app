@@ -49,7 +49,7 @@ jobs:
               echo "::set-output name=enable_demo_features::false"
           else
               echo "::set-output name=app_env::dev"
-              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet:dev/api/graphql"
+              echo "::set-output name=testnet_squid_api_url::https://subsquid.squids.live/subsquid-network-testnet:dev/api/graphql"
               echo "::set-output name=mainnet_squid_api_url::https://subsquid.squids.live/subsquid-network-mainnet:dev/api/graphql"
               echo "::set-output name=enable_demo_features::true"
           fi
