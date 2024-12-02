@@ -46,7 +46,7 @@ export const stakeSchema = yup.object({
     .label('Amount')
     .required()
     .positive()
-    .max(yup.ref('max'))
+    .max(yup.ref('max'), 'Insufficient balance')
     .min(yup.ref('min'))
     .typeError('${path} is invalid'),
   max: yup.string().label('Max').required().typeError('${path} is invalid'),
@@ -183,6 +183,7 @@ export function GatewayStakeDialog({
         onClose();
       } catch (e: unknown) {
         toast.error(errorMessage(e));
+        // toast.error(errorMessage(e));
       }
     },
   });
@@ -323,9 +324,7 @@ export function GatewayStakeDialog({
               id="durationBlocks"
               label={
                 // TODO: add tooltip text
-                <HelpTooltip title="Lorem ipsum dolor">
-                  <span>Duration</span>
-                </HelpTooltip>
+                <span>Duration</span>
               }
               formik={formik}
               showErrorOnlyOfTouched
@@ -347,7 +346,7 @@ export function GatewayStakeDialog({
               {numberWithCommasFormatter(preview?.epochCount)}
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignContent="center">
-              <HelpTooltip title="Lorem ipsum dolor">
+              <HelpTooltip title="Available CUs in a current epoch. When all CUs are used, the portal will temporarily stop processing additional requests until the next epoch begins">
                 <span>Available CUs</span>
               </HelpTooltip>
               {numberWithCommasFormatter(preview?.cuPerEpoch)}

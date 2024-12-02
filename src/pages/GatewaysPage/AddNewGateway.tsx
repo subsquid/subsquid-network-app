@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { peerIdToHex } from '@lib/network';
 import { Add } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Alert, SxProps } from '@mui/material';
+import { SxProps } from '@mui/material';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
@@ -117,7 +117,7 @@ export function AddGatewayDialog({
 
         onClose();
       } catch (e: unknown) {
-        toast.custom(<Alert color="error">{errorMessage(e)}</Alert>);
+        toast.error(errorMessage(e));
       }
     },
   });
@@ -160,7 +160,7 @@ export function AddGatewayDialog({
               showErrorOnlyOfTouched
               id="peerId"
               label={
-                <HelpTooltip title="Lorem ipsum dolor sit amet consectetur adipisicing elit">
+                <HelpTooltip title="A PeerID is a unique identifier that distinguishes one peer from another within the SQD Network">
                   <span>Peer ID</span>
                 </HelpTooltip>
               }

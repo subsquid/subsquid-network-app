@@ -124,7 +124,7 @@ export function WorkerWithdrawDialog({
 
   return (
     <ContractCallDialog
-      title="Unregister worker?"
+      title="Withdraw worker?"
       open={open}
       onResult={confirmed => {
         if (!confirmed) return onClose();

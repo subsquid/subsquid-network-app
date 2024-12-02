@@ -16,7 +16,7 @@ const formatter8 = new Intl.NumberFormat('en', {
 });
 
 export function numberWithCommasFormatter(val?: number | bigint | string) {
-  if (val === undefined) return '';
+  if (!val) return '0';
 
   return formatter8.format(typeof val === 'string' ? Number(val) : val);
 }

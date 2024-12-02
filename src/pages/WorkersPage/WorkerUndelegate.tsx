@@ -37,7 +37,7 @@ export const undelegateSchema = yup.object({
     .label('Amount')
     .required()
     .positive()
-    .max(yup.ref('max'))
+    .max(yup.ref('max'), 'Insufficient balance')
     .typeError('${path} is invalid'),
   max: yup.string().label('Max').required().typeError('${path} is invalid'),
 });
@@ -136,7 +136,7 @@ function WorkerUndelegateDialog({
   const contracts = useContracts();
   const { writeTransactionAsync, isPending } = useWriteSQDTransaction();
 
-  const stakingAddress = useReadRouterStaking({
+  const { data: stakingAddress, isLoading: isStakingAddressLoading } = useReadRouterStaking({
     address: contracts.ROUTER,
   });
 
@@ -159,7 +159,7 @@ function WorkerUndelegateDialog({
     enableReinitialize: true,
 
     onSubmit: async values => {
-      if (!stakingAddress.data) return;
+      if (!stakingAddress) return;
       if (!worker) return;
 
       try {
@@ -172,7 +172,7 @@ function WorkerUndelegateDialog({
 
         const receipt = await writeTransactionAsync({
           abi: stakingAbi,
-          address: stakingAddress.data,
+          address: stakingAddress,
           functionName: 'withdraw',
           args: [BigInt(worker.id), sqdAmount],
           vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
@@ -193,6 +193,8 @@ function WorkerUndelegateDialog({
     enabled: open && !!worker,
   });
 
+  const isLoading = isStakingAddressLoading || isExpectedAprPending;
+
   return (
     <ContractCallDialog
       title="Undelegate worker"
@@ -203,7 +205,7 @@ function WorkerUndelegateDialog({
 
         formik.handleSubmit();
       }}
-      confirmColor="error"
+      disableConfirmButton={isLoading || !formik.isValid}
     >
       <Form onSubmit={formik.handleSubmit}>
         <FormRow>

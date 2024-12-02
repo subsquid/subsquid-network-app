@@ -26,7 +26,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useBlock } from 'wagmi';
 
 import {
@@ -176,22 +176,27 @@ export function MyStakes() {
                   <ColumnLabel>
                     <Stack direction="row" spacing={1}>
                       <span>Amount</span>
-                      <Tooltip
-                        title="Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-                        placement="top"
-                      >
-                        <Box display="flex">
-                          {stake &&
-                            lastL1Block &&
-                            (isPending ? (
+                      <Box display="flex">
+                        {stake &&
+                          lastL1Block &&
+                          (isPending ? (
+                            <Tooltip
+                              title="Tokens have been locked but will become active at the start of the next epoch"
+                              placement="top"
+                            >
                               <SquaredChip label="Pending" color="warning" />
-                            ) : isActive ? (
+                            </Tooltip>
+                          ) : isActive ? (
+                            <Tooltip
+                              title="Tokens have been locked and remain valid until the expiration date"
+                              placement="top"
+                            >
                               <SquaredChip label="Active" color="info" />
-                            ) : isExpired ? (
-                              <SquaredChip label="Expired" color="error" />
-                            ) : null)}
-                        </Box>
-                      </Tooltip>
+                            </Tooltip>
+                          ) : isExpired ? (
+                            <SquaredChip label="Expired" color="error" />
+                          ) : null)}
+                      </Box>
                     </Stack>
                   </ColumnLabel>
                   <ColumnValue>{tokenFormatter(fromSqd(stake?.amount), SQD_TOKEN, 3)}</ColumnValue>
@@ -207,7 +212,7 @@ export function MyStakes() {
               </Stack>
               <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
                 <Box>
-                  <ColumnLabel>Unlocked At</ColumnLabel>
+                  <ColumnLabel>Expired At</ColumnLabel>
                   <ColumnValue>
                     {!stake?.autoExtension
                       ? unlockDate && stake?.lockEnd
@@ -245,7 +250,13 @@ export function MyGateways() {
           <SquaredChip label="My Portals" color="primary" />
 
           <Stack direction="row" spacing={1}>
-            <Button color="secondary" variant="outlined">
+            <Button
+              color="secondary"
+              variant="outlined"
+              component={Link}
+              target="_blank"
+              to="https://docs.sqd.dev/subsquid-network/participate/portal/"
+            >
               LEARN MORE
             </Button>
             <AddGatewayButton disabled={isLoading} sources={sources} />
@@ -295,7 +306,7 @@ export function MyGateways() {
   );
 }
 
-const GettingStartedAlert = () => {
+const GettingStarted = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -304,7 +315,10 @@ const GettingStartedAlert = () => {
       primary: 'Get SQD tokens',
       secondary: (
         <>
-          Make sure you have enough SQD tokens. <a href="#">How much do I need?</a>
+          Make sure you have enough SQD tokens to get started.{' '}
+          <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#lock-sqd">
+            How much do I need?
+          </a>
         </>
       ),
     },
@@ -312,7 +326,11 @@ const GettingStartedAlert = () => {
       primary: 'Lock you tokens',
       secondary: (
         <>
-          Lock your tokens to obtain Compute Units (CUs). <a href="#">How do I lock my tokens?</a>
+          Lock your SQD tokens to generate Compute Units (CUs), which are used to handle SQD Network
+          queries.{' '}
+          <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#staking-requirements-and-compute-units">
+            How do I lock my tokens?
+          </a>
         </>
       ),
     },
@@ -320,13 +338,16 @@ const GettingStartedAlert = () => {
       primary: 'Generate a Peer ID',
       secondary: (
         <>
-          Create a Peer ID to identify your portal. <a href="#">How do I generate a Peer ID?</a>
+          Create a Peer ID to identify your portal.{' '}
+          <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#generate-peer-id">
+            How do I generate a Peer ID?
+          </a>
         </>
       ),
     },
     {
-      primary: 'Add your portal',
-      secondary: <>Register your portal on a chain.</>,
+      primary: 'Register Your Portal',
+      secondary: <>Add your portal to the chain to complete the setup.</>,
     },
   ];
 
@@ -375,9 +396,11 @@ const GettingStartedAlert = () => {
             ))}
           </List>
           <Typography variant="body1" mt={1}>
-            That's it! You're ready to run your Portal. If you need more guidance read our{' '}
-            <a href="#">portal section</a> in our docs or reach out to our{' '}
-            <a href="#">support team</a> for help.
+            That's it! Your portal is now ready to run. For more detailed guidance, check out the{' '}
+            <a href="https://docs.sqd.dev/subsquid-network/participate/portal/">
+              Portal Documentation
+            </a>{' '}
+            or <a href="https://t.me/HydraDevs">contact our team</a> for help.
           </Typography>
         </Box>
       </Collapse>
@@ -389,7 +412,7 @@ export function GatewaysPage() {
   return (
     <CenteredPageWrapper className="wide">
       <ConnectedWalletRequired>
-        <GettingStartedAlert />
+        <GettingStarted />
         <MyStakes />
         <MyGateways />
       </ConnectedWalletRequired>
