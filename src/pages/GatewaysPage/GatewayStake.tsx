@@ -46,8 +46,8 @@ export const stakeSchema = yup.object({
     .label('Amount')
     .required()
     .positive()
-    .max(yup.ref('max'), 'Insufficient balance')
     .min(yup.ref('min'))
+    .max(yup.ref('max'), 'Insufficient balance')
     .typeError('${path} is invalid'),
   max: yup.string().label('Max').required().typeError('${path} is invalid'),
   min: yup.string().label('Min').required().typeError('${path} is invalid'),
