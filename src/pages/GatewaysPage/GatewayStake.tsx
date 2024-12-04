@@ -296,7 +296,11 @@ export function GatewayStakeDialog({
           <FormRow>
             <FormikTextInput
               id="amount"
-              label="Amount"
+              label={
+                <HelpTooltip title="Locking additional SQD increases the number of CUs available per epoch">
+                  <span>Amount</span>
+                </HelpTooltip>
+              }
               formik={formik}
               showErrorOnlyOfTouched
               autoComplete="off"
@@ -324,7 +328,7 @@ export function GatewayStakeDialog({
               id="durationBlocks"
               label={
                 // TODO: add tooltip text
-                <span>Duration</span>
+                <span>Duration (blocks)</span>
               }
               formik={formik}
               showErrorOnlyOfTouched

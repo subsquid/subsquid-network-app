@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
-import { dateFormat, relativeDateFormat } from '@i18n';
+import { dateFormat } from '@i18n';
 import { CircleRounded } from '@mui/icons-material';
 import { Box, Chip as MaterialChip, Tooltip, chipClasses, styled } from '@mui/material';
 import capitalize from 'lodash-es/capitalize';
 
 import { WorkerStatus as Status, Worker } from '@api/subsquid-network-squid';
-import { useTicker } from '@hooks/useTicker';
+import { useCountdown } from '@hooks/useCountdown';
 
 export const Chip = styled(MaterialChip)(({ theme }) => ({
   // [`&.${chipClasses.colorSuccess}`]: {
@@ -22,6 +22,12 @@ export const Chip = styled(MaterialChip)(({ theme }) => ({
     borderColor: theme.palette.primary.contrastText,
   },
 }));
+
+function AppliesTooltip({ timestamp }: { timestamp?: string }) {
+  const timeLeft = useCountdown({ timestamp });
+
+  return `Applies in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`;
+}
 
 export function WorkerStatusChip({
   worker,
@@ -55,20 +61,9 @@ export function WorkerStatusChip({
     return { label: capitalize(worker.status), color: 'primary' };
   }, [worker.jailReason, worker.jailed, worker.online, worker.status]);
 
-  const curTimestamp = useTicker(() => Date.now(), 1000);
-  const timeLeft = useMemo(
-    () =>
-      worker.statusChangeAt ? relativeDateFormat(curTimestamp, worker.statusChangeAt) : undefined,
-    [curTimestamp, worker.statusChangeAt],
-  );
-
   const chip = (
     <Tooltip
-      title={
-        worker.statusChangeAt
-          ? `Applies in ${timeLeft} (${dateFormat(worker.statusChangeAt, 'dateTime')})`
-          : ''
-      }
+      title={worker.statusChangeAt && <AppliesTooltip timestamp={worker.statusChangeAt} />}
       placement="top"
     >
       <Chip

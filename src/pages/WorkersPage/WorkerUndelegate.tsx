@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import { dateFormat, relativeDateFormat } from '@i18n';
+import { dateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
 import { Lock } from '@mui/icons-material';
@@ -19,11 +19,17 @@ import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
+import { useCountdown } from '@hooks/useCountdown';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
-import { useTicker } from '@hooks/useTicker';
 import { useContracts } from '@network/useContracts';
 
 import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegate';
+
+function UnlocksTooltip({ timestamp }: { timestamp?: string }) {
+  const timeLeft = useCountdown({ timestamp });
+
+  return <span>{`Unlocks in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`}</span>;
+}
 
 export type SourceWalletWithDelegation = SourceWalletWithBalance & {
   locked: boolean;
@@ -58,8 +64,7 @@ export function WorkerUndelegate({
 
   const isLocked = useMemo(() => !!sources?.length && !sources?.some(d => !d.locked), [sources]);
 
-  const curTimestamp = useTicker(() => Date.now(), 1000);
-  const { unlockedAt, timeLeft } = useMemo(() => {
+  const { unlockedAt } = useMemo(() => {
     const min = sources?.reduce(
       (r, d) => {
         if (!d.unlockedAt) return r;
@@ -72,18 +77,17 @@ export function WorkerUndelegate({
 
     return {
       unlockedAt: min ? new Date(min).toISOString() : undefined,
-      timeLeft: min ? relativeDateFormat(curTimestamp, min) : undefined,
     };
-  }, [curTimestamp, sources]);
+  }, [sources]);
 
   return (
     <>
-      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-        {isLocked && (
-          <Tooltip
-            title={unlockedAt && `Unlocks in ${timeLeft} (${dateFormat(unlockedAt, 'dateTime')})`}
-            placement="top"
-          >
+      <Tooltip
+        title={!disabled && unlockedAt && <UnlocksTooltip timestamp={unlockedAt} />}
+        placement="top"
+      >
+        <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+          {isLocked && !disabled && (
             <Lock
               fontSize="small"
               sx={{
@@ -95,18 +99,18 @@ export function WorkerUndelegate({
                 zIndex: 1,
               }}
             />
-          </Tooltip>
-        )}
-        <LoadingButton
-          loading={open}
-          onClick={() => setOpen(true)}
-          variant="outlined"
-          color="error"
-          disabled={disabled || isLocked}
-        >
-          UNDELEGATE
-        </LoadingButton>
-      </Box>
+          )}
+          <LoadingButton
+            loading={open}
+            onClick={() => setOpen(true)}
+            variant="outlined"
+            color="error"
+            disabled={disabled || isLocked}
+          >
+            UNDELEGATE
+          </LoadingButton>
+        </Box>
+      </Tooltip>
       <WorkerUndelegateDialog
         open={open}
         onClose={() => setOpen(false)}

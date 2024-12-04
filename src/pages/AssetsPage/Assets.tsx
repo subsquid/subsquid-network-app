@@ -281,7 +281,7 @@ export function MyAssets() {
               <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
                 <TokenBalance balance={balances[3]} />
                 <TokenBalance balance={balances[4]} />
-                <TokenBalance balance={balances[5]} />
+                {/* <TokenBalance balance={balances[5]} /> */}
               </Stack>
             </Stack>
           </Grid>

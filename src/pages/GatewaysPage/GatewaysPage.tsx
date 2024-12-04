@@ -9,6 +9,7 @@ import {
   Avatar,
   Box,
   Button,
+  Card,
   Collapse,
   Divider,
   IconButton,
@@ -44,6 +45,7 @@ import {
 import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { DashboardTable, NoItems } from '@components/Table';
+import { useCountdown } from '@hooks/useCountdown';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
@@ -56,6 +58,18 @@ import { GatewayName } from './GatewayName';
 import { GatewayStakeButton } from './GatewayStake';
 import { GatewayUnregisterButton } from './GatewayUnregister';
 import { GatewayUnstakeButton } from './GatewayUnstake';
+
+function AppliesTooltip({ timestamp }: { timestamp?: string }) {
+  const timeLeft = useCountdown({ timestamp });
+
+  return <span>{`Applies in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`}</span>;
+}
+
+function ExpiresTooltip({ timestamp }: { timestamp?: string }) {
+  const timeLeft = useCountdown({ timestamp });
+
+  return <span>{`Expires in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`}</span>;
+}
 
 export function MyStakes() {
   const theme = useTheme();
@@ -95,6 +109,14 @@ export function MyStakes() {
   const { data: lastL1Block, isLoading: isL1BlockLoading } = useBlock({
     chainId: l1ChainId,
   });
+  const { data: appliedAtL1Block, isLoading: isAppliedAtBlockLoading } = useBlock({
+    chainId: l1ChainId,
+    blockNumber: stake?.lockStart,
+    includeTransactions: false,
+    query: {
+      enabled: stake && stake?.lockStart <= (lastL1Block?.number || 0n),
+    },
+  });
   const { data: unlockedAtL1Block, isLoading: isUnlockedAtBlockLoading } = useBlock({
     chainId: l1ChainId,
     blockNumber: stake?.lockEnd,
@@ -124,15 +146,27 @@ export function MyStakes() {
     stake.lockEnd >= (lastL1Block?.number || 0n);
   const isExpired = !!stake?.amount && stake.lockEnd < (lastL1Block?.number || 0n);
 
-  const unlockDate = useMemo(() => {
+  const appliedAt = useMemo(() => {
     if (!stake || !lastL1Block) return;
 
-    if (stake.lockEnd < lastL1Block.number)
-      return Number(unlockedAtL1Block?.timestamp || 0n) * 1000;
+    if (stake.lockStart < lastL1Block.number)
+      return new Date(Number(appliedAtL1Block?.timestamp || 0n) * 1000).toISOString();
 
-    return (
-      Number(lastL1Block.timestamp) * 1000 + getBlockTime(stake.lockEnd - lastL1Block.number + 1n)
-    );
+    return new Date(
+      Number(lastL1Block.timestamp) * 1000 +
+        getBlockTime(stake.lockStart - lastL1Block.number + 1n),
+    ).toISOString();
+  }, [appliedAtL1Block?.timestamp, lastL1Block, stake]);
+
+  const unlockedAt = useMemo(() => {
+    if (!stake || !lastL1Block || stake.autoExtension) return;
+
+    if (stake.lockEnd < lastL1Block.number)
+      return new Date(Number(unlockedAtL1Block?.timestamp || 0n) * 1000).toISOString();
+
+    return new Date(
+      Number(lastL1Block.timestamp) * 1000 + getBlockTime(stake.lockEnd - lastL1Block.number + 1n),
+    ).toISOString();
   }, [lastL1Block, stake, unlockedAtL1Block?.timestamp]);
 
   const cuPerEpoch = useMemo(() => {
@@ -154,7 +188,13 @@ export function MyStakes() {
           action={
             <Stack direction="row" spacing={1}>
               <GatewayStakeButton sources={sources} disabled={isLoading || isPending} />
-              <GatewayUnstakeButton disabled={isLoading || !isExpired} />
+              <GatewayUnstakeButton
+                disabled={isLoading || !stake?.amount}
+                source={{
+                  locked: !isExpired,
+                  unlockedAt,
+                }}
+              />
             </Stack>
           }
         >
@@ -181,14 +221,14 @@ export function MyStakes() {
                           lastL1Block &&
                           (isPending ? (
                             <Tooltip
-                              title="Tokens have been locked but will become active at the start of the next epoch"
+                              title={<AppliesTooltip timestamp={appliedAt} />}
                               placement="top"
                             >
                               <SquaredChip label="Pending" color="warning" />
                             </Tooltip>
                           ) : isActive ? (
                             <Tooltip
-                              title="Tokens have been locked and remain valid until the expiration date"
+                              title={<ExpiresTooltip timestamp={unlockedAt} />}
                               placement="top"
                             >
                               <SquaredChip label="Active" color="info" />
@@ -210,7 +250,7 @@ export function MyStakes() {
                   <ColumnValue>{numberWithCommasFormatter(cuPerEpoch || 0)}</ColumnValue>
                 </Box>
               </Stack>
-              <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
+              {/* <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
                 <Box>
                   <ColumnLabel>Expired At</ColumnLabel>
                   <ColumnValue>
@@ -221,7 +261,7 @@ export function MyStakes() {
                       : 'Auto-extension enabled'}
                   </ColumnValue>
                 </Box>
-              </Stack>
+              </Stack> */}
             </Stack>
           </Stack>
         </SummarySection>
@@ -352,25 +392,28 @@ const GettingStarted = () => {
   ];
 
   return (
-    <Alert
-      sx={{ mb: 2 }}
-      color="info"
-      icon={<Info />}
-      action={
-        <IconButton color="inherit" sx={{ padding: 0.5 }} onClick={() => setOpen(!open)}>
-          <ExpandMore
-            sx={{
-              transition: 'transform 300ms ease-out',
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-            }}
-          />
-        </IconButton>
-      }
-    >
-      <Typography>Getting started with your portal</Typography>
+    <Card sx={{ mb: 2, background: '#f3f3ff', padding: 0 }}>
+      <Alert
+        sx={{ cursor: 'pointer' }}
+        color="info"
+        icon={<Info />}
+        action={
+          <IconButton color="inherit" sx={{ padding: 0.5 }}>
+            <ExpandMore
+              sx={{
+                transition: 'transform 300ms ease-out',
+                transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+            />
+          </IconButton>
+        }
+        onClick={() => setOpen(!open)}
+      >
+        <Typography>Getting started with your portal</Typography>
+      </Alert>
 
-      <Collapse in={open} unmountOnExit timeout={300}>
-        <Box pt={1.5}>
+      <Collapse in={open} timeout={300}>
+        <Box pt={0} pl={6.5} pr={6.5} pb={2} color="#383766">
           <List disablePadding>
             {steps.map(({ primary, secondary }, i) => (
               <ListItem
@@ -404,7 +447,7 @@ const GettingStarted = () => {
           </Typography>
         </Box>
       </Collapse>
-    </Alert>
+    </Card>
   );
 };
 

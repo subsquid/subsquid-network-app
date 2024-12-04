@@ -15,7 +15,7 @@ const Item = styled(MenuItem)(({ theme }) => ({
   transition: 'all ease-out 150ms',
   // paddingLeft: theme.spacing(1.5),
   // paddingRight: theme.spacing(1),
-  // borderRadius: '2px',
+  borderRadius: '4px',
   '& path': {
     transition: 'fill ease-out 150ms',
   },

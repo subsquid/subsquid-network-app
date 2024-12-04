@@ -12,7 +12,7 @@ import { LogoutMenuItem } from './LogoutMenuItem';
 
 export const UserMenuStyled = styled(Menu, {
   name: 'UserMenuStyled',
-})(() => ({
+})(({ theme }) => ({
   minWidth: '100%',
 }));
 
@@ -71,6 +71,10 @@ export function UserMenu() {
             sx: {
               overflow: 'visible',
               width: 192,
+              pl: 1,
+              pr: 1,
+              pt: 0.5,
+              pb: 0.5,
             },
           },
         }}

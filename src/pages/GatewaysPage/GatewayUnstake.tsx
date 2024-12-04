@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
-import { LockOpen as LockOpenIcon } from '@mui/icons-material';
+import { dateFormat } from '@i18n';
+import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { Box, SxProps, Tooltip } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
 import * as yup from 'yup';
@@ -11,6 +12,7 @@ import { gatewayRegistryAbi } from '@api/contracts';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
 import { ContractCallDialog } from '@components/ContractCallDialog';
+import { useCountdown } from '@hooks/useCountdown';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
 
@@ -24,22 +26,68 @@ export const stakeSchema = yup.object({
   //   .max(yup.ref('max'), ({ max }) => `Amount should be less than ${formatSqd(max)} `),
 });
 
-export function GatewayUnstakeButton({ sx, disabled }: { sx?: SxProps; disabled?: boolean }) {
+function UnlocksTooltip({ timestamp }: { timestamp?: Date | string | number | undefined }) {
+  const timeLeft = useCountdown({ timestamp });
+
+  return `Unlocks in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`;
+}
+
+export function GatewayUnstakeButton({
+  sx,
+  disabled,
+  source,
+}: {
+  sx?: SxProps;
+  disabled?: boolean;
+  source: {
+    locked: boolean;
+    unlockedAt?: string;
+  };
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <LoadingButton
-        startIcon={<LockOpenIcon />}
-        disabled={disabled}
-        loading={open}
-        variant="contained"
-        color="error"
-        onClick={() => setOpen(true)}
-        sx={sx}
+      <Tooltip
+        hidden={disabled}
+        title={
+          !disabled &&
+          (source.unlockedAt ? (
+            <UnlocksTooltip timestamp={source.unlockedAt} />
+          ) : (
+            'Auto-extension is enabled'
+          ))
+        }
+        placement="top"
       >
-        WITHDRAW
-      </LoadingButton>
+        <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+          {source.locked && !disabled && (
+            <Lock
+              fontSize="small"
+              // color="secondary"
+              sx={{
+                color: '#3e4a5c',
+                position: 'absolute',
+                top: '0px',
+                right: '0px',
+                transform: 'translate(0%, -25%)',
+                zIndex: 1,
+              }}
+            />
+          )}
+          <LoadingButton
+            // startIcon={<LockOpenIcon />}
+            disabled={disabled || source.locked}
+            loading={open}
+            variant="contained"
+            color="error"
+            onClick={() => setOpen(true)}
+            sx={sx}
+          >
+            WITHDRAW
+          </LoadingButton>
+        </Box>
+      </Tooltip>
       <GatewayUnstakeDialog open={open} onClose={() => setOpen(false)} />
     </>
   );

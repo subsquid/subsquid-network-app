@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { dateFormat, relativeDateFormat } from '@i18n';
+import { dateFormat } from '@i18n';
 import { peerIdToHex } from '@lib/network';
 import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
@@ -13,9 +13,16 @@ import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
 import { AccountType, SourceWallet, Worker } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
+import { useCountdown } from '@hooks/useCountdown';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
+
+function UnlocksTooltip({ timestamp }: { timestamp?: string }) {
+  const timeLeft = useCountdown({ timestamp });
+
+  return <span>{`Unlocks in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`}</span>;
+}
 
 export function WorkerWithdrawButton({
   worker,
@@ -35,15 +42,12 @@ export function WorkerWithdrawButton({
 
   return (
     <>
-      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-        {source.locked && (
-          <Tooltip
-            title={`Unlocks in ${relativeDateFormat(Date.now(), source.unlockedAt)} (${dateFormat(
-              source.unlockedAt,
-              'dateTime',
-            )})`}
-            placement="top"
-          >
+      <Tooltip
+        title={!disabled && source.unlockedAt && <UnlocksTooltip timestamp={source.unlockedAt} />}
+        placement="top"
+      >
+        <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+          {source.locked && !disabled && (
             <Lock
               fontSize="small"
               // color="secondary"
@@ -56,18 +60,18 @@ export function WorkerWithdrawButton({
                 zIndex: 1,
               }}
             />
-          </Tooltip>
-        )}
-        <LoadingButton
-          loading={open}
-          onClick={() => setOpen(true)}
-          variant="outlined"
-          color="error"
-          disabled={disabled || source.locked}
-        >
-          WITHDRAW
-        </LoadingButton>
-      </Box>
+          )}
+          <LoadingButton
+            loading={open}
+            onClick={() => setOpen(true)}
+            variant="outlined"
+            color="error"
+            disabled={disabled || source.locked}
+          >
+            WITHDRAW
+          </LoadingButton>
+        </Box>
+      </Tooltip>
       <WorkerWithdrawDialog
         open={open}
         onClose={() => setOpen(false)}

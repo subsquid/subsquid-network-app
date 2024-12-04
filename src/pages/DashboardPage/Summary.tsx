@@ -1,6 +1,5 @@
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 
-import { relativeDateFormat } from '@i18n';
 import {
   bytesFormatter,
   numberWithCommasFormatter,
@@ -26,7 +25,7 @@ import { useNetworkSummary } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
-import { useTicker } from '@hooks/useTicker';
+import { useCountdown } from '@hooks/useCountdown';
 import { useContracts } from '@network/useContracts';
 
 export function ColumnLabel({ children, color }: PropsWithChildren<{ color?: string }>) {
@@ -108,14 +107,13 @@ function OnlineInfo() {
 }
 
 function CurrentEpochEstimation({ epochEnd }: { epochEnd: number }) {
-  const curTime = useTicker(() => Date.now(), 1000);
-  const epochEndsIn = useMemo(() => relativeDateFormat(curTime, epochEnd), [curTime, epochEnd]);
+  const timeLeft = useCountdown({ timestamp: epochEnd });
 
   return (
     <Stack direction="row" spacing={1}>
       <span>Ends in</span>
       <SquaredChip
-        label={<Typography variant="subtitle1">~{epochEndsIn}</Typography>}
+        label={<Typography variant="subtitle1">~{timeLeft}</Typography>}
         color="warning"
       />
     </Stack>

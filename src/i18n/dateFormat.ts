@@ -4,7 +4,7 @@ export function dateFormat(
   value: Date | string | number | undefined,
   tpl: 'dateTime' | 'date' | string = 'date',
 ) {
-  if (!value) return null;
+  if (!value) return undefined;
 
   if (tpl === 'dateTime') {
     tpl = 'dd.MM.yyyy HH:mm:ss';
@@ -12,10 +12,10 @@ export function dateFormat(
     tpl = 'dd.MM.yyyy';
   }
 
-  if (value.valueOf() == 0) return null;
+  if (value.valueOf() == 0) return undefined;
 
   const date = new Date(value);
-  if (!isValid(date)) return null;
+  if (!isValid(date)) return undefined;
 
   return format(new Date(value), tpl);
 }
