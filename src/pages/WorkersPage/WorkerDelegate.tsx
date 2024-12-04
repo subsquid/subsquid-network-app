@@ -42,7 +42,7 @@ export const delegateSchema = yup.object({
     .label('Amount')
     .required()
     .positive()
-    .max(yup.ref('max'))
+    .max(yup.ref('max'), 'Insufficient balance')
     .typeError('${path} is invalid'),
   max: yup.string().label('Max').required().typeError('${path} is invalid'),
 });
@@ -97,7 +97,7 @@ export function WorkerDelegateDialog({
 
   const { setWaitHeight } = useSquidHeight();
 
-  const stakingAddress = useReadRouterStaking({
+  const { data: stakingAddress, isLoading: isStakingAddressLoading } = useReadRouterStaking({
     address: contracts.ROUTER,
   });
 
@@ -122,7 +122,7 @@ export function WorkerDelegateDialog({
     enableReinitialize: true,
 
     onSubmit: async values => {
-      if (!stakingAddress.data) return;
+      if (!stakingAddress) return;
       if (!worker) return;
 
       try {
@@ -135,7 +135,7 @@ export function WorkerDelegateDialog({
 
         const receipt = await writeTransactionAsync({
           abi: stakingAbi,
-          address: stakingAddress.data,
+          address: stakingAddress,
           functionName: 'deposit',
           args: [BigInt(worker.id), sqdAmount],
           vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
@@ -157,6 +157,8 @@ export function WorkerDelegateDialog({
     enabled: open && !!worker,
   });
 
+  const isLoading = isStakingAddressLoading || isExpectedAprPending;
+
   return (
     <ContractCallDialog
       title="Delegate worker"
@@ -167,6 +169,7 @@ export function WorkerDelegateDialog({
         formik.handleSubmit();
       }}
       loading={isPending}
+      disableConfirmButton={isLoading || !formik.isValid}
     >
       <Form onSubmit={formik.handleSubmit}>
         <FormRow>

@@ -21,6 +21,7 @@ import { ConfirmDialog } from '@components/ConfirmDialog';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikCheckBoxInput, FormikTextInput, FormRow } from '@components/Form';
 import { FormikSelect } from '@components/Form/FormikSelect';
+import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { SourceWalletOption } from '@components/SourceWallet';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
@@ -106,10 +107,6 @@ export function AddNewWorkerDialog({
     (source: SourceWalletWithBalance) => BigInt(source.balance) < (bondAmount || 0n),
     [bondAmount],
   );
-  const hasAvailableSource = useMemo(
-    () => !!sources?.some(s => !isSourceDisabled(s)),
-    [isSourceDisabled, sources],
-  );
 
   const initialValues = useMemo(() => {
     const source = sources?.find(s => !isSourceDisabled(s)) || sources?.[0];
@@ -121,7 +118,8 @@ export function AddNewWorkerDialog({
       email: '',
       peerId: '',
       source: source?.id || '',
-      bond: fromSqd(bondAmount).toString(),
+      amount: fromSqd(bondAmount).toString(),
+      max: fromSqd(source?.balance).toString(),
     };
   }, [bondAmount, isSourceDisabled, sources]);
 
@@ -173,7 +171,7 @@ export function AddNewWorkerDialog({
 
           formik.handleSubmit();
         }}
-        disableConfirmButton={isLoading || !hasAvailableSource}
+        disableConfirmButton={isLoading || !formik.isValid}
         loading={contractWriter.isPending}
       >
         {isLoading ? (
@@ -195,12 +193,19 @@ export function AddNewWorkerDialog({
                     }) || []
                   }
                   formik={formik}
+                  onChange={e => {
+                    const source = sources?.find(w => w?.id === e.target.value);
+                    if (!source) return;
+
+                    formik.setFieldValue('source', source.id);
+                    formik.setFieldValue('max', fromSqd(source.balance).toString());
+                  }}
                 />
               </FormRow>
               <FormRow>
                 <FormikTextInput
                   showErrorOnlyOfTouched
-                  id="bond"
+                  id="amount"
                   label="Bond amount"
                   formik={formik}
                   disabled
@@ -210,7 +215,11 @@ export function AddNewWorkerDialog({
                 <FormikTextInput
                   showErrorOnlyOfTouched
                   id="peerId"
-                  label="Peer ID"
+                  label={
+                    <HelpTooltip title="A PeerID is a unique identifier that distinguishes one peer from another within the SQD Network">
+                      <span>Peer ID</span>
+                    </HelpTooltip>
+                  }
                   formik={formik}
                 />
               </FormRow>

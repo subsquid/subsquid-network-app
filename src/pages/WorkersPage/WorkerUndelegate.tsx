@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
-import { dateFormat, relativeDateFormat } from '@i18n';
-import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters';
+import { dateFormat } from '@i18n';
+import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
 import { Lock } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
@@ -19,10 +19,17 @@ import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { SourceWalletOption } from '@components/SourceWallet';
+import { useCountdown } from '@hooks/useCountdown';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
 
 import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegate';
+
+function UnlocksTooltip({ timestamp }: { timestamp?: string }) {
+  const timeLeft = useCountdown({ timestamp });
+
+  return <span>{`Unlocks in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`}</span>;
+}
 
 export type SourceWalletWithDelegation = SourceWalletWithBalance & {
   locked: boolean;
@@ -36,7 +43,7 @@ export const undelegateSchema = yup.object({
     .label('Amount')
     .required()
     .positive()
-    .max(yup.ref('max'))
+    .max(yup.ref('max'), 'Insufficient balance')
     .typeError('${path} is invalid'),
   max: yup.string().label('Max').required().typeError('${path} is invalid'),
 });
@@ -57,8 +64,7 @@ export function WorkerUndelegate({
 
   const isLocked = useMemo(() => !!sources?.length && !sources?.some(d => !d.locked), [sources]);
 
-  const [curTimestamp] = useDebounce(Date.now(), 1000);
-  const { unlockedAt, timeLeft } = useMemo(() => {
+  const { unlockedAt } = useMemo(() => {
     const min = sources?.reduce(
       (r, d) => {
         if (!d.unlockedAt) return r;
@@ -71,18 +77,17 @@ export function WorkerUndelegate({
 
     return {
       unlockedAt: min ? new Date(min).toISOString() : undefined,
-      timeLeft: min ? relativeDateFormat(curTimestamp, min) : undefined,
     };
-  }, [curTimestamp, sources]);
+  }, [sources]);
 
   return (
     <>
-      <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-        {isLocked && (
-          <Tooltip
-            title={unlockedAt && `Unlocks in ${timeLeft} (${dateFormat(unlockedAt, 'dateTime')})`}
-            placement="top"
-          >
+      <Tooltip
+        title={!disabled && unlockedAt && <UnlocksTooltip timestamp={unlockedAt} />}
+        placement="top"
+      >
+        <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+          {isLocked && !disabled && (
             <Lock
               fontSize="small"
               sx={{
@@ -94,18 +99,18 @@ export function WorkerUndelegate({
                 zIndex: 1,
               }}
             />
-          </Tooltip>
-        )}
-        <LoadingButton
-          loading={open}
-          onClick={() => setOpen(true)}
-          variant="outlined"
-          color="error"
-          disabled={disabled || isLocked}
-        >
-          UNDELEGATE
-        </LoadingButton>
-      </Box>
+          )}
+          <LoadingButton
+            loading={open}
+            onClick={() => setOpen(true)}
+            variant="outlined"
+            color="error"
+            disabled={disabled || isLocked}
+          >
+            UNDELEGATE
+          </LoadingButton>
+        </Box>
+      </Tooltip>
       <WorkerUndelegateDialog
         open={open}
         onClose={() => setOpen(false)}
@@ -135,7 +140,7 @@ function WorkerUndelegateDialog({
   const contracts = useContracts();
   const { writeTransactionAsync, isPending } = useWriteSQDTransaction();
 
-  const stakingAddress = useReadRouterStaking({
+  const { data: stakingAddress, isLoading: isStakingAddressLoading } = useReadRouterStaking({
     address: contracts.ROUTER,
   });
 
@@ -158,7 +163,7 @@ function WorkerUndelegateDialog({
     enableReinitialize: true,
 
     onSubmit: async values => {
-      if (!stakingAddress.data) return;
+      if (!stakingAddress) return;
       if (!worker) return;
 
       try {
@@ -171,7 +176,7 @@ function WorkerUndelegateDialog({
 
         const receipt = await writeTransactionAsync({
           abi: stakingAbi,
-          address: stakingAddress.data,
+          address: stakingAddress,
           functionName: 'withdraw',
           args: [BigInt(worker.id), sqdAmount],
           vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
@@ -192,6 +197,8 @@ function WorkerUndelegateDialog({
     enabled: open && !!worker,
   });
 
+  const isLoading = isStakingAddressLoading || isExpectedAprPending;
+
   return (
     <ContractCallDialog
       title="Undelegate worker"
@@ -202,7 +209,7 @@ function WorkerUndelegateDialog({
 
         formik.handleSubmit();
       }}
-      confirmColor="error"
+      disableConfirmButton={isLoading || !formik.isValid}
     >
       <Form onSubmit={formik.handleSubmit}>
         <FormRow>

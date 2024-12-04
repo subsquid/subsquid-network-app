@@ -166,6 +166,13 @@ export function MyAssets() {
       background: theme.palette.secondary.main,
       tip: 'Tokens delegated to workers',
     };
+    const lockedPortal: TokenBalance = {
+      name: 'Locked in Portal',
+      value: BigNumber(0),
+      color: theme.palette.text.primary,
+      background: theme.palette.text.primary,
+      tip: '',
+    };
 
     sourcesQuery?.accounts.forEach(s => {
       if (s.type === AccountType.User) {
@@ -185,7 +192,7 @@ export function MyAssets() {
       });
     });
 
-    return [transferable, vesting, claimable, bonded, delegated];
+    return [transferable, vesting, claimable, bonded, delegated, lockedPortal];
   }, [sourcesQuery?.accounts, theme.palette]);
 
   const totalBalance = useMemo(() => {
@@ -274,6 +281,7 @@ export function MyAssets() {
               <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
                 <TokenBalance balance={balances[3]} />
                 <TokenBalance balance={balances[4]} />
+                {/* <TokenBalance balance={balances[5]} /> */}
               </Stack>
             </Stack>
           </Grid>

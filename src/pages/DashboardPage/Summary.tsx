@@ -1,6 +1,5 @@
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 
-import { relativeDateFormat } from '@i18n';
 import {
   bytesFormatter,
   numberWithCommasFormatter,
@@ -21,12 +20,12 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
-import { useDebounce } from 'use-debounce';
 
 import { useNetworkSummary } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
+import { useCountdown } from '@hooks/useCountdown';
 import { useContracts } from '@network/useContracts';
 
 export function ColumnLabel({ children, color }: PropsWithChildren<{ color?: string }>) {
@@ -107,15 +106,24 @@ function OnlineInfo() {
   );
 }
 
+function CurrentEpochEstimation({ epochEnd }: { epochEnd: number }) {
+  const timeLeft = useCountdown({ timestamp: epochEnd });
+
+  return (
+    <Stack direction="row" spacing={1}>
+      <span>Ends in</span>
+      <SquaredChip
+        label={<Typography variant="subtitle1">~{timeLeft}</Typography>}
+        color="warning"
+      />
+    </Stack>
+  );
+}
+
 function CurrentEpoch() {
   const { data, isLoading } = useNetworkSummary();
 
   const [epochEnd, setEpochEnd] = useState<number>(Date.now());
-
-  const [curTime] = useDebounce(Date.now(), 1000);
-
-  const epochEndsIn = useMemo(() => relativeDateFormat(curTime, epochEnd), [curTime, epochEnd]);
-
   useEffect(() => {
     if (!data || !data.epoch) return;
 
@@ -131,15 +139,7 @@ function CurrentEpoch() {
       sx={{ height: 1 }}
       loading={isLoading}
       title={<SquaredChip label="Current epoch" color="primary" />}
-      action={
-        <Stack direction="row" spacing={1}>
-          <span>Ends in</span>
-          <SquaredChip
-            label={<Typography variant="subtitle1">~{epochEndsIn}</Typography>}
-            color="warning"
-          />
-        </Stack>
-      }
+      action={<CurrentEpochEstimation epochEnd={epochEnd} />}
     >
       <Typography variant="h1">{data?.epoch?.number || 0}</Typography>
     </SummarySection>
@@ -230,10 +230,14 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
             // contentStyle={{ transition: 'all ease-out 5500ms' }}
             content={<AprTooltip />}
             animationDuration={0}
+            // animationEasing="ease-out"
             cursor={{
               stroke: theme.palette.text.secondary,
               strokeWidth: 2,
               strokeDasharray: 6,
+            }}
+            cursorStyle={{
+              transition: 'all ease-out 300ms !important',
             }}
             defaultIndex={Math.max(data.length - 2, 0)}
             active

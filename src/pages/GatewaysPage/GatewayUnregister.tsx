@@ -75,7 +75,7 @@ export function GatewayUnregisterDialog({
 
   return (
     <ContractCallDialog
-      title="Unregister gateway?"
+      title="Unregister portal?"
       open={open}
       onResult={confirmed => {
         if (!confirmed) return onClose();
@@ -85,7 +85,7 @@ export function GatewayUnregisterDialog({
       loading={gatewayRegistryContract.isPending}
       hideCancelButton={false}
     >
-      Are you sure you want to unregister this gateway? This will disable the gateway, but you can
+      Are you sure you want to unregister this portal? This will disable the portal, but you can
       re-register it later.
     </ContractCallDialog>
   );

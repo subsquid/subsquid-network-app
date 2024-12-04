@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as yup from '@schema';
 
 export const editWorkerSchema = yup.object({
   name: yup.string().label('Name').max(255).trim().required('Worker name is required'),
@@ -17,4 +17,12 @@ export const addWorkerSchema = editWorkerSchema.shape({
     .trim()
     .required('Peer ID is required'),
   source: yup.string().label('Source address').trim().required('Source address is required'),
+  amount: yup
+    .decimal()
+    .label('Amount')
+    .required()
+    .positive()
+    .max(yup.ref('max'), 'Insufficient balance')
+    .typeError('${path} is invalid'),
+  max: yup.string().label('Max').required().typeError('${path} is invalid'),
 });

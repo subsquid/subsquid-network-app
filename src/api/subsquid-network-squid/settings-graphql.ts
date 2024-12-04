@@ -44,7 +44,7 @@ export function useNetworkSummary() {
           epoch: res.epoches.length ? res.epoches[0] : undefined,
         };
       },
-      refetchInterval: 6000, // a half of block time in l1
+      refetchInterval: 12_000, // block time in l1
     },
   );
 
