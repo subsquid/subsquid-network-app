@@ -105,7 +105,7 @@ export function MyDelegations() {
                           locked: d.locked || false,
                           unlockedAt: d.unlockedAt || '',
                         }))}
-                        disabled={!worker.delegations.some(d => !d.locked)}
+                        disabled={isLoading}
                       />
                     </Stack>
                   </TableCell>

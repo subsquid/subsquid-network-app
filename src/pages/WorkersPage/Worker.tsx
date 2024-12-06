@@ -120,7 +120,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                 // FIXME: some issue with types
                 unlockedAt: (d as any).unlockedAt,
               }))}
-              disabled={isLoading || !delegations?.some(d => !d.locked)}
+              disabled={isLoading}
             />
           </Stack>
         }

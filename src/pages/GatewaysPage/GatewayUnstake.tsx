@@ -52,6 +52,7 @@ export function GatewayUnstakeButton({
         hidden={disabled}
         title={
           !disabled &&
+          source.locked &&
           (source.unlockedAt ? (
             <UnlocksTooltip timestamp={source.unlockedAt} />
           ) : (

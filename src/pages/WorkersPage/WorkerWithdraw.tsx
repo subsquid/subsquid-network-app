@@ -43,7 +43,11 @@ export function WorkerWithdrawButton({
   return (
     <>
       <Tooltip
-        title={!disabled && source.unlockedAt && <UnlocksTooltip timestamp={source.unlockedAt} />}
+        title={
+          !disabled &&
+          source.locked &&
+          source.unlockedAt && <UnlocksTooltip timestamp={source.unlockedAt} />
+        }
         placement="top"
       >
         <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>

@@ -83,7 +83,7 @@ export function WorkerUndelegate({
   return (
     <>
       <Tooltip
-        title={!disabled && unlockedAt && <UnlocksTooltip timestamp={unlockedAt} />}
+        title={!disabled && isLocked && unlockedAt && <UnlocksTooltip timestamp={unlockedAt} />}
         placement="top"
       >
         <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
