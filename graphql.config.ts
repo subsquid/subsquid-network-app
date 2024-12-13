@@ -7,7 +7,7 @@ export default {
   overwrite: true,
   schema:
     process.env.SQUID_API_URL ||
-    'https://subsquid.squids.live/subsquid-network-testnet/v/v5/graphql',
+    'https://subsquid.squids.live/subsquid-network-mainnet@v5/api/graphql',
   documents: ['src/api/subsquid-network-squid/schema.graphql'],
   hooks: {
     afterOneFileWrite: ['prettier --write'],

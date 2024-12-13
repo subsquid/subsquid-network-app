@@ -59,6 +59,11 @@ query sourcesWithAssets($address: String!) {
         ...WorkerBaseFragment
       }
     }
+
+    gatewayStakes(where: { amount_gt: 0 }) {
+      id
+      amount
+    }
   }
 }
 
@@ -193,7 +198,7 @@ query workerDelegationInfo($workerId: String!) {
     trafficWeight
   }
 
-  statistics(limit: 1) {
+  settings(limit: 1) {
     utilizedStake
     baseApr
   }
