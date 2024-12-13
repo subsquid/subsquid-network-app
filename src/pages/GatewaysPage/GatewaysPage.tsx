@@ -356,7 +356,11 @@ const GettingStarted = () => {
       secondary: (
         <>
           Make sure you have enough SQD tokens to get started.{' '}
-          <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#lock-sqd">
+          <a
+            href="https://docs.sqd.dev/subsquid-network/participate/portal/#staking-requirements-and-compute-units"
+            target="_blank"
+            rel="noreferrer"
+          >
             How much do I need?
           </a>
         </>
@@ -368,7 +372,11 @@ const GettingStarted = () => {
         <>
           Lock your SQD tokens to generate Compute Units (CUs), which are used to handle SQD Network
           queries.{' '}
-          <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#staking-requirements-and-compute-units">
+          <a
+            href="https://docs.sqd.dev/subsquid-network/participate/portal/#staking-requirements-and-compute-units"
+            target="_blank"
+            rel="noreferrer"
+          >
             How do CUs transfer to SQD?
           </a>
         </>
@@ -379,7 +387,11 @@ const GettingStarted = () => {
       secondary: (
         <>
           Create a Peer ID to identify your portal.{' '}
-          <a href="https://docs.sqd.dev/subsquid-network/participate/portal/#generate-peer-id">
+          <a
+            href="https://docs.sqd.dev/subsquid-network/participate/portal/#generate-peer-id"
+            target="_blank"
+            rel="noreferrer"
+          >
             How to generate a Peer ID?
           </a>
         </>
@@ -440,10 +452,18 @@ const GettingStarted = () => {
           </List>
           <Typography variant="body1" mt={1}>
             That's it! Your portal is now ready to run. For more detailed guidance, check out the{' '}
-            <a href="https://docs.sqd.dev/subsquid-network/participate/portal/">
+            <a
+              href="https://docs.sqd.dev/subsquid-network/participate/portal/"
+              target="_blank"
+              rel="noreferrer"
+            >
               Portal Documentation
             </a>{' '}
-            or <a href="https://t.me/HydraDevs">contact our team</a> for help.
+            or{' '}
+            <a href="https://t.me/HydraDevs" target="_blank" rel="noreferrer">
+              contact our team
+            </a>{' '}
+            for help.
           </Typography>
         </Box>
       </Collapse>
