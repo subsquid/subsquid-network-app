@@ -21,6 +21,9 @@ const network = getSubsquidNetwork();
 export const rainbowConfig = getDefaultConfig({
   appName: `Subsquid Network ${upperFirst(network)}`,
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
-  chains: network === NetworkName.Mainnet ? [arbitrum, mainnet] : [arbitrumSepolia, sepolia],
+  chains:
+    network === NetworkName.Mainnet
+      ? [arbitrum, { ...mainnet, rpcUrls: { default: { http: ['https://rpc.ankr.com/eth'] } } }]
+      : [arbitrumSepolia, sepolia],
   syncConnectedChain: true,
 });
