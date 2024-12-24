@@ -185,6 +185,30 @@ export const networkControllerAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// OverTheCounter
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const overTheCounterAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: 'amount', internalType: 'uint256', type: 'uint256' }],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'receiver', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // RewardTreasury
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -896,6 +920,55 @@ export const useReadNetworkControllerWorkerEpochLength =
   /*#__PURE__*/ createUseReadContract({
     abi: networkControllerAbi,
     functionName: 'workerEpochLength',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link overTheCounterAbi}__
+ */
+export const useWriteOverTheCounter = /*#__PURE__*/ createUseWriteContract({
+  abi: overTheCounterAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link overTheCounterAbi}__ and `functionName` set to `"deposit"`
+ */
+export const useWriteOverTheCounterDeposit =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: overTheCounterAbi,
+    functionName: 'deposit',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link overTheCounterAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const useWriteOverTheCounterWithdraw =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: overTheCounterAbi,
+    functionName: 'withdraw',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link overTheCounterAbi}__
+ */
+export const useSimulateOverTheCounter =
+  /*#__PURE__*/ createUseSimulateContract({ abi: overTheCounterAbi })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link overTheCounterAbi}__ and `functionName` set to `"deposit"`
+ */
+export const useSimulateOverTheCounterDeposit =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: overTheCounterAbi,
+    functionName: 'deposit',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link overTheCounterAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const useSimulateOverTheCounterWithdraw =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: overTheCounterAbi,
+    functionName: 'withdraw',
   })
 
 /**

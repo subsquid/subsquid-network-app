@@ -9,6 +9,7 @@ import { DashboardPage } from '@pages/DashboardPage/DashboardPage.tsx';
 import { DelegationsPage } from '@pages/DelegationsPage/DelegationsPage.tsx';
 import { Gateway } from '@pages/GatewaysPage/Gateway.tsx';
 import { GatewaysPage } from '@pages/GatewaysPage/GatewaysPage.tsx';
+import { OtcContractsPage } from '@pages/OtcPage/OtcPage.tsx';
 import { Worker } from '@pages/WorkersPage/Worker.tsx';
 import { WorkersPage } from '@pages/WorkersPage/WorkersPage.tsx';
 
@@ -43,6 +44,9 @@ export const AppRoutes = () => {
           <Route element={<Gateway backPath="/portals" />} path=":peerId" />
         </Route>
         <Route path="/gateways" element={<Navigate to="/portals" replace={true} />} />
+        <Route path="/otc">
+          <Route element={<OtcContractsPage />} index />
+        </Route>
         <Route element={<Navigate to="/dashboard" replace={true} />} path="*" />
       </Route>
     </Routes>

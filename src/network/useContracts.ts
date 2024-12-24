@@ -14,6 +14,7 @@ export function useContracts(): {
   SQD_TOKEN: string;
   CHAIN_ID_L1: number;
   MULTICALL: `0x${string}`;
+  OTC: `0x${string}`;
 } {
   const network = getSubsquidNetwork();
 
@@ -31,6 +32,7 @@ export function useContracts(): {
         ROUTER: '0xD2093610c5d27c201CD47bCF1Df4071610114b64',
         CHAIN_ID_L1: sepolia.id,
         MULTICALL: '0x7eCfBaa8742fDf5756DAC92fbc8b90a19b8815bF',
+        OTC: '0xe34189ad45044e93d3af7d93ac520d02651faf72',
       };
     }
     case NetworkName.Mainnet: {
@@ -46,6 +48,7 @@ export function useContracts(): {
         ROUTER: '0x67F56D27dab93eEb07f6372274aCa277F49dA941',
         CHAIN_ID_L1: mainnet.id,
         MULTICALL: '0x7eCfBaa8742fDf5756DAC92fbc8b90a19b8815bF',
+        OTC: '0x1c77ad535552E7428630bCDF5B10B1E992F9f16c',
       };
     }
   }
