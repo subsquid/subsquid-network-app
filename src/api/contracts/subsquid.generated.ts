@@ -29,6 +29,30 @@ export const arbMulticallAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// BuyBack
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const buyBackAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: 'amount', internalType: 'uint256', type: 'uint256' }],
+    name: 'deposit',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'receiver', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GatewayRegistry
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -662,6 +686,54 @@ export const useReadArbMulticallGetL1BlockNumber =
   /*#__PURE__*/ createUseReadContract({
     abi: arbMulticallAbi,
     functionName: 'getL1BlockNumber',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link buyBackAbi}__
+ */
+export const useWriteBuyBack = /*#__PURE__*/ createUseWriteContract({
+  abi: buyBackAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link buyBackAbi}__ and `functionName` set to `"deposit"`
+ */
+export const useWriteBuyBackDeposit = /*#__PURE__*/ createUseWriteContract({
+  abi: buyBackAbi,
+  functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link buyBackAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const useWriteBuyBackWithdraw = /*#__PURE__*/ createUseWriteContract({
+  abi: buyBackAbi,
+  functionName: 'withdraw',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link buyBackAbi}__
+ */
+export const useSimulateBuyBack = /*#__PURE__*/ createUseSimulateContract({
+  abi: buyBackAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link buyBackAbi}__ and `functionName` set to `"deposit"`
+ */
+export const useSimulateBuyBackDeposit =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: buyBackAbi,
+    functionName: 'deposit',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link buyBackAbi}__ and `functionName` set to `"withdraw"`
+ */
+export const useSimulateBuyBackWithdraw =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: buyBackAbi,
+    functionName: 'withdraw',
   })
 
 /**
