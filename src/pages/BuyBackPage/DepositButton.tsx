@@ -127,7 +127,7 @@ export function DepositDialog({
 
   return (
     <ContractCallDialog
-      title="Deposit OTC contract"
+      title="Deposit Buyback contract"
       open={open}
       onResult={confirmed => {
         if (!confirmed) return onClose();

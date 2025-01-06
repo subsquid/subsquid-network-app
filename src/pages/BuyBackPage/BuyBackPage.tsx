@@ -28,7 +28,7 @@ export function OtcContracts() {
   const isLoading = isSourcesQueryLoading;
 
   return (
-    <DashboardTable loading={isLoading} title={<SquaredChip label="Buy Back" color="primary" />}>
+    <DashboardTable loading={isLoading} title={<SquaredChip label="Buyback" color="primary" />}>
       <TableHead>
         <TableRow>
           <TableCell>Contract</TableCell>
@@ -69,8 +69,9 @@ export function BuyBacksPage() {
       <ConnectedWalletRequired>
         <Alert sx={{ mb: 2 }} color="warning" icon={<Warning color="warning" />}>
           <Typography>
-            Please do not deposit tokens until you know what you are doing. It will not be possible
-            to return them back!
+            This is the official Subsquid Labs buyback page. ⚠️Attention: Please only deposit the
+            contractually agreed amount of SQD Tokens. Deposited SQD cannot be refunded. For
+            questions, please reach out to mf@subsquid.io
           </Typography>
         </Alert>
         <OtcContracts />
