@@ -69,9 +69,10 @@ export function BuyBacksPage() {
       <ConnectedWalletRequired>
         <Alert sx={{ mb: 2 }} color="warning" icon={<Warning color="warning" />}>
           <Typography>
-            This is the official Subsquid Labs buyback page. ⚠️Attention: Please only deposit the
-            contractually agreed amount of SQD Tokens. Deposited SQD cannot be refunded. For
-            questions, please reach out to mf@subsquid.io
+            This is the official Subsquid Labs buyback page. Please only deposit the contractually
+            agreed amount of SQD Tokens. Deposited SQD cannot be refunded.
+            <br />
+            For questions, please reach out to <a href="mailto:mf@subsquid.io">mf@subsquid.io</a>
           </Typography>
         </Alert>
         <OtcContracts />
