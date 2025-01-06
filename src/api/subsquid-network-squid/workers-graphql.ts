@@ -497,7 +497,7 @@ export function useWorkerDelegationInfo({
       select: res => {
         return {
           worker: res.workerById,
-          info: res.statistics[0],
+          info: res.settings[0],
         };
       },
       enabled,

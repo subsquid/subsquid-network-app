@@ -5,6 +5,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { NetworkLayout } from '@layouts/NetworkLayout';
 import { AssetsPage } from '@pages/AssetsPage/AssetsPage.tsx';
 import { Vesting } from '@pages/AssetsPage/Vesting.tsx';
+import { BuyBacksPage } from '@pages/BuyBackPage/BuyBackPage.tsx';
 import { DashboardPage } from '@pages/DashboardPage/DashboardPage.tsx';
 import { DelegationsPage } from '@pages/DelegationsPage/DelegationsPage.tsx';
 import { Gateway } from '@pages/GatewaysPage/Gateway.tsx';
@@ -43,6 +44,9 @@ export const AppRoutes = () => {
           <Route element={<Gateway backPath="/portals" />} path=":peerId" />
         </Route>
         <Route path="/gateways" element={<Navigate to="/portals" replace={true} />} />
+        <Route path="/buyback">
+          <Route element={<BuyBacksPage />} index />
+        </Route>
         <Route element={<Navigate to="/dashboard" replace={true} />} path="*" />
       </Route>
     </Routes>

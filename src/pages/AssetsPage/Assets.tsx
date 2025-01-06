@@ -31,6 +31,7 @@ import { useContracts } from '@network/useContracts';
 import { ColumnLabel, ColumnValue, SummarySection } from '@pages/DashboardPage/Summary';
 
 import { ClaimButton } from './ClaimButton';
+import {demoFeaturesEnabled} from '@hooks/demoFeaturesEnabled';
 
 type TokenBalance = {
   name: string;
@@ -171,7 +172,7 @@ export function MyAssets() {
       value: BigNumber(0),
       color: theme.palette.text.primary,
       background: theme.palette.text.primary,
-      tip: '',
+      tip: 'Tokens locked in Portal stake',
     };
 
     sourcesQuery?.accounts.forEach(s => {
@@ -189,6 +190,10 @@ export function MyAssets() {
       s.workers2.forEach(w => {
         bonded.value = bonded.value.plus(w.bond);
         claimable.value = claimable.value.plus(w.claimableReward);
+      });
+
+      s.gatewayStakes.forEach(gs => {
+        lockedPortal.value = bonded.value.plus(gs.amount);
       });
     });
 
@@ -281,7 +286,7 @@ export function MyAssets() {
               <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
                 <TokenBalance balance={balances[3]} />
                 <TokenBalance balance={balances[4]} />
-                {/* <TokenBalance balance={balances[5]} /> */}
+                {demoFeaturesEnabled() && <TokenBalance balance={balances[5]} />}
               </Stack>
             </Stack>
           </Grid>
