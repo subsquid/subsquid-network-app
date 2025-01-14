@@ -227,7 +227,7 @@ export function useWorkers({
 
     return {
       page: normalizedPage,
-      totalPages: Math.floor(filtered.length / perPage),
+      totalPages,
       workers: sortWorkers(filtered, sortBy, sortDir).slice(
         (normalizedPage - 1) * perPage,
         normalizedPage * perPage,
