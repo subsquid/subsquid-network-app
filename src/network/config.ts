@@ -23,7 +23,7 @@ export const rainbowConfig = getDefaultConfig({
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
   chains:
     network === NetworkName.Mainnet
-      ? [arbitrum, { ...mainnet, rpcUrls: { default: { http: ['https://rpc.ankr.com/eth'] } } }]
+      ? [arbitrum, { ...mainnet, rpcUrls: { default: { http: ['https://eth.drpc.org', 'https://rpc.ankr.com/eth'] } } }]
       : [arbitrumSepolia, sepolia],
   syncConnectedChain: true,
 });
