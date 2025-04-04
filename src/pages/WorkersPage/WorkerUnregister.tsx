@@ -39,7 +39,7 @@ export function WorkerUnregisterButton({
         color="error"
         disabled={disabled}
       >
-        DELETE
+        REMOVE
       </LoadingButton>
       <WorkerUnregisterDialog
         open={open}
@@ -106,9 +106,8 @@ export function WorkerUnregisterDialog({
       loading={contractWriter.isPending}
       hideCancelButton={false}
     >
-      Are you sure you want to unregister this worker? This will disable the worker, but you can
-      re-register it later. You will be able to withdraw your tokens after the end of the lock
-      period.
+      Are you sure you want to unregister this worker? This will disable the worker. You will be
+      able to withdraw your tokens after the end of the lock period.
     </ContractCallDialog>
   );
 }

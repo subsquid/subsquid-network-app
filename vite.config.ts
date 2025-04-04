@@ -13,7 +13,7 @@ export default defineConfig({
     'process.env.APP_VERSION': encode(process.env.APP_VERSION || 'local'),
 
     'process.env.DISCORD_API_URL': encode(
-      process.env.DISCORD_API_URL || 'https://discord.gg/hellosqd',
+      process.env.DISCORD_API_URL || 'https://t.me/subsquid',
     ),
     'process.env.DOCS_API_URL': encode(process.env.DOCS_API_URL || 'https://docs.subsquid.io'),
     'process.env.TESTNET_WORKERS_CHAT_URL': encode(
