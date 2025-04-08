@@ -1,6 +1,8 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { upperFirst } from 'lodash-es';
+import { fallback, http, unstable_connector } from 'wagmi';
 import { arbitrumSepolia, arbitrum, sepolia, mainnet } from 'wagmi/chains';
+import { injected } from 'wagmi/connectors';
 
 import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
 
@@ -23,7 +25,8 @@ export const rainbowConfig = getDefaultConfig({
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
   chains:
     network === NetworkName.Mainnet
-      ? [arbitrum, { ...mainnet, rpcUrls: { default: { http: ['https://eth.drpc.org', 'https://rpc.ankr.com/eth'] } } }]
+      ? [arbitrum, { ...mainnet, rpcUrls: { default: { http: ['https://eth.llamarpc.com'] } } }]
       : [arbitrumSepolia, sepolia],
+  // transports: [fallback([unstable_connector(injected), http()])],
   syncConnectedChain: true,
 });
