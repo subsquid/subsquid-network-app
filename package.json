@@ -52,8 +52,8 @@
     "use-debounce": "^10.0.1",
     "use-element-position": "^1.0.13",
     "use-local-storage-state": "^19.3.1",
-    "viem": "^2.21.44",
-    "wagmi": "^2.12.25",
+    "viem": "^2.26.2",
+    "wagmi": "^2.14.16",
     "yup": "^1.4.0"
   },
   "devDependencies": {
