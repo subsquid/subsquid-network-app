@@ -10,7 +10,7 @@ import {
   TransactionReceipt,
   encodeFunctionData,
 } from 'viem';
-import { useAccount, useConfig, useWriteContract } from 'wagmi';
+import { useConfig, useWriteContract } from 'wagmi';
 
 import { useContracts } from '@network/useContracts';
 
@@ -34,15 +34,7 @@ type WriteTransactionResult = {
   ) => Promise<TransactionReceipt>;
 };
 
-type VestingExecuteParams = {
-  address: Address;
-  abi: typeof vestingAbi;
-  functionName: 'execute';
-  args: readonly [Address, `0x${string}`, bigint];
-};
-
 export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult {
-  const account = useAccount();
   const config = useConfig();
   const { writeContractAsync, ...result } = useWriteContract();
   const [isPending, setPending] = useState<boolean>(false);
@@ -62,34 +54,31 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
     ) => {
       setPending(true);
       try {
-        const address = account.address;
-        if (!address) throw new Error('No account connected');
-
         const { approve, vesting, ...writeParams } = params;
 
         let hash: `0x${string}`;
         if (vesting) {
           const encodedFunctionData = encodeFunctionData({
-            abi: params.abi,
-            functionName: params.functionName,
-            args: params.args,
+            abi: writeParams.abi,
+            functionName: writeParams.functionName,
+            args: writeParams.args,
           } as Parameters<typeof encodeFunctionData>[0]);
 
-          const vestingParams: VestingExecuteParams = {
+          hash = await writeContractAsync({
             address: vesting,
             abi: vestingAbi,
             functionName: 'execute',
-            args: [address, encodedFunctionData, params.approve ?? 0n],
-          };
-
-          hash = await writeContractAsync(vestingParams);
+            args: approve
+              ? [writeParams.address, encodedFunctionData, approve]
+              : [writeParams.address, encodedFunctionData],
+          } as Parameters<typeof writeContractAsync>[0]);
         } else {
           if (approve) {
             const allowance = await readContract(config, {
               abi: erc20Abi,
               functionName: 'allowance',
               address: SQD,
-              args: [address, params.address],
+              args: [writeParams.address, params.address],
             });
 
             if (allowance < approve) {
@@ -105,10 +94,7 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
 
           // FIXME: this is a workaround for wagmi types,
           // probably makes sense to do it in a different way
-          hash = await writeContractAsync({
-            ...writeParams,
-            account: address,
-          } as Parameters<typeof writeContractAsync>[0]);
+          hash = await writeContractAsync(writeParams as Parameters<typeof writeContractAsync>[0]);
         }
 
         return await waitForTransactionReceipt(config, { hash });
