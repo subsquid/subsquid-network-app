@@ -1,165 +1,105 @@
 import { useState } from 'react';
 
-import { MutateOptions } from '@tanstack/react-query';
-import {
-  readContract,
-  waitForTransactionReceipt,
-  WaitForTransactionReceiptReturnType,
-  writeContract,
-} from '@wagmi/core';
+import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
+import { erc20Abi } from 'viem';
 import {
   Abi,
   Address,
   ContractFunctionArgs,
   ContractFunctionName,
+  TransactionReceipt,
   encodeFunctionData,
-  erc20Abi,
-  WriteContractErrorType,
 } from 'viem';
-import {
-  Config,
-  ResolvedRegister,
-  useAccount,
-  useBalance,
-  useConfig,
-  useWriteContract,
-  UseWriteContractParameters,
-  UseWriteContractReturnType,
-} from 'wagmi';
-import { WriteContractData, WriteContractVariables } from 'wagmi/query';
+import { useConfig, useWriteContract } from 'wagmi';
 
 import { useContracts } from '@network/useContracts';
 
 import { vestingAbi } from './subsquid.generated';
 
-export type UseWriteTransactionParameters<
-  config extends Config,
-  context,
-> = UseWriteContractParameters<config, context>;
-
-export type UseWriteTransactionReturnType<config extends Config = Config, context = unknown> = Omit<
-  UseWriteContractReturnType<config, context>,
-  'writeContractAsync' | 'writeContract'
-> & {
-  writeTransactionAsync: WriteTransactionMutateAsync<config, context>;
+type WriteTransactionParams<TAbi extends Abi, TFunctionName extends ContractFunctionName<TAbi>> = {
+  abi: TAbi;
+  address: Address;
+  functionName: TFunctionName;
+  args?: ContractFunctionArgs<TAbi, 'nonpayable' | 'payable', TFunctionName>;
+  approve?: bigint;
+  vesting?: Address;
 };
 
-export type WriteTransactionMutateAsync<config extends Config, context = unknown> = <
-  const abi extends Abi | readonly unknown[],
-  functionName extends ContractFunctionName<abi, 'nonpayable' | 'payable'>,
-  args extends ContractFunctionArgs<abi, 'nonpayable' | 'payable', functionName>,
-  chainId extends config['chains'][number]['id'],
->(
-  variables: WriteContractVariables<abi, functionName, args, config, chainId> & {
-    approve?: bigint;
-    vesting?: Address;
-  },
-  options?:
-    | MutateOptions<
-        WriteContractData,
-        WriteContractErrorType,
-        WriteContractVariables<
-          abi,
-          functionName,
-          args,
-          config,
-          chainId,
-          // use `functionName` to make sure it's not union of all possible function names
-          functionName
-        >,
-        context
-      >
-    | undefined,
-) => Promise<WaitForTransactionReceiptReturnType<config, chainId>>;
+type WriteTransactionResult = {
+  isPending: boolean;
+  error: Error | null;
+  isError: boolean;
+  writeTransactionAsync: <TAbi extends Abi, TFunctionName extends ContractFunctionName<TAbi>>(
+    params: WriteTransactionParams<TAbi, TFunctionName>,
+  ) => Promise<TransactionReceipt>;
+};
 
-export function useWriteSQDTransaction<
-  config extends Config = ResolvedRegister['config'],
-  context = unknown,
->(
-  parameters: UseWriteTransactionParameters<config, context> = {},
-): UseWriteTransactionReturnType<config, context> {
-  const account = useAccount();
-  const { data: ethBalance } = useBalance({
-    address: account.address,
-    query: { enabled: !!account.address },
-  });
-
-  const config = useConfig(parameters);
-  const { writeContractAsync, ...result } = useWriteContract(parameters);
+export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult {
+  const config = useConfig();
+  const { writeContractAsync, ...result } = useWriteContract();
   const [isPending, setPending] = useState<boolean>(false);
-  const [error, setError] = useState<WriteContractErrorType | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const { SQD } = useContracts();
 
   return {
-    ...(result as any),
+    ...result,
     isPending,
     error,
     isError: !!error,
-    writeTransactionAsync: async (
-      ...args: Parameters<WriteTransactionMutateAsync<config, context>>
+    writeTransactionAsync: async <
+      TAbi extends Abi,
+      TFunctionName extends ContractFunctionName<TAbi>,
+    >(
+      params: WriteTransactionParams<TAbi, TFunctionName>,
     ) => {
       setPending(true);
       try {
-        if (!ethBalance?.value) {
-          throw new Error('Insufficient ETH balance');
-        }
-
-        const address =
-          (typeof args[0].account === 'string' ? args[0].account : args[0].account?.address) ||
-          account.address;
-        if (!address) return;
+        const { approve, vesting, ...writeParams } = params;
 
         let hash: `0x${string}`;
-        if (args[0].vesting) {
-          const { vesting, address, ...rest } = args[0];
-
+        if (vesting) {
           const encodedFunctionData = encodeFunctionData({
-            abi: args[0].abi,
-            functionName: args[0].functionName,
-            args: args[0].args,
-          });
+            abi: writeParams.abi,
+            functionName: writeParams.functionName,
+            args: writeParams.args,
+          } as Parameters<typeof encodeFunctionData>[0]);
 
-          hash = await writeContractAsync(
-            {
-              ...(args[0] as any),
-              address: vesting,
-              abi: vestingAbi,
-              functionName: 'execute',
-              args: args[0].approve
-                ? [address, encodedFunctionData, rest.approve]
-                : [address, encodedFunctionData],
-            },
-            args[1] as any,
-          );
+          hash = await writeContractAsync({
+            address: vesting,
+            abi: vestingAbi,
+            functionName: 'execute',
+            args: approve
+              ? [writeParams.address, encodedFunctionData, approve]
+              : [writeParams.address, encodedFunctionData],
+          } as Parameters<typeof writeContractAsync>[0]);
         } else {
-          if (args[0].approve) {
-            const amount = args[0].approve;
-
+          if (approve) {
             const allowance = await readContract(config, {
               abi: erc20Abi,
               functionName: 'allowance',
               address: SQD,
-              args: [address, args[0].address],
+              args: [writeParams.address, params.address],
             });
 
-            if (allowance < amount) {
-              const hash = await writeContract(config as any, {
-                ...(args[0] as any),
+            if (allowance < approve) {
+              const hash = await writeContract(config, {
                 abi: erc20Abi,
                 functionName: 'approve',
                 address: SQD,
-                args: [args[0].address, amount],
+                args: [params.address, approve],
               });
               await waitForTransactionReceipt(config, { hash });
             }
           }
 
-          hash = await writeContractAsync(args[0], args[1] as any);
+          // FIXME: this is a workaround for wagmi types,
+          // probably makes sense to do it in a different way
+          hash = await writeContractAsync(writeParams as Parameters<typeof writeContractAsync>[0]);
         }
 
         return await waitForTransactionReceipt(config, { hash });
       } catch (e) {
-        setError(e as WriteContractErrorType);
+        setError(e as Error);
         throw e;
       } finally {
         setPending(false);

@@ -24,7 +24,7 @@ export function numberWithCommasFormatter(val?: number | bigint | string) {
 export function bytesFormatter(val?: number | string) {
   // if (!val) return '0 MB';
 
-  return prettyBytes(Number(val || 0), { maximumFractionDigits: 0 });
+  return prettyBytes(Number(val || 0), { maximumFractionDigits: 1, locale: 'en-US' });
 }
 
 export function addressFormatter(val?: string, compact?: boolean) {

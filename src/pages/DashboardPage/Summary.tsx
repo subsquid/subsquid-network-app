@@ -203,66 +203,64 @@ function AprTooltip({ active, payload }: TooltipProps<number, string>) {
 
 function AprChart({ data }: { data: { date: string; value: number }[] }) {
   const theme = useTheme();
+  const ANIMATION_DURATION = 100;
+  const ANIMATION_EASING = 'ease-out' as const;
+  const ANIMATION_TRANSITION = `all ${ANIMATION_EASING} ${ANIMATION_DURATION}ms`;
 
   return (
-    <ResponsiveContainer width="200%" height="85%" style={{ margin: theme.spacing(-1.5) }}>
-      <AreaChart
-        width={200}
-        height={60}
-        data={data}
-        defaultShowTooltip
-        margin={{
-          top: 16,
-          right: 0,
-          left: 0,
-          bottom: 0,
-        }}
-        style={{ cursor: 'pointer' }}
-      >
-        <defs>
-          <linearGradient id="area-gradient" x2="0" y2="1">
-            <stop offset="0%" stopColor={theme.palette.info.main} />
-            <stop offset="100%" stopColor={alpha(theme.palette.info.main, 0.25)} />
-          </linearGradient>
-        </defs>
-        {data.length ? (
-          <Tooltip
-            // contentStyle={{ transition: 'all ease-out 5500ms' }}
-            content={<AprTooltip />}
+    <>
+      <style>{`.recharts-tooltip-cursor { transition: all ease-out ${ANIMATION_DURATION}ms !important; }`}</style>
+      <ResponsiveContainer width="200%" height="85%" style={{ margin: theme.spacing(-1.5) }}>
+        <AreaChart
+          width={200}
+          height={60}
+          data={data}
+          defaultShowTooltip
+          margin={{ top: 16, right: 0, left: 0, bottom: 0 }}
+          style={{ cursor: 'pointer' }}
+        >
+          <defs>
+            <linearGradient id="area-gradient" x2="0" y2="1">
+              <stop offset="0%" stopColor={theme.palette.info.main} />
+              <stop offset="100%" stopColor={alpha(theme.palette.info.main, 0.25)} />
+            </linearGradient>
+          </defs>
+          {data.length ? (
+            <Tooltip
+              content={<AprTooltip />}
+              animationDuration={0}
+              cursor={{
+                stroke: theme.palette.text.secondary,
+                strokeWidth: 2,
+                strokeDasharray: 6,
+              }}
+              cursorStyle={{
+                transform: 'translateX(-50%)',
+              }}
+              defaultIndex={Math.max(data.length - 2, 0)}
+              active
+              allowEscapeViewBox={{ x: true }}
+              position={{ y: -10 }}
+              wrapperStyle={{
+                zIndex: theme.zIndex.appBar - 1,
+                transition: ANIMATION_TRANSITION,
+              }}
+              offset={0}
+              trigger="click"
+              filterNull
+            />
+          ) : null}
+          <Area
             animationDuration={0}
-            // animationEasing="ease-out"
-            cursor={{
-              stroke: theme.palette.text.secondary,
-              strokeWidth: 2,
-              strokeDasharray: 6,
-            }}
-            cursorStyle={{
-              transition: 'all ease-out 300ms !important',
-            }}
-            defaultIndex={Math.max(data.length - 2, 0)}
-            active
-            allowEscapeViewBox={{ x: true }}
-            position={{ y: -10 }}
-            wrapperStyle={{
-              zIndex: theme.zIndex.appBar - 1,
-            }}
-            offset={0}
-            trigger="click"
-            filterNull
+            dataKey="value"
+            stroke={theme.palette.info.main}
+            strokeWidth={theme.spacing(0.5)}
+            fill="url(#area-gradient)"
+            activeDot={{ strokeWidth: 0 }}
           />
-        ) : null}
-        <Area
-          animationDuration={0}
-          dataKey="value"
-          stroke={theme.palette.info.main}
-          strokeWidth={theme.spacing(0.5)}
-          fill="url(#area-gradient)"
-          activeDot={{
-            strokeWidth: 0,
-          }}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+        </AreaChart>
+      </ResponsiveContainer>
+    </>
   );
 }
 
