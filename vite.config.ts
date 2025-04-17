@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { defineConfig, splitVendorChunkPlugin } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
@@ -12,9 +13,7 @@ export default defineConfig({
   define: {
     'process.env.APP_VERSION': encode(process.env.APP_VERSION || 'local'),
 
-    'process.env.DISCORD_API_URL': encode(
-      process.env.DISCORD_API_URL || 'https://t.me/subsquid',
-    ),
+    'process.env.DISCORD_API_URL': encode(process.env.DISCORD_API_URL || 'https://t.me/subsquid'),
     'process.env.DOCS_API_URL': encode(process.env.DOCS_API_URL || 'https://docs.subsquid.io'),
     'process.env.TESTNET_WORKERS_CHAT_URL': encode(
       process.env.TESTNET_WORKERS_CHAT_URL || 'https://t.me/+vzY6TbX38kxkOTFi',
@@ -48,10 +47,19 @@ export default defineConfig({
       '@mui/material/Unstable_Grid2',
     ],
   },
+
   plugins: [
     tsconfigPaths(),
     react(),
     createHtmlPlugin({}),
     process.env.NODE_ENV === 'production' ? splitVendorChunkPlugin() : undefined,
+    sentryVitePlugin({
+      org: 'subsquid-labs-gmbh',
+      project: 'network-app',
+    }),
   ],
+
+  build: {
+    sourcemap: true,
+  },
 });
