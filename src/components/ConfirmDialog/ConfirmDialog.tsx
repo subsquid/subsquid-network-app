@@ -6,7 +6,6 @@ import {
   Button,
   Dialog,
   DialogContent,
-  DialogContentText,
   IconButton,
   styled,
   useMediaQuery,
@@ -53,9 +52,10 @@ export const Content = styled(DialogContent)(({ theme: { spacing, breakpoints } 
   margin: spacing(1, 4, 4),
   overflowY: 'visible',
   [breakpoints.down('sm')]: {
-    margin: spacing(0, 3, 4, 3),
+    margin: spacing(1, 3, 3),
   },
 }));
+
 export const Actions = styled(Box)(({ theme: { spacing, breakpoints } }) => ({
   padding: 0,
   display: 'flex',
@@ -68,6 +68,10 @@ export const Actions = styled(Box)(({ theme: { spacing, breakpoints } }) => ({
   },
   [breakpoints.down('sm')]: {
     margin: spacing(3, 3),
+    flexDirection: 'column',
+    '& > *': {
+      width: '100%',
+    },
   },
 }));
 
@@ -121,13 +125,20 @@ export function ConfirmDialog({
   };
 
   return (
-    <Dialog open={open} onClick={onClick} onClose={onReject}>
-      <ConfirmWrapper
-        sx={{
-          maxWidth: !mobile ? maxWidth : undefined,
-          minWidth: !mobile ? minWidth : undefined,
-        }}
-      >
+    <Dialog
+      open={open}
+      onClick={onClick}
+      onClose={onReject}
+      PaperProps={{
+        sx: {
+          width: mobile ? '75%' : undefined,
+          maxWidth: mobile ? '75%' : maxWidth,
+          minWidth: mobile ? '75%' : minWidth,
+          margin: 'auto',
+        },
+      }}
+    >
+      <ConfirmWrapper>
         <ConfirmDialogTitle>
           <SquaredChip label={title} color="primary" />
           <CloseIconButton onClick={onReject}>
@@ -135,7 +146,7 @@ export function ConfirmDialog({
           </CloseIconButton>
         </ConfirmDialogTitle>
         <Content>
-          <DialogContentText id="alert-dialog-description">{children}</DialogContentText>
+          <Box id="alert-dialog-description">{children}</Box>
         </Content>
         <Actions>
           {!hideCancelButton ? (
