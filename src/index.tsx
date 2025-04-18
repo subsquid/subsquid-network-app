@@ -78,7 +78,16 @@ if (process.env.SENTRY_DSN) {
       // See: http://blog.errorception.com/2012/03/tale-of-unfindable-js-error.html
       'originalCreateNotification',
       'canvas.contentDocument',
+      'wallet must has at least one account',
     ],
+    beforeSend(event) {
+      if (
+        (event.extra?.__serialized__ as Error)?.message === 'wallet must has at least one account'
+      ) {
+        return null;
+      }
+      return event;
+    },
     denyUrls: [
       // Extensions
       /extensions\//i,
