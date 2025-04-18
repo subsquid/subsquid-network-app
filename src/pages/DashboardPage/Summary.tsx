@@ -214,7 +214,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
         <AreaChart
           width={200}
           height={60}
-          data={data}
+          data={useMemo(() => data, [data])}
           defaultShowTooltip
           margin={{ top: 16, right: 0, left: 0, bottom: 0 }}
           style={{ cursor: 'pointer' }}

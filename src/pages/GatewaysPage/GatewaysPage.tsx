@@ -286,9 +286,8 @@ export function MyGateways() {
     <DashboardTable
       loading={isLoading}
       title={
-        <>
+        <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
           <SquaredChip label="My Portals" color="primary" />
-
           <Stack direction="row" spacing={1}>
             <Button
               color="secondary"
@@ -301,8 +300,9 @@ export function MyGateways() {
             </Button>
             <AddGatewayButton disabled={isLoading} sources={sources} />
           </Stack>
-        </>
+        </Box>
       }
+      sx={{ mb: 2 }}
     >
       <TableHead>
         <TableRow>
@@ -313,32 +313,22 @@ export function MyGateways() {
       </TableHead>
       <TableBody>
         {gatewaysQuery?.gateways.length ? (
-          <>
-            {gatewaysQuery?.gateways.map(gateway => {
-              return (
-                <TableRow key={gateway.id}>
-                  <TableCell>
-                    <GatewayName gateway={gateway} to={`/portals/${gateway.id}`} />
-                  </TableCell>
-                  <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-end">
-                      <GatewayUnregisterButton gateway={gateway} />
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </>
-        ) : (
+          gatewaysQuery.gateways.map(gateway => (
+            <TableRow key={gateway.id}>
+              <TableCell>
+                <GatewayName gateway={gateway} to={`/portals/${gateway.id}`} />
+              </TableCell>
+              <TableCell>{dateFormat(gateway.createdAt)}</TableCell>
+              <TableCell>
+                <Box display="flex" justifyContent="flex-end">
+                  <GatewayUnregisterButton gateway={gateway} />
+                </Box>
+              </TableCell>
+            </TableRow>
+          ))
+        ) : isLoading ? null : (
           <NoItems>
             <Typography>No portal registered yet</Typography>
-            {/* {!isProMode && (
-              <AddGateway
-                sx={{ mt: 2 }}
-                disabled={!isProMode && BigInt(stake?.stake?.amount || 0) <= 0n}
-              />
-            )} */}
           </NoItems>
         )}
       </TableBody>

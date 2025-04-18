@@ -26,12 +26,12 @@ import {
 } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
+import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 import { ColumnLabel, ColumnValue, SummarySection } from '@pages/DashboardPage/Summary';
 
 import { ClaimButton } from './ClaimButton';
-import {demoFeaturesEnabled} from '@hooks/demoFeaturesEnabled';
 
 type TokenBalance = {
   name: string;

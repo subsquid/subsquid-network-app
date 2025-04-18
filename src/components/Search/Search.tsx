@@ -55,6 +55,7 @@ export const Search = ({
         value={realTimeValue}
         size="small"
         fullWidth={fullWidth}
+        autoComplete="off"
         onChange={e => {
           const value = e.target.value;
           setRealTimeValue(value);
