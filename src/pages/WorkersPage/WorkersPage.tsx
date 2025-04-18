@@ -146,7 +146,7 @@ export function MyWorkers() {
                   </TableRow>
                 );
               })
-            ) : (
+            ) : isLoading ? null : (
               <NoItems>
                 <span>No worker registered yet</span>
               </NoItems>

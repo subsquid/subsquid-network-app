@@ -108,7 +108,7 @@ export function MyVestings() {
               );
             })}
           </>
-        ) : (
+        ) : isLoading ? null : (
           <NoItems>
             <span>No vesting was found</span>
           </NoItems>

@@ -1,8 +1,6 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { upperFirst } from 'lodash-es';
-import { fallback, http, unstable_connector } from 'wagmi';
 import { arbitrumSepolia, arbitrum, sepolia, mainnet } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
 
 import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
 

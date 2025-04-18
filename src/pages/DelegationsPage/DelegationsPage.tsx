@@ -37,6 +37,7 @@ export function MyDelegations() {
       <DashboardTable
         loading={isLoading}
         title={<SquaredChip label="My Delegations" color="primary" />}
+        sx={{ mb: 2 }}
       >
         <TableHead>
           <TableRow>
@@ -74,45 +75,43 @@ export function MyDelegations() {
         </TableHead>
         <TableBody>
           {delegations.length ? (
-            delegations.map(worker => {
-              return (
-                <TableRow key={worker.peerId}>
-                  <TableCell className="pinned">
-                    <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
-                  </TableCell>
-                  <TableCell>
-                    <WorkerStatusChip worker={worker} />
-                  </TableCell>
-                  <TableCell>
-                    {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <DelegationCapacity worker={worker} />
-                  </TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(worker.myDelegation), SQD_TOKEN)}</TableCell>
-                  <TableCell>
-                    {tokenFormatter(fromSqd(worker.myTotalDelegationReward), SQD_TOKEN)}
-                  </TableCell>
-                  <TableCell className="pinned">
-                    <Stack direction="row" spacing={1} justifyContent="flex-end">
-                      <WorkerDelegate worker={worker} sources={sources} />
-                      <WorkerUndelegate
-                        worker={worker}
-                        sources={worker.delegations.map(d => ({
-                          id: d.owner.id,
-                          type: d.owner.type,
-                          balance: d.deposit,
-                          locked: d.locked || false,
-                          unlockedAt: d.unlockedAt || '',
-                        }))}
-                        disabled={isLoading}
-                      />
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
+            delegations.map(worker => (
+              <TableRow key={worker.peerId}>
+                <TableCell className="pinned">
+                  <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
+                </TableCell>
+                <TableCell>
+                  <WorkerStatusChip worker={worker} />
+                </TableCell>
+                <TableCell>
+                  {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+                </TableCell>
+                <TableCell>
+                  <DelegationCapacity worker={worker} />
+                </TableCell>
+                <TableCell>{tokenFormatter(fromSqd(worker.myDelegation), SQD_TOKEN)}</TableCell>
+                <TableCell>
+                  {tokenFormatter(fromSqd(worker.myTotalDelegationReward), SQD_TOKEN)}
+                </TableCell>
+                <TableCell className="pinned">
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <WorkerDelegate worker={worker} sources={sources} />
+                    <WorkerUndelegate
+                      worker={worker}
+                      sources={worker.delegations.map(d => ({
+                        id: d.owner.id,
+                        type: d.owner.type,
+                        balance: d.deposit,
+                        locked: d.locked || false,
+                        unlockedAt: d.unlockedAt || '',
+                      }))}
+                      disabled={isLoading}
+                    />
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : isLoading ? null : (
             <NoItems />
           )}
         </TableBody>

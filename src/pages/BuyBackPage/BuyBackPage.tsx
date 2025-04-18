@@ -28,38 +28,38 @@ export function OtcContracts() {
   const isLoading = isSourcesQueryLoading;
 
   return (
-    <DashboardTable loading={isLoading} title={<SquaredChip label="Buyback" color="primary" />}>
-      <TableHead>
-        <TableRow>
-          <TableCell>Contract</TableCell>
-          <TableCell></TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {BUYBACKs.length ? (
-          <>
-            {BUYBACKs.map(address => {
-              return (
-                <TableRow key={address}>
-                  <TableCell>
-                    <SourceWalletName source={{ id: address }} />
-                  </TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-end">
-                      <DepositButton address={address} sources={sources} />
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </>
-        ) : (
-          <NoItems>
-            <span>No vesting was found</span>
-          </NoItems>
-        )}
-      </TableBody>
-    </DashboardTable>
+    <Box>
+      <DashboardTable
+        loading={isLoading}
+        title={<SquaredChip label="Buyback" color="primary" />}
+        sx={{ mb: 2 }}
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell>Contract</TableCell>
+            <TableCell className="pinned"></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {BUYBACKs.length ? (
+            BUYBACKs.map(address => (
+              <TableRow key={address}>
+                <TableCell>
+                  <SourceWalletName source={{ id: address }} />
+                </TableCell>
+                <TableCell className="pinned">
+                  <Box display="flex" justifyContent="flex-end">
+                    <DepositButton address={address} sources={sources} />
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <NoItems />
+          )}
+        </TableBody>
+      </DashboardTable>
+    </Box>
   );
 }
 

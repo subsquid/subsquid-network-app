@@ -10,21 +10,26 @@ export function NoItems({
   sx?: SxProps;
 }>) {
   return (
-    <Box
-      className="no-items"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100%"
-      sx={sx}
-      flexDirection="column"
-    >
-      <Typography variant="body1">
-        <Stack spacing={1} direction="row" alignItems="center">
-          <ErrorOutlineOutlined />
-          {children || <span>No items to show</span>}
-        </Stack>
-      </Typography>
-    </Box>
+    <tr>
+      <td colSpan={100} style={{ borderBottom: 'none', height: '96px' }}>
+        <Box
+          className="no-items"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100%"
+          minHeight="96px"
+          sx={sx}
+          flexDirection="column"
+        >
+          <Stack spacing={1} direction="row" alignItems="center">
+            <ErrorOutlineOutlined />
+            <Typography variant="body1">
+              {children || <span>No items to show</span>}
+            </Typography>
+          </Stack>
+        </Box>
+      </td>
+    </tr>
   );
 }

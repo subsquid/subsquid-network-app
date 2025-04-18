@@ -113,15 +113,16 @@ export function Workers() {
   return (
     <Box>
       <DashboardTable
-        loading={isLoading}
         title={
           <Search
-            placeholder="Search "
+            placeholder="Search"
             value={query.search}
             onChange={setQuery.search}
             fullWidth={isMobile}
           />
         }
+        loading={isLoading}
+        sx={{ mb: 2 }}
       >
         <TableHead>
           <TableRow>
@@ -170,45 +171,42 @@ export function Workers() {
         </TableHead>
         <TableBody>
           {workers.length ? (
-            workers.map(worker => {
-              return (
-                <TableRow key={worker.peerId}>
-                  <TableCell className="pinned">
-                    <WorkerName
-                      worker={worker}
-                      to={`/workers/${worker.peerId}?backPath=/dashboard`}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <WorkerStatusChip worker={worker} />
-                  </TableCell>
-                  <TableCell>
-                    <WorkerVersion worker={worker} />
-                  </TableCell>
-                  <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
-                  <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
-                  <TableCell>
-                    {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                  </TableCell>
-                  {/*<TableCell>{formatSqd(worker.totalDelegations.capacity, 0)}</TableCell>*/}
-                  <TableCell>
-                    <DelegationCapacity worker={worker} />
-                  </TableCell>
-                  <TableCell>{dateFormat(worker.createdAt)}</TableCell>
-                  <TableCell className="pinned">
-                    <Box display="flex" justifyContent="flex-end">
-                      <WorkerDelegate worker={worker} sources={sources} />
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })
+            workers.map(worker => (
+              <TableRow key={worker.peerId}>
+                <TableCell className="pinned">
+                  <WorkerName
+                    worker={worker}
+                    to={`/workers/${worker.peerId}?backPath=/dashboard`}
+                  />
+                </TableCell>
+                <TableCell>
+                  <WorkerStatusChip worker={worker} />
+                </TableCell>
+                <TableCell>
+                  <WorkerVersion worker={worker} />
+                </TableCell>
+                <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
+                <TableCell>
+                  {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
+                </TableCell>
+                <TableCell>
+                  <DelegationCapacity worker={worker} />
+                </TableCell>
+                <TableCell>{dateFormat(worker.createdAt)}</TableCell>
+                <TableCell className="pinned">
+                  <Box display="flex" justifyContent="flex-end">
+                    <WorkerDelegate worker={worker} sources={sources} />
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))
           ) : (
             <NoItems />
           )}
         </TableBody>
       </DashboardTable>
-      {isWorkersLoading ? null : (
+      {!isWorkersLoading && (
         <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
       )}
     </Box>
