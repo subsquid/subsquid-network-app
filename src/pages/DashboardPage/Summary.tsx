@@ -21,7 +21,8 @@ import {
 import Grid from '@mui/material/Unstable_Grid2';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 
-import { useNetworkSummary } from '@api/subsquid-network-squid';
+import { useNetworkStats } from '@api/subsquid-network-squid';
+import { useCurrentEpoch } from '@api/subsquid-network-squid';
 import SquaredChip from '@components/Chip/SquaredChip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
@@ -79,7 +80,7 @@ export function SummarySection({
 }
 
 function OnlineInfo() {
-  const { data, isLoading } = useNetworkSummary();
+  const { data, isLoading } = useNetworkStats();
 
   return (
     <SummarySection
@@ -121,9 +122,9 @@ function CurrentEpochEstimation({ epochEnd }: { epochEnd: number }) {
 }
 
 function CurrentEpoch() {
-  const { data, isLoading } = useNetworkSummary();
-
+  const { data, isLoading } = useCurrentEpoch();
   const [epochEnd, setEpochEnd] = useState<number>(Date.now());
+
   useEffect(() => {
     if (!data || !data.epoch) return;
 
@@ -132,7 +133,7 @@ function CurrentEpoch() {
       new Date(data.lastBlockTimestampL1).getTime();
 
     setEpochEnd(newEpochEnd);
-  }, [data, epochEnd]);
+  }, [data]);
 
   return (
     <SummarySection
@@ -147,7 +148,7 @@ function CurrentEpoch() {
 }
 
 function Stats() {
-  const { data, isLoading } = useNetworkSummary();
+  const { data, isLoading } = useNetworkStats();
   const { SQD_TOKEN } = useContracts();
 
   return (
@@ -165,14 +166,6 @@ function Stats() {
           <ColumnLabel>Total delegation</ColumnLabel>
           <ColumnValue>{tokenFormatter(fromSqd(data?.totalDelegation), SQD_TOKEN, 3)}</ColumnValue>
         </Box>
-        {/* <Box>
-            <WorkerColumnLabel>Worker APR</WorkerColumnLabel>
-            <WorkerColumnValue>{percentFormatter(data?.workerApr)}</WorkerColumnValue>
-          </Box>
-          <Box>
-            <WorkerColumnLabel>Delegator APR</WorkerColumnLabel>
-            <WorkerColumnValue>{percentFormatter(data?.stakerApr)}</WorkerColumnValue>
-          </Box> */}
         <Box>
           <ColumnLabel>Queries, 24h / 90d</ColumnLabel>
           <ColumnValue>
@@ -275,16 +268,16 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
 }
 
 function WorkersApr({ length }: { length?: number }) {
-  const { data, isLoading } = useNetworkSummary();
+  const { data, isLoading } = useNetworkStats();
 
   const aprs = useMemo(() => {
-    if (!data) return [];
+    if (!data?.aprs || !data?.workerApr) return [];
 
     return data.aprs.slice(length ? -length : 0).map((apr, i) => ({
       date: apr.timestamp,
       value: i === data.aprs.length - 1 ? (apr.workerApr + data.workerApr) / 2 : apr.workerApr,
     }));
-  }, [data, length]);
+  }, [data?.aprs, data?.workerApr, length]);
 
   return (
     <SummarySection
@@ -303,16 +296,16 @@ function WorkersApr({ length }: { length?: number }) {
 }
 
 function DelegatorsApr({ length }: { length?: number }) {
-  const { data, isLoading } = useNetworkSummary();
+  const { data, isLoading } = useNetworkStats();
 
   const aprs = useMemo(() => {
-    if (!data) return [];
+    if (!data?.aprs || !data?.stakerApr) return [];
 
     return data.aprs.slice(length ? -length : 0).map((apr, i) => ({
       date: apr.timestamp,
       value: i === data.aprs.length - 1 ? (apr.stakerApr + data.stakerApr) / 2 : apr.stakerApr,
     }));
-  }, [data, length]);
+  }, [data?.aprs, data?.stakerApr, length]);
 
   return (
     <SummarySection
@@ -339,31 +332,25 @@ export function NetworkSummary() {
 
   return (
     <Box minHeight={528} mb={2} display="flex">
-      <>
-        <Grid container spacing={2} disableEqualOverflow flex={1}>
-          <Grid container xxs={12} sm={8}>
-            <Grid xxs={12} sm={6} sx={{ ...size }}>
-              <OnlineInfo />
-            </Grid>
-            <Grid xxs={12} sm={6} sx={{ ...size }}>
-              <CurrentEpoch />
-            </Grid>
-            <Grid xxs={12} sm={6} sx={{ ...size }}>
-              <WorkersApr />
-            </Grid>
-            <Grid xxs={12} sm={6} sx={{ ...size }}>
-              <DelegatorsApr />
-            </Grid>
+      <Grid container spacing={2} disableEqualOverflow flex={1}>
+        <Grid container xxs={12} sm={8}>
+          <Grid xxs={12} sm={6} sx={{ ...size }}>
+            <OnlineInfo />
           </Grid>
-          <Grid xxs={12} sm={4}>
-            <Stats />
+          <Grid xxs={12} sm={6} sx={{ ...size }}>
+            <CurrentEpoch />
+          </Grid>
+          <Grid xxs={12} sm={6} sx={{ ...size }}>
+            <WorkersApr />
+          </Grid>
+          <Grid xxs={12} sm={6} sx={{ ...size }}>
+            <DelegatorsApr />
           </Grid>
         </Grid>
-
-        {/* <Box height={500}>
-            
-          </Box> */}
-      </>
+        <Grid xxs={12} sm={4}>
+          <Stats />
+        </Grid>
+      </Grid>
     </Box>
   );
 }
