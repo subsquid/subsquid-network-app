@@ -100,12 +100,27 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
 
         return await waitForTransactionReceipt(config, { hash });
       } catch (e) {
-        Sentry.captureException(e, {
-          extra: {
-            params,
-            config,
-          },
-        });
+        if (e instanceof Error && !/rejected/i.test(e.message)) {
+          Sentry.captureException(e, {
+            extra: {
+              params: JSON.stringify(params, (_, value) =>
+                typeof value === 'bigint' ? value.toString() : value,
+              ),
+              connections: JSON.stringify(
+                Array.from(config.state.connections.values()).map(c => ({
+                  accounts: c.accounts,
+                  chainId: c.chainId,
+                  connector: {
+                    id: c.connector.id,
+                    name: c.connector.name,
+                    type: c.connector.type,
+                    transport: c.connector.transport,
+                  },
+                })),
+              ),
+            },
+          });
+        }
 
         setError(e as Error);
         throw e;
