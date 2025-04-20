@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import * as Sentry from '@sentry/react';
 import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
 import { erc20Abi } from 'viem';
 import {
@@ -99,6 +100,13 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
 
         return await waitForTransactionReceipt(config, { hash });
       } catch (e) {
+        Sentry.captureException(e, {
+          extra: {
+            params,
+            config,
+          },
+        });
+
         setError(e as Error);
         throw e;
       } finally {
