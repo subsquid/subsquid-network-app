@@ -209,7 +209,15 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
 
   return (
     <>
-      <style>{`.recharts-tooltip-cursor { transition: all ease-out ${ANIMATION_DURATION}ms !important; }`}</style>
+      <style>{`
+        .recharts-tooltip-cursor { 
+          transition: all ease-out ${ANIMATION_DURATION}ms !important;
+          pointer-events: none;
+        }
+        .recharts-wrapper {
+          touch-action: none;
+        }
+      `}</style>
       <ResponsiveContainer width="200%" height="85%" style={{ margin: theme.spacing(-1.5) }}>
         <AreaChart
           width={200}
@@ -217,7 +225,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
           data={useMemo(() => data, [data])}
           defaultShowTooltip
           margin={{ top: 16, right: 0, left: 0, bottom: 0 }}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
         >
           <defs>
             <linearGradient id="area-gradient" x2="0" y2="1">
@@ -236,6 +244,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
               }}
               cursorStyle={{
                 transform: 'translateX(-50%)',
+                pointerEvents: 'none',
               }}
               defaultIndex={Math.max(data.length - 2, 0)}
               active
@@ -244,6 +253,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
               wrapperStyle={{
                 zIndex: theme.zIndex.appBar - 1,
                 transition: ANIMATION_TRANSITION,
+                WebkitTapHighlightColor: 'transparent',
               }}
               offset={0}
               trigger="click"
