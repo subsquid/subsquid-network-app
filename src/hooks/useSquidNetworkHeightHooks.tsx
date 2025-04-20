@@ -5,12 +5,12 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useState,
 } from 'react';
 
 import { logger } from '@logger';
 import { useQueryClient } from '@tanstack/react-query';
 import { max, partition } from 'lodash-es';
-// import { useSnackbar,  } from 'notistack';
 import { toast } from 'react-hot-toast';
 import { useBlockNumber } from 'wagmi';
 
@@ -53,11 +53,22 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
     serializer: localStorageStringSerializer,
     storageSync: false,
   });
+
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isToastHidden, setIsToastHidden] = useState(false);
+
+  const { data: chainHeight } = useBlockNumber({
+    watch: true,
+    query: {
+      refetchInterval: isSyncing ? 200 : 1000,
+    },
+  });
+
   const { data, isLoading } = useSquidNetworkHeightQuery(
     dataSource,
     {},
     {
-      refetchInterval: 2000,
+      refetchInterval: isSyncing ? 200 : 2000,
     },
   );
   // const { enqueueSnackbar } = useSnackbar();
@@ -97,15 +108,23 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
   }, [heightHooks]);
 
   useEffect(() => {
-    if (maxWaitHeight > 0) {
-      toast.loading(`Syncing ${currentHeight} block of ${maxWaitHeight}`, {
+    if (isLoading || !chainHeight) return;
+
+    const syncing = BigInt(currentHeight) < chainHeight - 50n;
+    setIsSyncing(syncing);
+
+    if (isToastHidden) return;
+
+    if (syncing || maxWaitHeight > currentHeight) {
+      toast.loading(`Syncing ${currentHeight} block of ${syncing ? chainHeight : maxWaitHeight}`, {
         id: 'squid-sync',
         duration: Infinity,
+        onClose: () => setIsToastHidden(true),
       });
     } else {
       toast.remove('squid-sync');
     }
-  }, [maxWaitHeight, currentHeight]);
+  }, [chainHeight, currentHeight, isLoading, maxWaitHeight, isToastHidden]);
 
   const setWaitHeight = useCallback(
     (height: bigint | string, invalidateQueries: unknown[] = []) => {
@@ -116,18 +135,18 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
       heightHooks.splice(0, heightHooks.length - 10);
 
       setHeightHooksRaw(JSON.stringify(heightHooks));
+
+      // Force show the toast when setWaitHeight is called
+      setIsToastHidden(false);
+      if (maxWaitHeight > currentHeight) {
+        toast.loading(`Syncing ${currentHeight} block of ${maxWaitHeight}`, {
+          id: 'squid-sync',
+          duration: Infinity,
+        });
+      }
     },
-    [heightHooks, setHeightHooksRaw],
+    [heightHooks, setHeightHooksRaw, maxWaitHeight, currentHeight],
   );
-
-  const { data: chainHeight } = useBlockNumber();
-  useEffect(() => {
-    if (isLoading) return;
-
-    if (chainHeight && BigInt(currentHeight) < chainHeight - 5n && maxWaitHeight < chainHeight) {
-      setWaitHeight(chainHeight);
-    }
-  }, [chainHeight, currentHeight, heightHooks, isLoading, maxWaitHeight, setWaitHeight]);
 
   return (
     <SquidHeightContext.Provider
