@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { toSqd } from '@lib/network';
 
 import { useSquid } from './datasource';
@@ -20,42 +22,58 @@ export function useNetworkSettings() {
   };
 }
 
-export function useNetworkSummary() {
+export function useNetworkStats() {
   const dataSource = useSquid();
-  const { data: networkStats, isLoading: isNetworkStatsLoading } = useNetworkSummaryQuery(
+  const { data, isLoading } = useNetworkSummaryQuery(
     dataSource,
     {},
     {
-      select: res => {
-        return {
-          ...res.networkStats,
-        };
-      },
+      select: res => res.networkStats,
     },
   );
 
-  const { data: currentEpoch, isLoading: isCurrentEpochLoading } = useCurrentEpochQuery(
+  return {
+    data,
+    isLoading,
+  };
+}
+
+export function useCurrentEpoch() {
+  const dataSource = useSquid();
+  const { data, isLoading } = useCurrentEpochQuery(
     dataSource,
     {},
     {
-      select: res => {
-        return {
-          ...res.networkStats,
-          epoch: res.epoches.length ? res.epoches[0] : undefined,
-        };
-      },
+      select: res => ({
+        ...res.networkStats,
+        epoch: res.epoches.length ? res.epoches[0] : undefined,
+      }),
       refetchInterval: 12_000, // block time in l1
     },
   );
 
   return {
-    data:
-      networkStats && currentEpoch
-        ? {
-            ...networkStats,
-            ...currentEpoch,
-          }
-        : undefined,
+    data,
+    isLoading,
+  };
+}
+
+// For backward compatibility
+export function useNetworkSummary() {
+  const { data: networkStats, isLoading: isNetworkStatsLoading } = useNetworkStats();
+  const { data: currentEpoch, isLoading: isCurrentEpochLoading } = useCurrentEpoch();
+
+  const data = useMemo(() => {
+    return networkStats && currentEpoch
+      ? {
+          ...networkStats,
+          ...currentEpoch,
+        }
+      : undefined;
+  }, [networkStats, currentEpoch]);
+
+  return {
+    data,
     isLoading: isNetworkStatsLoading || isCurrentEpochLoading,
   };
 }
