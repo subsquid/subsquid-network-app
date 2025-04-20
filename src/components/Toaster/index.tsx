@@ -1,6 +1,6 @@
 import { Report } from '@mui/icons-material';
 import { Alert, AlertColor, Box, CircularProgress, Typography } from '@mui/material';
-import toast, { Toaster as Toaster_ } from 'react-hot-toast';
+import toast, { Toaster as Toaster_, Toast } from 'react-hot-toast';
 
 export function Toaster() {
   return (
@@ -10,7 +10,7 @@ export function Toaster() {
       toastOptions={{ duration: 2000 }}
       reverseOrder={true}
     >
-      {t => {
+      {(t: Toast) => {
         const content = typeof t.message === 'function' ? t.message(t) : t.message;
 
         const { color, icon } =
@@ -34,7 +34,10 @@ export function Toaster() {
             hidden={!t.visible}
             icon={icon}
             color={color as AlertColor}
-            onClose={() => toast.remove(t.id)}
+            onClose={() => {
+              t.onClose?.();
+              toast.remove(t.id);
+            }}
           >
             <Typography>{content}</Typography>
           </Alert>

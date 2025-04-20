@@ -24,9 +24,7 @@ export function NoItems({
         >
           <Stack spacing={1} direction="row" alignItems="center">
             <ErrorOutlineOutlined />
-            <Typography variant="body1">
-              {children || <span>No items to show</span>}
-            </Typography>
+            <Typography variant="body1">{children || <span>No items to show</span>}</Typography>
           </Stack>
         </Box>
       </td>
