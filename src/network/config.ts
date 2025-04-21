@@ -17,13 +17,27 @@ import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
 // }
 
 const network = getSubsquidNetwork();
+const isProduction = process.env.NODE_ENV === 'production';
 
 export const rainbowConfig = getDefaultConfig({
   appName: `Subsquid Network ${upperFirst(network)}`,
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
   chains:
     network === NetworkName.Mainnet
-      ? [arbitrum, { ...mainnet, rpcUrls: { default: { http: ['https://eth.llamarpc.com'] } } }]
+      ? [
+          isProduction
+            ? {
+                ...arbitrum,
+                rpcUrls: { default: { http: [`${window.location.origin}/rpc/arbitrum-one`] } },
+              }
+            : arbitrum,
+          isProduction
+            ? {
+                ...mainnet,
+                rpcUrls: { default: { http: [`${window.location.origin}/rpc/ethereum`] } },
+              }
+            : mainnet,
+        ]
       : [arbitrumSepolia, sepolia],
   // transports: [fallback([unstable_connector(injected), http()])],
   syncConnectedChain: true,

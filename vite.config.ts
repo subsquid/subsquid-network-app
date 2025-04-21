@@ -36,6 +36,7 @@ export default defineConfig({
     ),
     'process.env.NETWORK': encode(process.env.NETWORK || 'mainnet'),
     'process.env.SENTRY_DSN': encode(process.env.SENTRY_DSN || ''),
+    'process.env.HOST_URL': encode(process.env.HOST_URL || ''),
   },
 
   optimizeDeps: {
