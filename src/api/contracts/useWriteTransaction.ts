@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import * as Sentry from '@sentry/react';
 import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
-import { erc20Abi } from 'viem';
+import { ContractFunctionExecutionError, createPublicClient, erc20Abi, http } from 'viem';
 import {
   Abi,
   Address,
@@ -12,8 +12,10 @@ import {
   encodeFunctionData,
 } from 'viem';
 import { useConfig, useWriteContract } from 'wagmi';
+import { arbitrum } from 'wagmi/chains';
 
 import { useContracts } from '@network/useContracts';
+import { getSubsquidNetwork, NetworkName } from '@network/useSubsquidNetwork';
 
 import { vestingAbi } from './subsquid.generated';
 
@@ -101,11 +103,41 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
         return await waitForTransactionReceipt(config, { hash });
       } catch (e) {
         if (e instanceof Error && !/rejected/i.test(e.message)) {
+          let params: any;
+
+          if (e instanceof ContractFunctionExecutionError) {
+            const { abi, functionName, args } = e;
+            params = { abi, functionName, args };
+
+            if (
+              process.env.NODE_ENV === 'production' &&
+              getSubsquidNetwork() === NetworkName.Mainnet
+            ) {
+              const client = createPublicClient({
+                chain: arbitrum,
+                transport: http(`${window.location.origin}/rpc/arbitrum-one-tenderly`),
+              });
+
+              const data = encodeFunctionData(params);
+              // NOTE: we do not really care about the result
+              client
+                .request({
+                  method: 'tenderly_simulateTransaction',
+                  params: [
+                    {
+                      from: e.sender!,
+                      to: e.contractAddress,
+                      data,
+                    },
+                  ],
+                } as any)
+                .catch(() => {});
+            }
+          }
+
           Sentry.captureException(e, {
             extra: {
-              params: JSON.stringify(params, (_, value) =>
-                typeof value === 'bigint' ? value.toString() : value,
-              ),
+              args: params,
               connections: JSON.stringify(
                 Array.from(config.state.connections.values()).map(c => ({
                   accounts: c.accounts,

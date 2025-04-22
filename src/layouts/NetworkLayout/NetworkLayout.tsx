@@ -22,7 +22,7 @@ import { Logo } from '@components/Logo';
 import { useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
 import { useAccount } from '@network/useAccount';
-import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { getChain, getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { ColorVariant } from '../../theme';
 
@@ -266,7 +266,7 @@ export const NetworkLayout = ({
 
   useEffect(() => {
     if (!isConnected) return;
-    if (chain?.id === getChainId(network)) return;
+    if (chain?.id === getChain(network).id) return;
 
     disconnect();
   }, [isConnected, chain?.id, walletClient, network, disconnect]);

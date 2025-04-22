@@ -15,8 +15,8 @@ export function getSubsquidNetwork() {
   return validate(process.env.NETWORK);
 }
 
-export function getChainId(network: NetworkName) {
-  return network === NetworkName.Mainnet ? arbitrum.id : arbitrumSepolia.id;
+export function getChain(network: NetworkName) {
+  return network === NetworkName.Mainnet ? arbitrum : arbitrumSepolia;
 }
 
 export function getNetworkName(chainId: number) {
