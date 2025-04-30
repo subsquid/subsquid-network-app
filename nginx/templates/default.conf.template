@@ -1,5 +1,5 @@
 # Rate limiting configuration
-limit_req_zone $binary_remote_addr zone=rpc_limit:10m rate=30r/m;
+limit_req_zone $binary_remote_addr zone=rpc_limit:10m rate=50r/m;
 
 # Map RPC paths to their corresponding URLs
 map $rpc_chain $rpc_service {
