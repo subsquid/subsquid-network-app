@@ -10,7 +10,7 @@ import { queryClient } from '@api/client';
 import { Toaster } from '@components/Toaster';
 import { SquidHeightProvider } from '@hooks/useSquidNetworkHeightHooks';
 import { rainbowConfig } from '@network/config';
-import { getChainId, getSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { getChain, getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { AppRoutes } from './AppRoutes';
 import { useCreateRainbowKitTheme, useCreateTheme, useThemeState } from './theme';
@@ -29,7 +29,7 @@ function App() {
             <RainbowKitProvider
               modalSize="compact"
               theme={rainbowkitTheme}
-              initialChain={getChainId(network)}
+              initialChain={getChain(network)}
             >
               <SquidHeightProvider>
                 <CssBaseline />
