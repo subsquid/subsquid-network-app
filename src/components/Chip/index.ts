@@ -1,0 +1,1 @@
+export { SquaredChip } from './SquaredChip';
