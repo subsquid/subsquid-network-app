@@ -1,8 +1,16 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import {
+  coinbaseWallet,
+  metaMaskWallet,
+  rainbowWallet,
+  safeWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 import { upperFirst } from 'lodash-es';
-import { arbitrumSepolia, arbitrum, sepolia, mainnet } from 'wagmi/chains';
+import { arbitrumSepolia, arbitrum } from 'wagmi/chains';
 
 import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
+import { fallback, http, injected, unstable_connector } from 'wagmi';
 
 // export let CHAIN: Chain = arbitrumSepolia;
 // if (process.env.NETWORK === 'hardhat') {
@@ -17,28 +25,19 @@ import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
 // }
 
 const network = getSubsquidNetwork();
-const isProduction = process.env.NODE_ENV === 'production';
 
 export const rainbowConfig = getDefaultConfig({
   appName: `Subsquid Network ${upperFirst(network)}`,
   projectId: process.env.WALLET_CONNECT_PROJECT_ID || '',
-  chains:
-    network === NetworkName.Mainnet
-      ? [
-          isProduction
-            ? {
-                ...arbitrum,
-                rpcUrls: { default: { http: [`${window.location.origin}/rpc/arbitrum-one`] } },
-              }
-            : arbitrum,
-          isProduction
-            ? {
-                ...mainnet,
-                rpcUrls: { default: { http: [`${window.location.origin}/rpc/ethereum`] } },
-              }
-            : mainnet,
-        ]
-      : [arbitrumSepolia, sepolia],
-  // transports: [fallback([unstable_connector(injected), http()])],
-  syncConnectedChain: true,
+  transports: {
+    [arbitrum.id]: fallback([http()]),
+    [arbitrumSepolia.id]: fallback([http()]),
+  },
+  chains: network === NetworkName.Mainnet ? [arbitrum] : [arbitrumSepolia],
+  wallets: [
+    {
+      groupName: 'Recommended',
+      wallets: [safeWallet, rainbowWallet, coinbaseWallet, metaMaskWallet, walletConnectWallet],
+    },
+  ],
 });

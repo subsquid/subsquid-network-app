@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import * as Sentry from '@sentry/react';
 import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
-import { erc20Abi } from 'viem';
+import { ContractFunctionExecutionError, createPublicClient, erc20Abi, http } from 'viem';
 import {
   Abi,
   Address,
@@ -12,8 +12,11 @@ import {
   encodeFunctionData,
 } from 'viem';
 import { useConfig, useWriteContract } from 'wagmi';
+import { arbitrum } from 'wagmi/chains';
 
+import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
+import { getSubsquidNetwork, NetworkName } from '@network/useSubsquidNetwork';
 
 import { vestingAbi } from './subsquid.generated';
 
@@ -41,6 +44,7 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
   const [isPending, setPending] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const { SQD } = useContracts();
+  const account = useAccount();
 
   return {
     ...result,
@@ -55,57 +59,85 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
     ) => {
       setPending(true);
       try {
-        const { approve, vesting, ...writeParams } = params;
-
         let hash: `0x${string}`;
-        if (vesting) {
+        if (params.vesting) {
           const encodedFunctionData = encodeFunctionData({
-            abi: writeParams.abi,
-            functionName: writeParams.functionName,
-            args: writeParams.args,
+            abi: params.abi,
+            functionName: params.functionName,
+            args: params.args,
           } as Parameters<typeof encodeFunctionData>[0]);
 
           hash = await writeContractAsync({
-            address: vesting,
+            address: params.vesting,
             abi: vestingAbi,
             functionName: 'execute',
-            args: approve
-              ? [writeParams.address, encodedFunctionData, approve]
-              : [writeParams.address, encodedFunctionData],
+            args: params.approve
+              ? [params.address, encodedFunctionData, params.approve]
+              : [params.address, encodedFunctionData],
           } as Parameters<typeof writeContractAsync>[0]);
         } else {
-          if (approve) {
+          if (params.approve) {
             const allowance = await readContract(config, {
               abi: erc20Abi,
               functionName: 'allowance',
               address: SQD,
-              args: [writeParams.address, params.address],
+              args: [params.address, params.address],
             });
 
-            if (allowance < approve) {
+            if (allowance < params.approve) {
+              simulateTenderly({
+                sender: account.address,
+                contractAddress: SQD,
+                params: {
+                  abi: erc20Abi,
+                  functionName: 'approve',
+                  args: [params.address, params.approve],
+                },
+              });
+
               const hash = await writeContract(config, {
                 abi: erc20Abi,
                 functionName: 'approve',
                 address: SQD,
-                args: [params.address, approve],
+                args: [params.address, params.approve],
               });
               await waitForTransactionReceipt(config, { hash });
             }
           }
 
+          simulateTenderly({
+            sender: account.address,
+            contractAddress: params.address,
+            params: {
+              abi: params.abi,
+              functionName: params.functionName,
+              args: params.args,
+            },
+          });
+
           // FIXME: this is a workaround for wagmi types,
           // probably makes sense to do it in a different way
-          hash = await writeContractAsync(writeParams as Parameters<typeof writeContractAsync>[0]);
+          hash = await writeContractAsync({
+            abi: params.abi,
+            functionName: params.functionName,
+            address: params.address,
+            args: params.args,
+          } as Parameters<typeof writeContractAsync>[0]);
         }
 
         return await waitForTransactionReceipt(config, { hash });
       } catch (e) {
         if (e instanceof Error && !/rejected/i.test(e.message)) {
+          let params: any;
+
+          if (e instanceof ContractFunctionExecutionError) {
+            const { abi, functionName, args } = e;
+            params = { abi, functionName, args };
+          }
+
           Sentry.captureException(e, {
             extra: {
-              params: JSON.stringify(params, (_, value) =>
-                typeof value === 'bigint' ? value.toString() : value,
-              ),
+              args: params,
               connections: JSON.stringify(
                 Array.from(config.state.connections.values()).map(c => ({
                   accounts: c.accounts,
@@ -129,4 +161,30 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
       }
     },
   };
+}
+
+function simulateTenderly(opts: any) {
+  if (process.env.NODE_ENV === 'production' && getSubsquidNetwork() === NetworkName.Mainnet) {
+    const client = createPublicClient({
+      chain: arbitrum,
+      transport: http(`${window.location.origin}/rpc/arbitrum-one-tenderly`),
+    });
+
+    const data = encodeFunctionData(opts.params);
+    // NOTE: we do not really care about the result
+    client
+      .request({
+        method: 'tenderly_simulateTransaction',
+        params: [
+          {
+            from: opts.sender,
+            to: opts.contractAddress,
+            value: '0x0',
+            data,
+          },
+          'latest',
+        ],
+      } as any)
+      .catch(() => {});
+  }
 }

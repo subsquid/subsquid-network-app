@@ -7,6 +7,7 @@ import { WriteContractData } from 'wagmi/query';
 import { useContracts } from '@network/useContracts.ts';
 
 import { WriteContractRes, errorMessage } from './utils';
+import { getChain } from '@network/useSubsquidNetwork';
 
 export function useApproveSqd() {
   const client = useClient();
