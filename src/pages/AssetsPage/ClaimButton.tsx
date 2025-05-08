@@ -3,8 +3,7 @@ import { useMemo, useState } from 'react';
 import { tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network/utils';
 import { TollOutlined } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
-import { Box, TableBody, TableCell, TableRow } from '@mui/material';
+import { Box, TableBody, TableCell, TableRow, Button } from '@mui/material';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
@@ -51,7 +50,7 @@ export function ClaimButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         startIcon={<TollOutlined />}
         onClick={() => setOpen(true)}
         color="info"
@@ -60,7 +59,7 @@ export function ClaimButton({
         disabled={disabled}
       >
         CLAIM
-      </LoadingButton>
+      </Button>
       <ClaimDialog sources={sources} open={open} onClose={() => setOpen(false)} />
     </>
   );
@@ -173,7 +172,6 @@ export function ClaimDialog({
 
           <Box
             sx={{
-              scrollbarWidth: 'thin',
               maxHeight: '50vh',
               overflow: 'auto',
             }}

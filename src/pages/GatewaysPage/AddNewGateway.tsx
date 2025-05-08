@@ -1,9 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { peerIdToHex } from '@lib/network';
 import { Add } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { Button, SxProps } from '@mui/material';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
@@ -37,7 +36,7 @@ export function AddGatewayButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         disabled={disabled}
         sx={sx}
         loading={open}
@@ -47,7 +46,7 @@ export function AddGatewayButton({
         onClick={() => setOpen(true)}
       >
         ADD PORTAL
-      </LoadingButton>
+      </Button>
       <AddGatewayDialog open={open} onClose={() => setOpen(false)} sources={sources} />
     </>
   );

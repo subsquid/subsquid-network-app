@@ -2,8 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { fromSqd, peerIdToHex } from '@lib/network/utils';
 import { Add } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { Button, SxProps } from '@mui/material';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import useLocalStorageState from 'use-local-storage-state';
@@ -46,7 +45,7 @@ export function AddWorkerButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         disabled={disabled}
         sx={sx}
         loading={open}
@@ -56,7 +55,7 @@ export function AddWorkerButton({
         onClick={() => setOpen(true)}
       >
         ADD WORKER
-      </LoadingButton>
+      </Button>
       <AddNewWorkerDialog
         open={open}
         onResult={confirmed => {

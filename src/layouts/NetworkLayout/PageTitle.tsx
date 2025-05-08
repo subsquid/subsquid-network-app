@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { Box, styled, Typography } from '@mui/material';
 import { SxProps } from '@mui/system/styleFunctionSx';
@@ -15,12 +15,12 @@ const PageTitleWrapper = styled('div', {
     alignItems: 'center',
     gap: theme.spacing(3.5),
 
-    [theme.breakpoints.down('xxs')]: {
+    [theme.breakpoints.down('xs')]: {
       gap: theme.spacing(2),
     },
   },
 
-  [theme.breakpoints.down('xxs')]: {
+  [theme.breakpoints.down('xs')]: {
     marginBottom: theme.spacing(4),
   },
 }));

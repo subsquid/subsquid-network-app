@@ -8,7 +8,7 @@ import { useReadContracts } from 'wagmi';
 
 import { vestingAbi } from '@api/contracts';
 import { AccountType, useSourcesQuery, useSquid } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { DashboardTable, NoItems } from '@components/Table';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';

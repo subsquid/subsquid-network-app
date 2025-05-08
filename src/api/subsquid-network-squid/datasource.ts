@@ -1,9 +1,10 @@
 import { NetworkName, getSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { useMemo } from 'react';
 
 export function useSquid() {
   const network = getSubsquidNetwork();
 
-  return {
+  return useMemo(() => ({
     endpoint:
       network === NetworkName.Tethys
         ? process.env.TESTNET_SQUID_API_URL || '/graphql'
@@ -13,5 +14,5 @@ export function useSquid() {
         'Content-type': 'application/json',
       },
     },
-  };
+  }), [network]);
 }

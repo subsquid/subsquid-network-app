@@ -1,11 +1,11 @@
 export function debug(message: string) {
-  return console.log(`%c${message}`, '');
+  return ;
 }
 export function info(message: string) {
-  return console.log(`%c${message}`, 'color: #66B2FF; font-size: 16px');
+  return ;
 }
 export function error(message: Error | string | unknown) {
-  return console.error(`%c${message}`, 'color: red; font-size: 16px');
+  return ;
 }
 export const logger = {
   debug,

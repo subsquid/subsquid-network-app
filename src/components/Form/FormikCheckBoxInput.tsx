@@ -7,44 +7,59 @@ import {
   formControlLabelClasses,
   FormHelperText,
   styled,
+  FormControlLabelProps,
 } from '@mui/material';
+import { FormikProps } from 'formik';
 
-export const Label = styled(FormControlLabel)(({ theme: { palette, breakpoints } }) => ({
-  marginRight: 0,
-  marginLeft: -10,
-  // marginBottom: spacing(1),
-  [`& .${formControlLabelClasses.label}`]: {
-    fontSize: '0.85rem',
-    color: palette.text.secondary,
-  },
-  [breakpoints.down('xxs')]: {
+export const Label = styled(FormControlLabel)<FormControlLabelProps>(
+  ({ theme: { palette, breakpoints } }) => ({
+    marginRight: 0,
+    marginLeft: -10,
     [`& .${formControlLabelClasses.label}`]: {
-      lineHeight: 1.5,
-      fontSize: '14px',
+      fontSize: '0.85rem',
+      color: palette.text.secondary,
     },
-  },
-}));
+    [breakpoints.down('xs')]: {
+      [`& .${formControlLabelClasses.label}`]: {
+        lineHeight: 1.5,
+        fontSize: '14px',
+      },
+    },
+  }),
+);
 
-export function FormikCheckBoxInput({
+interface FormikCheckBoxInputProps<T extends Record<string, any>> {
+  id: keyof T;
+  label: string | React.ReactElement;
+  formik: FormikProps<T>;
+  showErrorOnlyOfTouched?: boolean;
+}
+
+export const FormikCheckBoxInput = <T extends Record<string, any>>({
   label,
   id,
   formik,
-}: {
-  id: string;
-  label: string | React.ReactElement;
-  formik?: any;
-}) {
-  const hasError = formik.touched[id] && Boolean(formik.errors[id]);
+  showErrorOnlyOfTouched = false,
+}: FormikCheckBoxInputProps<T>) => {
+  const actualError =
+    !showErrorOnlyOfTouched || (showErrorOnlyOfTouched && formik.touched[id])
+      ? (formik.errors[id] as string | undefined)
+      : undefined;
 
   return (
     <Box>
       <Label
         control={
-          <Checkbox id={id} checked={formik.values[id]} onChange={formik.handleChange} name={id} />
+          <Checkbox
+            id={id as string}
+            checked={formik.values[id] as boolean}
+            onChange={formik.handleChange}
+            name={id as string}
+          />
         }
         label={label}
       />
-      {hasError && <FormHelperText error={true}>{formik.errors[id]}</FormHelperText>}
+      {actualError && <FormHelperText error>{actualError}</FormHelperText>}
     </Box>
   );
-}
+};

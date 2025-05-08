@@ -10,7 +10,7 @@ import {
   WorkerSortBy,
   WorkerStatus,
 } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
@@ -129,8 +129,8 @@ export function MyWorkers() {
                             source={{
                               ...worker.owner,
                               // FIXME: some types issue
-                              locked: (worker as any).locked,
-                              unlockedAt: (worker as any).unlockedAt,
+                              locked: !!worker.locked,
+                              lockEnd: worker.lockEnd,
                             }}
                             disabled={worker.status !== WorkerStatus.Deregistered}
                           />

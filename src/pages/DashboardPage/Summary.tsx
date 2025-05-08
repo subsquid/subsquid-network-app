@@ -7,23 +7,13 @@ import {
   tokenFormatter,
 } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
-import {
-  alpha,
-  Box,
-  Card,
-  Divider,
-  Stack,
-  SxProps,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { alpha, Box, Card, Divider, Stack, SxProps, Typography, useTheme } from '@mui/material';
+import { Grid } from '@mui/material';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 
 import { useNetworkStats } from '@api/subsquid-network-squid';
 import { useCurrentEpoch } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { useCountdown } from '@hooks/useCountdown';
@@ -99,7 +89,7 @@ function OnlineInfo() {
     >
       <Box display="flex">
         <Typography variant="h1">{data?.onlineWorkersCount || 0}</Typography>
-        <Typography variant="h1" color={theme => theme.palette.text.disabled}>
+        <Typography variant="h1" color="text.disabled">
           /{data?.workersCount || 0}
         </Typography>
       </Box>
@@ -153,8 +143,8 @@ function Stats() {
 
   return (
     <SummarySection
-      loading={isLoading}
       sx={{ height: 1 }}
+      loading={isLoading}
       title={<SquaredChip label="Other Data" color="primary" />}
     >
       <Stack divider={<Divider />} spacing={1}>
@@ -209,7 +199,7 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
         }
         .recharts-wrapper {
           touch-action: none;
-        }
+          }
       `}</style>
       <ResponsiveContainer width="200%" height="85%" style={{ margin: theme.spacing(-1.5) }}>
         <AreaChart
@@ -235,22 +225,19 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
                 strokeWidth: 2,
                 strokeDasharray: 6,
               }}
-              cursorStyle={{
-                transform: 'translateX(-50%)',
-                pointerEvents: 'none',
-              }}
               defaultIndex={Math.max(data.length - 2, 0)}
               active
               allowEscapeViewBox={{ x: true }}
               position={{ y: -10 }}
               wrapperStyle={{
-                zIndex: theme.zIndex.appBar - 1,
+                zIndex: 1,
                 transition: ANIMATION_TRANSITION,
                 WebkitTapHighlightColor: 'transparent',
               }}
               offset={0}
               trigger="click"
               filterNull
+              
             />
           ) : null}
           <Area
@@ -326,28 +313,28 @@ function DelegatorsApr({ length }: { length?: number }) {
 
 export function NetworkSummary() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const size = isMobile ? { minHeight: 128 } : { height: 0.5 };
+  const size = { minHeight: 128, height: { xs: 'auto', md: 0.5 } };
 
   return (
     <Box minHeight={528} mb={2} display="flex">
-      <Grid container spacing={2} disableEqualOverflow flex={1}>
-        <Grid container xxs={12} sm={8}>
-          <Grid xxs={12} sm={6} sx={{ ...size }}>
+      <Grid container spacing={2} flex={1}>
+        {/* FIXME: some wtf hack with mb */}
+        <Grid container size={{ xs: 12, sm: 12, md: 8 }} mb={{ xs: 0, md: 2 }}>
+          <Grid size={{ xs: 12, sm: 6 }} sx={{ ...size }}>
             <OnlineInfo />
           </Grid>
-          <Grid xxs={12} sm={6} sx={{ ...size }}>
+          <Grid size={{ xs: 12, sm: 6 }} sx={{ ...size }}>
             <CurrentEpoch />
           </Grid>
-          <Grid xxs={12} sm={6} sx={{ ...size }}>
+          <Grid size={{ xs: 12, sm: 6 }} sx={{ ...size }}>
             <WorkersApr />
           </Grid>
-          <Grid xxs={12} sm={6} sx={{ ...size }}>
+          <Grid size={{ xs: 12, sm: 6 }} sx={{ ...size }}>
             <DelegatorsApr />
           </Grid>
         </Grid>
-        <Grid xxs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 12, md: 4 }}>
           <Stats />
         </Grid>
       </Grid>

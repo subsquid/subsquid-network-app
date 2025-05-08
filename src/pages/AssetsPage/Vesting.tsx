@@ -10,7 +10,7 @@ import { useReadContracts } from 'wagmi';
 import { sqdAbi, vestingAbi } from '@api/contracts';
 import { useVestingByAddress } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Loader } from '@components/Loader';
 import { NotFound } from '@components/NotFound';

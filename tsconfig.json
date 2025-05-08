@@ -10,7 +10,6 @@
     /* Linting */
     "strict": true,
 
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -38,12 +37,10 @@
       "@apps": ["./src/apps/apps"],
       "@apps/*": ["./src/apps/*"],
       "@network/*": ["./src/network/*"],
-      "@schema": ["./src/schema"],
+      "@schema": ["./src/schema"]
     }
   },
-  "include": [
-    "src",
-  ],
+  "include": ["src"],
   "exclude": ["dist", "node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

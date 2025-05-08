@@ -1,38 +1,39 @@
-import React from 'react';
-
 import CheckIcon from '@mui/icons-material/Check';
 import { Stack, Tooltip } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, SxProps, Theme } from '@mui/system';
+
+export interface CopyToClipboardTooltipProps {
+  children: React.ReactElement;
+  copied: boolean;
+  setCopied: (copied: boolean) => void;
+  tooltipText?: string;
+  copiedTooltipText?: string;
+  sx?: SxProps<Theme>;
+}
 
 export const CopyToClipboardTooltip = ({
   children,
   copied,
   setCopied,
-}: {
-  children: JSX.Element;
-  copied: boolean;
-  setCopied: (copied: boolean) => void;
-}) => {
+  tooltipText = 'Copy',
+  copiedTooltipText = 'Copied',
+  sx,
+}: CopyToClipboardTooltipProps) => {
   return (
     <Tooltip
       title={
-        <Box
-          sx={{
-            position: 'relative',
-          }}
-        >
+        <Box sx={sx}>
           {copied ? (
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Box>Copied</Box>
+              <Box>{copiedTooltipText}</Box>
               <CheckIcon sx={{ width: 16, height: 16 }} />
             </Stack>
           ) : (
-            <Box>Copy</Box>
+            <Box>{tooltipText}</Box>
           )}
         </Box>
       }
       arrow
-      // open
       placement="top"
       onClose={() => {
         setTimeout(() => setCopied(false), 400);

@@ -21,6 +21,7 @@ import { useContracts } from '@network/useContracts.ts';
 
 import { softCapAbi, stakingAbi, vestingAbi } from './subsquid.generated';
 import { errorMessage, TxResult, isApproveRequiredError, WriteContractRes } from './utils';
+import { getChain } from '@network/useSubsquidNetwork';
 
 type WorkerDepositRequest = {
   worker: Pick<Worker, 'id'>;
@@ -280,12 +281,14 @@ export function useCapedStakeAfterDelegation({
         abi: softCapAbi,
         functionName: 'capedStakeAfterDelegation',
         args: [BigInt(workerId), BigInt(amount || 0n) * (undelegate ? -1n : 1n)],
+        chainId: getChain().id,
       },
       {
         address: contracts.STAKING,
         abi: stakingAbi,
         functionName: 'delegated',
         args: [BigInt(workerId)],
+        chainId: getChain().id,
       },
     ],
     allowFailure: false,

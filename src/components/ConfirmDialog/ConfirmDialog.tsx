@@ -1,6 +1,5 @@
 import React, { PropsWithChildren, SyntheticEvent } from 'react';
 
-import { LoadingButton } from '@mui/lab';
 import {
   Box,
   Button,
@@ -12,12 +11,12 @@ import {
   useTheme,
 } from '@mui/material';
 
-import SquaredChip from '@components/Chip/SquaredChip.tsx';
+import { SquaredChip } from '@components/Chip';
 import { CloseIcon } from '@icons/CloseIcon.tsx';
 
 export const ConfirmWrapper = styled(Box, {
   name: 'ConfirmWrapper',
-})(({ theme }) => ({}));
+})(({}) => ({}));
 
 export const ConfirmDialogTitle = styled(Box, {
   name: 'ConfirmDialogTitle',
@@ -36,13 +35,12 @@ export const ConfirmDialogTitle = styled(Box, {
 
 export const CloseIconButton = styled(IconButton, {
   name: 'CloseIconButton',
-})(({ theme: { spacing, breakpoints } }) => ({
+})(({}) => ({
   position: 'absolute',
   top: -6,
   right: -6,
-  opacity: 0.5,
   padding: 0,
-  // [breakpoints.down('xxs')]: {
+  // [breakpoints.down('xs')]: {
   //   paddingLeft: '10px',
   // },
 }));
@@ -75,7 +73,7 @@ export const Actions = styled(Box)(({ theme: { spacing, breakpoints } }) => ({
   },
 }));
 
-export type ConfirmDialogProps = {
+interface ConfirmDialogProps extends PropsWithChildren {
   title: string;
   open: boolean;
   maxWidth?: string | number;
@@ -90,9 +88,9 @@ export type ConfirmDialogProps = {
   onResult?: (confirmed: boolean) => unknown;
   onApprove?: () => unknown;
   loading?: boolean;
-};
+}
 
-export function ConfirmDialog({
+export const ConfirmDialog = ({
   title,
   children,
   open,
@@ -108,40 +106,54 @@ export function ConfirmDialog({
   loading = false,
   onResult,
   onApprove,
-}: PropsWithChildren<ConfirmDialogProps>) {
+}: ConfirmDialogProps) => {
   const theme = useTheme();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const onReject = (e: SyntheticEvent, reason?: 'backdropClick' | 'escapeKeyDown') => {
-    if (disableBackdropClick && reason === 'backdropClick') return;
 
+  const handleReject = (e: SyntheticEvent, reason?: 'backdropClick' | 'escapeKeyDown') => {
+    if (disableBackdropClick && reason === 'backdropClick') return;
     onResult?.(false);
   };
+
   const handleApprove = () => {
     onApprove?.();
     onResult?.(true);
   };
-  const onClick = (event: React.UIEvent) => {
+
+  const handleClick = (event: React.UIEvent) => {
     event.stopPropagation();
   };
 
   return (
     <Dialog
       open={open}
-      onClick={onClick}
-      onClose={onReject}
-      PaperProps={{
-        sx: {
-          width: mobile ? '75%' : undefined,
-          maxWidth: mobile ? '75%' : maxWidth,
-          minWidth: mobile ? '75%' : minWidth,
-          margin: 'auto',
+      onClick={handleClick}
+      onClose={handleReject}
+      slotProps={{
+        paper: {
+          sx: {
+            width: mobile ? '75%' : undefined,
+            maxWidth: mobile ? '75%' : maxWidth,
+            minWidth: mobile ? '75%' : minWidth,
+            margin: 'auto',
+            boxShadow: 'none',
+            background: theme.palette.background.default,
+            overflow: 'auto',
+            maxHeight: 'calc(100% - 64px)',
+          },
+        },
+        backdrop: {
+          sx: {
+            backdropFilter: 'blur(0.5px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
         },
       }}
     >
       <ConfirmWrapper>
         <ConfirmDialogTitle>
           <SquaredChip label={title} color="primary" />
-          <CloseIconButton onClick={onReject}>
+          <CloseIconButton onClick={handleReject}>
             <CloseIcon />
           </CloseIconButton>
         </ConfirmDialogTitle>
@@ -149,13 +161,13 @@ export function ConfirmDialog({
           <Box id="alert-dialog-description">{children}</Box>
         </Content>
         <Actions>
-          {!hideCancelButton ? (
-            <Button onClick={onReject} variant="contained" color="primary">
+          {!hideCancelButton && (
+            <Button onClick={handleReject} variant="contained" color="primary">
               {cancelButtonText}
             </Button>
-          ) : null}
-          {!hideConfirmButton ? (
-            <LoadingButton
+          )}
+          {!hideConfirmButton && (
+            <Button
               onClick={handleApprove}
               disabled={disableConfirmButton}
               loading={loading}
@@ -163,10 +175,10 @@ export function ConfirmDialog({
               variant="contained"
             >
               {confirmButtonText}
-            </LoadingButton>
-          ) : null}
+            </Button>
+          )}
         </Actions>
       </ConfirmWrapper>
     </Dialog>
   );
-}
+};

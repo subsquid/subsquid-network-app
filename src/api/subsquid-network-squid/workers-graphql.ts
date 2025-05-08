@@ -8,7 +8,6 @@ import { PartialDeep, SimplifyDeep } from 'type-fest';
 import { useAccount } from '@network/useAccount.ts';
 
 import { useSquid } from './datasource';
-import { useFixDelegations, useFixWorkers } from './fixes';
 import {
   AccountType,
   Delegation,
@@ -144,83 +143,91 @@ export enum SortDir {
   Desc = 'desc',
 }
 
+const createSortFunction = <T extends PartialDeep<WorkerExtended, { recurseIntoArrays: true }>>(
+  sortBy: WorkerSortBy,
+  sortDir: SortDir,
+): ((a: T, b: T) => number) => {
+  return (a, b) => {
+    let result: number;
+
+    switch (sortBy) {
+      case WorkerSortBy.Name:
+        result = a.name ? (b.name ? a.name.localeCompare(b.name) : -1) : 1;
+        break;
+      case WorkerSortBy.Uptime90d:
+        result = (a.uptime90Days ?? -1) - (b.uptime90Days ?? -1);
+        break;
+      case WorkerSortBy.Uptime24h:
+        result = (a.uptime24Hours ?? -1) - (b.uptime24Hours ?? -1);
+        break;
+      case WorkerSortBy.DelegationCapacity:
+        result = (a.delegationCapacity ?? -1) - (b.delegationCapacity ?? -1);
+        break;
+      case WorkerSortBy.StakerAPR:
+        result = (a.stakerApr ?? -1) - (b.stakerApr ?? -1);
+        break;
+      case WorkerSortBy.WorkerAPR:
+        result = (a.apr ?? -1) - (b.apr ?? -1);
+        break;
+      case WorkerSortBy.WorkerReward:
+        result = BigInt(a.totalReward ?? -1) > BigInt(b.totalReward ?? -1) ? 1 : -1;
+        break;
+      case WorkerSortBy.MyDelegation:
+        result = BigInt(a.myDelegation ?? -1) > BigInt(b.myDelegation ?? -1) ? 1 : -1;
+        break;
+      case WorkerSortBy.MyDelegationReward:
+        result =
+          BigInt(a.myTotalDelegationReward ?? -1) > BigInt(b.myTotalDelegationReward ?? -1)
+            ? 1
+            : -1;
+        break;
+      case WorkerSortBy.Version:
+        result = a.version ? (b.version ? compareSemver(a.version, b.version) : 1) : -1;
+        break;
+      case WorkerSortBy.JoinedAt:
+      default:
+        result = new Date(a.createdAt || 0).valueOf() - new Date(b.createdAt || 0).valueOf();
+    }
+
+    return sortDir === SortDir.Desc ? -result : result;
+  };
+};
+
 export function sortWorkers<T extends PartialDeep<WorkerExtended, { recurseIntoArrays: true }>>(
   workers: T[],
   sortBy: WorkerSortBy,
   sortDir: SortDir,
-) {
-  return workers.sort((a, b) => {
-    if (sortDir === SortDir.Desc) {
-      [a, b] = [b, a];
-    }
-
-    switch (sortBy) {
-      case WorkerSortBy.Name:
-        return a.name ? (b.name ? a.name.localeCompare(b.name) : -1) : 1;
-      case WorkerSortBy.Uptime90d:
-        return (a.uptime90Days ?? -1) - (b.uptime90Days ?? -1);
-      case WorkerSortBy.Uptime24h:
-        return (a.uptime24Hours ?? -1) - (b.uptime24Hours ?? -1);
-      case WorkerSortBy.DelegationCapacity:
-        return (a.delegationCapacity ?? -1) - (b.delegationCapacity ?? -1);
-      case WorkerSortBy.StakerAPR:
-        return (a.stakerApr ?? -1) - (b.stakerApr ?? -1);
-      case WorkerSortBy.WorkerAPR:
-        return (a.apr ?? -1) - (b.apr ?? -1);
-      case WorkerSortBy.WorkerReward:
-        return BigInt(a.totalReward ?? -1) > BigInt(b.totalReward ?? -1) ? 1 : -1;
-      case WorkerSortBy.MyDelegation:
-        return BigInt(a.myDelegation ?? -1) > BigInt(b.myDelegation ?? -1) ? 1 : -1;
-      case WorkerSortBy.MyDelegationReward:
-        return BigInt(a.myTotalDelegationReward ?? -1) > BigInt(b.myTotalDelegationReward ?? -1)
-          ? 1
-          : -1;
-      case WorkerSortBy.Version:
-        return a.version ? (b.version ? compareSemver(a.version, b.version) : 1) : -1;
-      default:
-        return new Date(a.createdAt || 0).valueOf() - new Date(b.createdAt || 0).valueOf();
-    }
-  });
+): T[] {
+  return [...workers].sort(createSortFunction(sortBy, sortDir));
 }
 
-export function useWorkers({
-  page,
-  perPage,
-  search,
-  sortBy,
-  sortDir,
-}: {
+interface WorkersQueryParams {
   page: number;
   perPage: number;
   search: string;
   sortBy: WorkerSortBy;
   sortDir: SortDir;
-}) {
+}
+
+export function useWorkers({ page, perPage, search, sortBy, sortDir }: WorkersQueryParams) {
   const dataSource = useSquid();
   const { isPending: isSettingsLoading } = useNetworkSettings();
-
   const { data, isPending } = useAllWorkersQuery(dataSource, {});
 
   const filteredData = useMemo(() => {
     const filtered = (data?.workers || [])
       .filter(w => {
-        if (search) {
-          const regex = new RegExp(`${search}`, 'i');
-
-          return w.peerId.match(regex) || w.name?.match(regex);
-        }
-
-        return true;
+        if (!search) return true;
+        const regex = new RegExp(search, 'i');
+        return w.peerId.match(regex) || w.name?.match(regex);
       })
-      .map(w => {
-        return {
-          ...w,
-          delegationCapacity: calculateDelegationCapacity({
-            totalDelegation: w.totalDelegation,
-            capedDelegation: w.capedDelegation,
-          }),
-        };
-      });
+      .map(w => ({
+        ...w,
+        delegationCapacity: calculateDelegationCapacity({
+          totalDelegation: w.totalDelegation,
+          capedDelegation: w.capedDelegation,
+        }),
+      }));
 
     const totalPages = Math.ceil(filtered.length / perPage);
     const normalizedPage = Math.min(Math.max(1, page), totalPages);
@@ -241,45 +248,42 @@ export function useWorkers({
   };
 }
 
-export function useMyWorkers({ sortBy, sortDir }: { sortBy: WorkerSortBy; sortDir: SortDir }) {
+interface MyWorkersParams {
+  sortBy: WorkerSortBy;
+  sortDir: SortDir;
+}
+
+export function useMyWorkers({ sortBy, sortDir }: MyWorkersParams) {
   const datasource = useSquid();
   const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
 
-  const enabled = !!address;
   const { data: workers, isLoading } = useMyWorkersQuery(
     datasource,
+    { address: address || '' },
     {
-      address: address || '',
-    },
-    {
-      select: res => {
-        return res.workers.map(w => {
-          return {
-            ...w,
-            totalReward: BigNumber(w.claimedReward).plus(w.claimableReward).toFixed(),
-          };
-        });
-      },
-      enabled,
+      select: res =>
+        res.workers.map(w => ({
+          ...w,
+          totalReward: BigNumber(w.claimedReward).plus(w.claimableReward).toFixed(),
+        })),
+      enabled: !!address,
     },
   );
 
-  const { data: fixedWorkers, isLoading: isFixedWorkersLoading } = useFixWorkers({ workers });
-
-  const data = useMemo(() => {
-    return sortWorkers(fixedWorkers || [], sortBy, sortDir);
-  }, [fixedWorkers, sortBy, sortDir]);
+  const data = useMemo(
+    () => sortWorkers(workers || [], sortBy, sortDir),
+    [workers, sortBy, sortDir],
+  );
 
   return {
     data,
-    isLoading: isSettingsLoading || isLoading || isFixedWorkersLoading,
+    isLoading: isSettingsLoading || isLoading,
   };
 }
 
 export function useWorkerByPeerId(peerId?: string) {
   const datasource = useSquid();
-  const enabled = !!peerId;
   const { isPending: isSettingsLoading } = useNetworkSettings();
   const { address } = useAccount();
 
@@ -289,27 +293,21 @@ export function useWorkerByPeerId(peerId?: string) {
     {
       select: res => {
         if (!res.workers.length) return;
-        return res.workers.map(w => {
-          return {
-            ...w,
-            delegationCapacity: calculateDelegationCapacity({
-              totalDelegation: w.totalDelegation,
-              capedDelegation: w.capedDelegation,
-            }),
-          };
-        })[0];
+        return res.workers.map(w => ({
+          ...w,
+          delegationCapacity: calculateDelegationCapacity({
+            totalDelegation: w.totalDelegation,
+            capedDelegation: w.capedDelegation,
+          }),
+        }))[0];
       },
-      enabled,
+      enabled: !!peerId,
     },
   );
 
-  const { data: fixedWorker, isLoading: isFixedWorkerLoading } = useFixWorkers({
-    workers: worker ? [worker] : undefined,
-  });
-
   return {
-    data: fixedWorker?.[0],
-    isLoading: isSettingsLoading || isLoading || isFixedWorkerLoading,
+    data: worker,
+    isLoading: isSettingsLoading || isLoading,
   };
 }
 
@@ -371,7 +369,7 @@ export function useWorkerByPeerId(peerId?: string) {
 //   };
 // }
 
-export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; sortDir: SortDir }) {
+export function useMyDelegations({ sortBy, sortDir }: MyWorkersParams) {
   const { address } = useAccount();
   const { isPending: isSettingsLoading } = useNetworkSettings();
   const datasource = useSquid();
@@ -381,16 +379,8 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
     { address: address || '0x' },
   );
 
-  const { data: fixedWorkers, isLoading: isFixedWorkersLoading } = useFixWorkers({
-    workers: delegationsQuery?.workers,
-  });
-
-  const { data: fixedDelegations, isLoading: isFixedDelegationsLoading } = useFixDelegations({
-    workers: fixedWorkers,
-  });
-
   const data = useMemo(() => {
-    type W = SimplifyDeep<
+    type WorkerWithDelegations = SimplifyDeep<
       Pick<
         Worker,
         | 'id'
@@ -404,57 +394,51 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
         | 'stakerApr'
       > &
         Pick<WorkerExtended, 'delegationCapacity' | 'myDelegation' | 'myTotalDelegationReward'> & {
-          delegations: (Pick<Delegation, 'deposit' | 'locked'> & {
+          delegations: (Pick<Delegation, 'deposit' | 'locked' | 'lockEnd'> & {
             owner: { id: string; type: AccountType };
-            unlockedAt?: string;
           })[];
         }
     >;
 
-    const workers = fixedDelegations?.map(w => {
-      const worker: W = {
-        id: w.id,
-        name: w.name,
-        peerId: w.peerId,
-        status: w.status,
-        online: w.online,
-        jailed: w.jailed,
-        stakerApr: w.stakerApr,
-        totalDelegation: w.totalDelegation,
-        capedDelegation: w.capedDelegation,
-        delegationCapacity: calculateDelegationCapacity({
+    return sortWorkers(
+      delegationsQuery?.workers?.map(w => {
+        const worker: WorkerWithDelegations = {
+          id: w.id,
+          name: w.name,
+          peerId: w.peerId,
+          status: w.status,
+          online: w.online,
+          jailed: w.jailed,
+          stakerApr: w.stakerApr,
           totalDelegation: w.totalDelegation,
           capedDelegation: w.capedDelegation,
-        }),
-        myDelegation: '0',
-        myTotalDelegationReward: '0',
-        delegations: [],
-      };
+          delegationCapacity: calculateDelegationCapacity({
+            totalDelegation: w.totalDelegation,
+            capedDelegation: w.capedDelegation,
+          }),
+          myDelegation: '0',
+          myTotalDelegationReward: '0',
+          delegations: [],
+        };
 
-      w.delegations.forEach(d => {
-        worker.myDelegation = BigNumber(worker.myDelegation).plus(d.deposit).toFixed();
-        worker.myTotalDelegationReward = BigNumber(worker.myTotalDelegationReward)
-          .plus(d.claimableReward)
-          .plus(d.claimedReward)
-          .toFixed();
-
-        worker.delegations.push({
-          ...d,
+        w.delegations.forEach(d => {
+          worker.myDelegation = BigNumber(worker.myDelegation).plus(d.deposit).toFixed();
+          worker.myTotalDelegationReward = BigNumber(worker.myTotalDelegationReward)
+            .plus(d.claimableReward)
+            .plus(d.claimedReward)
+            .toFixed();
+          worker.delegations.push(d);
         });
-      });
 
-      return worker;
-    });
-
-    return sortWorkers(workers || [], sortBy, sortDir);
-  }, [fixedDelegations, sortBy, sortDir]);
+        return worker;
+      }) || [],
+      sortBy,
+      sortDir,
+    );
+  }, [delegationsQuery, sortBy, sortDir]);
 
   return {
-    isLoading:
-      isSettingsLoading ||
-      isDelegationsQueryLoading ||
-      isFixedWorkersLoading ||
-      isFixedDelegationsLoading,
+    isLoading: isSettingsLoading || isDelegationsQueryLoading,
     data,
   };
 }
@@ -462,84 +446,79 @@ export function useMyDelegations({ sortBy, sortDir }: { sortBy: WorkerSortBy; so
 export function useIsWorkerOperator() {
   const { address } = useAccount();
   const datasource = useSquid();
+
   const { data, isLoading } = useMyWorkersCountQuery(
     datasource,
+    { address: address || '' },
     {
-      address: address || '',
-    },
-    {
-      select: res => {
-        return !!res.workersConnection.totalCount;
-      },
+      select: res => !!res.workersConnection.totalCount,
     },
   );
 
   return {
-    isLoading: isLoading,
+    isLoading,
     isWorkerOperator: data ?? false,
   };
 }
 
-export function useWorkerDelegationInfo({
-  workerId,
-  enabled,
-}: {
+interface WorkerDelegationInfoParams {
   workerId?: string;
   enabled?: boolean;
-}) {
+}
+
+export function useWorkerDelegationInfo({ workerId, enabled }: WorkerDelegationInfoParams) {
   const datasource = useSquid();
+
   const { data, isLoading } = useWorkerDelegationInfoQuery(
     datasource,
+    { workerId: workerId || '' },
     {
-      workerId: workerId || '',
-    },
-    {
-      select: res => {
-        return {
-          worker: res.workerById,
-          info: res.settings[0],
-        };
-      },
+      select: res => ({
+        worker: res.workerById,
+        info: res.settings[0],
+      }),
       enabled,
     },
   );
 
   return {
-    isLoading: isLoading,
+    isLoading,
     data,
   };
 }
 
-export function useWorkerOwner({ workerId, enabled }: { workerId?: string; enabled?: boolean }) {
+interface WorkerOwnerParams {
+  workerId?: string;
+  enabled?: boolean;
+}
+
+export function useWorkerOwner({ workerId, enabled }: WorkerOwnerParams) {
   const datasource = useSquid();
+
   const { data, isLoading } = useWorkerOwnerQuery(
     datasource,
+    { workerId: workerId || '' },
     {
-      workerId: workerId || '',
-    },
-    {
-      select: res => {
-        return res.workerById;
-      },
+      select: res => res.workerById,
       enabled,
     },
   );
 
   return {
-    isLoading: isLoading,
+    isLoading,
     data,
   };
 }
 
-export function useMyWorkerDelegations({
-  peerId,
-  enabled,
-}: {
+interface MyWorkerDelegationsParams {
   peerId?: string;
   enabled?: boolean;
-}) {
+}
+
+export function useMyWorkerDelegations({ peerId, enabled }: MyWorkerDelegationsParams) {
   const { address } = useAccount();
   const datasource = useSquid();
+
   const { data: delegations, isLoading: isDelegationsLoading } = useMyDelegationsQuery(
     datasource,
     {
@@ -547,19 +526,13 @@ export function useMyWorkerDelegations({
       address: address || '',
     },
     {
-      select: res => {
-        return res.workers;
-      },
+      select: res => res.workers,
       enabled,
     },
   );
 
-  const { data: fixedDelegations, isLoading: isFixedDelegationsLoading } = useFixDelegations({
-    workers: delegations,
-  });
-
   return {
-    isLoading: isDelegationsLoading || isFixedDelegationsLoading,
-    data: fixedDelegations?.[0]?.delegations,
+    isLoading: isDelegationsLoading,
+    data: delegations?.[0]?.delegations,
   };
 }

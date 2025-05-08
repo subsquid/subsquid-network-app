@@ -1,6 +1,4 @@
-import React from 'react';
-
-export function SortableIcon({ size = 16, dir }: { size?: number; dir?: 'asc' | 'desc' }) {
+export function SortableIcon({ size = 16, dir }: { size?: number; dir?: string }) {
   return (
     <svg
       width={size}

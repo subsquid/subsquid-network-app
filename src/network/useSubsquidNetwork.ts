@@ -15,7 +15,7 @@ export function getSubsquidNetwork() {
   return validate(process.env.NETWORK);
 }
 
-export function getChain(network: NetworkName) {
+export function getChain(network: NetworkName = getSubsquidNetwork()) {
   return network === NetworkName.Mainnet ? arbitrum : arbitrumSepolia;
 }
 

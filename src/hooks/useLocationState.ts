@@ -2,7 +2,7 @@ import { isArray, isDate, mapValues, pickBy } from 'lodash-es';
 import qs from 'qs';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
+// biome-ignore lint/style/noNamespace: <explanation>
 export namespace Location {
   export class Param {
     public initial?: unknown;

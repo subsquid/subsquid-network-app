@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -9,8 +7,9 @@ import { WagmiProvider } from 'wagmi';
 import { queryClient } from '@api/client';
 import { Toaster } from '@components/Toaster';
 import { SquidHeightProvider } from '@hooks/useSquidNetworkHeightHooks';
+import { TickerProvider } from '@hooks/useTicker';
 import { rainbowConfig } from '@network/config';
-import { getChain, getSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { getChain } from '@network/useSubsquidNetwork';
 
 import { AppRoutes } from './AppRoutes';
 import { useCreateRainbowKitTheme, useCreateTheme, useThemeState } from './theme';
@@ -19,7 +18,6 @@ function App() {
   const [themeName] = useThemeState();
   const theme = useCreateTheme(themeName);
   const rainbowkitTheme = useCreateRainbowKitTheme(themeName);
-  const network = getSubsquidNetwork();
 
   return (
     <>
@@ -29,14 +27,16 @@ function App() {
             <RainbowKitProvider
               modalSize="compact"
               theme={rainbowkitTheme}
-              initialChain={getChain(network)}
+              initialChain={getChain()}
             >
-              <SquidHeightProvider>
-                <CssBaseline />
-                <BrowserRouter>
-                  <AppRoutes />
-                </BrowserRouter>
-              </SquidHeightProvider>
+              <TickerProvider>
+                <SquidHeightProvider>
+                  <CssBaseline />
+                  <BrowserRouter>
+                    <AppRoutes />
+                  </BrowserRouter>
+                </SquidHeightProvider>
+              </TickerProvider>
               {/* </SnackbarProvider> */}
             </RainbowKitProvider>
             <Toaster />

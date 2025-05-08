@@ -4,6 +4,33 @@ import { Box, Paper, styled, Theme } from '@mui/material';
 import { SxProps } from '@mui/system/styleFunctionSx';
 import classNames from 'classnames';
 
+export interface CardProps {
+  /** Optional title for the card */
+  title?: React.ReactNode;
+  /** Custom styles for the card */
+  sx?: SxProps<Theme>;
+  /** Whether to remove padding from the card */
+  noPadding?: boolean;
+  /** Whether to add an outline to the card */
+  outlined?: boolean;
+  /** Whether to remove the shadow from the card */
+  noShadow?: boolean;
+  /** Whether the card is in a loading state */
+  loading?: boolean;
+  /** Optional action elements to display in the card header */
+  action?: React.ReactNode;
+  /** Custom styles for the title */
+  titleSx?: SxProps<Theme>;
+  /** Custom styles for the content */
+  contentSx?: SxProps<Theme>;
+  /** Custom styles for the action area */
+  actionSx?: SxProps<Theme>;
+  /** Whether to disable the card */
+  disabled?: boolean;
+  /** Optional className for the card */
+  className?: string;
+}
+
 export const CardTitle = styled(Box)(({ theme }) => ({
   fontWeight: 500,
   fontSize: '1.5rem',
@@ -13,10 +40,10 @@ export const CardTitle = styled(Box)(({ theme }) => ({
 
 export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) => ({
   padding: theme.spacing(1.5, 1.5),
-  // boxShadow: `0px 4px 12px 0px #9595953D`,
   boxShadow: 'none',
   overflowX: 'auto',
   scrollbarWidth: 'thin',
+  transition: 'all 300ms ease-out',
 
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(2.5),
@@ -25,6 +52,8 @@ export const CardWrapper = styled(Paper, { name: 'CardWrapper' })(({ theme }) =>
   '&.disabled': {
     color: theme.palette.text.secondary,
     textAlign: 'center',
+    opacity: 0.7,
+    pointerEvents: 'none',
   },
 
   '&.noPadding': {
@@ -50,25 +79,41 @@ export const Card = ({
   noPadding,
   outlined,
   sx,
-}: PropsWithChildren<{
-  noShadow?: boolean;
-  title?: React.ReactNode;
-  sx?: SxProps<Theme>;
-  noPadding?: boolean;
-  outlined?: boolean;
-}>) => {
+  action,
+  titleSx,
+  contentSx,
+  actionSx,
+  disabled,
+  className,
+}: PropsWithChildren<CardProps>) => {
   return (
     <>
-      {title ? <CardTitle>{title}</CardTitle> : null}
+      {(title || action) && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 3,
+            ...titleSx,
+          }}
+        >
+          {title && <CardTitle sx={titleSx}>{title}</CardTitle>}
+          {action && (
+            <Box sx={{ display: 'flex', alignItems: 'center', ...actionSx }}>{action}</Box>
+          )}
+        </Box>
+      )}
       <CardWrapper
-        className={classNames({
+        className={classNames(className, {
           noShadow,
           noPadding,
           outlined,
+          disabled,
         })}
         sx={sx}
       >
-        {children}
+        <Box sx={contentSx}>{children}</Box>
       </CardWrapper>
     </>
   );

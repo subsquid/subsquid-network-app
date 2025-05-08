@@ -1,8 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { fromSqd, toSqd } from '@lib/network/utils';
-import { LoadingButton } from '@mui/lab';
-import { Chip } from '@mui/material';
+import { Button, Chip } from '@mui/material';
 import * as yup from '@schema';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
@@ -43,7 +42,7 @@ export function DepositButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         loading={open}
         disabled={disabled || !address}
         onClick={() => setOpen(true)}
@@ -51,7 +50,7 @@ export function DepositButton({
         color={variant === 'contained' ? 'info' : 'secondary'}
       >
         DEPOSIT
-      </LoadingButton>
+      </Button>
       <DepositDialog
         open={open}
         onClose={() => setOpen(false)}

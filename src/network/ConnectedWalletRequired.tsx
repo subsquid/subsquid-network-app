@@ -1,9 +1,9 @@
-import React, { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { Box } from '@mui/material';
 import { useAccount } from 'wagmi';
 
-import ConnectButton from '@components/Button/ConnectButton';
+import { ConnectButton } from '@components/Button';
 
 export function ConnectedWalletRequired({ children }: PropsWithChildren) {
   const { isConnected } = useAccount();

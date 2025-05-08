@@ -84,7 +84,7 @@ export const SummaryValue = styled(Box, {
 
 export function Workers() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xxs'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
 
   const [query, setQuery] = useLocationState({
     page: new Location.Number(1),

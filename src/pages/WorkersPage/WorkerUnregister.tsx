@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { peerIdToHex } from '@lib/network';
-import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { SxProps, Button } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
 
@@ -30,7 +29,7 @@ export function WorkerUnregisterButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         // startIcon={<Remove />}
         sx={sx}
         loading={open}
@@ -40,7 +39,7 @@ export function WorkerUnregisterButton({
         disabled={disabled}
       >
         REMOVE
-      </LoadingButton>
+      </Button>
       <WorkerUnregisterDialog
         open={open}
         onClose={() => setOpen(false)}

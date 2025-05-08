@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network/utils';
-import { LoadingButton } from '@mui/lab';
+import { Button } from '@mui/material';
 import { Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
@@ -62,7 +62,7 @@ export function WorkerDelegate({
 
   return (
     <>
-      <LoadingButton
+      <Button
         loading={open}
         disabled={disabled || !worker || worker.status !== WorkerStatus.Active}
         onClick={() => setOpen(true)}
@@ -70,7 +70,7 @@ export function WorkerDelegate({
         color={variant === 'contained' ? 'info' : 'secondary'}
       >
         DELEGATE
-      </LoadingButton>
+      </Button>
       <WorkerDelegateDialog
         open={open}
         onClose={() => setOpen(false)}
@@ -101,17 +101,20 @@ export function WorkerDelegateDialog({
     address: contracts.ROUTER,
   });
 
-  const isSourceDisabled = (source: SourceWalletWithBalance) => source.balance === '0';
+  const isSourceDisabled = useCallback(
+    (source: SourceWalletWithBalance) => source.balance === '0',
+    [],
+  );
 
   const initialValues = useMemo(() => {
     const source = sources?.find(c => !isSourceDisabled(c)) || sources?.[0];
 
     return {
       source: source?.id || '',
-      amount: '0',
+      amount: '',
       max: fromSqd(source?.balance).toString(),
     };
-  }, [sources]);
+  }, [sources, isSourceDisabled]);
 
   const formik = useFormik({
     initialValues,
@@ -202,6 +205,7 @@ export function WorkerDelegateDialog({
             formik={formik}
             showErrorOnlyOfTouched
             autoComplete="off"
+            placeholder="0"
             InputProps={{
               endAdornment: (
                 <Chip
