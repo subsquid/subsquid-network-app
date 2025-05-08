@@ -1,7 +1,8 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 
 import { InfoOutlined } from '@mui/icons-material';
-import { Stack, Tooltip } from '@mui/material';
+import { Stack, Tooltip, styled, SxProps, Theme } from '@mui/material';
+import { Box } from '@mui/system';
 
 // export const Help = styled(Box)(({ theme, color }) => ({
 //   width: 15,
@@ -18,21 +19,59 @@ import { Stack, Tooltip } from '@mui/material';
 //   cursor: 'help',
 // }));
 
+const ContentBox = styled(Box)(({}) => ({
+  display: 'flex',
+  alignItems: 'center',
+}));
+
+export interface HelpTooltipProps {
+  /** The tooltip content */
+  title: React.ReactNode;
+  /** The content to be displayed alongside the tooltip */
+  children?: React.ReactNode;
+  /** Placement of the tooltip relative to the content */
+  placement?: 'start' | 'end';
+  /** Custom styles for the tooltip */
+  sx?: SxProps<Theme>;
+  /** Custom styles for the icon */
+  iconSx?: SxProps<Theme>;
+  /** Custom styles for the content */
+  contentSx?: SxProps<Theme>;
+  /** Whether to show an arrow on the tooltip */
+  arrow?: boolean;
+  /** Tooltip placement relative to the icon */
+  tooltipPlacement?: 'top' | 'bottom' | 'left' | 'right';
+  /** Delay in ms before showing the tooltip */
+  enterDelay?: number;
+  /** Delay in ms before hiding the tooltip */
+  leaveDelay?: number;
+}
+
 export const HelpTooltip = ({
   title,
   children,
   placement = 'end',
-}: PropsWithChildren<{
-  title: React.ReactNode;
-  placement?: 'start' | 'end';
-}>) => {
+  sx,
+  iconSx,
+  contentSx,
+  arrow = true,
+  tooltipPlacement = 'top',
+  enterDelay = 0,
+  leaveDelay = 0,
+}: HelpTooltipProps) => {
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center">
-      {placement === 'end' && children}
-      <Tooltip title={title} placement="top">
-        <InfoOutlined fontSize="small" />
+    <Stack direction="row" spacing={0.5} alignItems="center" sx={sx}>
+      {placement === 'end' && children && <ContentBox sx={contentSx}>{children}</ContentBox>}
+      <Tooltip
+        title={title}
+        placement={tooltipPlacement}
+        arrow={arrow}
+        enterDelay={enterDelay}
+        leaveDelay={leaveDelay}
+      >
+        <InfoOutlined fontSize="small" sx={iconSx} />
       </Tooltip>
-      {placement === 'start' && children}
+      {placement === 'start' && children && <ContentBox sx={contentSx}>{children}</ContentBox>}
     </Stack>
   );
 };

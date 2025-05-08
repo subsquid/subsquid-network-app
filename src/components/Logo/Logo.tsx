@@ -1,18 +1,12 @@
-import React from 'react';
-
-import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
+import { Box, SxProps, Theme, styled, useTheme } from '@mui/material';
 
 import { LogoFull } from './LogoFull';
 
-export const LogoWrapper = styled('div', {
+export const LogoWrapper = styled(Box, {
   name: 'LogoWrapper',
 })(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  '& img': {
-    // display: 'block',
-    // marginRight: 2,
-  },
   userSelect: 'none',
 }));
 
@@ -34,24 +28,40 @@ export const LogoSecondary = styled(Box, {
   lineHeight: 1,
   letterSpacing: '0 em',
   marginLeft: theme.spacing(0.5),
-  // fontStyle: 'italic',
 }));
 
-export function Logo({ color = '#fff' }: { color?: string }) {
-  const theme = useTheme();
-  const compact = useMediaQuery(theme.breakpoints.down('xl'));
+export interface LogoProps {
+  /** The color of the logo text */
+  color?: string;
+  /** Whether to show the network name */
+  showNetwork?: boolean;
+  /** The network name to display */
+  network?: string;
+  /** Custom styles for the logo wrapper */
+  sx?: SxProps<Theme>;
+  /** Custom styles for the primary text */
+  primarySx?: SxProps<Theme>;
+  /** Custom styles for the secondary text */
+  secondarySx?: SxProps<Theme>;
+}
 
+export function Logo({
+  color = '#fff',
+  showNetwork = false,
+  network = '',
+  sx,
+  primarySx,
+  secondarySx,
+}: LogoProps) {
   return (
-    <LogoWrapper>
+    <LogoWrapper sx={sx}>
       <LogoFull />
-      {/* {compact ? <LogoCompact /> : <LogoFull />} */}
-      {/* <img width={size} height={size} src="/logo.png" /> */}
-      {/* {!narrow ? (
+      {showNetwork && (
         <>
-          <LogoPrimary sx={{ color }}>SUBSQUID</LogoPrimary>
-          <LogoSecondary sx={{ color }}>{upperFirst(network)}</LogoSecondary>
+          <LogoPrimary sx={{ color, ...primarySx }}>SUBSQUID</LogoPrimary>
+          {network && <LogoSecondary sx={{ color, ...secondarySx }}>{network}</LogoSecondary>}
         </>
-      ) : null} */}
+      )}
     </LogoWrapper>
   );
 }

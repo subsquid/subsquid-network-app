@@ -1,6 +1,6 @@
-import { Chip as MaterialChip, styled, chipClasses } from '@mui/material';
+import { Chip as MaterialChip, styled, chipClasses, ChipProps } from '@mui/material';
 
-const SquaredChip = styled(MaterialChip)(({ theme }) => ({
+export const SquaredChip = styled(MaterialChip)<ChipProps>(({ theme }) => ({
   borderRadius: 4,
   fontSize: 16,
   fontWeight: 600,
@@ -9,5 +9,3 @@ const SquaredChip = styled(MaterialChip)(({ theme }) => ({
     padding: theme.spacing(0, 0.5),
   },
 }));
-
-export default SquaredChip;

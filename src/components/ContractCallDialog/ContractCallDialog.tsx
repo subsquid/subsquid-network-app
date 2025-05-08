@@ -1,12 +1,30 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 
 import { Box } from '@mui/material';
 import { useAccount } from 'wagmi';
 
-import ConnectButton from '@components/Button/ConnectButton';
-import { ConfirmDialog, ConfirmDialogProps } from '@components/ConfirmDialog';
+import { ConnectButton } from '@components/Button';
+import { ConfirmDialog } from '@components/ConfirmDialog';
 
-export function ContractCallDialog({
+interface ContractCallDialogProps {
+  title: string;
+  open: boolean;
+  maxWidth?: string | number;
+  minWidth?: string | number;
+  confirmColor?: 'primary' | 'error' | 'success' | 'info';
+  confirmButtonText?: string;
+  cancelButtonText?: string;
+  disableBackdropClick?: boolean;
+  disableConfirmButton?: boolean;
+  hideCancelButton?: boolean;
+  hideConfirmButton?: boolean;
+  onResult?: (confirmed: boolean) => unknown;
+  onApprove?: () => unknown;
+  loading?: boolean;
+  children: React.ReactNode;
+}
+
+export const ContractCallDialog = ({
   title,
   children,
   open,
@@ -21,7 +39,7 @@ export function ContractCallDialog({
   loading = false,
   onResult,
   onApprove,
-}: PropsWithChildren<ConfirmDialogProps>) {
+}: ContractCallDialogProps) => {
   const { isConnected } = useAccount();
 
   if (!isConnected) {
@@ -75,7 +93,7 @@ export function ContractCallDialog({
       onApprove={onApprove}
       cancelButtonText={cancelButtonText}
     >
-      <div>{children}</div>
+      {children}
     </ConfirmDialog>
   );
-}
+};

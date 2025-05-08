@@ -1,9 +1,43 @@
+import React from 'react';
+
 import { addressFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network';
-import { Box, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  Stack,
+  styled,
+  useMediaQuery,
+  useTheme,
+  SxProps,
+  Theme,
+  Tooltip,
+} from '@mui/material';
 
 import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
 import { useContracts } from '@network/useContracts';
+
+export interface SourceWalletOptionProps {
+  /** The source wallet data */
+  source: SourceWalletWithBalance;
+  /** Custom styles for the wrapper */
+  sx?: SxProps<Theme>;
+  /** Custom styles for the label */
+  labelSx?: SxProps<Theme>;
+  /** Custom styles for the address */
+  addressSx?: SxProps<Theme>;
+  /** Custom styles for the balance */
+  balanceSx?: SxProps<Theme>;
+  /** Whether to show the full address on hover */
+  showFullAddressOnHover?: boolean;
+  /** Custom label for wallet type */
+  walletLabel?: string;
+  /** Custom label for vesting contract type */
+  vestingLabel?: string;
+  /** Custom component to render the address */
+  addressComponent?: React.ComponentType<{ address: string; isMobile: boolean }>;
+  /** Custom component to render the balance */
+  balanceComponent?: React.ComponentType<{ balance: string; token: string }>;
+}
 
 const SourceWalletOptionWrapper = styled(Box, {
   name: 'SourceWalletOptionWrapper',
@@ -33,21 +67,57 @@ const SourceWalletBalance = styled(Stack, {
   textAlign: 'right',
 }));
 
-export const SourceWalletOption = ({ source }: { source: SourceWalletWithBalance }) => {
+export const SourceWalletOption = ({
+  source,
+  sx,
+  labelSx,
+  addressSx,
+  balanceSx,
+  showFullAddressOnHover = false,
+  walletLabel = 'Wallet',
+  vestingLabel = 'Vesting contract',
+  addressComponent: AddressComponent,
+  balanceComponent: BalanceComponent,
+}: SourceWalletOptionProps) => {
   const { SQD_TOKEN } = useContracts();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  const formattedAddress = addressFormatter(source.id, isMobile);
+  const formattedBalance = tokenFormatter(fromSqd(source?.balance), SQD_TOKEN);
+
+  const renderAddress = () => {
+    if (AddressComponent) {
+      return <AddressComponent address={source.id} isMobile={isMobile} />;
+    }
+
+    const addressElement = <Box sx={addressSx}>{formattedAddress}</Box>;
+
+    return showFullAddressOnHover ? (
+      <Tooltip title={source.id} placement="top">
+        {addressElement}
+      </Tooltip>
+    ) : (
+      addressElement
+    );
+  };
+
+  const renderBalance = () => {
+    if (BalanceComponent) {
+      return <BalanceComponent balance={source.balance} token={SQD_TOKEN} />;
+    }
+
+    return <SourceWalletBalance sx={balanceSx}>{formattedBalance}</SourceWalletBalance>;
+  };
+
   return (
-    <SourceWalletOptionWrapper>
-      <SourceWalletLabel>
-        {source.type === AccountType.User ? 'Wallet' : 'Vesting contract'}
+    <SourceWalletOptionWrapper sx={sx}>
+      <SourceWalletLabel sx={labelSx}>
+        {source.type === AccountType.User ? walletLabel : vestingLabel}
       </SourceWalletLabel>
       <SourceWalletStack direction="row" spacing={1} justifyContent="space-between">
-        <Box>{addressFormatter(source.id, isMobile)}</Box>
-        <SourceWalletBalance>
-          {tokenFormatter(fromSqd(source?.balance), SQD_TOKEN)}
-        </SourceWalletBalance>
+        {renderAddress()}
+        {renderBalance()}
       </SourceWalletStack>
     </SourceWalletOptionWrapper>
   );

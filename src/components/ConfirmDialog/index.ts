@@ -1,1 +1,8 @@
-export * from './ConfirmDialog';
+export {
+  ConfirmDialog,
+  ConfirmWrapper,
+  ConfirmDialogTitle,
+  CloseIconButton,
+  Content,
+  Actions,
+} from './ConfirmDialog';

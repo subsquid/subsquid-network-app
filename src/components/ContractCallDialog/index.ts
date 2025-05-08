@@ -1,1 +1,1 @@
-export * from './ContractCallDialog';
+export { ContractCallDialog } from './ContractCallDialog';

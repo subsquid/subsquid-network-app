@@ -1,18 +1,24 @@
-import { styled, Table } from '@mui/material';
+import { styled, Table, TableProps } from '@mui/material';
+
+interface TableListProps extends TableProps {
+  className?: string;
+  noBorder?: boolean;
+  noPadding?: boolean;
+}
 
 export const TableList = styled(Table, {
   name: 'TableList',
-})(({ theme }) => ({
-  // '& tbody tr:last-child td': {
-  //   border: 'none',
-  // },
+})<TableListProps>(({ theme, noBorder, noPadding }) => ({
   '& td, & th': {
-    borderBottomColor: theme.palette.divider,
+    borderBottomColor: noBorder ? 'transparent' : theme.palette.divider,
   },
   '& tr td:first-child, & tr th:first-child': {
-    paddingLeft: 0,
+    paddingLeft: noPadding ? 0 : theme.spacing(2),
   },
   '& tr td:last-child, & tr th:last-child': {
-    paddingRight: 0,
+    paddingRight: noPadding ? 0 : theme.spacing(2),
+  },
+  '& tr td, & tr th': {
+    padding: noPadding ? 0 : theme.spacing(1),
   },
 }));

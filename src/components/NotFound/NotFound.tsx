@@ -1,9 +1,52 @@
-import React from 'react';
-
-import { Box } from '@mui/material';
+import { Box, SxProps, Theme, Typography } from '@mui/material';
 import { upperFirst } from 'lodash-es';
 
-export function NotFound({ id, item }: { id?: string; item?: string }) {
+import { BackButton } from '@components/BackButton';
+
+export interface NotFoundProps {
+  /** The ID of the item that was not found */
+  id?: string;
+  /** The type of item that was not found (e.g. "worker", "gateway", "vesting") */
+  item?: string;
+  /** Custom message to display instead of the default "not found" message */
+  message?: string;
+  /** Custom styles for the container */
+  sx?: SxProps<Theme>;
+  /** Custom styles for the message text */
+  messageSx?: SxProps<Theme>;
+  /** Custom styles for the ID text */
+  idSx?: SxProps<Theme>;
+  /** Whether to show a back button */
+  showBackButton?: boolean;
+  /** Custom back button path */
+  backPath?: string;
+}
+
+export function NotFound({
+  id,
+  item,
+  message,
+  sx,
+  messageSx,
+  idSx,
+  showBackButton = false,
+  backPath,
+}: NotFoundProps) {
+  const defaultMessage =
+    item || id ? (
+      <>
+        {item ? upperFirst(item) : null}{' '}
+        {id ? (
+          <Typography component="b" sx={idSx}>
+            {id}
+          </Typography>
+        ) : null}{' '}
+        not found
+      </>
+    ) : (
+      'Not found'
+    );
+
   return (
     <Box
       sx={{
@@ -11,18 +54,18 @@ export function NotFound({ id, item }: { id?: string; item?: string }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        ...sx,
       }}
     >
       <Box sx={{ textAlign: 'center' }}>
-        <Box>
-          {item || id ? (
-            <>
-              {item ? upperFirst(item) : null} {id ? <b>{id}</b> : null} not found
-            </>
-          ) : (
-            <>Not found</>
-          )}
-        </Box>
+        <Typography variant="body1" sx={messageSx}>
+          {message || defaultMessage}
+        </Typography>
+        {showBackButton && backPath && (
+          <Box sx={{ mt: 2 }}>
+            <BackButton path={backPath} />
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function CheckboxCheckedIcon({ size = 20 }: { size?: number }) {
   return (
     <svg

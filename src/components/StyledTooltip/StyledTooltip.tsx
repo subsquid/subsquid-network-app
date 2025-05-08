@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
 
 export const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useTheme } from '@mui/material';
 
 export function SwitchArrowsIcon({ size = 24, fill }: { size?: number; fill?: string }) {

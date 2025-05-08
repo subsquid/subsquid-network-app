@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { SortableIcon } from '@icons/SortableIcon';
 
 export function SortIcon({
@@ -7,7 +5,7 @@ export function SortIcon({
   value,
 }: {
   query: {
-    sortDir?: 'asc' | 'desc';
+    sortDir?: string;
     sortBy?: string;
   };
   value: string;
