@@ -125,7 +125,7 @@ export function AddNewWorkerDialog({
   }, [bondAmount, isSourceDisabled, sources]);
 
   const [peerIdToValidate, setPeerIdToValidate] = useState('');
-  const { promise: existingWorkerPromise } = useWorkerByPeerId(peerIdToValidate);
+  const { data: existingWorker } = useWorkerByPeerId(peerIdToValidate);
 
   const formik = useFormik({
     initialValues,
@@ -134,10 +134,9 @@ export function AddNewWorkerDialog({
     validateOnBlur: true,
     validateOnMount: true,
     enableReinitialize: true,
-    validate: async values => {
+    validate: values => {
       const errors: Record<string, string> = {};
 
-      const existingWorker = await existingWorkerPromise;
       if (values.peerId && existingWorker && existingWorker.status !== WorkerStatus.Withdrawn) {
         errors.peerId = 'Peer ID is already registered';
       }
