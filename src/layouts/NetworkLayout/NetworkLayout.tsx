@@ -75,11 +75,10 @@ const Content = styled('div', {
 const ContentWrapper = styled('div', {
   name: 'ContentWrapper',
 })(({ theme }) => ({
-  margin: theme.spacing(0, 'auto'),
+  margin: theme.spacing(0, 1),
   padding: theme.spacing(2, 2, 8, 2),
   flex: '1',
-  maxWidth: '100%',
-  overflowX: 'visible',
+  overflowX: 'hidden',
 
   [theme.breakpoints.up('xl')]: {
     maxWidth: 1336,

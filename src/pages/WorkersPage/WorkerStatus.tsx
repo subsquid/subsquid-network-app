@@ -5,8 +5,9 @@ import { CircleRounded } from '@mui/icons-material';
 import { Box, Chip as MaterialChip, Tooltip, chipClasses, styled } from '@mui/material';
 import capitalize from 'lodash-es/capitalize';
 
-import { WorkerStatus as Status, Worker } from '@api/subsquid-network-squid';
+import { WorkerStatus as Status, useCurrentEpoch, WorkerStatus } from '@api/subsquid-network-squid';
 import { useCountdown } from '@hooks/useCountdown';
+import { SkeletonWrapper } from '@components/SkeletonWrapper';
 
 export const Chip = styled(MaterialChip)(({ theme }) => ({
   // [`&.${chipClasses.colorSuccess}`]: {
@@ -23,23 +24,34 @@ export const Chip = styled(MaterialChip)(({ theme }) => ({
   },
 }));
 
-function AppliesTooltip({ timestamp }: { timestamp?: string }) {
+function AppliesTooltip({ timestamp }: { timestamp?: number }) {
   const timeLeft = useCountdown({ timestamp });
 
   return `Applies in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`;
 }
 
 export function WorkerStatusChip({
+  loading,
   worker,
 }: {
-  worker: Pick<Worker, 'status' | 'jailReason' | 'jailed' | 'online'> & { statusChangeAt?: string };
+  loading?: boolean;
+  worker?: {
+    status?: string;
+    jailReason?: string;
+    jailed?: boolean;
+    online?: boolean;
+    statusHistory?: {
+      blockNumber: number;
+      pending: boolean;
+    }[];
+  };
 }) {
   const { label, color, tip } = useMemo((): {
     label: string;
     color: 'error' | 'warning' | 'success' | 'primary';
     tip?: string;
   } => {
-    if (!worker.status) return { label: 'Unknown', color: 'primary' };
+    if (!worker) return { label: 'unknown', color: 'primary' };
 
     switch (worker.status) {
       case Status.Active:
@@ -59,11 +71,24 @@ export function WorkerStatusChip({
     }
 
     return { label: capitalize(worker.status), color: 'primary' };
-  }, [worker.jailReason, worker.jailed, worker.online, worker.status]);
+  }, [worker]);
+
+  const { data: currentEpoch } = useCurrentEpoch();
+  const applyTimestamp = useMemo(() => {
+    if (!currentEpoch || !worker?.statusHistory?.length) return;
+
+    const lastStatus = worker.statusHistory[worker.statusHistory.length - 1];
+    if (!lastStatus.pending) return;
+
+    return (
+      new Date(currentEpoch.lastBlockTimestampL1).getTime() +
+      (lastStatus.blockNumber - currentEpoch.lastBlockL1 + 1) * currentEpoch.blockTimeL1
+    );
+  }, [currentEpoch, worker]);
 
   const chip = (
     <Tooltip
-      title={worker.statusChangeAt && <AppliesTooltip timestamp={worker.statusChangeAt} />}
+      title={applyTimestamp ? <AppliesTooltip timestamp={applyTimestamp} /> : undefined}
       placement="top"
     >
       <Chip
@@ -79,11 +104,15 @@ export function WorkerStatusChip({
     </Tooltip>
   );
 
-  return tip ? (
-    <Tooltip title={tip} placement="top">
-      {chip}
-    </Tooltip>
-  ) : (
-    chip
+  return (
+    <SkeletonWrapper loading={loading}>
+      {tip ? (
+        <Tooltip title={tip} placement="top">
+          {chip}
+        </Tooltip>
+      ) : (
+        chip
+      )}
+    </SkeletonWrapper>
   );
 }

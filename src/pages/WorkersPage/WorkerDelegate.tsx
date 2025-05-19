@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network/utils';
-import { Button } from '@mui/material';
+import { Button, Skeleton, Typography } from '@mui/material';
 import { Chip, Stack } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
@@ -225,10 +225,12 @@ export function WorkerDelegateDialog({
         </FormRow>
         <FormDivider />
         <Stack direction="row" justifyContent="space-between" alignContent="center">
-          <HelpTooltip title={EXPECTED_APR_TIP}>
-            <span>Expected APR</span>
-          </HelpTooltip>
-          <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+          <Typography variant="body2">
+            <HelpTooltip title={EXPECTED_APR_TIP}>Expected APR</HelpTooltip>
+          </Typography>
+          <Typography variant="body2">
+            {isExpectedAprPending ? <Skeleton width={48} /> : percentFormatter(stakerApr)}
+          </Typography>
         </Stack>
       </Form>
     </ContractCallDialog>

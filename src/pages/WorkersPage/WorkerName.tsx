@@ -1,49 +1,36 @@
-import { Stack, styled, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { Link } from 'react-router-dom';
+import { SxProps } from '@mui/material';
 
 import { Worker } from '@api/subsquid-network-squid';
-import { Avatar } from '@components/Avatar';
+import { NameWithAvatar } from '@components/SourceWalletName';
+import { shortPeerId } from '@components/PeerId';
 import { CopyToClipboard } from '@components/CopyToClipboard';
-import { PeerIdShort, shortPeerId } from '@components/PeerId';
-
-// import { WorkerDelegationCapacity } from './WorkerDelegationCapacity';
-
-const Name = styled(Box, {
-  name: 'Name',
-})(({ theme }) => ({
-  marginBottom: theme.spacing(0.25),
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
-  overflow: 'hidden',
-}));
+import { Link } from 'react-router-dom';
 
 export const WorkerName = ({
   worker,
-  to,
+  loading,
+  sx,
 }: {
-  worker: Pick<Worker, 'name' | 'peerId'>;
-  to?: string;
+  sx?: SxProps;
+  worker?: Pick<Worker, 'name' | 'peerId'>;
+  loading?: boolean;
 }) => {
+  if (!worker && !loading) return null;
+
   return (
-    <Stack spacing={1.5} direction="row" alignItems="center">
-      <Avatar name={worker.name || worker.peerId} colorDiscriminator={worker.peerId} />
-      <Box overflow="clip">
-        {worker.name ? (
-          <Name>{worker.name.length > 30 ? worker.name.slice(0, 27) + '...' : worker.name}</Name>
-        ) : null}
-        <Typography variant="caption">
-          <CopyToClipboard
-            text={worker.peerId}
-            content={
-              <PeerIdShort>
-                <Link to={to || '#'}>{shortPeerId(worker.peerId)}</Link>
-              </PeerIdShort>
-            }
-          />
-        </Typography>
-        {/* <WorkerDelegationCapacity worker={worker} /> */}
-      </Box>
-    </Stack>
+    <NameWithAvatar
+      title={worker?.name || 'Worker'}
+      subtitle={
+        <CopyToClipboard
+          text={worker?.peerId || ''}
+          content={
+            <Link to={`/workers/${worker?.peerId}`}>{shortPeerId(worker?.peerId || '')}</Link>
+          }
+        />
+      }
+      avatarValue={worker?.peerId}
+      loading={loading}
+      sx={sx}
+    />
   );
 };

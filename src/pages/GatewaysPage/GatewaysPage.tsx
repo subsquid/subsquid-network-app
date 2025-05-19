@@ -276,7 +276,7 @@ export function MyGateways() {
 
   const { data: sources, isLoading: isSourcesLoading } = useMySources();
 
-  const { data: gatewaysQuery, isLoading: isGatewaysQueryLoading } = useMyGatewaysQuery(squid, {
+  const { data: gatewaysQuery, isLoading: isGatewaysQueryLoading } = useMyGatewaysQuery({
     address: account?.address || '0x',
   });
 

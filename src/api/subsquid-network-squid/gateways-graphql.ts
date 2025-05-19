@@ -26,7 +26,7 @@ export function useMyGateways() {
 
   const enabled = !!address;
   const { data, isLoading } = useMyGatewaysQuery(
-    datasource,
+    
     {
       address: address || '',
     },
@@ -49,7 +49,7 @@ export function useGatewayByPeerId(peerId?: string) {
   const enabled = !!peerId;
 
   const { data, isLoading } = useGatewayByPeerIdQuery(
-    datasource,
+    
     {
       peerId: peerId || '',
     },
@@ -75,7 +75,7 @@ export function useMyGatewayStake() {
 
   const enabled = !!address;
   const { data, isLoading } = useMyGatewayStakesQuery(
-    datasource,
+    
     {
       address: address || '',
     },

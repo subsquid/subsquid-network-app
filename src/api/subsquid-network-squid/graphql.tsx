@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { fetcher } from "./fetcher";
 export type Maybe<T> = T;
 export type InputMaybe<T> = T;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -20,31 +21,6 @@ export type Incremental<T> =
   | {
       [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never;
     };
-
-function fetcher<TData, TVariables>(
-  endpoint: string,
-  requestInit: RequestInit,
-  query: string,
-  variables?: TVariables,
-) {
-  return async (): Promise<TData> => {
-    const res = await fetch(endpoint, {
-      method: "POST",
-      ...requestInit,
-      body: JSON.stringify({ query, variables }),
-    });
-
-    const json = await res.json();
-
-    if (json.errors) {
-      const { message } = json.errors[0];
-
-      throw new Error(message);
-    }
-
-    return json.data;
-  };
-}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string };
@@ -5537,6 +5513,12 @@ export type WorkerStatusFragmentFragment = {
   jailed?: boolean;
   dialOk?: boolean;
   jailReason?: string;
+  statusHistory: Array<{
+    __typename?: "WorkerStatusChange";
+    blockNumber: number;
+    pending: boolean;
+    timestamp?: string;
+  }>;
 };
 
 export type WorkerFragmentFragment = {
@@ -5560,6 +5542,12 @@ export type WorkerFragmentFragment = {
   jailReason?: string;
   owner: { __typename?: "Account"; id: string; type: AccountType };
   realOwner: { __typename?: "Account"; id: string };
+  statusHistory: Array<{
+    __typename?: "WorkerStatusChange";
+    blockNumber: number;
+    pending: boolean;
+    timestamp?: string;
+  }>;
 };
 
 export type WorkerFullFragmentFragment = {
@@ -5604,6 +5592,12 @@ export type WorkerFullFragmentFragment = {
   }>;
   owner: { __typename?: "Account"; id: string; type: AccountType };
   realOwner: { __typename?: "Account"; id: string };
+  statusHistory: Array<{
+    __typename?: "WorkerStatusChange";
+    blockNumber: number;
+    pending: boolean;
+    timestamp?: string;
+  }>;
 };
 
 export type AllWorkersQueryVariables = Exact<{ [key: string]: never }>;
@@ -5631,6 +5625,12 @@ export type AllWorkersQuery = {
     jailReason?: string;
     owner: { __typename?: "Account"; id: string; type: AccountType };
     realOwner: { __typename?: "Account"; id: string };
+    statusHistory: Array<{
+      __typename?: "WorkerStatusChange";
+      blockNumber: number;
+      pending: boolean;
+      timestamp?: string;
+    }>;
   }>;
 };
 
@@ -5692,6 +5692,12 @@ export type WorkerByPeerIdQuery = {
     }>;
     owner: { __typename?: "Account"; id: string; type: AccountType };
     realOwner: { __typename?: "Account"; id: string };
+    statusHistory: Array<{
+      __typename?: "WorkerStatusChange";
+      blockNumber: number;
+      pending: boolean;
+      timestamp?: string;
+    }>;
   }>;
 };
 
@@ -5739,6 +5745,12 @@ export type MyWorkersQuery = {
     jailReason?: string;
     owner: { __typename?: "Account"; id: string; type: AccountType };
     realOwner: { __typename?: "Account"; id: string };
+    statusHistory: Array<{
+      __typename?: "WorkerStatusChange";
+      blockNumber: number;
+      pending: boolean;
+      timestamp?: string;
+    }>;
   }>;
 };
 
@@ -5823,6 +5835,12 @@ export type MyDelegationsQuery = {
     }>;
     owner: { __typename?: "Account"; id: string; type: AccountType };
     realOwner: { __typename?: "Account"; id: string };
+    statusHistory: Array<{
+      __typename?: "WorkerStatusChange";
+      blockNumber: number;
+      pending: boolean;
+      timestamp?: string;
+    }>;
   }>;
 };
 
@@ -6058,6 +6076,11 @@ export const WorkerStatusFragmentFragmentDoc = `
   jailed
   dialOk
   jailReason
+  statusHistory(orderBy: id_DESC, limit: 1) {
+    blockNumber
+    pending
+    timestamp
+  }
 }
     `;
 export const WorkerFragmentFragmentDoc = `
@@ -6164,7 +6187,6 @@ export const useSquidNetworkHeightQuery = <
   TData = SquidNetworkHeightQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables?: SquidNetworkHeightQueryVariables,
   options?: Omit<
     UseQueryOptions<SquidNetworkHeightQuery, TError, TData>,
@@ -6183,8 +6205,6 @@ export const useSquidNetworkHeightQuery = <
         ? ["squidNetworkHeight"]
         : ["squidNetworkHeight", variables],
     queryFn: fetcher<SquidNetworkHeightQuery, SquidNetworkHeightQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       SquidNetworkHeightDocument,
       variables,
     ),
@@ -6209,7 +6229,6 @@ export const SettingsDocument = `
     `;
 
 export const useSettingsQuery = <TData = SettingsQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables?: SettingsQueryVariables,
   options?: Omit<UseQueryOptions<SettingsQuery, TError, TData>, "queryKey"> & {
     queryKey?: UseQueryOptions<SettingsQuery, TError, TData>["queryKey"];
@@ -6218,8 +6237,6 @@ export const useSettingsQuery = <TData = SettingsQuery, TError = unknown>(
   return useQuery<SettingsQuery, TError, TData>({
     queryKey: variables === undefined ? ["settings"] : ["settings", variables],
     queryFn: fetcher<SettingsQuery, SettingsQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       SettingsDocument,
       variables,
     ),
@@ -6239,7 +6256,6 @@ export const SourcesDocument = `
     ${AccountFragmentFragmentDoc}`;
 
 export const useSourcesQuery = <TData = SourcesQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: SourcesQueryVariables,
   options?: Omit<UseQueryOptions<SourcesQuery, TError, TData>, "queryKey"> & {
     queryKey?: UseQueryOptions<SourcesQuery, TError, TData>["queryKey"];
@@ -6248,8 +6264,6 @@ export const useSourcesQuery = <TData = SourcesQuery, TError = unknown>(
   return useQuery<SourcesQuery, TError, TData>({
     queryKey: ["sources", variables],
     queryFn: fetcher<SourcesQuery, SourcesQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       SourcesDocument,
       variables,
     ),
@@ -6289,7 +6303,6 @@ export const useSourcesWithAssetsQuery = <
   TData = SourcesWithAssetsQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: SourcesWithAssetsQueryVariables,
   options?: Omit<
     UseQueryOptions<SourcesWithAssetsQuery, TError, TData>,
@@ -6305,8 +6318,6 @@ export const useSourcesWithAssetsQuery = <
   return useQuery<SourcesWithAssetsQuery, TError, TData>({
     queryKey: ["sourcesWithAssets", variables],
     queryFn: fetcher<SourcesWithAssetsQuery, SourcesWithAssetsQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       SourcesWithAssetsDocument,
       variables,
     ),
@@ -6339,7 +6350,6 @@ export const useSourcesWithDelegationsQuery = <
   TData = SourcesWithDelegationsQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: SourcesWithDelegationsQueryVariables,
   options?: Omit<
     UseQueryOptions<SourcesWithDelegationsQuery, TError, TData>,
@@ -6357,12 +6367,7 @@ export const useSourcesWithDelegationsQuery = <
     queryFn: fetcher<
       SourcesWithDelegationsQuery,
       SourcesWithDelegationsQueryVariables
-    >(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
-      SourcesWithDelegationsDocument,
-      variables,
-    ),
+    >(SourcesWithDelegationsDocument, variables),
     ...options,
   });
 };
@@ -6376,7 +6381,6 @@ export const AllWorkersDocument = `
     ${WorkerFragmentFragmentDoc}`;
 
 export const useAllWorkersQuery = <TData = AllWorkersQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables?: AllWorkersQueryVariables,
   options?: Omit<
     UseQueryOptions<AllWorkersQuery, TError, TData>,
@@ -6389,8 +6393,6 @@ export const useAllWorkersQuery = <TData = AllWorkersQuery, TError = unknown>(
     queryKey:
       variables === undefined ? ["allWorkers"] : ["allWorkers", variables],
     queryFn: fetcher<AllWorkersQuery, AllWorkersQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       AllWorkersDocument,
       variables,
     ),
@@ -6421,7 +6423,6 @@ export const useWorkerByPeerIdQuery = <
   TData = WorkerByPeerIdQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: WorkerByPeerIdQueryVariables,
   options?: Omit<
     UseQueryOptions<WorkerByPeerIdQuery, TError, TData>,
@@ -6433,8 +6434,6 @@ export const useWorkerByPeerIdQuery = <
   return useQuery<WorkerByPeerIdQuery, TError, TData>({
     queryKey: ["workerByPeerId", variables],
     queryFn: fetcher<WorkerByPeerIdQuery, WorkerByPeerIdQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       WorkerByPeerIdDocument,
       variables,
     ),
@@ -6455,7 +6454,6 @@ export const useWorkerDaysUptimeByIdQuery = <
   TData = WorkerDaysUptimeByIdQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: WorkerDaysUptimeByIdQueryVariables,
   options?: Omit<
     UseQueryOptions<WorkerDaysUptimeByIdQuery, TError, TData>,
@@ -6473,12 +6471,7 @@ export const useWorkerDaysUptimeByIdQuery = <
     queryFn: fetcher<
       WorkerDaysUptimeByIdQuery,
       WorkerDaysUptimeByIdQueryVariables
-    >(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
-      WorkerDaysUptimeByIdDocument,
-      variables,
-    ),
+    >(WorkerDaysUptimeByIdDocument, variables),
     ...options,
   });
 };
@@ -6498,7 +6491,6 @@ export const MyWorkersDocument = `
     ${WorkerFragmentFragmentDoc}`;
 
 export const useMyWorkersQuery = <TData = MyWorkersQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: MyWorkersQueryVariables,
   options?: Omit<UseQueryOptions<MyWorkersQuery, TError, TData>, "queryKey"> & {
     queryKey?: UseQueryOptions<MyWorkersQuery, TError, TData>["queryKey"];
@@ -6507,8 +6499,6 @@ export const useMyWorkersQuery = <TData = MyWorkersQuery, TError = unknown>(
   return useQuery<MyWorkersQuery, TError, TData>({
     queryKey: ["myWorkers", variables],
     queryFn: fetcher<MyWorkersQuery, MyWorkersQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       MyWorkersDocument,
       variables,
     ),
@@ -6528,7 +6518,6 @@ export const useMyWorkersCountQuery = <
   TData = MyWorkersCountQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: MyWorkersCountQueryVariables,
   options?: Omit<
     UseQueryOptions<MyWorkersCountQuery, TError, TData>,
@@ -6540,8 +6529,6 @@ export const useMyWorkersCountQuery = <
   return useQuery<MyWorkersCountQuery, TError, TData>({
     queryKey: ["myWorkersCount", variables],
     queryFn: fetcher<MyWorkersCountQuery, MyWorkersCountQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       MyWorkersCountDocument,
       variables,
     ),
@@ -6570,7 +6557,6 @@ export const useWorkerDelegationInfoQuery = <
   TData = WorkerDelegationInfoQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: WorkerDelegationInfoQueryVariables,
   options?: Omit<
     UseQueryOptions<WorkerDelegationInfoQuery, TError, TData>,
@@ -6588,12 +6574,7 @@ export const useWorkerDelegationInfoQuery = <
     queryFn: fetcher<
       WorkerDelegationInfoQuery,
       WorkerDelegationInfoQueryVariables
-    >(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
-      WorkerDelegationInfoDocument,
-      variables,
-    ),
+    >(WorkerDelegationInfoDocument, variables),
     ...options,
   });
 };
@@ -6613,7 +6594,6 @@ export const WorkerOwnerDocument = `
     `;
 
 export const useWorkerOwnerQuery = <TData = WorkerOwnerQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: WorkerOwnerQueryVariables,
   options?: Omit<
     UseQueryOptions<WorkerOwnerQuery, TError, TData>,
@@ -6625,8 +6605,6 @@ export const useWorkerOwnerQuery = <TData = WorkerOwnerQuery, TError = unknown>(
   return useQuery<WorkerOwnerQuery, TError, TData>({
     queryKey: ["workerOwner", variables],
     queryFn: fetcher<WorkerOwnerQuery, WorkerOwnerQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       WorkerOwnerDocument,
       variables,
     ),
@@ -6660,7 +6638,6 @@ export const useMyDelegationsQuery = <
   TData = MyDelegationsQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: MyDelegationsQueryVariables,
   options?: Omit<
     UseQueryOptions<MyDelegationsQuery, TError, TData>,
@@ -6672,8 +6649,6 @@ export const useMyDelegationsQuery = <
   return useQuery<MyDelegationsQuery, TError, TData>({
     queryKey: ["myDelegations", variables],
     queryFn: fetcher<MyDelegationsQuery, MyDelegationsQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       MyDelegationsDocument,
       variables,
     ),
@@ -6705,7 +6680,6 @@ export const MyAssetsDocument = `
     ${WorkerBaseFragmentFragmentDoc}`;
 
 export const useMyAssetsQuery = <TData = MyAssetsQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: MyAssetsQueryVariables,
   options?: Omit<UseQueryOptions<MyAssetsQuery, TError, TData>, "queryKey"> & {
     queryKey?: UseQueryOptions<MyAssetsQuery, TError, TData>["queryKey"];
@@ -6714,8 +6688,6 @@ export const useMyAssetsQuery = <TData = MyAssetsQuery, TError = unknown>(
   return useQuery<MyAssetsQuery, TError, TData>({
     queryKey: ["myAssets", variables],
     queryFn: fetcher<MyAssetsQuery, MyAssetsQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       MyAssetsDocument,
       variables,
     ),
@@ -6748,7 +6720,6 @@ export const MyClaimsDocument = `
     ${WorkerBaseFragmentFragmentDoc}`;
 
 export const useMyClaimsQuery = <TData = MyClaimsQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: MyClaimsQueryVariables,
   options?: Omit<UseQueryOptions<MyClaimsQuery, TError, TData>, "queryKey"> & {
     queryKey?: UseQueryOptions<MyClaimsQuery, TError, TData>["queryKey"];
@@ -6757,8 +6728,6 @@ export const useMyClaimsQuery = <TData = MyClaimsQuery, TError = unknown>(
   return useQuery<MyClaimsQuery, TError, TData>({
     queryKey: ["myClaims", variables],
     queryFn: fetcher<MyClaimsQuery, MyClaimsQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       MyClaimsDocument,
       variables,
     ),
@@ -6778,7 +6747,6 @@ export const useGatewayByPeerIdQuery = <
   TData = GatewayByPeerIdQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: GatewayByPeerIdQueryVariables,
   options?: Omit<
     UseQueryOptions<GatewayByPeerIdQuery, TError, TData>,
@@ -6790,8 +6758,6 @@ export const useGatewayByPeerIdQuery = <
   return useQuery<GatewayByPeerIdQuery, TError, TData>({
     queryKey: ["gatewayByPeerId", variables],
     queryFn: fetcher<GatewayByPeerIdQuery, GatewayByPeerIdQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       GatewayByPeerIdDocument,
       variables,
     ),
@@ -6808,7 +6774,6 @@ export const MyGatewaysDocument = `
     ${GatewayFragmentFragmentDoc}`;
 
 export const useMyGatewaysQuery = <TData = MyGatewaysQuery, TError = unknown>(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: MyGatewaysQueryVariables,
   options?: Omit<
     UseQueryOptions<MyGatewaysQuery, TError, TData>,
@@ -6820,8 +6785,6 @@ export const useMyGatewaysQuery = <TData = MyGatewaysQuery, TError = unknown>(
   return useQuery<MyGatewaysQuery, TError, TData>({
     queryKey: ["myGateways", variables],
     queryFn: fetcher<MyGatewaysQuery, MyGatewaysQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       MyGatewaysDocument,
       variables,
     ),
@@ -6846,7 +6809,6 @@ export const useMyGatewayStakesQuery = <
   TData = MyGatewayStakesQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: MyGatewayStakesQueryVariables,
   options?: Omit<
     UseQueryOptions<MyGatewayStakesQuery, TError, TData>,
@@ -6858,8 +6820,6 @@ export const useMyGatewayStakesQuery = <
   return useQuery<MyGatewayStakesQuery, TError, TData>({
     queryKey: ["myGatewayStakes", variables],
     queryFn: fetcher<MyGatewayStakesQuery, MyGatewayStakesQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       MyGatewayStakesDocument,
       variables,
     ),
@@ -6879,7 +6839,6 @@ export const useVestingByAddressQuery = <
   TData = VestingByAddressQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables: VestingByAddressQueryVariables,
   options?: Omit<
     UseQueryOptions<VestingByAddressQuery, TError, TData>,
@@ -6895,8 +6854,6 @@ export const useVestingByAddressQuery = <
   return useQuery<VestingByAddressQuery, TError, TData>({
     queryKey: ["vestingByAddress", variables],
     queryFn: fetcher<VestingByAddressQuery, VestingByAddressQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       VestingByAddressDocument,
       variables,
     ),
@@ -6931,7 +6888,6 @@ export const useNetworkSummaryQuery = <
   TData = NetworkSummaryQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables?: NetworkSummaryQueryVariables,
   options?: Omit<
     UseQueryOptions<NetworkSummaryQuery, TError, TData>,
@@ -6946,8 +6902,6 @@ export const useNetworkSummaryQuery = <
         ? ["networkSummary"]
         : ["networkSummary", variables],
     queryFn: fetcher<NetworkSummaryQuery, NetworkSummaryQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       NetworkSummaryDocument,
       variables,
     ),
@@ -6974,7 +6928,6 @@ export const useCurrentEpochQuery = <
   TData = CurrentEpochQuery,
   TError = unknown,
 >(
-  dataSource: { endpoint: string; fetchParams?: RequestInit },
   variables?: CurrentEpochQueryVariables,
   options?: Omit<
     UseQueryOptions<CurrentEpochQuery, TError, TData>,
@@ -6987,8 +6940,6 @@ export const useCurrentEpochQuery = <
     queryKey:
       variables === undefined ? ["currentEpoch"] : ["currentEpoch", variables],
     queryFn: fetcher<CurrentEpochQuery, CurrentEpochQueryVariables>(
-      dataSource.endpoint,
-      dataSource.fetchParams || {},
       CurrentEpochDocument,
       variables,
     ),

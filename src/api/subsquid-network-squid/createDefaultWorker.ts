@@ -1,0 +1,60 @@
+import { AccountType, WorkerStatus } from '@api/subsquid-network-squid';
+
+export const createDefaultWorker = (index: number = 0) => {
+  return {
+    id: `${index}`,
+    peerId: '12D3KooWMzxoJtGQSN4HjRh9kVNteiFwvaHvaQHhJk8hHCmw4MkB',
+    name: `Worker ${index}`,
+    createdAt: new Date().toISOString(),
+    status: WorkerStatus.Active,
+    uptime24Hours: 99,
+    uptime90Days: 99,
+    apr: 99,
+    stakerApr: 99,
+    bond: '100000000000000000000000',
+    claimableReward: '100000000000000000000000',
+    claimedReward: '100000000000000000000000',
+    version: '0.0.0',
+    delegationCount: 10,
+    totalDelegation: '100000000000000000000000',
+    totalDelegationRewards: '100000000000000000000000',
+    queries24Hours: 1000,
+    queries90Days: 1000000,
+    servedData24Hours: 10000,
+    servedData90Days: 10000000,
+    storedData: 100000000,
+    website: undefined,
+    description: undefined,
+    locked: false,
+    lockEnd: undefined,
+    delegationCapacity: 99,
+    myDelegation: '1000000000000000000000000',
+    myTotalDelegationReward: '1000000000000000000000000',
+    jailed: false,
+    jailReason: undefined,
+    online: true,
+    statusHistory: [],
+    delegations: [
+      {
+        owner: {
+          id: '0x0000000000000000000000000000000000000000',
+          type: AccountType.User,
+          __typename: 'Account',
+        },
+        deposit: '0',
+        locked: false,
+        lockEnd: undefined,
+      },
+    ],
+    owner: {
+      id: '0x0000000000000000000000000000000000000000',
+      type: AccountType.User,
+      __typename: 'Account',
+    },
+    realOwner: {
+      id: '0x0000000000000000000000000000000000000000',
+      type: AccountType.User,
+      __typename: 'Account',
+    },
+  };
+};

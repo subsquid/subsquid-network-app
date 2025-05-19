@@ -1,26 +1,42 @@
-import { tokenFormatter } from '@lib/formatters/formatters';
+import { tokenFormatter, addressFormatter } from '@lib/formatters/formatters';
 import { fromSqd, unwrapMulticallResult } from '@lib/network/utils';
-import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, TableBody, TableCell, TableHead, TableRow, styled } from '@mui/material';
 import { keepPreviousData } from '@tanstack/react-query';
 import chunk from 'lodash-es/chunk';
 import { erc20Abi } from 'viem';
 import { useReadContracts } from 'wagmi';
+import { Link } from 'react-router-dom';
 
 import { vestingAbi } from '@api/contracts';
-import { AccountType, useSourcesQuery, useSquid } from '@api/subsquid-network-squid';
+import {
+  AccountType,
+  useSourcesQuery,
+  useSquid,
+  createDefaultVesting,
+} from '@api/subsquid-network-squid';
 import { SquaredChip } from '@components/Chip';
 import { DashboardTable, NoItems } from '@components/Table';
+import { NameWithAvatar } from '@components/SourceWalletName';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
+import { SkeletonWrapper } from '@components/SkeletonWrapper';
+import { useMemo } from 'react';
+import { CopyToClipboard } from '@components/CopyToClipboard';
 
 import { ReleaseButton } from './ReleaseButton';
-import { SourceWalletName } from './VestingName';
+
+const StyledTableRow = styled(TableRow)({
+  minHeight: '48px',
+  '& td': {
+    height: '48px',
+  },
+});
 
 export function MyVestings() {
   const account = useAccount();
   const squid = useSquid();
 
-  const { data: sourcesQuery, isLoading } = useSourcesQuery(squid, {
+  const { data: sourcesQuery, isLoading: isSourcesLoading } = useSourcesQuery({
     address: account.address as `0x${string}`,
   });
   const { SQD_TOKEN, SQD } = useContracts();
@@ -72,11 +88,21 @@ export function MyVestings() {
     },
   });
 
+  const isLoading = isSourcesLoading || isVestingsLoading;
+
+  const data = useMemo(
+    () =>
+      isLoading
+        ? Array.from({ length: 3 }, (_, index) => createDefaultVesting(index))
+        : vestingsQuery.accounts?.map((vesting, i) => ({
+            ...vesting,
+            ...vestings?.[i],
+          })),
+    [isLoading, vestingsQuery.accounts, vestings],
+  );
+
   return (
-    <DashboardTable
-      loading={isLoading || isVestingsLoading}
-      title={<SquaredChip label="My Vestings" color="primary" />}
-    >
+    <DashboardTable title={<SquaredChip label="My Vestings" color="primary" />}>
       <TableHead>
         <TableRow>
           <TableCell>Vesting</TableCell>
@@ -87,28 +113,54 @@ export function MyVestings() {
         </TableRow>
       </TableHead>
       <TableBody>
-        {vestingsQuery.accounts?.length ? (
-          <>
-            {vestingsQuery.accounts.map((vesting, i) => {
-              const d = vestings?.[i];
-              return (
-                <TableRow key={vesting.id}>
-                  <TableCell>
-                    <SourceWalletName source={vesting} to={`vestings/${vesting.id}`} />
-                  </TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(d?.balance), SQD_TOKEN)}</TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(d?.deposited), SQD_TOKEN)}</TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(d?.releasable), SQD_TOKEN)}</TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-end">
-                      <ReleaseButton vesting={vesting} disabled={!d?.releasable} />
+        {data?.length ? (
+          data.map(vesting => (
+            <StyledTableRow key={vesting.id}>
+              <TableCell>
+                <NameWithAvatar
+                  title="Vesting contract"
+                  subtitle={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CopyToClipboard
+                        text={vesting.id}
+                        content={
+                          <Link to={`/assets/vestings/${vesting.id}`}>
+                            {addressFormatter(vesting.id, true)}
+                          </Link>
+                        }
+                      />
                     </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </>
-        ) : isLoading ? null : (
+                  }
+                  avatarValue={vesting.id}
+                  loading={isLoading}
+                  sx={{ width: { xs: 200, sm: 240 } }}
+                />
+              </TableCell>
+              <TableCell>
+                <SkeletonWrapper loading={isLoading}>
+                  <span>{tokenFormatter(fromSqd(vesting.balance), SQD_TOKEN)}</span>
+                </SkeletonWrapper>
+              </TableCell>
+              <TableCell>
+                <SkeletonWrapper loading={isLoading}>
+                  <span>{tokenFormatter(fromSqd(vesting.deposited), SQD_TOKEN)}</span>
+                </SkeletonWrapper>
+              </TableCell>
+              <TableCell>
+                <SkeletonWrapper loading={isLoading}>
+                  <span>{tokenFormatter(fromSqd(vesting.releasable), SQD_TOKEN)}</span>
+                </SkeletonWrapper>
+              </TableCell>
+              <TableCell>
+                <Box display="flex" justifyContent="flex-end">
+                  <SkeletonWrapper loading={isLoading}>
+                    <ReleaseButton vesting={vesting} disabled={!vesting.releasable} />
+                  </SkeletonWrapper>
+                </Box>
+              </TableCell>
+            </StyledTableRow>
+          ))
+        ) : (
           <NoItems>
             <span>No vesting was found</span>
           </NoItems>

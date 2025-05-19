@@ -4,14 +4,12 @@ import { zeroAddress } from 'viem';
 import { getAddress } from 'viem/utils';
 
 export function percentFormatter(value?: number | string | BigNumber) {
-  if (!value) return '0%';
-
-  value = BigNumber(value);
+  value = BigNumber(value || 0);
 
   return `${value.lt(0.01) && value.gt(0) ? '<0.01' : value.toFixed(2)}%`;
 }
 
-const formatter8 = new Intl.NumberFormat('en', {
+const formatter8 = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 8,
 });
 

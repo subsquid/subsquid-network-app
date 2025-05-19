@@ -19,11 +19,6 @@ import { Box } from '@mui/system';
 //   cursor: 'help',
 // }));
 
-const ContentBox = styled(Box)(({}) => ({
-  display: 'flex',
-  alignItems: 'center',
-}));
-
 export interface HelpTooltipProps {
   /** The tooltip content */
   title: React.ReactNode;
@@ -61,7 +56,7 @@ export const HelpTooltip = ({
 }: HelpTooltipProps) => {
   return (
     <Stack direction="row" spacing={0.5} alignItems="center" sx={sx}>
-      {placement === 'end' && children && <ContentBox sx={contentSx}>{children}</ContentBox>}
+      {placement === 'end' && children && <Box>{children}</Box>}
       <Tooltip
         title={title}
         placement={tooltipPlacement}
@@ -69,9 +64,9 @@ export const HelpTooltip = ({
         enterDelay={enterDelay}
         leaveDelay={leaveDelay}
       >
-        <InfoOutlined fontSize="small" sx={iconSx} />
+        <InfoOutlined fontSize="inherit" sx={{ transform: 'scale(1.2)', ...iconSx }} />
       </Tooltip>
-      {placement === 'start' && children && <ContentBox sx={contentSx}>{children}</ContentBox>}
+      {placement === 'start' && children && <Box>{children}</Box>}
     </Stack>
   );
 };
