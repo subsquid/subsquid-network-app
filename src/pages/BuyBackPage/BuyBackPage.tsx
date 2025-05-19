@@ -49,7 +49,6 @@ export function OtcContracts() {
                     title="Contract"
                     subtitle={address}
                     avatarValue={address}
-                    loading={isLoading}
                   />
                 </TableCell>
                 <TableCell className="pinned">

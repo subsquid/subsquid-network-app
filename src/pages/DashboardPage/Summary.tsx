@@ -16,7 +16,6 @@ import { useCurrentEpoch } from '@api/subsquid-network-squid';
 import { SquaredChip } from '@components/Chip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
-import { SkeletonWrapper } from '@components/SkeletonWrapper';
 import { useCountdown } from '@hooks/useCountdown';
 import { useContracts } from '@network/useContracts';
 
@@ -76,27 +75,22 @@ function OnlineInfo() {
   return (
     <SummarySection
       sx={{ height: 1 }}
+      loading={isLoading}
       title={<SquaredChip label="Workers Online" color="primary" />}
       action={
-        <SkeletonWrapper loading={isLoading} width={120}>
-          <Stack direction="row" spacing={1}>
-            <span>Data</span>
-            <SquaredChip
-              label={
-                <Typography variant="subtitle1">{bytesFormatter(data?.storedData)}</Typography>
-              }
-              color="info"
-            />
-          </Stack>
-        </SkeletonWrapper>
+        <Stack direction="row" spacing={1}>
+          <span>Data</span>
+          <SquaredChip
+            label={<Typography variant="subtitle1">{bytesFormatter(data?.storedData)}</Typography>}
+            color="info"
+          />
+        </Stack>
       }
     >
-      <SkeletonWrapper loading={isLoading} width={240}>
-        <Typography variant="h1" display="flex" alignItems="flex-end">
-          <Box>{data?.onlineWorkersCount || 0}</Box>
-          <Box color="text.disabled">/{data?.workersCount || 0}</Box>
-        </Typography>
-      </SkeletonWrapper>
+      <Typography variant="h1" display="flex" alignItems="flex-end">
+        <Box>{data?.onlineWorkersCount || 0}</Box>
+        <Box color="text.disabled">/{data?.workersCount || 0}</Box>
+      </Typography>
     </SummarySection>
   );
 }
@@ -132,16 +126,11 @@ function CurrentEpoch() {
   return (
     <SummarySection
       sx={{ height: 1 }}
+      loading={isLoading}
       title={<SquaredChip label="Current epoch" color="primary" />}
-      action={
-        <SkeletonWrapper loading={isLoading} width={120}>
-          <CurrentEpochEstimation epochEnd={epochEnd} />
-        </SkeletonWrapper>
-      }
+      action={<CurrentEpochEstimation epochEnd={epochEnd} />}
     >
-      <SkeletonWrapper loading={isLoading} width={240}>
-        <Typography variant="h1">{data?.epoch?.number || 0}</Typography>
-      </SkeletonWrapper>
+      <Typography variant="h1">{data?.epoch?.number || 0}</Typography>
     </SummarySection>
   );
 }
@@ -151,65 +140,37 @@ function Stats() {
   const { SQD_TOKEN } = useContracts();
 
   return (
-    <SummarySection sx={{ height: 1 }} title={<SquaredChip label="Other Data" color="primary" />}>
+    <SummarySection
+      sx={{ height: 1 }}
+      loading={isLoading}
+      title={<SquaredChip label="Other Data" color="primary" />}
+    >
       <Stack divider={<Divider />} spacing={1} flex={1}>
         <Box>
           <ColumnLabel>Total bond</ColumnLabel>
-          <SkeletonWrapper loading={isLoading} width={320}>
-            <ColumnValue>{tokenFormatter(fromSqd(data?.totalBond), SQD_TOKEN, 3)}</ColumnValue>
-          </SkeletonWrapper>
+          <ColumnValue>{tokenFormatter(fromSqd(data?.totalBond), SQD_TOKEN, 3)}</ColumnValue>
         </Box>
         <Box>
           <ColumnLabel>Total delegation</ColumnLabel>
-          <SkeletonWrapper loading={isLoading} width={320}>
-            <ColumnValue>
-              {tokenFormatter(fromSqd(data?.totalDelegation), SQD_TOKEN, 3)}
-            </ColumnValue>
-          </SkeletonWrapper>
+          <ColumnValue>{tokenFormatter(fromSqd(data?.totalDelegation), SQD_TOKEN, 3)}</ColumnValue>
         </Box>
         <Box>
-          <ColumnLabel>Queries, 24h / 90d</ColumnLabel>
-          <SkeletonWrapper loading={isLoading} width={320}>
-            <ColumnValue>
-              <span>
-                {numberWithCommasFormatter(data?.queries24Hours) +
-                  '/' +
-                  numberWithCommasFormatter(data?.queries90Days)}
-              </span>
-            </ColumnValue>
-          </SkeletonWrapper>
+          <ColumnLabel>Queries, 24h/90d</ColumnLabel>
+          <ColumnValue>
+            {numberWithCommasFormatter(data?.queries24Hours)}/
+            {numberWithCommasFormatter(data?.queries90Days)}
+          </ColumnValue>
         </Box>
         <Box>
-          <ColumnLabel>Data served, 24h / 90d</ColumnLabel>
-          <SkeletonWrapper loading={isLoading} width={320}>
-            <ColumnValue>
-              {bytesFormatter(data?.servedData24Hours) +
-                '/' +
-                bytesFormatter(data?.servedData90Days)}
-            </ColumnValue>
-          </SkeletonWrapper>
+          <ColumnLabel>Data served, 24h/90d</ColumnLabel>
+          <ColumnValue>
+            {bytesFormatter(data?.servedData24Hours)}/{bytesFormatter(data?.servedData90Days)}
+          </ColumnValue>
         </Box>
       </Stack>
     </SummarySection>
   );
 }
-
-const placeholderData = [
-  { date: '2024-01-01T00:00:00.000Z', value: 20.2 },
-  { date: '2024-01-02T00:00:00.000Z', value: 20.5 },
-  { date: '2024-01-03T00:00:00.000Z', value: 20.8 },
-  { date: '2024-01-04T00:00:00.000Z', value: 20.6 },
-  { date: '2024-01-05T00:00:00.000Z', value: 20.3 },
-  { date: '2024-01-06T00:00:00.000Z', value: 20.1 },
-  { date: '2024-01-07T00:00:00.000Z', value: 20.4 },
-  { date: '2024-01-08T00:00:00.000Z', value: 20.7 },
-  { date: '2024-01-09T00:00:00.000Z', value: 20.5 },
-  { date: '2024-01-10T00:00:00.000Z', value: 20.2 },
-  { date: '2024-01-11T00:00:00.000Z', value: 20.0 },
-  { date: '2024-01-12T00:00:00.000Z', value: 20.3 },
-  { date: '2024-01-13T00:00:00.000Z', value: 20.6 },
-  { date: '2024-01-14T00:00:00.000Z', value: 20.4 },
-];
 
 function AprTooltip({ active, payload }: TooltipProps<number, string>) {
   return active && payload?.length ? (
@@ -221,53 +182,11 @@ function AprTooltip({ active, payload }: TooltipProps<number, string>) {
   ) : null;
 }
 
-function AprChart({
-  data,
-  loading,
-}: { data: { date: string; value: number }[]; loading?: boolean }) {
+function AprChart({ data }: { data: { date: string; value: number }[] }) {
   const theme = useTheme();
   const ANIMATION_DURATION = 100;
   const ANIMATION_EASING = 'ease-out' as const;
   const ANIMATION_TRANSITION = `all ${ANIMATION_EASING} ${ANIMATION_DURATION}ms`;
-  const memoizedData = useMemo(() => data, [data]);
-
-  if (loading) {
-    return (
-      <>
-        <style>
-          {`
-            @keyframes skeleton-pulse {
-              0% { opacity: 1; }
-              50% { opacity: 0.4; }
-              100% { opacity: 1; }
-            }
-          `}
-        </style>
-        <ResponsiveContainer width="200%" height="85%" style={{ margin: theme.spacing(-1.5) }}>
-          <AreaChart
-            width={200}
-            height={60}
-            data={placeholderData}
-            margin={{ top: 16, right: 0, left: 0, bottom: 0 }}
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            <Area
-              animationDuration={0}
-              dataKey="value"
-              strokeWidth={0}
-              fill={alpha(theme.palette.action.active, theme.palette.action.activatedOpacity)}
-              activeDot={false}
-              style={{
-                animation: 'skeleton-pulse 2s ease-in-out 0.5s infinite',
-                opacity: 0,
-                animationDelay: '0.6s',
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </>
-    );
-  }
 
   return (
     <>
@@ -284,7 +203,7 @@ function AprChart({
         <AreaChart
           width={200}
           height={60}
-          data={memoizedData}
+          data={data}
           defaultShowTooltip
           margin={{ top: 16, right: 0, left: 0, bottom: 0 }}
           style={{ cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
@@ -346,17 +265,16 @@ function WorkersApr({ length }: { length?: number }) {
 
   return (
     <SummarySection
+      loading={isLoading}
       sx={{ height: 1, overflow: 'visible' }}
       title={<SquaredChip label="Worker APR" color="primary" />}
       action={
-        <SkeletonWrapper loading={isLoading} width={120}>
-          <HelpTooltip title="Median value">
-            <span>{`Last ${aprs.length} days`}</span>
-          </HelpTooltip>
-        </SkeletonWrapper>
+        <HelpTooltip title="Median value">
+          <span>{`Last ${aprs.length} days`}</span>
+        </HelpTooltip>
       }
     >
-      <AprChart data={aprs} loading={isLoading} />
+      <AprChart data={aprs} />
     </SummarySection>
   );
 }
@@ -375,18 +293,17 @@ function DelegatorsApr({ length }: { length?: number }) {
 
   return (
     <SummarySection
+      loading={isLoading}
       sx={{ height: 1, overflow: 'visible' }}
       title={<SquaredChip label="Delegator APR" color="primary" />}
       action={
-        <SkeletonWrapper loading={isLoading} width={120}>
-          <Stack direction="row" alignItems="center" spacing={0.5}>
-            <Typography>{`Last ${aprs.length} days`}</Typography>
-            <HelpTooltip title="Median value" />
-          </Stack>
-        </SkeletonWrapper>
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Typography>{`Last ${aprs.length} days`}</Typography>
+          <HelpTooltip title="Median value" />
+        </Stack>
       }
     >
-      <AprChart data={aprs} loading={isLoading} />
+      <AprChart data={aprs} />
     </SummarySection>
   );
 }

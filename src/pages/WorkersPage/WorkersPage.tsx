@@ -2,7 +2,6 @@ import { percentFormatter, tokenFormatter } from '@lib/formatters/formatters.ts'
 import { fromSqd } from '@lib/network';
 import { Box, Button, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
-import { useMemo } from 'react';
 
 import {
   SortDir,
@@ -10,8 +9,6 @@ import {
   useMyWorkers,
   WorkerSortBy,
   WorkerStatus,
-  AccountType,
-  createDefaultWorker,
 } from '@api/subsquid-network-squid';
 import { SquaredChip } from '@components/Chip';
 import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
@@ -21,7 +18,6 @@ import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useContracts } from '@network/useContracts';
 import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
-import { SkeletonWrapper } from '@components/SkeletonWrapper';
 
 import { AddWorkerButton } from './AddNewWorker';
 import { WorkerUnregisterButton } from './WorkerUnregister';
@@ -45,15 +41,10 @@ export function MyWorkers() {
 
   const isLoading = isSourcesLoading || isWorkersLoading;
 
-  const data = useMemo(
-    () =>
-      isLoading ? Array.from({ length: 10 }, (_, index) => createDefaultWorker(index)) : workers,
-    [isLoading, workers],
-  );
-
   return (
     <Box>
       <DashboardTable
+        loading={isLoading}
         title={
           <>
             <SquaredChip label="My Workers" color="primary" />
@@ -102,71 +93,53 @@ export function MyWorkers() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.length ? (
-              data.map(worker => {
+            {workers?.length ? (
+              workers.map(worker => {
                 return (
-                  <TableRow key={worker.id}>
+                  <TableRow key={worker.peerId}>
                     <TableCell>
-                      <WorkerName loading={isLoading} worker={worker} />
+                      <WorkerName worker={worker} />
                     </TableCell>
                     <TableCell>
-                      <WorkerStatusChip loading={isLoading} worker={worker} />
+                      <WorkerStatusChip worker={worker} />
                     </TableCell>
                     <TableCell>
-                      <WorkerVersion loading={isLoading} version={worker.version} />
+                      <WorkerVersion worker={worker} />
                     </TableCell>
+                    <TableCell>{percentFormatter(worker.uptime24Hours)}</TableCell>
+                    <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                    <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
                     <TableCell>
-                      <SkeletonWrapper loading={isLoading}>
-                        <span>{percentFormatter(worker.uptime24Hours)}</span>
-                      </SkeletonWrapper>
-                    </TableCell>
-                    <TableCell>
-                      <SkeletonWrapper loading={isLoading}>
-                        <span>{percentFormatter(worker.uptime90Days)}</span>
-                      </SkeletonWrapper>
-                    </TableCell>
-                    <TableCell>
-                      <SkeletonWrapper loading={isLoading}>
-                        <span>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</span>
-                      </SkeletonWrapper>
-                    </TableCell>
-                    <TableCell>
-                      <SkeletonWrapper loading={isLoading}>
-                        <span>
-                          {tokenFormatter(
-                            fromSqd(worker.claimableReward).plus(fromSqd(worker.claimedReward)),
-                            SQD_TOKEN,
-                          )}
-                        </span>
-                      </SkeletonWrapper>
+                      {tokenFormatter(
+                        fromSqd(worker.claimableReward).plus(fromSqd(worker.claimedReward)),
+                        SQD_TOKEN,
+                      )}
                     </TableCell>
                     <TableCell>
                       <Box display="flex" justifyContent="flex-end">
-                        <SkeletonWrapper loading={isLoading}>
-                          {worker.status === WorkerStatus.Deregistered ||
-                          worker.status === WorkerStatus.Deregistering ? (
-                            <WorkerWithdrawButton
-                              worker={worker}
-                              source={{
-                                ...worker.owner,
-                                locked: !!worker.locked,
-                                lockEnd: worker.lockEnd,
-                              }}
-                            />
-                          ) : (
-                            <WorkerUnregisterButton
-                              worker={worker}
-                              source={worker.owner}
-                              disabled={worker.status !== WorkerStatus.Active}
-                            />
-                          )}
-                        </SkeletonWrapper>
+                        {worker.status === WorkerStatus.Deregistered ||
+                        worker.status === WorkerStatus.Deregistering ? (
+                          <WorkerWithdrawButton
+                            worker={worker}
+                            source={{
+                              ...worker.owner,
+                              locked: !!worker.locked,
+                              lockEnd: worker.lockEnd,
+                            }}
+                          />
+                        ) : (
+                          <WorkerUnregisterButton
+                            worker={worker}
+                            source={worker.owner}
+                            disabled={worker.status !== WorkerStatus.Active}
+                          />
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>
                 );
               })
-            ) : (
+            ) : isLoading ? null : (
               <NoItems>
                 <span>No worker registered yet</span>
               </NoItems>

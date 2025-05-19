@@ -16,7 +16,6 @@ import {
 } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { Cell, Pie, PieChart } from 'recharts';
-import { alpha } from '@mui/material/styles';
 
 import {
   AccountType,
@@ -33,7 +32,6 @@ import { useContracts } from '@network/useContracts';
 import { ColumnLabel, ColumnValue, SummarySection } from '@pages/DashboardPage/Summary';
 
 import { ClaimButton } from './ClaimButton';
-import { SkeletonWrapper } from '@components/SkeletonWrapper';
 
 type TokenBalance = {
   name: string;
@@ -43,11 +41,7 @@ type TokenBalance = {
   tip?: string;
 };
 
-function TokenBalance({
-  sx,
-  balance,
-  loading,
-}: { sx?: SxProps<Theme>; balance?: TokenBalance; loading?: boolean }) {
+function TokenBalance({ sx, balance }: { sx?: SxProps<Theme>; balance?: TokenBalance }) {
   const { SQD_TOKEN } = useContracts();
 
   return (
@@ -60,20 +54,13 @@ function TokenBalance({
           </Stack>
         </HelpTooltip>
       </ColumnLabel>
-      <SkeletonWrapper loading={loading} width={320}>
-        <ColumnValue>{tokenFormatter(fromSqd(balance?.value), SQD_TOKEN, 3)}</ColumnValue>
-      </SkeletonWrapper>
+      <ColumnValue>{tokenFormatter(fromSqd(balance?.value), SQD_TOKEN, 3)}</ColumnValue>
     </Box>
   );
 }
 
-function TotalBalance({
-  balances,
-  total,
-  loading,
-}: { balances: TokenBalance[]; total: BigNumber; loading?: boolean }) {
+function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: BigNumber }) {
   const { SQD_TOKEN } = useContracts();
-  const theme = useTheme();
 
   return (
     <Box
@@ -83,74 +70,49 @@ function TotalBalance({
       alignItems="flex-end"
       flex={1}
     >
-      <Box mb={4} mr={7} position="relative" width={240} height={240}>
-        {loading ? (
-          <>
-            <style>
-              {`
-                @keyframes skeleton-pulse {
-                  0% { opacity: 1; }
-                  50% { opacity: 0.4; }
-                  100% { opacity: 1; }
-                }
-              `}
-            </style>
-            <Box
-              sx={{
-                width: '100%',
-                height: '100%',
-                borderRadius: '50%',
-                backgroundColor: alpha(
-                  theme.palette.action.active,
-                  theme.palette.action.activatedOpacity,
-                ),
-                animation: 'skeleton-pulse 2s ease-in-out 0.5s infinite',
-                position: 'relative',
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: '50%',
-                  height: '50%',
-                  borderRadius: '50%',
-                  backgroundColor: theme.palette.background.paper,
-                },
-                opacity: 0,
-                animationDelay: '0.6s',
-              }}
-            />
-          </>
-        ) : (
-          <PieChart width={240} height={240}>
-            <Pie
-              data={balances.map(i => ({ name: i.name, value: i.value.toNumber() }))}
-              animationDuration={0}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={120}
-              nameKey="name"
-              dataKey="value"
-              style={{ outline: 'none' }}
-            >
-              {balances.map(i => (
-                <Cell key={i.name} fill={i.color} strokeWidth={0} />
-              ))}
-            </Pie>
-          </PieChart>
-        )}
+      {/* <Box display="flex" pr={7} pb={3} alignItems="center">
+        <PieChart
+          series={[
+            {
+              data: balances.map(i => ({ id: i.name, value: i.value.toNumber(), color: i.color })),
+              outerRadius: 120,
+              innerRadius: 60,
+              valueFormatter: v => tokenFormatter(v.value, SQD_TOKEN, 3),
+              cx: 128,
+              cy: 128,
+            },
+          ]}
+          width={256}
+          height={256}
+          skipAnimation
+        />
+      </Box> */}
+      <Box mb={4} mr={7}>
+        <PieChart width={240} height={240}>
+          <Pie
+            data={balances.map(i => ({ name: i.name, value: i.value.toNumber() }))}
+            animationDuration={0}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={120}
+            nameKey="name"
+            dataKey="value"
+            style={{ outline: 'none' }}
+          >
+            {balances.map(i => (
+              <Cell key={i.name} fill={i.color} strokeWidth={0} />
+            ))}
+          </Pie>
+        </PieChart>
       </Box>
 
       <Box mb={1}>
         <SquaredChip label="Total" color="primary" />
       </Box>
-      <SkeletonWrapper loading={loading} width={320}>
-        <Typography variant="h2" textAlign="end">
-          {tokenFormatter(total, SQD_TOKEN, 3)}
-        </Typography>
-      </SkeletonWrapper>
+      <Typography variant="h2" textAlign="end">
+        {tokenFormatter(total, SQD_TOKEN, 3)}
+      </Typography>
     </Box>
   );
 }
@@ -299,12 +261,11 @@ export function MyAssets() {
   return (
     <Box minHeight={448} mb={2} display="flex">
       <SummarySection
+        loading={isLoading}
         sx={{ width: 1 }}
         title={<SquaredChip label="My Assets" color="primary" />}
         action={
-          <SkeletonWrapper loading={isLoading}>
-            <ClaimButton sources={claimableSources} disabled={isLoading || !hasAvailableClaims} />
-          </SkeletonWrapper>
+          <ClaimButton sources={claimableSources} disabled={isLoading || !hasAvailableClaims} />
         }
       >
         <Grid container spacing={2} flex={1}>
@@ -318,27 +279,21 @@ export function MyAssets() {
               justifyContent="stretch"
             >
               <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
-                <TokenBalance balance={balances[0]} loading={isLoading} />
-                <TokenBalance balance={balances[1]} loading={isLoading} />
-                <TokenBalance balance={balances[2]} loading={isLoading} />
+                <TokenBalance balance={balances[0]} />
+                <TokenBalance balance={balances[1]} />
+                <TokenBalance balance={balances[2]} />
               </Stack>
               <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
-                <TokenBalance balance={balances[3]} loading={isLoading} />
-                <TokenBalance balance={balances[4]} loading={isLoading} />
-                {demoFeaturesEnabled() && (
-                  <TokenBalance balance={balances[5]} loading={isLoading} />
-                )}
+                <TokenBalance balance={balances[3]} />
+                <TokenBalance balance={balances[4]} />
+                {demoFeaturesEnabled() && <TokenBalance balance={balances[5]} />}
               </Stack>
             </Stack>
           </Grid>
           {narrowSm ? null : (
             <Grid size={{ xs: 0, sm: 4 }}>
               <Box display="flex" alignItems="flex-end" height={1}>
-                <TotalBalance
-                  balances={balances}
-                  total={fromSqd(totalBalance)}
-                  loading={isLoading}
-                />
+                <TotalBalance balances={balances} total={fromSqd(totalBalance)} />
               </Box>
             </Grid>
           )}

@@ -661,8 +661,6 @@ export const useCreateTheme = (mode: PaletteType) => {
               root: {
                 transform: 'none',
                 backgroundColor: alpha(colors.action.active, colors.action.activatedOpacity),
-                opacity: 0,
-                animationDelay: '0.6s',
               },
               text: {
                 borderRadius: 4,

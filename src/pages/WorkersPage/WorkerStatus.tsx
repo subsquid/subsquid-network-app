@@ -7,7 +7,6 @@ import capitalize from 'lodash-es/capitalize';
 
 import { WorkerStatus as Status, useCurrentEpoch, WorkerStatus } from '@api/subsquid-network-squid';
 import { useCountdown } from '@hooks/useCountdown';
-import { SkeletonWrapper } from '@components/SkeletonWrapper';
 
 export const Chip = styled(MaterialChip)(({ theme }) => ({
   // [`&.${chipClasses.colorSuccess}`]: {
@@ -31,10 +30,8 @@ function AppliesTooltip({ timestamp }: { timestamp?: number }) {
 }
 
 export function WorkerStatusChip({
-  loading,
   worker,
 }: {
-  loading?: boolean;
   worker?: {
     status?: string;
     jailReason?: string;
@@ -104,15 +101,11 @@ export function WorkerStatusChip({
     </Tooltip>
   );
 
-  return (
-    <SkeletonWrapper loading={loading}>
-      {tip ? (
-        <Tooltip title={tip} placement="top">
-          {chip}
-        </Tooltip>
-      ) : (
-        chip
-      )}
-    </SkeletonWrapper>
+  return tip ? (
+    <Tooltip title={tip} placement="top">
+      {chip}
+    </Tooltip>
+  ) : (
+    chip
   );
 }

@@ -29,7 +29,6 @@ export const WorkerName = ({
         />
       }
       avatarValue={worker?.peerId}
-      loading={loading}
       sx={sx}
     />
   );

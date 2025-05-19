@@ -14,36 +14,24 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/system';
 
-import {
-  SortDir,
-  useMySources,
-  useNetworkSettings,
-  useWorkers,
-  WorkerSortBy,
-  WorkerStatus,
-  createDefaultWorker,
-} from '@api/subsquid-network-squid';
+import { SortDir, useMySources, useWorkers, WorkerSortBy } from '@api/subsquid-network-squid';
 import { Search } from '@components/Search/Search';
 import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { DelegationCapacity } from '@pages/WorkersPage/DelegationCapacity';
 import { WorkerDelegate } from '@pages/WorkersPage/WorkerDelegate';
+import { WorkerName } from '@pages/WorkersPage/WorkerName';
 import { WorkerStatusChip } from '@pages/WorkersPage/WorkerStatus';
 import { WorkerVersion } from '@pages/WorkersPage/WorkerVersion';
-import { SkeletonWrapper } from '@components/SkeletonWrapper';
-import { WorkerName } from '@pages/WorkersPage/WorkerName';
-import { useMemo } from 'react';
 
 function TableNavigation({
   totalPages,
   setPage,
   page,
-  loading,
 }: {
   setPage?: (page: number) => unknown;
   page: number;
   totalPages: number;
-  loading?: boolean;
 }) {
   const hasPrevPage = page > 1;
   const hasNextPage = page < totalPages;
@@ -65,11 +53,9 @@ function TableNavigation({
       >
         <ArrowBackIosNew />
       </IconButton>
-      <SkeletonWrapper loading={loading} width={50}>
-        <Typography sx={{ fontVariant: 'tabular-nums' }}>
-          {page} / {totalPages}
-        </Typography>
-      </SkeletonWrapper>
+      <Typography sx={{ fontVariant: 'tabular-nums' }}>
+        {page} / {totalPages}
+      </Typography>
       <IconButton
         size="small"
         onClick={() => {
@@ -96,13 +82,6 @@ export const SummaryValue = styled(Box, {
   flex: 1,
 }));
 
-const StyledTableRow = styled(TableRow)({
-  minHeight: '48px',
-  '& td': {
-    height: '48px',
-  },
-});
-
 export function Workers() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
@@ -116,8 +95,6 @@ export function Workers() {
 
   const { data: sources, isLoading: isSourcesLoading } = useMySources();
 
-  const pageSize = 15;
-
   const {
     workers,
     totalPages,
@@ -126,26 +103,12 @@ export function Workers() {
   } = useWorkers({
     search: query.search,
     page: query.page,
-    perPage: pageSize,
+    perPage: 15,
     sortBy: query.sortBy as WorkerSortBy,
     sortDir: query.sortDir as SortDir,
   });
 
-  const {
-    minimalWorkerVersion,
-    recommendedWorkerVersion,
-    isLoading: isSettingsLoading,
-  } = useNetworkSettings();
-
-  const isLoading = isSourcesLoading || isWorkersLoading || isSettingsLoading;
-
-  const data = useMemo(
-    () =>
-      isLoading
-        ? Array.from({ length: pageSize }, (_, index) => createDefaultWorker(index))
-        : workers,
-    [isLoading, workers],
-  );
+  const isLoading = isSourcesLoading || isWorkersLoading;
 
   return (
     <Box>
@@ -158,6 +121,7 @@ export function Workers() {
             fullWidth={isMobile}
           />
         }
+        loading={isLoading}
         sx={{ mb: 2 }}
       >
         <TableHead>
@@ -201,74 +165,42 @@ export function Workers() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.length ? (
-            data.map(worker => (
-              <StyledTableRow key={worker.id}>
+          {workers.length ? (
+            workers.map(worker => (
+              <TableRow key={worker.peerId}>
                 <TableCell className="pinned">
-                  <WorkerName
-                    loading={isLoading}
-                    worker={worker}
-                    sx={{ width: { xs: 200, sm: 240 } }}
-                  />
+                  <WorkerName worker={worker} />
                 </TableCell>
                 <TableCell>
-                  <WorkerStatusChip loading={isLoading} worker={worker} />
+                  <WorkerStatusChip worker={worker} />
                 </TableCell>
                 <TableCell>
-                  <WorkerVersion
-                    loading={isLoading}
-                    version={worker.version}
-                    minimalWorkerVersion={minimalWorkerVersion}
-                    recommendedWorkerVersion={recommendedWorkerVersion}
-                  />
+                  <WorkerVersion worker={worker} />
+                </TableCell>
+                <TableCell>{percentFormatter(worker.uptime90Days)}</TableCell>
+                <TableCell>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</TableCell>
+                <TableCell>
+                  {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
                 </TableCell>
                 <TableCell>
-                  <SkeletonWrapper loading={isLoading}>
-                    <span>{percentFormatter(worker.uptime90Days)}</span>
-                  </SkeletonWrapper>
+                  <DelegationCapacity worker={worker} />
                 </TableCell>
-                <TableCell>
-                  <SkeletonWrapper loading={isLoading}>
-                    <span>{worker.apr != null ? percentFormatter(worker.apr) : '-'}</span>
-                  </SkeletonWrapper>
-                </TableCell>
-                <TableCell>
-                  <SkeletonWrapper loading={isLoading}>
-                    <span>
-                      {worker.stakerApr != null ? percentFormatter(worker.stakerApr) : '-'}
-                    </span>
-                  </SkeletonWrapper>
-                </TableCell>
-                <TableCell>
-                  <SkeletonWrapper loading={isLoading}>
-                    <DelegationCapacity worker={worker} />
-                  </SkeletonWrapper>
-                </TableCell>
-                <TableCell>
-                  <SkeletonWrapper loading={isLoading}>
-                    <span>{dateFormat(worker.createdAt)}</span>
-                  </SkeletonWrapper>
-                </TableCell>
+                <TableCell>{dateFormat(worker.createdAt)}</TableCell>
                 <TableCell className="pinned">
                   <Box display="flex" justifyContent="flex-end">
-                    <SkeletonWrapper loading={isLoading}>
-                      <WorkerDelegate worker={worker} sources={sources} />
-                    </SkeletonWrapper>
+                    <WorkerDelegate worker={worker} sources={sources} />
                   </Box>
                 </TableCell>
-              </StyledTableRow>
+              </TableRow>
             ))
           ) : (
             <NoItems />
           )}
         </TableBody>
       </DashboardTable>
-      <TableNavigation
-        page={page}
-        totalPages={totalPages}
-        setPage={setQuery.page}
-        loading={isLoading}
-      />
+      {!isWorkersLoading && (
+        <TableNavigation page={page} totalPages={totalPages} setPage={setQuery.page} />
+      )}
     </Box>
   );
 }

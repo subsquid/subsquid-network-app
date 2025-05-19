@@ -1,7 +1,8 @@
-import { SkeletonWrapper } from '@components/SkeletonWrapper';
 import { Report, Warning } from '@mui/icons-material';
 import { Box, Stack, styled, Tooltip } from '@mui/material';
 import { satisfies } from 'semver';
+
+import { Worker, useNetworkSettings } from '@api/subsquid-network-squid';
 
 export const WorkerVersionName = styled(Box, {
   name: 'WorkerVersionName',
@@ -10,27 +11,17 @@ export const WorkerVersionName = styled(Box, {
   whiteSpace: 'nowrap',
 }));
 
-export const WorkerVersion = ({
-  version,
-  minimalWorkerVersion,
-  recommendedWorkerVersion,
-  loading,
-}: {
-  version?: string;
-  minimalWorkerVersion?: string;
-  recommendedWorkerVersion?: string;
-  loading?: boolean;
-}) => {
+export const WorkerVersion = ({ worker }: { worker: Pick<Worker, 'version'> }) => {
+  const { minimalWorkerVersion, recommendedWorkerVersion } = useNetworkSettings();
+
   return (
-    <SkeletonWrapper loading={loading}>
-      <Stack spacing={1} direction="row" alignItems="flex-start">
-        <WorkerVersionName>{version ?? '-'}</WorkerVersionName>
-        {!loading && version && (
+    <>
+      {worker.version ? (
+        <Stack spacing={1} direction="row" alignItems="flex-start">
+          <WorkerVersionName>{worker.version}</WorkerVersionName>
           <Box display="flex">
-            {!satisfies(version, recommendedWorkerVersion || '', {
-              includePrerelease: true,
-            }) ? (
-              !satisfies(version, minimalWorkerVersion || '', { includePrerelease: true }) ? (
+            {!satisfies(worker.version, recommendedWorkerVersion, { includePrerelease: true }) ? (
+              !satisfies(worker.version, minimalWorkerVersion, { includePrerelease: true }) ? (
                 <Tooltip title="Unsupported" placement="top">
                   <Report color="error" />
                 </Tooltip>
@@ -41,8 +32,10 @@ export const WorkerVersion = ({
               )
             ) : null}
           </Box>
-        )}
-      </Stack>
-    </SkeletonWrapper>
+        </Stack>
+      ) : (
+        <Box>-</Box>
+      )}
+    </>
   );
 };

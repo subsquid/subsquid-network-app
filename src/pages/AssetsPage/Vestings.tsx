@@ -1,36 +1,23 @@
-import { tokenFormatter, addressFormatter } from '@lib/formatters/formatters';
+import { addressFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, unwrapMulticallResult } from '@lib/network/utils';
-import { Box, TableBody, TableCell, TableHead, TableRow, styled } from '@mui/material';
+import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { keepPreviousData } from '@tanstack/react-query';
 import chunk from 'lodash-es/chunk';
 import { erc20Abi } from 'viem';
 import { useReadContracts } from 'wagmi';
-import { Link } from 'react-router-dom';
 
 import { vestingAbi } from '@api/contracts';
-import {
-  AccountType,
-  useSourcesQuery,
-  useSquid,
-  createDefaultVesting,
-} from '@api/subsquid-network-squid';
+import { AccountType, useSourcesQuery, useSquid } from '@api/subsquid-network-squid';
 import { SquaredChip } from '@components/Chip';
 import { DashboardTable, NoItems } from '@components/Table';
 import { NameWithAvatar } from '@components/SourceWalletName';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
-import { SkeletonWrapper } from '@components/SkeletonWrapper';
-import { useMemo } from 'react';
-import { CopyToClipboard } from '@components/CopyToClipboard';
 
 import { ReleaseButton } from './ReleaseButton';
-
-const StyledTableRow = styled(TableRow)({
-  minHeight: '48px',
-  '& td': {
-    height: '48px',
-  },
-});
+import { useMemo } from 'react';
+import { CopyToClipboard } from '@components/CopyToClipboard';
+import { Link } from 'react-router-dom';
 
 export function MyVestings() {
   const account = useAccount();
@@ -92,17 +79,18 @@ export function MyVestings() {
 
   const data = useMemo(
     () =>
-      isLoading
-        ? Array.from({ length: 3 }, (_, index) => createDefaultVesting(index))
-        : vestingsQuery.accounts?.map((vesting, i) => ({
-            ...vesting,
-            ...vestings?.[i],
-          })),
-    [isLoading, vestingsQuery.accounts, vestings],
+      vestingsQuery.accounts?.map((vesting, i) => ({
+        ...vesting,
+        ...vestings?.[i],
+      })) || [],
+    [vestingsQuery.accounts, vestings],
   );
 
   return (
-    <DashboardTable title={<SquaredChip label="My Vestings" color="primary" />}>
+    <DashboardTable
+      loading={isLoading || isVestingsLoading}
+      title={<SquaredChip label="My Vestings" color="primary" />}
+    >
       <TableHead>
         <TableRow>
           <TableCell>Vesting</TableCell>
@@ -115,7 +103,7 @@ export function MyVestings() {
       <TableBody>
         {data?.length ? (
           data.map(vesting => (
-            <StyledTableRow key={vesting.id}>
+            <TableRow key={vesting.id}>
               <TableCell>
                 <NameWithAvatar
                   title="Vesting contract"
@@ -132,33 +120,18 @@ export function MyVestings() {
                     </Box>
                   }
                   avatarValue={vesting.id}
-                  loading={isLoading}
                   sx={{ width: { xs: 200, sm: 240 } }}
                 />
               </TableCell>
-              <TableCell>
-                <SkeletonWrapper loading={isLoading}>
-                  <span>{tokenFormatter(fromSqd(vesting.balance), SQD_TOKEN)}</span>
-                </SkeletonWrapper>
-              </TableCell>
-              <TableCell>
-                <SkeletonWrapper loading={isLoading}>
-                  <span>{tokenFormatter(fromSqd(vesting.deposited), SQD_TOKEN)}</span>
-                </SkeletonWrapper>
-              </TableCell>
-              <TableCell>
-                <SkeletonWrapper loading={isLoading}>
-                  <span>{tokenFormatter(fromSqd(vesting.releasable), SQD_TOKEN)}</span>
-                </SkeletonWrapper>
-              </TableCell>
+              <TableCell>{tokenFormatter(fromSqd(vesting?.balance), SQD_TOKEN)}</TableCell>
+              <TableCell>{tokenFormatter(fromSqd(vesting?.deposited), SQD_TOKEN)}</TableCell>
+              <TableCell>{tokenFormatter(fromSqd(vesting?.releasable), SQD_TOKEN)}</TableCell>
               <TableCell>
                 <Box display="flex" justifyContent="flex-end">
-                  <SkeletonWrapper loading={isLoading}>
-                    <ReleaseButton vesting={vesting} disabled={!vesting.releasable} />
-                  </SkeletonWrapper>
+                  <ReleaseButton vesting={vesting} disabled={!vesting?.releasable} />
                 </Box>
               </TableCell>
-            </StyledTableRow>
+            </TableRow>
           ))
         ) : (
           <NoItems>
