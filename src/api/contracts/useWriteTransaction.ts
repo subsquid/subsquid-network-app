@@ -81,12 +81,12 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
               abi: erc20Abi,
               functionName: 'allowance',
               address: SQD,
-              args: [params.address, params.address],
+              args: [account.address!, params.address],
             });
 
             if (allowance < params.approve) {
               simulateTenderly({
-                sender: account.address,
+                sender: account.address!,
                 contractAddress: SQD,
                 params: {
                   abi: erc20Abi,
