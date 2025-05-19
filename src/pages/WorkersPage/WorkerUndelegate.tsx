@@ -103,7 +103,7 @@ export function WorkerUndelegate({
             onClick={() => setOpen(true)}
             variant="outlined"
             color="error"
-            disabled={disabled || isLocked}
+            disabled={!sources?.length || disabled || isLocked}
           >
             UNDELEGATE
             {isLocked && !disabled && (
