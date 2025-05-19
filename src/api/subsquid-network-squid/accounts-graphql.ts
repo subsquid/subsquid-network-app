@@ -32,7 +32,7 @@ export function useMySources<TData = SourceWalletWithBalance[]>({
   const { address } = useAccount();
 
   const { data: sourcesQuery, isLoading } = useSourcesQuery(
-    squid,
+    
     { address: address || '0x' },
     { enabled },
   );
@@ -79,7 +79,7 @@ export function useVestingByAddress({ address }: { address?: string }) {
   const account = useAccount();
 
   const { data, isPending } = useVestingByAddressQuery(
-    datasource,
+    
     {
       address: address?.toLowerCase() || '',
     },

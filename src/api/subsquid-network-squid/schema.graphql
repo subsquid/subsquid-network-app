@@ -98,6 +98,11 @@ fragment WorkerStatusFragment on Worker {
   jailed
   dialOk
   jailReason
+  statusHistory(orderBy: id_DESC, limit: 1) {
+    blockNumber
+    pending
+    timestamp
+  }
 }
 
 fragment WorkerFragment on Worker {

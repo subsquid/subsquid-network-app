@@ -6,8 +6,7 @@ import { useSquid } from './datasource';
 import { useCurrentEpochQuery, useNetworkSummaryQuery, useSettingsQuery } from './graphql';
 
 export function useNetworkSettings() {
-  const dataSource = useSquid();
-  const { data, isPending } = useSettingsQuery(dataSource);
+  const { data, isPending, isLoading } = useSettingsQuery();
 
   const settings = data?.settingsConnection.edges?.[0]?.node;
   const bondAmount = settings?.bondAmount ? settings?.bondAmount : toSqd(100_000);
@@ -19,13 +18,13 @@ export function useNetworkSettings() {
     minimalWorkerVersion,
     recommendedWorkerVersion,
     isPending,
+    isLoading,
   };
 }
 
 export function useNetworkStats() {
   const dataSource = useSquid();
   const { data, isLoading } = useNetworkSummaryQuery(
-    dataSource,
     {},
     {
       select: res => res.networkStats,
@@ -41,7 +40,6 @@ export function useNetworkStats() {
 export function useCurrentEpoch() {
   const dataSource = useSquid();
   const { data, isLoading } = useCurrentEpochQuery(
-    dataSource,
     {},
     {
       select: res => ({

@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { Box, styled } from '@mui/material';
 
@@ -32,13 +33,14 @@ interface SearchProps {
 }
 
 export const Search = ({ value, onChange, fullWidth, placeholder }: SearchProps) => {
-  const [realTimeValue, setRealTimeValue] = useState(value);
-  const handleChange = useCallback((value: string) => onChange?.(value), [onChange]);
+  const [realTimeValue, setRealTimeValue] = useState(value || '');
+
+  const debouncedOnChange = useDebouncedCallback((value: string) => onChange?.(value), 200);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setRealTimeValue(newValue);
-    handleChange(newValue);
+    debouncedOnChange(newValue);
   };
 
   return (

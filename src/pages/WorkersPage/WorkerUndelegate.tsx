@@ -4,7 +4,7 @@ import { dateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
 import { Lock } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Button, Skeleton, Typography } from '@mui/material';
 import { Box, Chip, Stack, Tooltip } from '@mui/material';
 import * as yup from '@schema';
 import { useFormik } from 'formik';
@@ -273,10 +273,12 @@ function WorkerUndelegateDialog({
         </FormRow>
         <FormDivider />
         <Stack direction="row" justifyContent="space-between" alignContent="center">
-          <HelpTooltip title={EXPECTED_APR_TIP}>
-            <Box>Expected APR</Box>
-          </HelpTooltip>
-          <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+          <Typography variant="body2">
+            <HelpTooltip title={EXPECTED_APR_TIP}>Expected APR</HelpTooltip>
+          </Typography>
+          <Typography variant="body2">
+            {isExpectedAprPending ? <Skeleton width={48} /> : percentFormatter(stakerApr)}
+          </Typography>
         </Stack>
       </Form>
     </ContractCallDialog>

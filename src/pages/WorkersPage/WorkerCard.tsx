@@ -4,6 +4,7 @@ import { Box } from '@mui/system';
 import { Account, Worker, WorkerStatusFragmentFragment } from '@api/subsquid-network-squid';
 import { Avatar } from '@components/Avatar';
 import { CopyToClipboard } from '@components/CopyToClipboard';
+import { SkeletonWrapper } from '@components/SkeletonWrapper';
 
 import { WorkerEdit } from './WorkerEdit';
 import { WorkerStatusChip } from './WorkerStatus';
@@ -20,28 +21,28 @@ function WorkerTitle({
   worker,
   owner,
   canEdit,
+  loading,
 }: {
   worker: Pick<Worker, 'id' | 'status' | 'peerId' | 'name'>;
   owner: Pick<Account, 'id' | 'type'>;
   canEdit: boolean;
+  loading?: boolean;
 }) {
   const theme = useTheme();
 
   return (
     <Stack spacing={0.5}>
       <Stack direction="row" alignItems="center" spacing={0.5}>
-        <Typography variant="h4" sx={{ overflowWrap: 'anywhere' }}>
-          {worker.name || worker.peerId}
-        </Typography>
+        <SkeletonWrapper loading={loading} width={200}>
+          <Typography variant="h4">{worker.name || worker.peerId}</Typography>
+        </SkeletonWrapper>
         {canEdit ? <WorkerEdit worker={worker} owner={owner} disabled={!canEdit} /> : null}
       </Stack>
-      <Typography
-        variant="body2"
-        component="span"
-        sx={{ overflowWrap: 'anywhere', color: theme.palette.text.secondary }}
-      >
-        <CopyToClipboard text={worker.peerId} content={<span>{worker.peerId}</span>} />
-      </Typography>
+      <SkeletonWrapper loading={loading} width={300}>
+        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+          <CopyToClipboard text={worker.peerId} content={<span>{worker.peerId}</span>} />
+        </Typography>
+      </SkeletonWrapper>
     </Stack>
   );
 }
@@ -50,28 +51,29 @@ export const WorkerCard = ({
   worker,
   owner,
   canEdit,
+  loading,
 }: {
   worker: Pick<Worker, 'id' | 'status' | 'peerId' | 'name'> & WorkerStatusFragmentFragment;
   owner: Pick<Account, 'id' | 'type'>;
   canEdit: boolean;
+  loading?: boolean;
 }) => {
   return (
     <>
       <Stack direction="row" justifyContent="space-between">
         <Stack spacing={2} direction="row" alignItems="center">
-          <Avatar
-            variant="circular"
-            name={worker.name || worker.peerId}
-            colorDiscriminator={worker.peerId}
-            size={56}
-          />
-          {/* <Stack justifyContent="stretch" flex={1} spacing={0.125}> */}
-          <WorkerTitle worker={worker} owner={owner} canEdit={canEdit} />
-
-          {/* </Stack> */}
+          <SkeletonWrapper loading={loading} variant="circular">
+            <Avatar
+              variant="circular"
+              name={worker.name || worker.peerId}
+              colorDiscriminator={worker.peerId}
+              size={56}
+            />
+          </SkeletonWrapper>
+          <WorkerTitle worker={worker} owner={owner} canEdit={canEdit} loading={loading} />
         </Stack>
         <Box>
-          <WorkerStatusChip worker={worker} />
+          <WorkerStatusChip loading={loading} worker={worker} />
         </Box>
       </Stack>
     </>

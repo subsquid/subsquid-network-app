@@ -7,7 +7,6 @@ import {
   useMemo,
   useReducer,
 } from 'react';
-import { useStableCallback } from './useStableCallback';
 
 interface TickerContextType {
   addHook: (fn: () => void, ms: number) => void;
@@ -88,10 +87,9 @@ export function TickerProvider({ children }: TickerProviderProps) {
 
 export function useTicker(fn: () => void, ms: number = 1000) {
   const { addHook, removeHook } = useContext(TickerContext);
-  const cb = useStableCallback(() => fn());
 
   useEffect(() => {
-    addHook(cb, ms);
-    return () => removeHook(cb, ms);
-  }, [addHook, removeHook, cb, ms]);
+    addHook(fn, ms);
+    return () => removeHook(fn, ms);
+  }, [addHook, removeHook, fn, ms]);
 }

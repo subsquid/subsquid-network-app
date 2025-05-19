@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { AppBarPropsColorOverrides, createTheme as createMuiTheme } from '@mui/material';
+import { alpha, AppBarPropsColorOverrides, createTheme as createMuiTheme } from '@mui/material';
 import { OverridableStringUnion } from '@mui/types';
 
 import { localStorageStringSerializer, useLocalStorageState } from '@hooks/useLocalStorageState';
@@ -653,6 +653,21 @@ export const useCreateTheme = (mode: PaletteType) => {
                 width: spacing * 2.25,
                 height: spacing * 2.25,
                 boxShadow: '0px 1px 2px rgba(0,0,0,0.1)',
+              },
+            },
+          },
+          MuiSkeleton: {
+            styleOverrides: {
+              root: {
+                transform: 'none',
+                backgroundColor: alpha(colors.action.active, colors.action.activatedOpacity),
+              },
+              text: {
+                borderRadius: 4,
+                transform: 'scaleY(0.9)',
+              },
+              rounded: {
+                borderRadius: 360,
               },
             },
           },

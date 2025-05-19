@@ -35,6 +35,10 @@ export default {
           BigInt: 'string',
           DateTime: 'string',
         },
+        fetcher: {
+          func: './fetcher#fetcher',
+          isReactHook: false,
+        },
       },
     },
   },

@@ -8,14 +8,14 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { useReadContracts } from 'wagmi';
 
 import { sqdAbi, vestingAbi } from '@api/contracts';
-import { useVestingByAddress } from '@api/subsquid-network-squid';
+import { useVestingByAddress, createDefaultVesting } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
 import { SquaredChip } from '@components/Chip';
 import { CopyToClipboard } from '@components/CopyToClipboard';
-import { Loader } from '@components/Loader';
 import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
 import { useContracts } from '@network/useContracts';
+import { SkeletonWrapper } from '@components/SkeletonWrapper';
 
 import { ReleaseButton } from './ReleaseButton';
 
@@ -116,9 +116,10 @@ export function Vesting({ backPath }: { backPath: string }) {
   const [searchParams] = useSearchParams();
 
   const isLoading = isVestingLoading || isVestingInfoLoading;
+  const displayVesting = isLoading ? createDefaultVesting() : vesting;
+  const displayVestingInfo = isLoading ? createDefaultVesting() : vestingInfo;
 
-  if (isLoading) return <Loader />;
-  else if (!vesting || !address) {
+  if (!displayVesting || !address) {
     return <NotFound item="vesting" id={address} />;
   }
 
@@ -127,11 +128,12 @@ export function Vesting({ backPath }: { backPath: string }) {
       <NetworkPageTitle
         backPath={searchParams.get('backPath') || backPath}
         endAdornment={
-          vesting?.isOwn() ? (
-            <Stack>
-              <ReleaseButton vesting={vesting} />
-            </Stack>
-          ) : null
+          <Stack>
+            <ReleaseButton
+              vesting={displayVesting}
+              disabled={isLoading || !displayVesting?.isOwn() || !displayVestingInfo?.releasable}
+            />
+          </Stack>
         }
       />
       <Card outlined>
@@ -143,30 +145,50 @@ export function Vesting({ backPath }: { backPath: string }) {
                 <DescLabel>Contract</DescLabel>
                 <DescValue>
                   <VestingAddress>
-                    <CopyToClipboard text={address} content={addressFormatter(address)} />
+                    <SkeletonWrapper loading={isLoading}>
+                      <CopyToClipboard text={address} content={addressFormatter(address)} />
+                    </SkeletonWrapper>
                   </VestingAddress>
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Balance</DescLabel>
-                <DescValue>{tokenFormatter(fromSqd(vestingInfo?.balance), SQD_TOKEN, 8)}</DescValue>
+                <DescValue>
+                  <SkeletonWrapper loading={isLoading}>
+                    <span>
+                      {tokenFormatter(fromSqd(displayVestingInfo?.balance), SQD_TOKEN, 8)}
+                    </span>
+                  </SkeletonWrapper>
+                </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Deposited</DescLabel>
                 <DescValue>
-                  {tokenFormatter(fromSqd(vestingInfo?.deposited), SQD_TOKEN, 8)}
+                  <SkeletonWrapper loading={isLoading}>
+                    <span>
+                      {tokenFormatter(fromSqd(displayVestingInfo?.deposited), SQD_TOKEN, 8)}
+                    </span>
+                  </SkeletonWrapper>
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Releasable</DescLabel>
                 <DescValue>
-                  {tokenFormatter(fromSqd(vestingInfo?.releasable), SQD_TOKEN, 8)}
+                  <SkeletonWrapper loading={isLoading}>
+                    <span>
+                      {tokenFormatter(fromSqd(displayVestingInfo?.releasable), SQD_TOKEN, 8)}
+                    </span>
+                  </SkeletonWrapper>
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Released</DescLabel>
                 <DescValue>
-                  {tokenFormatter(fromSqd(vestingInfo?.released), SQD_TOKEN, 8)}
+                  <SkeletonWrapper loading={isLoading}>
+                    <span>
+                      {tokenFormatter(fromSqd(displayVestingInfo?.released), SQD_TOKEN, 8)}
+                    </span>
+                  </SkeletonWrapper>
                 </DescValue>
               </Stack>
             </Stack>
@@ -177,24 +199,42 @@ export function Vesting({ backPath }: { backPath: string }) {
               <Stack direction="row">
                 <DescLabel>Start</DescLabel>
                 <DescValue>
-                  {vestingInfo?.start ? dateFormat(vestingInfo?.start, 'dateTime') : '-'}
+                  <SkeletonWrapper loading={isLoading}>
+                    <span>
+                      {displayVestingInfo?.start
+                        ? dateFormat(displayVestingInfo?.start, 'dateTime')
+                        : '-'}
+                    </span>
+                  </SkeletonWrapper>
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>End</DescLabel>
                 <DescValue>
-                  {vestingInfo?.end ? dateFormat(vestingInfo?.end, 'dateTime') : '-'}
+                  <SkeletonWrapper loading={isLoading}>
+                    <span>
+                      {displayVestingInfo?.end
+                        ? dateFormat(displayVestingInfo?.end, 'dateTime')
+                        : '-'}
+                    </span>
+                  </SkeletonWrapper>
                 </DescValue>
               </Stack>
               <Stack direction="row">
                 <DescLabel>Initial release</DescLabel>
-                <DescValue>{`${tokenFormatter(
-                  fromSqd(vestingInfo?.expectedTotal)
-                    .times(vestingInfo?.initialRelease ?? 0)
-                    .div(100),
-                  SQD_TOKEN,
-                  8,
-                )} (${percentFormatter(vestingInfo?.initialRelease)})`}</DescValue>
+                <DescValue>
+                  <SkeletonWrapper loading={isLoading}>
+                    <span>
+                      {`${tokenFormatter(
+                        fromSqd(displayVestingInfo?.expectedTotal)
+                          .times(displayVestingInfo?.initialRelease ?? 0)
+                          .div(100),
+                        SQD_TOKEN,
+                        8,
+                      )} (${percentFormatter(displayVestingInfo?.initialRelease)})`}
+                    </span>
+                  </SkeletonWrapper>
+                </DescValue>
               </Stack>
             </Stack>
           </Box>

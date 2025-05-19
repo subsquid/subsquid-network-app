@@ -67,7 +67,7 @@ export function isValidPeerId(peerId: string): boolean {
 export function shortPeerId(
   peerId: string,
   startChars: number = 4,
-  endChars: number = 6,
+  endChars: number = 8,
   showEllipsis: boolean = true,
 ): string {
   if (peerId.length < startChars + endChars) {
