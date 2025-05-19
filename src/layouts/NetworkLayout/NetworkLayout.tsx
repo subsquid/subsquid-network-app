@@ -1,5 +1,5 @@
 import '@rainbow-me/rainbowkit/styles.css';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import {
   AppBar as AppBarMaterial,
   Box,
@@ -17,7 +17,7 @@ import { Logo } from '@components/Logo';
 import { useBannerHeight } from '@components/TopBanner';
 import { MenuIcon } from '@icons/MenuIcon';
 import { useAccount } from '@network/useAccount';
-import { getSubsquidNetwork } from '@network/useSubsquidNetwork';
+import { getChain, getSubsquidNetwork } from '@network/useSubsquidNetwork';
 
 import { NetworkMenu } from './NetworkMenu';
 import { UserMenu } from './UserMenu';
@@ -157,11 +157,11 @@ export const NetworkLayout = ({
   const { disconnect } = useDisconnect();
   const network = getSubsquidNetwork();
 
-  //useEffect(() => {
-  //  if (!isConnected) return;
-  //  if (chain?.id === getChain(network).id) return;
-  //  disconnect();
-  //}, [isConnected, chain?.id, network, disconnect]);
+  useEffect(() => {
+    if (!isConnected) return;
+    if (chain?.id === getChain(network).id) return;
+    disconnect();
+  }, [isConnected, chain?.id, network, disconnect]);
 
   const centeredSx = {
     alignSelf: stretchContent ? 'stretch' : 'flex-start',
