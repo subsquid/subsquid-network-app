@@ -65,7 +65,7 @@ function TableNavigation({
       >
         <ArrowBackIosNew />
       </IconButton>
-      <SkeletonWrapper loading={loading} width={60}>
+      <SkeletonWrapper loading={loading} width={50}>
         <Typography sx={{ fontVariant: 'tabular-nums' }}>
           {page} / {totalPages}
         </Typography>

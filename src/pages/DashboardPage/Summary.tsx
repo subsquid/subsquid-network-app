@@ -257,7 +257,11 @@ function AprChart({
               strokeWidth={0}
               fill={alpha(theme.palette.action.active, theme.palette.action.activatedOpacity)}
               activeDot={false}
-              style={{ animation: 'skeleton-pulse 2s ease-in-out 0.5s infinite' }}
+              style={{
+                animation: 'skeleton-pulse 2s ease-in-out 0.5s infinite',
+                opacity: 0,
+                animationDelay: '0.6s',
+              }}
             />
           </AreaChart>
         </ResponsiveContainer>

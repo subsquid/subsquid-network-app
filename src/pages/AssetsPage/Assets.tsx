@@ -100,7 +100,10 @@ function TotalBalance({
                 width: '100%',
                 height: '100%',
                 borderRadius: '50%',
-                backgroundColor: alpha(theme.palette.action.active, theme.palette.action.activatedOpacity),
+                backgroundColor: alpha(
+                  theme.palette.action.active,
+                  theme.palette.action.activatedOpacity,
+                ),
                 animation: 'skeleton-pulse 2s ease-in-out 0.5s infinite',
                 position: 'relative',
                 '&::after': {
@@ -113,7 +116,9 @@ function TotalBalance({
                   height: '50%',
                   borderRadius: '50%',
                   backgroundColor: theme.palette.background.paper,
-                }
+                },
+                opacity: 0,
+                animationDelay: '0.6s',
               }}
             />
           </>
@@ -158,7 +163,7 @@ export function MyAssets() {
   const account = useAccount();
   const squid = useSquid();
 
-  const { data: sourcesQuery, isLoading: isSourcesLoading } = useSourcesWithAssetsQuery( {
+  const { data: sourcesQuery, isLoading: isSourcesLoading } = useSourcesWithAssetsQuery({
     address: account.address || '0x',
   });
 
