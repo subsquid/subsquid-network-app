@@ -283,7 +283,7 @@ export function useWorkerByPeerId(peerId?: string) {
   const { isPending: isSettingsLoading } = useNetworkSettings();
   const { address } = useAccount();
 
-  const { data: worker, isLoading } = useWorkerByPeerIdQuery(
+  const { data: worker, isLoading, promise } = useWorkerByPeerIdQuery(
     { peerId: peerId || '', address },
     {
       select: res => {
@@ -303,6 +303,7 @@ export function useWorkerByPeerId(peerId?: string) {
   return {
     data: worker,
     isLoading: isSettingsLoading || isLoading,
+    promise,
   };
 }
 
