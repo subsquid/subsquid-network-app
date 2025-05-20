@@ -154,6 +154,8 @@ export function useWriteSQDTransaction({}: object = {}): WriteTransactionResult 
           });
         }
 
+        // biome-ignore lint/suspicious/noConsole: <explanation>
+        console.error(e);
         setError(e as Error);
         throw e;
       } finally {
