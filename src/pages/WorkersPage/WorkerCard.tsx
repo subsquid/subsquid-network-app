@@ -37,6 +37,7 @@ function WorkerTitle({
       </Stack>
       <Typography
         variant="body2"
+        component="span"
         sx={{ overflowWrap: 'anywhere', color: theme.palette.text.secondary }}
       >
         <CopyToClipboard text={worker.peerId} content={<span>{worker.peerId}</span>} />

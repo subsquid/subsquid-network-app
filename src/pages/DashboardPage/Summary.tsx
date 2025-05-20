@@ -197,13 +197,13 @@ function AprChart({ data }: { data: { date: string; value: number }[] }) {
         }
         .recharts-wrapper {
           touch-action: none;
-          }
+        }
       `}</style>
       <ResponsiveContainer width="200%" height="85%" style={{ margin: theme.spacing(-1.5) }}>
         <AreaChart
           width={200}
           height={60}
-          data={data}
+          data={useMemo(() => data, [data])}
           defaultShowTooltip
           margin={{ top: 16, right: 0, left: 0, bottom: 0 }}
           style={{ cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}

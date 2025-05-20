@@ -93,7 +93,7 @@ export const ContractCallDialog = ({
       onApprove={onApprove}
       cancelButtonText={cancelButtonText}
     >
-      {children}
+      <div>{children}</div>
     </ConfirmDialog>
   );
 };
