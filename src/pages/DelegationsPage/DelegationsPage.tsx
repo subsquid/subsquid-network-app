@@ -4,7 +4,7 @@ import { Box, Stack, TableBody, TableCell, TableHead, TableRow } from '@mui/mate
 import { Outlet } from 'react-router-dom';
 
 import { SortDir, useMyDelegations, useMySources, WorkerSortBy } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { DashboardTable, NoItems, SortableHeaderCell } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
@@ -78,7 +78,7 @@ export function MyDelegations() {
             delegations.map(worker => (
               <TableRow key={worker.peerId}>
                 <TableCell className="pinned">
-                  <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
+                  <WorkerName worker={worker} />
                 </TableCell>
                 <TableCell>
                   <WorkerStatusChip worker={worker} />
@@ -103,7 +103,7 @@ export function MyDelegations() {
                         type: d.owner.type,
                         balance: d.deposit,
                         locked: d.locked || false,
-                        unlockedAt: d.unlockedAt || '',
+                        lockEnd: d.lockEnd,
                       }))}
                       disabled={isLoading}
                     />

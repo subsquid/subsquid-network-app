@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, styled, SxProps, Table, TableBody } from '@mui/material';
+import { Box, styled, SxProps, Table, TableBody, TableProps } from '@mui/material';
 
 import { Loader } from '@components/Loader';
 
@@ -15,26 +15,19 @@ interface DashboardTableProps {
   children: React.ReactNode;
   /** Optional class name for the root element */
   className?: string;
+  /** Optional minimum height for the table body */
+  minHeight?: number;
+  /** Optional scrollbar styles */
+  scrollbarStyles?: {
+    height?: string;
+    trackColor?: string;
+    thumbColor?: string;
+    thumbHoverColor?: string;
+    borderRadius?: string;
+  };
+  /** Additional table props */
+  tableProps?: Omit<TableProps, 'children'>;
 }
-
-const TABLE_STYLES = {
-  cell: {
-    typography: 'body1',
-    borderBottom: '1px solid',
-    padding: '8px 16px 8px 0',
-    minHeight: '32px',
-  },
-  header: {
-    typography: 'body2',
-    minHeight: '16px',
-    textAlign: 'start',
-    paddingTop: 0,
-  },
-  body: {
-    position: 'relative',
-    minHeight: '150px',
-  },
-} as const;
 
 export const DashboardTableBase = styled(Table)(({ theme }) => ({
   '& td, & th': {
@@ -80,11 +73,11 @@ export const DashboardTableBase = styled(Table)(({ theme }) => ({
   minWidth: 'max-content',
 }));
 
-const LoadingTableBody = () => (
+const LoadingTableBody = ({ minHeight = 200 }: { minHeight?: number }) => (
   <TableBody>
     <tr>
       <td colSpan={100} style={{ borderBottom: 'none' }}>
-        <Box display="flex" alignItems="center" justifyContent="center" minHeight={200}>
+        <Box display="flex" alignItems="center" justifyContent="center" minHeight={minHeight}>
           <Loader loading />
         </Box>
       </td>
@@ -92,7 +85,11 @@ const LoadingTableBody = () => (
   </TableBody>
 );
 
-const TitleSection = ({ title }: { title: React.ReactNode }) =>
+interface TitleSectionProps {
+  title: React.ReactNode;
+}
+
+const TitleSection = ({ title }: TitleSectionProps) =>
   title ? (
     <Box display="flex" justifyContent="space-between" marginBottom={1} minHeight={36}>
       {title}
@@ -105,8 +102,17 @@ export const DashboardTable = ({
   sx,
   loading,
   className,
+  minHeight = 200,
+  scrollbarStyles = {
+    height: '4px',
+    trackColor: 'transparent',
+    thumbColor: '#888',
+    thumbHoverColor: '#555',
+    borderRadius: '2px',
+  },
+  tableProps,
 }: DashboardTableProps) => {
-  const tableContent = loading ? <LoadingTableBody /> : children;
+  const tableContent = loading ? <LoadingTableBody minHeight={minHeight} /> : children;
 
   return (
     <Box sx={sx} className={className}>
@@ -117,22 +123,9 @@ export const DashboardTable = ({
           overflowX: 'auto',
           overflowY: 'hidden',
           maxHeight: '100%',
-          '&::-webkit-scrollbar': {
-            height: '4px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#888',
-            borderRadius: '2px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: '#555',
-          },
         }}
       >
-        <DashboardTableBase>{tableContent}</DashboardTableBase>
+        <DashboardTableBase {...tableProps}>{tableContent}</DashboardTableBase>
       </Box>
     </Box>
   );

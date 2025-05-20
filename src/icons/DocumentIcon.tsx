@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function DocumentIcon({ size = 24, fill = '#A0A1A6' }: { size?: number; fill?: string }) {
   return (
     <svg

@@ -1,6 +1,20 @@
+# Rate limiting configuration
+limit_req_zone $binary_remote_addr zone=rpc_limit:10m rate=50r/m;
+
+# Map RPC paths to their corresponding URLs
+map $rpc_chain $rpc_service {
+    default "";
+    arbitrum-one "${ARBITRUM_ONE_RPC_URL}";
+    ethereum "${ETHEREUM_RPC_URL}";
+    arbitrum-one-tenderly "${ARBITRUM_ONE_TENDERLY_RPC_URL}";
+}
+
 server {
     listen       80 default_server;
     server_name  localhost;
+
+    # DNS resolver configuration
+    resolver 8.8.8.8 8.8.4.4 valid=30s;
 
     access_log  /var/log/nginx/host.access.log  main;
 
@@ -13,6 +27,21 @@ server {
         expires -1;
         root   /usr/share/nginx/html;
         try_files /index.html =404;
+    }
+
+    # RPC proxy configuration
+    location ~ /rpc/(?<rpc_chain>[^/]+) {
+        limit_req zone=rpc_limit burst=20 nodelay;
+        limit_req_status 429;
+        
+        if ($rpc_service = "") {
+            return 404;
+        }
+
+        proxy_pass $rpc_service;
+        proxy_ssl_server_name on;
+        proxy_pass_request_headers on;
+        proxy_pass_request_body on;
     }
 
     location / {
@@ -29,4 +58,4 @@ server {
         # Set this location as internal so it cannot be requested externally (will be 404, which returns to /index.html)
         internal;
     }
-}
+} 

@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 import { IconButton, Stack, styled, Typography, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
@@ -14,7 +14,7 @@ export const PeerIdRow = styled(Box, {
 })(({ theme }) => ({
   marginTop: theme.spacing(0.5),
   marginBottom: theme.spacing(1.5),
-  color: theme.palette.importantLink.main,
+  color: theme.palette.primary.main,
   fontSize: '0.875rem',
 }));
 

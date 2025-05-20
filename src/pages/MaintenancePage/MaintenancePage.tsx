@@ -1,5 +1,3 @@
-import React from 'react';
-
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
 
@@ -17,7 +15,6 @@ const Line = styled(Box, {
     marginRight: 5,
   },
   '& a': {
-    color: theme.palette.importantLink.main,
     [theme.breakpoints.down('xs')]: {
       flex: 1,
       lineHeight: 1.2,
@@ -27,7 +24,7 @@ const Line = styled(Box, {
 
 export function MaintenancePage() {
   const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down('xxs'));
+  const mobile = useMediaQuery(theme.breakpoints.down('xs'));
 
   return (
     <Box

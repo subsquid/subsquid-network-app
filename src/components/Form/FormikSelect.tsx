@@ -8,54 +8,49 @@ import {
   styled,
   FormHelperText,
   SelectChangeEvent,
+  SelectProps,
 } from '@mui/material';
+import { FormikProps } from 'formik';
+
+interface SelectOption {
+  label: React.ReactNode;
+  value: string;
+  disabled?: boolean;
+}
 
 const FormSelect = styled(Select, {
   name: 'FormSelect',
-})(({ theme }) => ({
+})<SelectProps>(({ theme }) => ({
   'label + &': {
     marginTop: theme.spacing(3),
   },
-
-  '& .MuiSelect-select.MuiSelect-filled': {
-    paddingTop: 22,
-  },
-
-  '&.Mui-disabled': {
-    background: theme.palette.background.input,
-    '&:hover': {
-      border: `1px solid ${theme.palette.background.default}`,
-    },
-  },
-
-  '& .MuiSvgIcon-root.Mui-disabled': {
-    display: 'none',
-  },
 }));
 
-export function FormikSelect({
+interface FormikSelectProps<T extends Record<string, any>> {
+  id: keyof T;
+  formik: FormikProps<T>;
+  options: SelectOption[];
+  label?: string;
+  disabled?: boolean;
+  showErrorOnlyOfTouched?: boolean;
+  onChange?: (event: SelectChangeEvent<unknown>, child: React.ReactNode) => void;
+}
+
+export const FormikSelect = <T extends Record<string, any>>({
   label,
   id,
   formik,
   options,
   disabled,
   showErrorOnlyOfTouched,
-  onChange = event => {
-    formik.setFieldValue(id, event.target.value);
+  onChange = (event: SelectChangeEvent<unknown>, child: React.ReactNode) => {
+    formik.setFieldValue(id as string, event.target.value as string);
   },
-}: {
-  id: string;
-  formik: any;
-  options: { label: React.ReactNode; value: string; disabled?: boolean }[];
-  label?: string;
-  disabled?: boolean;
-  showErrorOnlyOfTouched?: boolean;
-  onChange?: (event: SelectChangeEvent<any>) => unknown;
-}) {
+}: FormikSelectProps<T>) => {
   const actualError =
     !showErrorOnlyOfTouched || (showErrorOnlyOfTouched && formik.touched[id])
-      ? formik.errors[id]
-      : null;
+      ? (formik.errors[id] as string | undefined)
+      : undefined;
 
   return (
     <FormControl hiddenLabel={!label} variant="standard" fullWidth error={Boolean(actualError)}>
@@ -63,18 +58,16 @@ export function FormikSelect({
       <FormSelect
         disabled={disabled}
         onChange={onChange}
-        value={formik.values[id]}
+        value={formik.values[id] as string}
         variant="filled"
       >
-        {options.map(o => {
-          return (
-            <MenuItem disabled={o.disabled} key={o.value} value={o.value}>
-              {o.label}
-            </MenuItem>
-          );
-        })}
+        {options.map(option => (
+          <MenuItem disabled={option.disabled} key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
       </FormSelect>
-      {actualError && <FormHelperText error={Boolean(actualError)}>{actualError}</FormHelperText>}
+      {actualError && <FormHelperText error>{actualError}</FormHelperText>}
     </FormControl>
   );
-}
+};

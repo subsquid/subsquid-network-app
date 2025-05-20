@@ -1,7 +1,6 @@
-import React from 'react';
-
-import { Autocomplete } from '@mui/lab';
+import { Autocomplete } from '@mui/material';
 import { autocompleteClasses, styled, TextField } from '@mui/material';
+import { FormikProps } from 'formik';
 
 const inputHeight = 54;
 const FormikAutocomplete = styled(Autocomplete<{ label: string; value: string }>)(
@@ -22,19 +21,28 @@ const FormikAutocomplete = styled(Autocomplete<{ label: string; value: string }>
   { name: 'FormikAutocompleteInput' },
 );
 
-export function FormikAutoComplete({
+interface FormikAutoCompleteProps<T extends Record<string, any>> {
+  id: keyof T;
+  formik: FormikProps<T>;
+  options: { label: string; value: string }[];
+  label?: string;
+  clearable?: boolean;
+  showErrorOnlyOfTouched?: boolean;
+}
+
+export function FormikAutoComplete<T extends Record<string, any>>({
   label,
   id,
   formik,
   options,
   clearable,
-}: {
-  id: string;
-  formik: any;
-  options: { label: string; value: string }[];
-  label?: string;
-  clearable?: boolean;
-}) {
+  showErrorOnlyOfTouched = false,
+}: FormikAutoCompleteProps<T>) {
+  const actualError =
+    !showErrorOnlyOfTouched || (showErrorOnlyOfTouched && formik.touched[id])
+      ? (formik.errors[id] as string | undefined)
+      : undefined;
+
   return (
     <FormikAutocomplete
       options={options}
@@ -42,8 +50,7 @@ export function FormikAutoComplete({
       disableClearable={!clearable as any}
       onChange={(event, res) => {
         if (!res) return;
-
-        formik.setFieldValue(id, res.value);
+        formik.setFieldValue(id as string, res.value);
       }}
       value={options.find(v => v.value === formik.values[id])}
       renderInput={params => (
@@ -53,6 +60,8 @@ export function FormikAutoComplete({
           label={label}
           variant="filled"
           InputProps={params.InputProps}
+          error={Boolean(actualError)}
+          helperText={actualError}
         />
       )}
     />

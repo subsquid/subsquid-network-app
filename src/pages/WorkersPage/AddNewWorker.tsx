@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
+import React from 'react';
 
 import { fromSqd, peerIdToHex } from '@lib/network/utils';
 import { Add } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { Button, SxProps } from '@mui/material';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import useLocalStorageState from 'use-local-storage-state';
@@ -16,7 +16,8 @@ import {
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
 import { encodeWorkerMetadata } from '@api/contracts/worker-registration/WorkerMetadata';
-import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
+import { AccountType, SourceWalletWithBalance, WorkerStatus } from '@api/subsquid-network-squid';
+import { useWorkerByPeerId } from '@api/subsquid-network-squid/workers-graphql';
 import { ConfirmDialog } from '@components/ConfirmDialog';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikCheckBoxInput, FormikTextInput, FormRow } from '@components/Form';
@@ -46,7 +47,7 @@ export function AddWorkerButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         disabled={disabled}
         sx={sx}
         loading={open}
@@ -56,7 +57,7 @@ export function AddWorkerButton({
         onClick={() => setOpen(true)}
       >
         ADD WORKER
-      </LoadingButton>
+      </Button>
       <AddNewWorkerDialog
         open={open}
         onResult={confirmed => {
@@ -123,6 +124,9 @@ export function AddNewWorkerDialog({
     };
   }, [bondAmount, isSourceDisabled, sources]);
 
+  const [peerIdToValidate, setPeerIdToValidate] = useState('');
+  const { data: existingWorker } = useWorkerByPeerId(peerIdToValidate);
+
   const formik = useFormik({
     initialValues,
     validationSchema: addWorkerSchema,
@@ -130,7 +134,15 @@ export function AddNewWorkerDialog({
     validateOnBlur: true,
     validateOnMount: true,
     enableReinitialize: true,
+    validate: values => {
+      const errors: Record<string, string> = {};
 
+      if (values.peerId && existingWorker && existingWorker.status !== WorkerStatus.Withdrawn) {
+        errors.peerId = 'Peer ID is already registered';
+      }
+
+      return errors;
+    },
     onSubmit: async values => {
       if (!workerRegistryAddress || !bondAmount) return;
 
@@ -160,6 +172,13 @@ export function AddNewWorkerDialog({
       }
     },
   });
+
+  // Update peerId to validate when form value changes
+  useEffect(() => {
+    if (formik.values.peerId) {
+      setPeerIdToValidate(formik.values.peerId);
+    }
+  }, [formik.values.peerId]);
 
   return (
     <>

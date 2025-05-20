@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { Lock } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
-import { Box, SxProps, Tooltip } from '@mui/material';
+import { Box, Button, SxProps, Tooltip } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
 import * as yup from 'yup';
@@ -76,7 +75,7 @@ export function GatewayUnstakeButton({
               }}
             />
           )}
-          <LoadingButton
+          <Button
             // startIcon={<LockOpenIcon />}
             disabled={disabled || source.locked}
             loading={open}
@@ -86,7 +85,7 @@ export function GatewayUnstakeButton({
             sx={sx}
           >
             WITHDRAW
-          </LoadingButton>
+          </Button>
         </Box>
       </Tooltip>
       <GatewayUnstakeDialog open={open} onClose={() => setOpen(false)} />

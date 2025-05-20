@@ -29,7 +29,7 @@ const TopBannerWrapper = styled(Box, {
       cursor: 'pointer',
     },
 
-    [theme.breakpoints.down('xxs')]: {
+    [theme.breakpoints.down('xs')]: {
       alignItems: 'flex-start',
       padding: '10px 0',
 

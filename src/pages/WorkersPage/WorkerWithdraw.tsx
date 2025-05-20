@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { peerIdToHex } from '@lib/network';
 import { Lock } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
+import { Button } from '@mui/material';
 import { Box, SxProps, Tooltip } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
@@ -11,14 +11,14 @@ import { useClient } from 'wagmi';
 import { useReadRouterWorkerRegistration, workerRegistryAbi } from '@api/contracts';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
-import { AccountType, SourceWallet, Worker } from '@api/subsquid-network-squid';
+import { AccountType, SourceWallet, useCurrentEpoch, Worker } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { useCountdown } from '@hooks/useCountdown';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 
-function UnlocksTooltip({ timestamp }: { timestamp?: string }) {
+function UnlocksTooltip({ timestamp }: { timestamp?: number }) {
   const timeLeft = useCountdown({ timestamp });
 
   return <span>{`Unlocks in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`}</span>;
@@ -34,11 +34,21 @@ export function WorkerWithdrawButton({
   worker: Pick<Worker, 'id' | 'status' | 'peerId'>;
   source: SourceWallet & {
     locked: boolean;
-    unlockedAt?: string;
+    lockEnd?: number;
   };
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+
+  const { data: currentEpoch } = useCurrentEpoch();
+  const unlockTimestamp = useMemo(() => {
+    if (!currentEpoch || !source.lockEnd) return;
+
+    return (
+      (source.lockEnd - currentEpoch.lastBlockL1 + 1) * currentEpoch.blockTimeL1 +
+      new Date(currentEpoch.lastBlockTimestampL1).getTime()
+    );
+  }, [currentEpoch, source.lockEnd]);
 
   return (
     <>
@@ -46,26 +56,12 @@ export function WorkerWithdrawButton({
         title={
           !disabled &&
           source.locked &&
-          source.unlockedAt && <UnlocksTooltip timestamp={source.unlockedAt} />
+          unlockTimestamp && <UnlocksTooltip timestamp={unlockTimestamp} />
         }
         placement="top"
       >
         <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-          {source.locked && !disabled && (
-            <Lock
-              fontSize="small"
-              // color="secondary"
-              sx={{
-                color: '#3e4a5c',
-                position: 'absolute',
-                top: '0px',
-                right: '0px',
-                transform: 'translate(0%, -25%)',
-                zIndex: 1,
-              }}
-            />
-          )}
-          <LoadingButton
+          <Button
             loading={open}
             onClick={() => setOpen(true)}
             variant="outlined"
@@ -73,7 +69,20 @@ export function WorkerWithdrawButton({
             disabled={disabled || source.locked}
           >
             WITHDRAW
-          </LoadingButton>
+            {source.locked && !disabled && (
+              <Lock
+                fontSize="small"
+                sx={{
+                  color: 'action.active',
+                  position: 'absolute',
+                  top: '0px',
+                  right: '0px',
+                  transform: 'translate(0%, -25%)',
+                  zIndex: 1,
+                }}
+              />
+            )}
+          </Button>
         </Box>
       </Tooltip>
       <WorkerWithdrawDialog

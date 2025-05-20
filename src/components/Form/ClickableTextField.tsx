@@ -1,19 +1,27 @@
 import React from 'react';
 
-import { Box, IconButton, styled, TextField } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  styled,
+  TextField,
+  BoxProps,
+  IconButtonProps,
+  TextFieldProps,
+} from '@mui/material';
 import classnames from 'classnames';
 
 import { EditIcon } from '@icons/EditIcon';
 
 export const ClickableInput = styled(Box, {
   name: 'ClickableInput',
-})(() => ({
+})<BoxProps>(() => ({
   cursor: 'pointer !important',
 }));
 
 export const ClickableIconButton = styled(IconButton, {
   name: 'ClickableIconButton',
-})(() => ({
+})<IconButtonProps>(() => ({
   boxSizing: 'content-box',
   padding: 0,
   width: 36,
@@ -22,40 +30,50 @@ export const ClickableIconButton = styled(IconButton, {
 
 export const StyledTextField = styled(TextField, {
   name: 'ClickableTextField',
-})(({ theme }) => ({
-  '& > div': {
-    backgroundColor: `${theme.palette.background.input} !important`,
-    border: `1px solid ${theme.palette.background.default}`,
-    '&:hover': {
-      backgroundColor: `${theme.palette.background.input} !important`,
-    },
-
-    '& input': {
-      color: `${theme.palette.text.primary} !important`,
-      textFillColor: `${theme.palette.text.primary} !important`,
-      cursor: 'pointer !important',
-    },
-  },
-
-  '&.disabled': {
-    '& input': {
-      cursor: 'default !important',
-      opacity: `0.5 !important`,
-    },
-
-    '&:hover > div': {
-      border: `1px solid ${theme.palette.background.default}`,
-    },
-  },
-
-  '& .MuiFormLabel-root.Mui-focused': {
-    color: theme.palette.primary.main,
-  },
-
-  '& svg': {
-    stroke: theme.palette.primary.main,
-  },
+})<TextFieldProps>(({ theme }) => ({
+  //'& > div': {
+  //  backgroundColor: `${theme.palette.background.input} !important`,
+  //  border: `1px solid ${theme.palette.background.default}`,
+  //  '&:hover': {
+  //    backgroundColor: `${theme.palette.background.input} !important`,
+  //  },
+  //
+  //  '& input': {
+  //    color: `${theme.palette.text.primary} !important`,
+  //    textFillColor: `${theme.palette.text.primary} !important`,
+  //    cursor: 'pointer !important',
+  //  },
+  //},
+  //
+  //'&.disabled': {
+  //  '& input': {
+  //    cursor: 'default !important',
+  //    opacity: `0.5 !important`,
+  //  },
+  //
+  //  '&:hover > div': {
+  //    border: `1px solid ${theme.palette.background.default}`,
+  //  },
+  //},
+  //
+  //'& .MuiFormLabel-root.Mui-focused': {
+  //  color: theme.palette.primary.main,
+  //},
+  //
+  //'& svg': {
+  //  stroke: theme.palette.primary.main,
+  //},
 }));
+
+interface ClickableTextFieldProps {
+  label: string;
+  value?: string;
+  onClick?: () => void;
+  endIcon?: React.ReactElement;
+  disabled?: boolean;
+  className?: string;
+  sx?: BoxProps['sx'];
+}
 
 export const ClickableTextField = ({
   label,
@@ -63,17 +81,13 @@ export const ClickableTextField = ({
   onClick,
   endIcon,
   disabled = false,
-}: {
-  label: string;
-  value?: string;
-  onClick?: () => unknown;
-  endIcon?: React.ReactElement;
-  disabled?: boolean;
-}) => {
+  className,
+  sx,
+}: ClickableTextFieldProps) => {
   const editable = !disabled;
 
   return (
-    <ClickableInput onClick={onClick}>
+    <ClickableInput onClick={onClick} className={className} sx={sx}>
       <StyledTextField
         label={label}
         fullWidth

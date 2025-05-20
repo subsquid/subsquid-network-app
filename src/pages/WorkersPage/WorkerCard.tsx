@@ -65,10 +65,7 @@ export const WorkerCard = ({
             colorDiscriminator={worker.peerId}
             size={56}
           />
-          {/* <Stack justifyContent="stretch" flex={1} spacing={0.125}> */}
           <WorkerTitle worker={worker} owner={owner} canEdit={canEdit} />
-
-          {/* </Stack> */}
         </Stack>
         <Box>
           <WorkerStatusChip worker={worker} />

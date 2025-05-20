@@ -18,7 +18,7 @@ import {
   useMyWorkerDelegations,
 } from '@api/subsquid-network-squid';
 import { Card } from '@components/Card';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { Loader } from '@components/Loader';
 import { NotFound } from '@components/NotFound';
 import { CenteredPageWrapper, NetworkPageTitle } from '@layouts/NetworkLayout';
@@ -96,7 +96,15 @@ export const Worker = ({ backPath }: { backPath: string }) => {
   const { data: sources, isLoading: isSourcesLoading } = useMySources();
   const { data: delegations, isLoading: isDelegationsLoading } = useMyWorkerDelegations({ peerId });
 
-  const isLoading = isSourcesLoading || isDelegationsLoading;
+  const isLoading = isPending || isSourcesLoading || isDelegationsLoading;
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (!worker) {
+    return <NotFound item="worker" id={peerId} />;
+  }
 
   return (
     <CenteredPageWrapper className="wide">
@@ -117,8 +125,7 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                 type: d.owner.type,
                 balance: d.deposit,
                 locked: d.locked || false,
-                // FIXME: some issue with types
-                unlockedAt: (d as any).unlockedAt,
+                lockEnd: d.lockEnd,
               }))}
               disabled={isLoading}
             />
@@ -126,17 +133,11 @@ export const Worker = ({ backPath }: { backPath: string }) => {
         }
       />
 
-      {isPending ? (
-        <Loader />
-      ) : !worker ? (
-        <NotFound item="worker" id={peerId} />
-      ) : (
-        <>
           <Card outlined>
             <Stack spacing={3} divider={<Divider orientation="horizontal" flexItem />}>
               <WorkerCard
-                worker={worker}
-                owner={worker.owner}
+            worker={worker}
+            owner={worker.owner}
                 canEdit={
                   worker.realOwner.id === address &&
                   [ApiWorkerStatus.Active, ApiWorkerStatus.Registering].includes(worker.status)
@@ -276,9 +277,8 @@ export const Worker = ({ backPath }: { backPath: string }) => {
                   worker={worker}
                   source={{
                     ...worker.owner,
-                    // FIXME: some types issue
-                    locked: (worker as any).locked,
-                    unlockedAt: (worker as any).unlockedAt,
+                    locked: !!worker.locked,
+                    lockEnd: worker.lockEnd,
                   }}
                   disabled={worker.status !== WorkerStatus.Deregistered}
                 />
@@ -291,8 +291,6 @@ export const Worker = ({ backPath }: { backPath: string }) => {
               )}
             </Box>
           ) : null}
-        </>
-      )}
     </CenteredPageWrapper>
   );
 };

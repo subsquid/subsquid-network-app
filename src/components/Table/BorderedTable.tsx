@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, SyntheticEvent } from 'react';
 
-import { Stack, styled, SxProps, Table, TableCell, Tooltip } from '@mui/material';
+import { Stack, styled, SxProps, Table, TableCell, TableProps, Tooltip } from '@mui/material';
 import { Box } from '@mui/system';
 
 import { SortDir } from '@api/subsquid-network-squid';
@@ -8,113 +8,131 @@ import { SortIcon } from '@components/SortIcon';
 
 const borderRadius = 8;
 
-export const BorderedTable = styled(Table)(({ theme }) => ({
-  // boxShadow: `0px 4px 12px 0px #9595953D`,
-  borderRadius: borderRadius,
-  borderSpacing: 0,
-  borderCollapse: 'separate',
-  // border: `1px solid ${theme.palette.divider}`,
+interface BorderedTableProps extends TableProps {
+  className?: string;
+  borderColor?: string;
+  hoverColor?: string;
+  cellPadding?: number | string;
+  borderRadius?: number;
+}
 
-  '& td, & th': {
-    background: theme.palette.background.paper,
-    borderBottom: `1px solid ${theme.palette.background.content}`,
-    padding: theme.spacing(2.5, 1.5),
-    fontVariantNumeric: 'tabular-nums',
-  },
+export const BorderedTable = styled(Table, {
+  shouldForwardProp: prop =>
+    !['borderColor', 'hoverColor', 'cellPadding', 'borderRadius'].includes(prop as string),
+})<BorderedTableProps>(
+  ({
+    theme,
+    borderColor,
+    hoverColor,
+    cellPadding = 2.5,
+    borderRadius: customBorderRadius = borderRadius,
+  }) => ({
+    borderRadius: customBorderRadius,
+    borderSpacing: 0,
+    borderCollapse: 'separate',
 
-  '& td:first-of-type, & th:first-of-type': {
-    paddingLeft: theme.spacing(5),
-    [theme.breakpoints.down('sm')]: {
-      paddingLeft: theme.spacing(2.5),
+    '& td, & th': {
+      background: theme.palette.background.paper,
+      borderBottom: `1px solid ${borderColor || theme.palette.background.default}`,
+      padding: theme.spacing(cellPadding, 1.5),
+      fontVariantNumeric: 'tabular-nums',
     },
-  },
 
-  '& td:last-of-type, & th:last-of-type': {
-    paddingRight: theme.spacing(5),
-    [theme.breakpoints.down('sm')]: {
-      paddingRight: theme.spacing(2.5),
+    '& td:first-of-type, & th:first-of-type': {
+      paddingLeft: theme.spacing(5),
+      [theme.breakpoints.down('sm')]: {
+        paddingLeft: theme.spacing(2.5),
+      },
     },
-  },
 
-  '& td:last-of-type.pinned, & th:last-of-type.pinned': {
-    boxShadow: '0px 0px 0px 0px rgba(0, 0, 0, 0.1)',
-    position: 'sticky',
-    right: 0,
-    [theme.breakpoints.down('sm')]: {
-      position: 'relative',
+    '& td:last-of-type, & th:last-of-type': {
+      paddingRight: theme.spacing(5),
+      [theme.breakpoints.down('sm')]: {
+        paddingRight: theme.spacing(2.5),
+      },
     },
-  },
 
-  '& td:first-of-type.pinned, & th:first-of-type.pinned': {
-    position: 'sticky',
-    left: 0,
-    [theme.breakpoints.down('sm')]: {
-      position: 'relative',
+    '& td:last-of-type.pinned, & th:last-of-type.pinned': {
+      boxShadow: '0px 0px 0px 0px rgba(0, 0, 0, 0.1)',
+      position: 'sticky',
+      right: 0,
+      [theme.breakpoints.down('sm')]: {
+        position: 'relative',
+      },
     },
-  },
 
-  '& th': {
-    color: theme.palette.text.secondary,
-    fontWeight: 'normal',
-    lineHeight: 1,
-    fontSize: '0.875rem',
-  },
+    '& td:first-of-type.pinned, & th:first-of-type.pinned': {
+      position: 'sticky',
+      left: 0,
+      [theme.breakpoints.down('sm')]: {
+        position: 'relative',
+      },
+    },
 
-  '& tr.hoverable:hover td, & tr.hovered td': {
-    background: theme.palette.action.hover,
-  },
+    '& th': {
+      color: theme.palette.text.secondary,
+      fontWeight: 'normal',
+      lineHeight: 1,
+      fontSize: '0.875rem',
+    },
 
-  '& thead th:first-of-type': { borderTopLeftRadius: borderRadius },
-  '& thead th:last-of-type': { borderTopRightRadius: borderRadius },
+    '& tr.hoverable:hover td, & tr.hovered td': {
+      background: hoverColor || theme.palette.action.hover,
+    },
 
-  '& tbody tr:last-of-type td': {
-    borderBottom: 'none',
-  },
-  '& tbody tr:last-of-type td:first-of-type': {
-    borderBottomLeftRadius: borderRadius,
-  },
-  '& tbody tr:last-of-type td:last-of-type': {
-    borderBottomRightRadius: borderRadius,
-  },
-}));
+    '& thead th:first-of-type': { borderTopLeftRadius: customBorderRadius },
+    '& thead th:last-of-type': { borderTopRightRadius: customBorderRadius },
 
-const ClickableStack = styled(Stack)(({ theme }) => ({
+    '& tbody tr:last-of-type td': {
+      borderBottom: 'none',
+    },
+    '& tbody tr:last-of-type td:first-of-type': {
+      borderBottomLeftRadius: customBorderRadius,
+    },
+    '& tbody tr:last-of-type td:last-of-type': {
+      borderBottomRightRadius: customBorderRadius,
+    },
+  }),
+);
+
+const ClickableStack = styled(Stack)(({}) => ({
   cursor: 'pointer',
   width: 'auto',
   userSelect: 'none',
   alignItems: 'center',
 }));
 
-export function HeaderCell({
-  help,
-  children,
-  sx,
-}: PropsWithChildren<{
+interface HeaderCellProps extends PropsWithChildren {
   width?: string | number;
   help?: React.ReactNode;
   sx?: SxProps;
-}>) {
-  return (
-    <Tooltip title={help} arrow placement="top">
-      <TableCell sx={sx}>{children}</TableCell>
-    </Tooltip>
-  );
+  align?: 'left' | 'center' | 'right';
 }
 
-export function SortableHeaderCell<S extends string>({
+export const HeaderCell = ({ help, children, sx, align = 'left' }: HeaderCellProps) => (
+  <Tooltip title={help} arrow placement="top">
+    <TableCell sx={{ textAlign: align, ...sx }}>{children}</TableCell>
+  </Tooltip>
+);
+
+interface SortableHeaderCellProps<S extends string> extends PropsWithChildren {
+  sort: S;
+  query: { sortBy: string; sortDir: string };
+  setQuery: { sortBy: (v: string) => void; sortDir: (v: string) => void };
+  help?: React.ReactNode;
+  sx?: SxProps;
+  align?: 'left' | 'center' | 'right';
+}
+
+export const SortableHeaderCell = <S extends string>({
   sort,
   children,
   query,
   setQuery,
   help,
   sx,
-}: PropsWithChildren<{
-  sort: S;
-  query: { sortBy: string; sortDir: string };
-  setQuery: { sortBy: (v: string) => unknown; sortDir: (v: string) => unknown };
-  help?: React.ReactNode;
-  sx?: SxProps;
-}>) {
+  align = 'left',
+}: SortableHeaderCellProps<S>) => {
   const handleSortChange = (sortBy: S) => (e: SyntheticEvent) => {
     e.preventDefault();
 
@@ -127,14 +145,13 @@ export function SortableHeaderCell<S extends string>({
   };
 
   return (
-    <HeaderCell help={help} sx={sx}>
+    <HeaderCell help={help} sx={sx} align={align}>
       <ClickableStack onClick={handleSortChange(sort)} direction="row" spacing={1}>
         <Box>{children}</Box>
         <Box display="flex">
-          <SortIcon query={query as any} value={sort} />
+          <SortIcon query={query} value={sort} />
         </Box>
-        {/* <TableSortLabel direction={query.sortDir as any} /> */}
       </ClickableStack>
     </HeaderCell>
   );
-}
+};

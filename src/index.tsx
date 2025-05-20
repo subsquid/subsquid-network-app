@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 import { info } from '@logger';
 import * as Sentry from '@sentry/react';
@@ -65,20 +65,23 @@ if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.APP_ENV,
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration({
-        maskAllText: false,
-        blockAllMedia: false,
-      }),
-    ],
+    integrations: [Sentry.browserTracingIntegration()],
     ignoreErrors: [
       // Random plugins/extensions
       'top.GLOBALS',
       // See: http://blog.errorception.com/2012/03/tale-of-unfindable-js-error.html
       'originalCreateNotification',
       'canvas.contentDocument',
+      'wallet must has at least one account',
     ],
+    beforeSend(event) {
+      if (
+        (event.extra?.__serialized__ as Error)?.message === 'wallet must has at least one account'
+      ) {
+        return null;
+      }
+      return event;
+    },
     denyUrls: [
       // Extensions
       /extensions\//i,
@@ -86,13 +89,8 @@ if (process.env.SENTRY_DSN) {
       /^chrome-extension:\/\//i,
       /^moz-extension:\/\//i,
     ],
-    // Performance Monitoring
-    tracesSampleRate: 1.0, //  Capture 100% of the transactions
-    // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-    // tracePropagationTargets: [/^https:\/\/yourserver\.io\/api/],
-    // Session Replay
-    replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-    replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+    tracesSampleRate: 1.0,
+    sendDefaultPii: false,
   });
 }
 

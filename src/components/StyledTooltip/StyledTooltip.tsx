@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
 
 export const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -7,6 +5,6 @@ export const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
 ))(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
     borderRadius: 6,
-    color: theme.palette.text.default,
+    color: theme.palette.text.primary,
   },
 }));

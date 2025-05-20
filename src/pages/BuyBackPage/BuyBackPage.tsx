@@ -3,21 +3,21 @@ import { Alert, Box, TableBody, TableCell, TableHead, TableRow, Typography } fro
 import { Outlet } from 'react-router-dom';
 
 import { useSourcesQuery, useSquid } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { DashboardTable, NoItems } from '@components/Table';
+import { NameWithAvatar } from '@components/SourceWalletName';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 
-import { SourceWalletName } from './BuyBackName';
 import { DepositButton } from './DepositButton';
 
 export function OtcContracts() {
   const account = useAccount();
   const squid = useSquid();
 
-  const { data: sourcesQuery, isLoading: isSourcesQueryLoading } = useSourcesQuery(squid, {
+  const { data: sourcesQuery, isLoading: isSourcesQueryLoading } = useSourcesQuery( {
     address: account.address as `0x${string}`,
   });
   const { BUYBACK } = useContracts();
@@ -45,7 +45,11 @@ export function OtcContracts() {
             BUYBACKs.map(address => (
               <TableRow key={address}>
                 <TableCell>
-                  <SourceWalletName source={{ id: address }} />
+                  <NameWithAvatar
+                    title="Contract"
+                    subtitle={address}
+                    avatarValue={address}
+                  />
                 </TableCell>
                 <TableCell className="pinned">
                   <Box display="flex" justifyContent="flex-end">

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
@@ -42,7 +42,7 @@ import {
   useMySources,
   useSquid,
 } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { DashboardTable, NoItems } from '@components/Table';
 import { useCountdown } from '@hooks/useCountdown';
@@ -276,7 +276,7 @@ export function MyGateways() {
 
   const { data: sources, isLoading: isSourcesLoading } = useMySources();
 
-  const { data: gatewaysQuery, isLoading: isGatewaysQueryLoading } = useMyGatewaysQuery(squid, {
+  const { data: gatewaysQuery, isLoading: isGatewaysQueryLoading } = useMyGatewaysQuery({
     address: account?.address || '0x',
   });
 

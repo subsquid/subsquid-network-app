@@ -1,4 +1,4 @@
 FROM nginx
 
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/templates/default.conf.template /etc/nginx/templates/default.conf.template
 COPY build/ /usr/share/nginx/html/

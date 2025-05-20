@@ -1,16 +1,43 @@
 import React, { useRef, useState } from 'react';
 
 import { ContentCopyOutlined } from '@mui/icons-material';
-import { Box, IconButton, Stack, styled } from '@mui/material';
+import { Box, IconButton, Stack, styled, SxProps } from '@mui/material';
 import { alpha } from '@mui/system/colorManipulator';
 import classNames from 'classnames';
 
 import { CopyToClipboardTooltip } from './CopyToClipboardTooltip';
 
+export interface CopyToClipboardProps {
+  /** The text to be copied to clipboard */
+  text: string;
+  /** Custom content to display instead of the text */
+  content?: React.ReactNode;
+  /** Size of the copy button in pixels */
+  copyButtonSize?: number;
+  /** Whether to show a bordered container */
+  bordered?: boolean;
+  /** Whether to take full width */
+  fullWidth?: boolean;
+  /** Whether to add bottom margin */
+  gutterBottom?: boolean;
+  /** Custom styles for the wrapper */
+  sx?: SxProps;
+  /** Custom styles for the content */
+  contentSx?: SxProps;
+  /** Custom styles for the copy button */
+  buttonSx?: SxProps;
+  /** Whether to show the copy button */
+  showButton?: boolean;
+  /** Custom tooltip text for copy button */
+  tooltipText?: string;
+  /** Custom tooltip text after copying */
+  copiedTooltipText?: string;
+  /** Callback when text is copied */
+  onCopy?: (text: string) => void;
+}
+
 export const Wrapper = styled(Stack)(({ theme }) => ({
   '& .copyButton': {
-    // marginTop: theme.spacing(-1),
-    // margin: 0,
     padding: 0,
     backgroundColor: 'transparent',
     fontSize: 'inherit',
@@ -29,7 +56,6 @@ export const Wrapper = styled(Stack)(({ theme }) => ({
     marginTop: theme.spacing(1.5),
     padding: theme.spacing(1, '45px', 1, 1.5),
     wordBreak: 'break-word',
-    // boxSizing: 'border-box',
     maxWidth: '100%',
     '& .copyButton': {
       position: 'absolute',
@@ -52,28 +78,30 @@ export const CopyToClipboard = ({
   bordered = false,
   fullWidth = false,
   gutterBottom = false,
-}: {
-  text: string;
-  content?: React.ReactNode;
-  copyButtonSize?: number;
-  bordered?: boolean;
-  fullWidth?: boolean;
-  gutterBottom?: boolean;
-}) => {
+  sx,
+  contentSx,
+  buttonSx,
+  showButton = true,
+  tooltipText = 'Copy',
+  copiedTooltipText = 'Copied',
+  onCopy,
+}: CopyToClipboardProps) => {
   const [copied, setCopied] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   if (!text) return null;
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    setCopied(true);
-    navigator.clipboard.writeText(text);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      onCopy?.(text);
+    } catch (error) {}
   };
 
   const handleSelect = () => {
     if (!ref.current) return;
-
     window.getSelection()?.selectAllChildren(ref.current);
   };
 
@@ -87,20 +115,29 @@ export const CopyToClipboard = ({
       direction="row"
       alignItems="center"
       spacing={1}
-      // onClick={handleSelect}
+      sx={sx}
     >
-      <Box
-        className="content"
-        ref={ref}
-        // onClick={handleSelect}
-      >
+      <Box className="content" ref={ref} onClick={handleSelect} sx={contentSx}>
         {content || text}
       </Box>
-      <CopyToClipboardTooltip copied={copied} setCopied={setCopied}>
-        <IconButton size="small" className="copyButton" color="inherit" onClick={handleClick}>
-          <ContentCopyOutlined fontSize="inherit" sx={{ transform: 'scale(1, -1)' }} />
-        </IconButton>
-      </CopyToClipboardTooltip>
+      {showButton && (
+        <CopyToClipboardTooltip
+          copied={copied}
+          setCopied={setCopied}
+          tooltipText={tooltipText}
+          copiedTooltipText={copiedTooltipText}
+        >
+          <IconButton
+            size="small"
+            className="copyButton"
+            color="inherit"
+            onClick={handleClick}
+            sx={buttonSx}
+          >
+            <ContentCopyOutlined fontSize="inherit" sx={{ transform: 'scale(1, -1)' }} />
+          </IconButton>
+        </CopyToClipboardTooltip>
+      )}
     </Wrapper>
   );
 };

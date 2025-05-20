@@ -1,10 +1,22 @@
 import { relativeDateFormat } from '@i18n';
 
 import { useTicker } from './useTicker';
+import { useCallback, useEffect, useState } from 'react';
 
 export function useCountdown({ timestamp }: { timestamp?: Date | string | number | undefined }) {
-  const curTimestamp = useTicker(() => Date.now(), 1000);
-  const timeLeft = timestamp ? relativeDateFormat(curTimestamp, timestamp) : undefined;
+  const [timeLeft, setTimeLeft] = useState<string | undefined>(
+    relativeDateFormat(new Date(), timestamp),
+  );
+
+  const update = useCallback(() => {
+    setTimeLeft(relativeDateFormat(new Date(), timestamp));
+  }, [timestamp]);
+
+  useEffect(() => {
+    update();
+  }, [update]);
+
+  useTicker(update, 1000);
 
   return timeLeft;
 }

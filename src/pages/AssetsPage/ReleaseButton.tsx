@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { LoadingButton } from '@mui/lab';
+import { Button } from '@mui/material';
 import { toast } from 'react-hot-toast';
 import * as yup from 'yup';
 
@@ -43,7 +41,7 @@ export function ReleaseButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         loading={isPending}
         onClick={onClick}
         variant="outlined"
@@ -51,7 +49,7 @@ export function ReleaseButton({
         disabled={disabled}
       >
         RELEASE
-      </LoadingButton>
+      </Button>
     </>
   );
 }

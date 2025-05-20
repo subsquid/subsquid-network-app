@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, ReactNode } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 import { Box, styled, Typography } from '@mui/material';
 import { SxProps } from '@mui/system/styleFunctionSx';
@@ -8,17 +8,12 @@ import { BackButton } from '@components/BackButton';
 const PageTitleWrapper = styled('div', {
   name: 'PageTitleWrapper',
 })(({ theme }) => ({
-  marginBottom: theme.spacing(2.5),
+  marginBottom: theme.spacing(2),
   minHeight: theme.spacing(5),
 
   '& .title': {
     display: 'flex',
     alignItems: 'start',
-    gap: theme.spacing(3.5),
-
-    [theme.breakpoints.down('xxs')]: {
-      gap: theme.spacing(2),
-    },
   },
 
   '& .endAdornment': {
@@ -47,15 +42,9 @@ export function NetworkPageTitle({
 }>) {
   return (
     <PageTitleWrapper sx={sx}>
-      <Typography
-        variant="h1"
-        sx={{
-          lineHeight: 1,
-          mb: 3,
-        }}
-      >
+      <Typography variant="h1" sx={{ lineHeight: 1 }}>
         <div className="title">
-          {backPath ? <BackButton path={backPath} /> : null}
+          <BackButton />
           <Box color="text.primary">{title}</Box>
           {endAdornment ? <div className="endAdornment">{endAdornment}</div> : null}
         </div>

@@ -14,7 +14,7 @@ import {
   SensorDoorOutlined,
   SmsOutlined,
 } from '@mui/icons-material';
-import { Button, styled } from '@mui/material';
+import { Box, Button, styled } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 
 import { useIsWorkerOperator } from '@api/subsquid-network-squid';
@@ -25,16 +25,18 @@ interface NetworkMenuProps {
   onItemClick: () => void;
 }
 
-const MenuItem = styled(Button)(({ theme: { palette, spacing, breakpoints, typography } }) => ({
-  ...typography.subtitle2,
+const MenuItem = styled(Button)(
+  ({ theme: { palette, spacing, breakpoints, typography, shape } }) => ({
+    ...typography.subtitle2,
 
-  height: spacing(7),
-  display: 'flex',
-  justifyContent: 'flex-start',
+    height: spacing(6),
+    display: 'flex',
+    justifyContent: 'flex-start',
 
-  padding: spacing(0, 3),
-  borderRadius: 0,
-}));
+    padding: spacing(0, 2),
+    borderRadius: shape.borderRadius,
+  }),
+);
 
 export const Item = forwardRef(
   (
@@ -140,9 +142,7 @@ export const NetworkMenu = ({ onItemClick }: NetworkMenuProps) => {
           path="/portals"
         />
       )}
-
-      <div style={{ flex: 1 }} />
-
+      <Box flex={1} />
       {/*<Item*/}
       {/*  label="Documentation"*/}
       {/*  path={process.env.DOCS_API_URL || ''}*/}

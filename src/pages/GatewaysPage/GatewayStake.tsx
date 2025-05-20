@@ -4,8 +4,7 @@ import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, getBlockTime, toSqd, unwrapMulticallResult } from '@lib/network/utils';
 import { LockOutlined as LockIcon } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
-import { Box, Chip, InputAdornment, Stack, SxProps } from '@mui/material';
+import { Box, Button, Chip, InputAdornment, Stack, SxProps } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
@@ -72,7 +71,7 @@ export function GatewayStakeButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         loading={open}
         startIcon={<LockIcon />}
         onClick={() => setOpen(true)}
@@ -82,7 +81,7 @@ export function GatewayStakeButton({
         sx={sx}
       >
         LOCK
-      </LoadingButton>
+      </Button>
       <GatewayStakeDialog open={open} onClose={() => setOpen(false)} sources={sources} />
     </>
   );

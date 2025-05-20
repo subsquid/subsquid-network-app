@@ -15,7 +15,6 @@ export function encodeGatewayMetadata(req: GetawayMetadata) {
       name: req.name,
       website: req.website,
       description: req.description,
-      email: req.email,
       endpointUrl: req.endpointUrl,
     },
     Boolean,

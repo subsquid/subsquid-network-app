@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd } from '@lib/network/utils';
@@ -6,6 +6,7 @@ import { CircleRounded } from '@mui/icons-material';
 import {
   Box,
   Divider,
+  Grid,
   Stack,
   SxProps,
   Theme,
@@ -13,7 +14,6 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
 import BigNumber from 'bignumber.js';
 import { Cell, Pie, PieChart } from 'recharts';
 
@@ -24,7 +24,7 @@ import {
   useSquid,
   Worker,
 } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { demoFeaturesEnabled } from '@hooks/demoFeaturesEnabled';
 import { useAccount } from '@network/useAccount';
@@ -119,13 +119,13 @@ function TotalBalance({ balances, total }: { balances: TokenBalance[]; total: Bi
 
 export function MyAssets() {
   const theme = useTheme();
-  const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
-  const narrowSm = useMediaQuery(theme.breakpoints.down('sm'));
+  const narrowXs = useMediaQuery(theme.breakpoints.down('sm'));
+  const narrowSm = useMediaQuery(theme.breakpoints.down('md'));
 
   const account = useAccount();
   const squid = useSquid();
 
-  const { data: sourcesQuery, isLoading: isSourcesLoading } = useSourcesWithAssetsQuery(squid, {
+  const { data: sourcesQuery, isLoading: isSourcesLoading } = useSourcesWithAssetsQuery({
     address: account.address || '0x',
   });
 
@@ -136,21 +136,21 @@ export function MyAssets() {
       name: 'Transferable',
       value: BigNumber(0),
       color: theme.palette.success.main,
-      background: theme.palette.success.background,
+      background: theme.palette.success.main,
       tip: 'Liquid tokens, can be freely transferred to external addresses',
     };
     const vesting: TokenBalance = {
       name: 'Vesting',
       value: BigNumber(0),
       color: theme.palette.warning.main,
-      background: theme.palette.warning.background,
+      background: theme.palette.warning.main,
       tip: 'Tokens locked in the vesting contracts owned by the wallet. Can be used for bonding (running a worker) and/or delegation',
     };
     const claimable: TokenBalance = {
       name: 'Claimable',
       value: BigNumber(0),
       color: theme.palette.info.main,
-      background: theme.palette.info.background,
+      background: theme.palette.info.main,
       tip: 'Earned but not yet claimed token rewards, aggregated across all workers and delegations',
     };
     const bonded: TokenBalance = {
@@ -247,7 +247,7 @@ export function MyAssets() {
         type: s.type,
         balance: totalClaimableBalance.toString(),
         claims: claims.sort(
-          (a, b) => BigNumber(a.claimableReward).comparedTo(b.claimableReward) * -1,
+          (a, b) => BigNumber(a.claimableReward).comparedTo(b.claimableReward)! * -1,
         ),
       };
     });
@@ -268,8 +268,8 @@ export function MyAssets() {
           <ClaimButton sources={claimableSources} disabled={isLoading || !hasAvailableClaims} />
         }
       >
-        <Grid container spacing={2} disableEqualOverflow flex={1}>
-          <Grid xxs={12} sm={8}>
+        <Grid container spacing={2} flex={1}>
+          <Grid size={{ xs: 12, sm: 8 }}>
             <Stack
               divider={<Divider flexItem />}
               spacing={1}
@@ -291,7 +291,7 @@ export function MyAssets() {
             </Stack>
           </Grid>
           {narrowSm ? null : (
-            <Grid xxs={0} sm={4}>
+            <Grid size={{ xs: 0, sm: 4 }}>
               <Box display="flex" alignItems="flex-end" height={1}>
                 <TotalBalance balances={balances} total={fromSqd(totalBalance)} />
               </Box>

@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { percentFormatter } from '@lib/formatters/formatters';
 import { fromSqd, toSqd } from '@lib/network';
 import { Lock } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
+import { Button, Skeleton, Typography } from '@mui/material';
 import { Box, Chip, Stack, Tooltip } from '@mui/material';
 import * as yup from '@schema';
 import { useFormik } from 'formik';
@@ -14,7 +14,12 @@ import { useDebounce } from 'use-debounce';
 import { stakingAbi, useReadRouterStaking } from '@api/contracts';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
-import { AccountType, SourceWalletWithBalance, Worker } from '@api/subsquid-network-squid';
+import {
+  AccountType,
+  SourceWalletWithBalance,
+  useCurrentEpoch,
+  Worker,
+} from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
@@ -25,7 +30,7 @@ import { useContracts } from '@network/useContracts';
 
 import { EXPECTED_APR_TIP, useExpectedAprAfterDelegation } from './WorkerDelegate';
 
-function UnlocksTooltip({ timestamp }: { timestamp?: string }) {
+function UnlocksTooltip({ timestamp }: { timestamp: number }) {
   const timeLeft = useCountdown({ timestamp });
 
   return <span>{`Unlocks in ${timeLeft} (${dateFormat(timestamp, 'dateTime')})`}</span>;
@@ -33,7 +38,7 @@ function UnlocksTooltip({ timestamp }: { timestamp?: string }) {
 
 export type SourceWalletWithDelegation = SourceWalletWithBalance & {
   locked: boolean;
-  unlockedAt?: string;
+  lockEnd?: number;
 };
 
 export const undelegateSchema = yup.object({
@@ -64,51 +69,57 @@ export function WorkerUndelegate({
 
   const isLocked = useMemo(() => !!sources?.length && !sources?.some(d => !d.locked), [sources]);
 
-  const { unlockedAt } = useMemo(() => {
-    const min = sources?.reduce(
-      (r, d) => {
-        if (!d.unlockedAt) return r;
+  const { data: currentEpoch } = useCurrentEpoch();
+  const unlockTimestamp = useMemo(() => {
+    if (!currentEpoch) return;
 
-        const ms = new Date(d.unlockedAt).getTime();
-        return !r || ms < r ? ms : r;
+    const lockEnd = sources?.reduce(
+      (r, d) => {
+        if (!d.lockEnd) return r;
+
+        return !r || d.lockEnd < r ? d.lockEnd : r;
       },
       undefined as number | undefined,
     );
+    if (!lockEnd) return;
 
-    return {
-      unlockedAt: min ? new Date(min).toISOString() : undefined,
-    };
-  }, [sources]);
+    return (
+      (lockEnd - currentEpoch.lastBlockL1 + 1) * currentEpoch.blockTimeL1 +
+      new Date(currentEpoch.lastBlockTimestampL1).getTime()
+    );
+  }, [currentEpoch, sources]);
 
   return (
     <>
       <Tooltip
-        title={!disabled && isLocked && unlockedAt && <UnlocksTooltip timestamp={unlockedAt} />}
+        title={
+          !disabled && isLocked && unlockTimestamp && <UnlocksTooltip timestamp={unlockTimestamp} />
+        }
         placement="top"
       >
         <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-          {isLocked && !disabled && (
-            <Lock
-              fontSize="small"
-              sx={{
-                color: '#3e4a5c',
-                position: 'absolute',
-                top: '0px',
-                right: '0px',
-                transform: 'translate(0%, -25%)',
-                zIndex: 1,
-              }}
-            />
-          )}
-          <LoadingButton
+          <Button
             loading={open}
             onClick={() => setOpen(true)}
             variant="outlined"
             color="error"
-            disabled={disabled || isLocked}
+            disabled={!sources?.length || disabled || isLocked}
           >
             UNDELEGATE
-          </LoadingButton>
+            {isLocked && !disabled && (
+              <Lock
+                fontSize="small"
+                sx={{
+                  color: 'action.active',
+                  position: 'absolute',
+                  top: '0px',
+                  right: '0px',
+                  transform: 'translate(0%, -25%)',
+                  zIndex: 1,
+                }}
+              />
+            )}
+          </Button>
         </Box>
       </Tooltip>
       <WorkerUndelegateDialog
@@ -149,7 +160,7 @@ function WorkerUndelegateDialog({
 
     return {
       source: source?.id || '',
-      amount: '0',
+      amount: '',
       max: fromSqd(source?.balance).toString(),
     };
   }, [sources, isSourceDisabled]);
@@ -242,6 +253,7 @@ function WorkerUndelegateDialog({
             label="Amount"
             formik={formik}
             autoComplete="off"
+            placeholder="0"
             InputProps={{
               endAdornment: (
                 <Chip
@@ -261,10 +273,12 @@ function WorkerUndelegateDialog({
         </FormRow>
         <FormDivider />
         <Stack direction="row" justifyContent="space-between" alignContent="center">
-          <HelpTooltip title={EXPECTED_APR_TIP}>
-            <Box>Expected APR</Box>
-          </HelpTooltip>
-          <span>{isExpectedAprPending ? '-' : percentFormatter(stakerApr)}</span>
+          <Typography variant="body2">
+            <HelpTooltip title={EXPECTED_APR_TIP}>Expected APR</HelpTooltip>
+          </Typography>
+          <Typography variant="body2">
+            {isExpectedAprPending ? <Skeleton width={48} /> : percentFormatter(stakerApr)}
+          </Typography>
         </Stack>
       </Form>
     </ContractCallDialog>

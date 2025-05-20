@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
 import { peerIdToHex } from '@lib/network';
-import { LoadingButton } from '@mui/lab';
-import { SxProps } from '@mui/material';
+import { Button, SxProps } from '@mui/material';
 import toast from 'react-hot-toast';
 import { useClient } from 'wagmi';
 
@@ -25,7 +24,7 @@ export function GatewayUnregisterButton({
 
   return (
     <>
-      <LoadingButton
+      <Button
         // startIcon={<Remove />}
         sx={sx}
         loading={open}
@@ -34,7 +33,7 @@ export function GatewayUnregisterButton({
         color="error"
       >
         DELETE
-      </LoadingButton>
+      </Button>
       <GatewayUnregisterDialog open={open} onClose={() => setOpen(false)} gateway={gateway} />
     </>
   );

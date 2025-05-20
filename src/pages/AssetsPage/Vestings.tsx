@@ -1,4 +1,4 @@
-import { tokenFormatter } from '@lib/formatters/formatters';
+import { addressFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, unwrapMulticallResult } from '@lib/network/utils';
 import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { keepPreviousData } from '@tanstack/react-query';
@@ -8,19 +8,22 @@ import { useReadContracts } from 'wagmi';
 
 import { vestingAbi } from '@api/contracts';
 import { AccountType, useSourcesQuery, useSquid } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { DashboardTable, NoItems } from '@components/Table';
+import { NameWithAvatar } from '@components/SourceWalletName';
 import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 
 import { ReleaseButton } from './ReleaseButton';
-import { SourceWalletName } from './VestingName';
+import { useMemo } from 'react';
+import { CopyToClipboard } from '@components/CopyToClipboard';
+import { Link } from 'react-router-dom';
 
 export function MyVestings() {
   const account = useAccount();
   const squid = useSquid();
 
-  const { data: sourcesQuery, isLoading } = useSourcesQuery(squid, {
+  const { data: sourcesQuery, isLoading: isSourcesLoading } = useSourcesQuery({
     address: account.address as `0x${string}`,
   });
   const { SQD_TOKEN, SQD } = useContracts();
@@ -72,6 +75,17 @@ export function MyVestings() {
     },
   });
 
+  const isLoading = isSourcesLoading || isVestingsLoading;
+
+  const data = useMemo(
+    () =>
+      vestingsQuery.accounts?.map((vesting, i) => ({
+        ...vesting,
+        ...vestings?.[i],
+      })) || [],
+    [vestingsQuery.accounts, vestings],
+  );
+
   return (
     <DashboardTable
       loading={isLoading || isVestingsLoading}
@@ -87,28 +101,39 @@ export function MyVestings() {
         </TableRow>
       </TableHead>
       <TableBody>
-        {vestingsQuery.accounts?.length ? (
-          <>
-            {vestingsQuery.accounts.map((vesting, i) => {
-              const d = vestings?.[i];
-              return (
-                <TableRow key={vesting.id}>
-                  <TableCell>
-                    <SourceWalletName source={vesting} to={`vestings/${vesting.id}`} />
-                  </TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(d?.balance), SQD_TOKEN)}</TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(d?.deposited), SQD_TOKEN)}</TableCell>
-                  <TableCell>{tokenFormatter(fromSqd(d?.releasable), SQD_TOKEN)}</TableCell>
-                  <TableCell>
-                    <Box display="flex" justifyContent="flex-end">
-                      <ReleaseButton vesting={vesting} disabled={!d?.releasable} />
+        {data?.length ? (
+          data.map(vesting => (
+            <TableRow key={vesting.id}>
+              <TableCell>
+                <NameWithAvatar
+                  title="Vesting contract"
+                  subtitle={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CopyToClipboard
+                        text={vesting.id}
+                        content={
+                          <Link to={`/assets/vestings/${vesting.id}`}>
+                            {addressFormatter(vesting.id, true)}
+                          </Link>
+                        }
+                      />
                     </Box>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </>
-        ) : isLoading ? null : (
+                  }
+                  avatarValue={vesting.id}
+                  sx={{ width: { xs: 200, sm: 240 } }}
+                />
+              </TableCell>
+              <TableCell>{tokenFormatter(fromSqd(vesting?.balance), SQD_TOKEN)}</TableCell>
+              <TableCell>{tokenFormatter(fromSqd(vesting?.deposited), SQD_TOKEN)}</TableCell>
+              <TableCell>{tokenFormatter(fromSqd(vesting?.releasable), SQD_TOKEN)}</TableCell>
+              <TableCell>
+                <Box display="flex" justifyContent="flex-end">
+                  <ReleaseButton vesting={vesting} disabled={!vesting?.releasable} />
+                </Box>
+              </TableCell>
+            </TableRow>
+          ))
+        ) : (
           <NoItems>
             <span>No vesting was found</span>
           </NoItems>

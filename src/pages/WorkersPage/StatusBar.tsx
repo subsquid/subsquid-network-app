@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { nonNullable } from '@lib/array';
 import { percentFormatter } from '@lib/formatters/formatters.ts';
 import { Box, Palette, styled, useTheme } from '@mui/material';
@@ -34,27 +32,27 @@ const setUptimeItem = (palette: Palette, uptime?: number): UptimeItem => {
   if (!nonNullable(uptime)) {
     return {
       tooltipText: 'No data available for this period.',
-      backgroundColor: palette.networkStatus.noData,
+      backgroundColor: palette.primary.main,
     };
   }
 
   if (uptime >= 99) {
     return {
       tooltipText: `Uptime ${percentFormatter(uptime)}`,
-      backgroundColor: palette.networkStatus.online,
+      backgroundColor: palette.success.main,
     };
   }
 
   if (uptime >= 90) {
     return {
       tooltipText: `Uptime ${percentFormatter(uptime)}`,
-      backgroundColor: palette.networkStatus.downtime,
+      backgroundColor: palette.warning.main,
     };
   }
 
   return {
     tooltipText: `Uptime ${percentFormatter(uptime)}`,
-    backgroundColor: palette.networkStatus.offline,
+    backgroundColor: palette.error.main,
   };
 };
 

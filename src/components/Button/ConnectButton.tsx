@@ -1,23 +1,34 @@
 import { LoginOutlined } from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
+import { Button, ButtonProps } from '@mui/material';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 
-function ConnectButton() {
-  const { openConnectModal, connectModalOpen } = useConnectModal();
-
-  return (
-    <LoadingButton
-      loading={connectModalOpen}
-      startIcon={<LoginOutlined />}
-      onClick={() => {
-        openConnectModal?.();
-      }}
-      variant="contained"
-      color="info"
-    >
-      CONNECT WALLET
-    </LoadingButton>
-  );
+interface ConnectButtonProps extends Omit<ButtonProps, 'onClick' | 'loading'> {
+  className?: string;
+  label?: string;
 }
 
-export default ConnectButton;
+export const ConnectButton = ({
+  className,
+  label = 'CONNECT WALLET',
+  ...props
+}: ConnectButtonProps) => {
+  const { openConnectModal, connectModalOpen } = useConnectModal();
+
+  const handleConnect = () => {
+    openConnectModal?.();
+  };
+
+  return (
+    <Button
+      className={className}
+      loading={connectModalOpen}
+      startIcon={<LoginOutlined />}
+      onClick={handleConnect}
+      variant="contained"
+      color="info"
+      {...props}
+    >
+      {label}
+    </Button>
+  );
+};

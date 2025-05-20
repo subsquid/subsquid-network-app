@@ -1,8 +1,12 @@
-import React, { PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { Box, CircularProgress, useTheme } from '@mui/material';
 
-export const Loader = ({ loading = true, children }: PropsWithChildren<{ loading?: boolean }>) => {
+interface LoaderProps extends PropsWithChildren {
+  loading?: boolean;
+}
+
+export const Loader = ({ loading = true, children }: LoaderProps) => {
   const theme = useTheme();
 
   if (loading) {

@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { Box, styled } from '@mui/material';
 
@@ -23,27 +24,24 @@ export const Field = styled(TextField)(({ theme }) => ({
   },
 }));
 
-export const Search = ({
-  value,
-  onChange,
-  fullWidth,
-  placeholder,
-}: {
+interface SearchProps {
   loading?: boolean;
   value?: string;
   onChange?: (value: string) => unknown;
   fullWidth?: boolean;
   placeholder?: string;
-}) => {
-  const [realTimeValue, setRealTimeValue] = useState(value);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // const handleChange = useCallback(
-  //   debounce(value => {
-  //     onChange?.(value);
-  //   }, 200),
-  //   [onChange],
-  // );
-  const handleChange = useCallback((value: string) => onChange?.(value), [onChange]);
+}
+
+export const Search = ({ value, onChange, fullWidth, placeholder }: SearchProps) => {
+  const [realTimeValue, setRealTimeValue] = useState(value || '');
+
+  const debouncedOnChange = useDebouncedCallback((value: string) => onChange?.(value), 200);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setRealTimeValue(newValue);
+    debouncedOnChange(newValue);
+  };
 
   return (
     <Box sx={{ flex: fullWidth ? 1 : '0 0 200px', position: 'relative' }}>
@@ -56,11 +54,7 @@ export const Search = ({
         size="small"
         fullWidth={fullWidth}
         autoComplete="off"
-        onChange={e => {
-          const value = e.target.value;
-          setRealTimeValue(value);
-          handleChange(value);
-        }}
+        onChange={handleInputChange}
         InputProps={{
           startAdornment: <SearchIcon />,
         }}

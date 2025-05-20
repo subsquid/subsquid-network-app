@@ -10,7 +10,7 @@ import {
   WorkerSortBy,
   WorkerStatus,
 } from '@api/subsquid-network-squid';
-import SquaredChip from '@components/Chip/SquaredChip';
+import { SquaredChip } from '@components/Chip';
 import { DashboardTable, SortableHeaderCell, NoItems } from '@components/Table';
 import { Location, useLocationState } from '@hooks/useLocationState';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
@@ -66,12 +66,7 @@ export function MyWorkers() {
         <>
           <TableHead>
             <TableRow>
-              <SortableHeaderCell
-                sort={WorkerSortBy.Name}
-                query={query}
-                setQuery={setQuery}
-                sx={{ width: 300 }}
-              >
+              <SortableHeaderCell sort={WorkerSortBy.Name} query={query} setQuery={setQuery}>
                 Worker
               </SortableHeaderCell>
               <TableCell>Status</TableCell>
@@ -103,7 +98,7 @@ export function MyWorkers() {
                 return (
                   <TableRow key={worker.peerId}>
                     <TableCell>
-                      <WorkerName worker={worker} to={`/workers/${worker.peerId}`} />
+                      <WorkerName worker={worker} />
                     </TableCell>
                     <TableCell>
                       <WorkerStatusChip worker={worker} />
@@ -128,11 +123,9 @@ export function MyWorkers() {
                             worker={worker}
                             source={{
                               ...worker.owner,
-                              // FIXME: some types issue
-                              locked: (worker as any).locked,
-                              unlockedAt: (worker as any).unlockedAt,
+                              locked: !!worker.locked,
+                              lockEnd: worker.lockEnd,
                             }}
-                            disabled={worker.status !== WorkerStatus.Deregistered}
                           />
                         ) : (
                           <WorkerUnregisterButton

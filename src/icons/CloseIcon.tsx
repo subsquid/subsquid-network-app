@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function CloseIcon({ size = 28 }: { size?: number }) {
   return (
     <svg

@@ -84,7 +84,7 @@ export const SummaryValue = styled(Box, {
 
 export function Workers() {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('xxs'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'));
 
   const [query, setQuery] = useLocationState({
     page: new Location.Number(1),
@@ -126,12 +126,7 @@ export function Workers() {
       >
         <TableHead>
           <TableRow>
-            <SortableHeaderCell
-              sort={WorkerSortBy.Name}
-              query={query}
-              setQuery={setQuery}
-              sx={{ width: 300 }}
-            >
+            <SortableHeaderCell sort={WorkerSortBy.Name} query={query} setQuery={setQuery}>
               Worker
             </SortableHeaderCell>
             <TableCell>Status</TableCell>
@@ -174,10 +169,7 @@ export function Workers() {
             workers.map(worker => (
               <TableRow key={worker.peerId}>
                 <TableCell className="pinned">
-                  <WorkerName
-                    worker={worker}
-                    to={`/workers/${worker.peerId}?backPath=/dashboard`}
-                  />
+                  <WorkerName worker={worker} />
                 </TableCell>
                 <TableCell>
                   <WorkerStatusChip worker={worker} />

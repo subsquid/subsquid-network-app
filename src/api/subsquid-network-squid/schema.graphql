@@ -98,6 +98,11 @@ fragment WorkerStatusFragment on Worker {
   jailed
   dialOk
   jailReason
+  statusHistory(orderBy: id_DESC, limit: 1) {
+    blockNumber
+    pending
+    timestamp
+  }
 }
 
 fragment WorkerFragment on Worker {
@@ -110,6 +115,8 @@ fragment WorkerFragment on Worker {
   stakerApr
   totalDelegation
   capedDelegation
+  locked
+  lockEnd
   owner {
     id
     type
@@ -142,6 +149,8 @@ fragment WorkerFullFragment on Worker {
     timestamp
     uptime
   }
+  locked
+  lockEnd
 }
 
 query allWorkers {
@@ -158,6 +167,7 @@ query workerByPeerId($peerId: String!, $address: String) {
       claimedReward
       deposit
       locked
+      lockEnd
       owner {
         id
         type
@@ -217,13 +227,20 @@ query workerOwner($workerId: String!) {
 }
 
 query myDelegations($address: String!, $workerId: String) {
-  workers(orderBy: id_ASC, where: {peerId_eq: $workerId, delegations_some: {realOwner: {id_eq: $address}, deposit_gt: 0}}) {
+  workers(
+    orderBy: id_ASC
+    where: {
+      peerId_eq: $workerId
+      delegations_some: { realOwner: { id_eq: $address }, deposit_gt: 0 }
+    }
+  ) {
     ...WorkerFragment
     delegations(where: { realOwner: { id_eq: $address }, deposit_gt: 0 }) {
       claimableReward
       claimedReward
       deposit
       locked
+      lockEnd
       owner {
         id
         type
