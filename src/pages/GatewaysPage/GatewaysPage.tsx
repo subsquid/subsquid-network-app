@@ -38,6 +38,7 @@ import {
 } from '@api/contracts';
 import {
   AccountType,
+  useCurrentEpoch,
   useMyGatewaysQuery,
   useMySources,
   useSquid,
@@ -106,25 +107,7 @@ export function MyStakes() {
     },
   });
 
-  const { data: lastL1Block, isLoading: isL1BlockLoading } = useBlock({
-    chainId: l1ChainId,
-  });
-  const { data: appliedAtL1Block, isLoading: isAppliedAtBlockLoading } = useBlock({
-    chainId: l1ChainId,
-    blockNumber: stake?.lockStart,
-    includeTransactions: false,
-    query: {
-      enabled: stake && stake?.lockStart <= (lastL1Block?.number || 0n),
-    },
-  });
-  const { data: unlockedAtL1Block, isLoading: isUnlockedAtBlockLoading } = useBlock({
-    chainId: l1ChainId,
-    blockNumber: stake?.lockEnd,
-    includeTransactions: false,
-    query: {
-      enabled: stake && stake?.lockEnd <= (lastL1Block?.number || 0n),
-    },
-  });
+  const { data: currentEpoch } = useCurrentEpoch();
 
   const { data: workerEpochLength, isLoading: isWorkerEpochLengthLoading } =
     useReadNetworkControllerWorkerEpochLength({
@@ -132,51 +115,45 @@ export function MyStakes() {
     });
 
   const isLoading =
-    isStakeLoading ||
-    isCuAmountLoading ||
-    isL1BlockLoading ||
-    isWorkerEpochLengthLoading ||
-    isUnlockedAtBlockLoading ||
-    isSourcesLoading;
+    isStakeLoading || isCuAmountLoading || isWorkerEpochLengthLoading || isSourcesLoading;
 
-  const isPending = !!stake?.amount && stake.lockStart > (lastL1Block?.number || 0n);
+  const isPending =
+    !!currentEpoch?.lastBlockL1 && !!stake?.amount && stake.lockStart > currentEpoch.lastBlockL1;
   const isActive =
+    !!currentEpoch?.lastBlockL1 &&
     !!stake?.amount &&
-    stake.lockStart <= (lastL1Block?.number || 0n) &&
-    stake.lockEnd >= (lastL1Block?.number || 0n);
-  const isExpired = !!stake?.amount && stake.lockEnd < (lastL1Block?.number || 0n);
+    stake.lockStart <= currentEpoch?.lastBlockL1 &&
+    stake.lockEnd >= currentEpoch?.lastBlockL1;
+  const isExpired =
+    !!currentEpoch?.lastBlockL1 && !!stake?.amount && stake.lockEnd < currentEpoch.lastBlockL1;
 
   const appliedAt = useMemo(() => {
-    if (!stake || !lastL1Block) return;
-
-    if (stake.lockStart < lastL1Block.number)
-      return new Date(Number(appliedAtL1Block?.timestamp || 0n) * 1000).toISOString();
+    if (!stake || !currentEpoch?.lastBlockL1) return;
 
     return new Date(
-      Number(lastL1Block.timestamp) * 1000 +
-        getBlockTime(stake.lockStart - lastL1Block.number + 1n),
+      new Date(currentEpoch.lastBlockTimestampL1).getTime() +
+        getBlockTime(Number(stake.lockStart) - currentEpoch.lastBlockL1 + 1),
     ).toISOString();
-  }, [appliedAtL1Block?.timestamp, lastL1Block, stake]);
+  }, [currentEpoch, stake]);
 
   const unlockedAt = useMemo(() => {
-    if (!stake || !lastL1Block || stake.autoExtension) return;
-
-    if (stake.lockEnd < lastL1Block.number)
-      return new Date(Number(unlockedAtL1Block?.timestamp || 0n) * 1000).toISOString();
+    if (!stake || !currentEpoch?.lastBlockL1 || stake.autoExtension) return;
 
     return new Date(
-      Number(lastL1Block.timestamp) * 1000 + getBlockTime(stake.lockEnd - lastL1Block.number + 1n),
+      new Date(currentEpoch.lastBlockTimestampL1).getTime() +
+        getBlockTime(Number(stake.lockEnd) - currentEpoch.lastBlockL1 + 1),
     ).toISOString();
-  }, [lastL1Block, stake, unlockedAtL1Block?.timestamp]);
+  }, [currentEpoch, stake]);
 
   const cuPerEpoch = useMemo(() => {
-    if (!stake?.lockEnd || !workerEpochLength || !lastL1Block || isExpired) return 0;
+    if (!stake?.lockEnd || !workerEpochLength || !currentEpoch?.lastBlockL1 || isExpired) return 0;
 
-    const computationUnits = stake.lockStart > lastL1Block.number ? stake.oldCUs : cuAmount || 0n;
+    const computationUnits =
+      stake.lockStart > currentEpoch.lastBlockL1 ? stake.oldCUs : cuAmount || 0n;
     if (stake.duration < workerEpochLength) return computationUnits;
 
     return (computationUnits * workerEpochLength) / stake.duration;
-  }, [cuAmount, isExpired, lastL1Block, stake, workerEpochLength]);
+  }, [cuAmount, isExpired, currentEpoch, stake, workerEpochLength]);
 
   return (
     <>
@@ -218,7 +195,6 @@ export function MyStakes() {
                       <span>Amount</span>
                       <Box display="flex">
                         {stake &&
-                          lastL1Block &&
                           (isPending ? (
                             <Tooltip
                               title={<AppliesTooltip timestamp={appliedAt} />}

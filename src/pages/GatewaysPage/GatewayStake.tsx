@@ -1,10 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, getBlockTime, toSqd, unwrapMulticallResult } from '@lib/network/utils';
 import { LockOutlined as LockIcon } from '@mui/icons-material';
-import { Box, Button, Chip, InputAdornment, Stack, SxProps } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  InputAdornment,
+  Stack,
+  SxProps,
+  Skeleton,
+  Typography,
+} from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
@@ -20,7 +29,7 @@ import {
 } from '@api/contracts';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
-import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
+import { AccountType, SourceWalletWithBalance, useCurrentEpoch } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
@@ -54,6 +63,8 @@ export const stakeSchema = yup.object({
   durationBlocks: yup
     .number()
     .label('Locked blocks duration')
+    .transform(value => (Number.isNaN(value) ? 0 : value))
+    .integer()
     .min(MIN_BLOCKS_LOCK, ({ min }) => `Tokens must be locked at least ${min} blocks`)
     .required('Lock min blocks is required'),
 });
@@ -115,19 +126,23 @@ export function GatewayStakeDialog({
   // const myGatewaysStake = useMyGatewayStake();
   const gatewayRegistryContract = useWriteSQDTransaction();
 
-  const { data: lastL1Block, isLoading: isLastL1BlockLoading } = useBlock({
-    chainId: CHAIN_ID_L1,
-  });
+  const { data: currentEpoch, isLoading: isCurrentEpochLoading } = useCurrentEpoch();
 
   const isLoading =
-    isLastL1BlockLoading ||
+    isCurrentEpochLoading ||
     isNetworkControllerLoading ||
     isWorkerEpochLengthLoading ||
     isMinStakeLoading;
 
-  const isSourceDisabled = (source: SourceWalletWithBalance) =>
-    source.balance === '0' || source.type === AccountType.Vesting;
-  const hasAvailableSource = useMemo(() => !!sources?.some(s => !isSourceDisabled(s)), [sources]);
+  const isSourceDisabled = useCallback(
+    (source: SourceWalletWithBalance) =>
+      source.balance === '0' || source.type === AccountType.Vesting,
+    [],
+  );
+  const hasAvailableSource = useMemo(
+    () => !!sources?.some(s => !isSourceDisabled(s)),
+    [sources, isSourceDisabled],
+  );
 
   const initialValues = useMemo(() => {
     const source = sources?.find(s => !isSourceDisabled(s)) || sources?.[0];
@@ -139,7 +154,7 @@ export function GatewayStakeDialog({
       min: fromSqd(minStake)?.toFixed() || '0',
       durationBlocks: (source?.stake.duration || MIN_BLOCKS_LOCK).toString(),
     };
-  }, [sources, minStake]);
+  }, [sources, minStake, isSourceDisabled]);
 
   const formik = useFormik({
     initialValues,
@@ -217,11 +232,13 @@ export function GatewayStakeDialog({
   });
 
   const preview = useMemo(() => {
-    if (!newContractValues.data || !lastL1Block || !selectedSource) return;
+    if (!newContractValues.data || !currentEpoch?.lastBlockL1 || !selectedSource) return null;
 
     const workerEpochLengthValue = workerEpochLength || 0n;
 
-    const epochCount = Math.ceil(debouncedValues.durationBlocks / Number(workerEpochLengthValue));
+    const epochCount = !debouncedValues.durationBlocks
+      ? 0
+      : Math.ceil(debouncedValues.durationBlocks / Number(workerEpochLengthValue));
 
     const cuPerEpoch = Number(
       epochCount <= 1
@@ -231,7 +248,8 @@ export function GatewayStakeDialog({
     );
 
     const unlockAt =
-      Number(lastL1Block.timestamp) * 1000 + getBlockTime(debouncedValues.durationBlocks);
+      new Date(currentEpoch.lastBlockTimestampL1).getTime() +
+      getBlockTime(debouncedValues.durationBlocks);
 
     const totalAmount = new BigNumber(selectedSource.stake.amount.toString())
       .plus(toSqd(debouncedValues.amount))
@@ -246,11 +264,22 @@ export function GatewayStakeDialog({
   }, [
     debouncedValues.amount,
     debouncedValues.durationBlocks,
-    lastL1Block,
+    currentEpoch?.lastBlockTimestampL1,
     newContractValues.data,
     selectedSource,
     workerEpochLength,
+    currentEpoch?.lastBlockL1,
   ]);
+
+  const isPreviewLoading = useMemo(() => {
+    return (
+      isLoading ||
+      !newContractValues.data ||
+      !currentEpoch?.lastBlockL1 ||
+      !selectedSource ||
+      !preview
+    );
+  }, [isLoading, newContractValues.data, currentEpoch?.lastBlockL1, selectedSource, preview]);
 
   return (
     <ContractCallDialog
@@ -342,23 +371,39 @@ export function GatewayStakeDialog({
           <Stack spacing={2}>
             <Stack direction="row" justifyContent="space-between" alignContent="center">
               <Box>Total amount</Box>
-              {tokenFormatter(fromSqd(preview?.totalAmount), 'SQD', 6)}
+              {isPreviewLoading ? (
+                <Skeleton width={80} />
+              ) : (
+                tokenFormatter(fromSqd(preview?.totalAmount), 'SQD', 6)
+              )}
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignContent="center">
               <Box>Epoch count</Box>
-              {numberWithCommasFormatter(preview?.epochCount)}
+              {isPreviewLoading ? (
+                <Skeleton width={40} />
+              ) : (
+                numberWithCommasFormatter(preview?.epochCount)
+              )}
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignContent="center">
               <HelpTooltip title="Available CUs in a current epoch. When all CUs are used, the portal will temporarily stop processing additional requests until the next epoch begins">
                 <span>Available CUs</span>
               </HelpTooltip>
-              {numberWithCommasFormatter(preview?.cuPerEpoch)}
+              {isPreviewLoading ? (
+                <Skeleton width={80} />
+              ) : (
+                numberWithCommasFormatter(preview?.cuPerEpoch)
+              )}
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignContent="center">
               <HelpTooltip title="Automatically relocked if auto extension is enabled">
                 <span>Unlocked at</span>
               </HelpTooltip>
-              <span>~{dateFormat(preview?.unlockAt, 'dateTime')}</span>
+              {isPreviewLoading ? (
+                <Skeleton width={180} />
+              ) : (
+                <span>~{dateFormat(preview?.unlockAt, 'dateTime')}</span>
+              )}
             </Stack>
           </Stack>
         </Form>
