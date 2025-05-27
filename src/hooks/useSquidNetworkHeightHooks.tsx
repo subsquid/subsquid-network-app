@@ -65,7 +65,6 @@ export function SquidHeightProvider({ children }: PropsWithChildren) {
   });
 
   const { data, isLoading } = useSquidNetworkHeightQuery(
-    
     {},
     {
       refetchInterval: isSyncing ? 200 : 2000,

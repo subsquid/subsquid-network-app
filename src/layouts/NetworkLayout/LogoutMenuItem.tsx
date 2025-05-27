@@ -1,5 +1,3 @@
-
-
 import { LogoutOutlined } from '@mui/icons-material';
 
 import { useAppReload } from '../../index.tsx';

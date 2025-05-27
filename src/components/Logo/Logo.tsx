@@ -1,4 +1,4 @@
-import { Box, SxProps, Theme, styled, } from '@mui/material';
+import { Box, SxProps, Theme, styled } from '@mui/material';
 
 import { LogoFull } from './LogoFull';
 

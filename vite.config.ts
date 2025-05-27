@@ -40,9 +40,7 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    include: [
-      '@mui/material',
-    ],
+    include: ['@mui/material'],
   },
 
   plugins: [

@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import React from 'react';
 
 import { fromSqd, peerIdToHex } from '@lib/network/utils';
 import { Add } from '@mui/icons-material';

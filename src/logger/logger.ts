@@ -1,11 +1,11 @@
 export function debug(message: string) {
-  return ;
+  return;
 }
 export function info(message: string) {
-  return ;
+  return;
 }
 export function error(message: Error | string | unknown) {
-  return ;
+  return;
 }
 export const logger = {
   debug,

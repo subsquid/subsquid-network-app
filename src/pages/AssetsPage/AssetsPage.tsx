@@ -1,5 +1,3 @@
-
-
 import { Outlet } from 'react-router-dom';
 
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
