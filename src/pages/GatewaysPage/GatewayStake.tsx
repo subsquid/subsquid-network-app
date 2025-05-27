@@ -1,49 +1,35 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, getBlockTime, toSqd, unwrapMulticallResult } from '@lib/network/utils';
 import { LockOutlined as LockIcon } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Chip,
-  InputAdornment,
-  Stack,
-  SxProps,
-  Skeleton,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Chip, InputAdornment, Stack, SxProps, Skeleton } from '@mui/material';
 import * as yup from '@schema';
 import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useDebounce } from 'use-debounce';
-import { useBlock, useReadContracts } from 'wagmi';
+import { useReadContracts } from 'wagmi';
 
 import {
   gatewayRegistryAbi,
   useReadGatewayRegistryMinStake,
   useReadNetworkControllerWorkerEpochLength,
   useReadRouterNetworkController,
+  useReadGatewayRegistryGetStake,
 } from '@api/contracts';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
-import { AccountType, SourceWalletWithBalance, useCurrentEpoch } from '@api/subsquid-network-squid';
+import { AccountType, useCurrentEpoch } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormDivider, FormikSelect, FormikTextInput, FormRow } from '@components/Form';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { SourceWalletOption } from '@components/SourceWallet';
+import { useSourceContext } from '@contexts/SourceContext';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
-
-export type SourceWalletWithStake = SourceWalletWithBalance & {
-  stake: {
-    amount: bigint;
-    duration: bigint;
-  };
-};
 
 const MIN_BLOCKS_LOCK = 1000;
 
@@ -72,11 +58,9 @@ export const stakeSchema = yup.object({
 export function GatewayStakeButton({
   sx,
   disabled,
-  sources,
 }: {
   sx?: SxProps;
   disabled?: boolean;
-  sources?: SourceWalletWithStake[];
 }) {
   const [open, setOpen] = useState(false);
 
@@ -93,7 +77,7 @@ export function GatewayStakeButton({
       >
         LOCK
       </Button>
-      <GatewayStakeDialog open={open} onClose={() => setOpen(false)} sources={sources} />
+      <GatewayStakeDialog open={open} onClose={() => setOpen(false)} />
     </>
   );
 }
@@ -101,15 +85,14 @@ export function GatewayStakeButton({
 export function GatewayStakeDialog({
   open,
   onClose,
-  sources,
 }: {
   open: boolean;
   onClose: () => void;
-  sources?: SourceWalletWithStake[];
 }) {
   const { setWaitHeight } = useSquidHeight();
+  const { sources, selectedSource } = useSourceContext();
 
-  const { GATEWAY_REGISTRATION, ROUTER, CHAIN_ID_L1 } = useContracts();
+  const { GATEWAY_REGISTRATION, ROUTER } = useContracts();
 
   const { data: networkController, isLoading: isNetworkControllerLoading } =
     useReadRouterNetworkController({
@@ -123,7 +106,16 @@ export function GatewayStakeDialog({
     address: GATEWAY_REGISTRATION,
   });
 
-  // const myGatewaysStake = useMyGatewayStake();
+  const { data: selectedStake, isLoading: isSelectedStakeLoading } = useReadGatewayRegistryGetStake(
+    {
+      address: GATEWAY_REGISTRATION,
+      args: [selectedSource?.id as `0x${string}`],
+      query: {
+        enabled: !!selectedSource?.id,
+      },
+    },
+  );
+
   const gatewayRegistryContract = useWriteSQDTransaction();
 
   const { data: currentEpoch, isLoading: isCurrentEpochLoading } = useCurrentEpoch();
@@ -132,29 +124,20 @@ export function GatewayStakeDialog({
     isCurrentEpochLoading ||
     isNetworkControllerLoading ||
     isWorkerEpochLengthLoading ||
-    isMinStakeLoading;
-
-  const isSourceDisabled = useCallback(
-    (source: SourceWalletWithBalance) =>
-      source.balance === '0' || source.type === AccountType.Vesting,
-    [],
-  );
-  const hasAvailableSource = useMemo(
-    () => !!sources?.some(s => !isSourceDisabled(s)),
-    [sources, isSourceDisabled],
-  );
+    isMinStakeLoading ||
+    isSelectedStakeLoading;
 
   const initialValues = useMemo(() => {
-    const source = sources?.find(s => !isSourceDisabled(s)) || sources?.[0];
+    const defaultSource = selectedSource || sources?.[0];
 
     return {
-      source: source?.id || '0x',
-      amount: !!source?.stake.amount ? '0' : fromSqd(minStake).toFixed() || '0',
-      max: fromSqd(source?.balance)?.toFixed() || '0',
+      source: defaultSource?.id || '0x',
+      amount: !!selectedStake?.amount ? '0' : fromSqd(minStake).toFixed() || '0',
+      max: fromSqd(defaultSource?.balance)?.toFixed() || '0',
       min: fromSqd(minStake)?.toFixed() || '0',
-      durationBlocks: (source?.stake.duration || MIN_BLOCKS_LOCK).toString(),
+      durationBlocks: (selectedStake?.duration || MIN_BLOCKS_LOCK).toString(),
     };
-  }, [sources, minStake, isSourceDisabled]);
+  }, [sources, selectedSource, minStake, selectedStake]);
 
   const formik = useFormik({
     initialValues,
@@ -177,10 +160,11 @@ export function GatewayStakeDialog({
           abi: gatewayRegistryAbi,
           address: GATEWAY_REGISTRATION,
           approve: sqdAmount,
+          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
         };
 
         const receipt = await gatewayRegistryContract.writeTransactionAsync(
-          source.stake.amount > 0n
+          selectedStake?.amount && selectedStake.amount > 0n
             ? {
                 ...functionData,
                 functionName: 'addStake',
@@ -192,17 +176,16 @@ export function GatewayStakeDialog({
                 args: [sqdAmount, BigInt(durationBlocks), false],
               },
         );
-        setWaitHeight(receipt.blockNumber, []);
 
+        setWaitHeight(receipt.blockNumber, []);
         onClose();
       } catch (e: unknown) {
         toast.error(errorMessage(e));
-        // toast.error(errorMessage(e));
       }
     },
   });
 
-  const selectedSource = useMemo(
+  const selectedFormSource = useMemo(
     () => sources?.find(s => s.id === formik.values.source),
     [sources, formik.values.source],
   );
@@ -215,7 +198,7 @@ export function GatewayStakeDialog({
         abi: gatewayRegistryAbi,
         functionName: 'computationUnitsAmount',
         args: [
-          (selectedSource?.stake.amount || 0n) + BigInt(toSqd(debouncedValues.amount)),
+          (selectedStake?.amount || 0n) + BigInt(toSqd(debouncedValues.amount)),
           BigInt(debouncedValues.durationBlocks),
         ],
       },
@@ -232,7 +215,7 @@ export function GatewayStakeDialog({
   });
 
   const preview = useMemo(() => {
-    if (!newContractValues.data || !currentEpoch?.lastBlockL1 || !selectedSource) return null;
+    if (!newContractValues.data || !currentEpoch?.lastBlockL1 || !selectedFormSource) return null;
 
     const workerEpochLengthValue = workerEpochLength || 0n;
 
@@ -251,7 +234,7 @@ export function GatewayStakeDialog({
       new Date(currentEpoch.lastBlockTimestampL1).getTime() +
       getBlockTime(debouncedValues.durationBlocks);
 
-    const totalAmount = new BigNumber(selectedSource.stake.amount.toString())
+    const totalAmount = new BigNumber((selectedStake?.amount || 0n).toString())
       .plus(toSqd(debouncedValues.amount))
       .toString();
 
@@ -266,9 +249,10 @@ export function GatewayStakeDialog({
     debouncedValues.durationBlocks,
     currentEpoch?.lastBlockTimestampL1,
     newContractValues.data,
-    selectedSource,
+    selectedFormSource,
     workerEpochLength,
     currentEpoch?.lastBlockL1,
+    selectedStake,
   ]);
 
   const isPreviewLoading = useMemo(() => {
@@ -276,10 +260,10 @@ export function GatewayStakeDialog({
       isLoading ||
       !newContractValues.data ||
       !currentEpoch?.lastBlockL1 ||
-      !selectedSource ||
+      !selectedFormSource ||
       !preview
     );
-  }, [isLoading, newContractValues.data, currentEpoch?.lastBlockL1, selectedSource, preview]);
+  }, [isLoading, newContractValues.data, currentEpoch?.lastBlockL1, selectedFormSource, preview]);
 
   return (
     <ContractCallDialog
@@ -290,7 +274,7 @@ export function GatewayStakeDialog({
 
         formik.handleSubmit();
       }}
-      disableConfirmButton={!formik.isValid || isLoading || !hasAvailableSource}
+      disableConfirmButton={!formik.isValid || isLoading}
       loading={gatewayRegistryContract.isPending}
     >
       {isLoading ? (
@@ -306,7 +290,6 @@ export function GatewayStakeDialog({
                   return {
                     label: <SourceWalletOption source={source} />,
                     value: source.id,
-                    disabled: source.balance === '0' || source.type !== AccountType.User,
                     max: fromSqd(source.balance).toString(),
                   };
                 }) || []
@@ -361,12 +344,9 @@ export function GatewayStakeDialog({
               formik={formik}
               showErrorOnlyOfTouched
               autoComplete="off"
-              disabled={!!selectedSource?.stake.amount}
+              disabled={!!selectedStake?.amount}
             />
           </FormRow>
-          {/* <FormRow>
-            <FormikSwitch id="autoExtension" label="Auto extension" formik={formik} />
-          </FormRow> */}
           <FormDivider />
           <Stack spacing={2}>
             <Stack direction="row" justifyContent="space-between" alignContent="center">

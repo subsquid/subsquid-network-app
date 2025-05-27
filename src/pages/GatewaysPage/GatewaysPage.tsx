@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
-
+import { useState } from 'react';
+import { FormikSelect } from '@components/Form';
+import { SourceWalletOption } from '@components/SourceWallet';
 import { dateFormat } from '@i18n';
 import { numberWithCommasFormatter, tokenFormatter } from '@lib/formatters/formatters';
-import { fromSqd, getBlockTime } from '@lib/network';
+import { fromSqd } from '@lib/network';
 import { ExpandMore, Info } from '@mui/icons-material';
 import {
   Alert,
@@ -28,30 +29,17 @@ import {
   useTheme,
 } from '@mui/material';
 import { Link, Outlet } from 'react-router-dom';
-import { useBlock } from 'wagmi';
 
-import {
-  useReadGatewayRegistryComputationUnitsAmount,
-  useReadGatewayRegistryGetStake,
-  useReadNetworkControllerWorkerEpochLength,
-  useReadRouterNetworkController,
-} from '@api/contracts';
-import {
-  AccountType,
-  useCurrentEpoch,
-  useMyGatewaysQuery,
-  useMySources,
-  useSquid,
-} from '@api/subsquid-network-squid';
+import { useMyGatewaysQuery } from '@api/subsquid-network-squid';
 import { SquaredChip } from '@components/Chip';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { DashboardTable, NoItems } from '@components/Table';
 import { useCountdown } from '@hooks/useCountdown';
 import { CenteredPageWrapper } from '@layouts/NetworkLayout';
 import { ConnectedWalletRequired } from '@network/ConnectedWalletRequired';
-import { useAccount } from '@network/useAccount';
 import { useContracts } from '@network/useContracts';
 import { ColumnLabel, ColumnValue, SummarySection } from '@pages/DashboardPage/Summary';
+import { SourceProvider, useSourceContext } from '@contexts/SourceContext';
 
 import { AddGatewayButton } from './AddNewGateway';
 import { AutoExtension } from './AutoExtension';
@@ -59,6 +47,7 @@ import { GatewayName } from './GatewayName';
 import { GatewayStakeButton } from './GatewayStake';
 import { GatewayUnregisterButton } from './GatewayUnregister';
 import { GatewayUnstakeButton } from './GatewayUnstake';
+import { useStakeInfo } from '@api/contracts/useStakeInfo';
 
 function AppliesTooltip({ timestamp }: { timestamp?: string }) {
   const timeLeft = useCountdown({ timestamp });
@@ -76,84 +65,13 @@ export function MyStakes() {
   const theme = useTheme();
   const narrowXs = useMediaQuery(theme.breakpoints.down('xs'));
 
-  const { address } = useAccount();
+  const { selectedSource } = useSourceContext();
+  const selectedSourceAddress = (selectedSource?.id || '0x') as `0x${string}`;
 
-  const { GATEWAY_REGISTRATION, ROUTER, SQD_TOKEN, CHAIN_ID_L1: l1ChainId } = useContracts();
+  const { SQD_TOKEN } = useContracts();
 
-  const { data: stake, isLoading: isStakeLoading } = useReadGatewayRegistryGetStake({
-    address: GATEWAY_REGISTRATION,
-    args: [address || '0x'],
-  });
-  const { data: cuAmount, isLoading: isCuAmountLoading } =
-    useReadGatewayRegistryComputationUnitsAmount({
-      address: GATEWAY_REGISTRATION,
-      args: [stake?.amount || 0n, stake?.duration || 0n],
-    });
-  const { data: sources, isLoading: isSourcesLoading } = useMySources({
-    select: res => {
-      return res?.map(s => ({
-        ...s,
-        stake:
-          s.type === AccountType.User
-            ? {
-                amount: stake?.amount || 0n,
-                duration: stake?.duration || 0n,
-              }
-            : {
-                amount: 0n,
-                duration: 0n,
-              },
-      }));
-    },
-  });
-
-  const { data: currentEpoch } = useCurrentEpoch();
-
-  const { data: workerEpochLength, isLoading: isWorkerEpochLengthLoading } =
-    useReadNetworkControllerWorkerEpochLength({
-      address: useReadRouterNetworkController({ address: ROUTER }).data,
-    });
-
-  const isLoading =
-    isStakeLoading || isCuAmountLoading || isWorkerEpochLengthLoading || isSourcesLoading;
-
-  const isPending =
-    !!currentEpoch?.lastBlockL1 && !!stake?.amount && stake.lockStart > currentEpoch.lastBlockL1;
-  const isActive =
-    !!currentEpoch?.lastBlockL1 &&
-    !!stake?.amount &&
-    stake.lockStart <= currentEpoch?.lastBlockL1 &&
-    stake.lockEnd >= currentEpoch?.lastBlockL1;
-  const isExpired =
-    !!currentEpoch?.lastBlockL1 && !!stake?.amount && stake.lockEnd < currentEpoch.lastBlockL1;
-
-  const appliedAt = useMemo(() => {
-    if (!stake || !currentEpoch?.lastBlockL1) return;
-
-    return new Date(
-      new Date(currentEpoch.lastBlockTimestampL1).getTime() +
-        getBlockTime(Number(stake.lockStart) - currentEpoch.lastBlockL1 + 1),
-    ).toISOString();
-  }, [currentEpoch, stake]);
-
-  const unlockedAt = useMemo(() => {
-    if (!stake || !currentEpoch?.lastBlockL1 || stake.autoExtension) return;
-
-    return new Date(
-      new Date(currentEpoch.lastBlockTimestampL1).getTime() +
-        getBlockTime(Number(stake.lockEnd) - currentEpoch.lastBlockL1 + 1),
-    ).toISOString();
-  }, [currentEpoch, stake]);
-
-  const cuPerEpoch = useMemo(() => {
-    if (!stake?.lockEnd || !workerEpochLength || !currentEpoch?.lastBlockL1 || isExpired) return 0;
-
-    const computationUnits =
-      stake.lockStart > currentEpoch.lastBlockL1 ? stake.oldCUs : cuAmount || 0n;
-    if (stake.duration < workerEpochLength) return computationUnits;
-
-    return (computationUnits * workerEpochLength) / stake.duration;
-  }, [cuAmount, isExpired, currentEpoch, stake, workerEpochLength]);
+  const { stake, isLoading, isPending, isActive, isExpired, appliedAt, unlockedAt, cuPerEpoch } =
+    useStakeInfo(selectedSourceAddress);
 
   return (
     <>
@@ -164,14 +82,8 @@ export function MyStakes() {
           title={<SquaredChip label="Lock Info" color="primary" />}
           action={
             <Stack direction="row" spacing={1}>
-              <GatewayStakeButton sources={sources} disabled={isLoading || isPending} />
-              <GatewayUnstakeButton
-                disabled={isLoading || !stake?.amount}
-                source={{
-                  locked: !isExpired,
-                  unlockedAt,
-                }}
-              />
+              <GatewayStakeButton disabled={isLoading || isPending} />
+              <GatewayUnstakeButton disabled={isLoading || !stake?.amount} />
             </Stack>
           }
         >
@@ -226,18 +138,6 @@ export function MyStakes() {
                   <ColumnValue>{numberWithCommasFormatter(cuPerEpoch || 0)}</ColumnValue>
                 </Box>
               </Stack>
-              {/* <Stack divider={<Divider flexItem />} spacing={1} flex={1}>
-                <Box>
-                  <ColumnLabel>Expired At</ColumnLabel>
-                  <ColumnValue>
-                    {!stake?.autoExtension
-                      ? unlockDate && stake?.lockEnd
-                        ? dateFormat(unlockDate, narrowXs ? 'date' : 'dateTime')
-                        : '-'
-                      : 'Auto-extension enabled'}
-                  </ColumnValue>
-                </Box>
-              </Stack> */}
             </Stack>
           </Stack>
         </SummarySection>
@@ -247,16 +147,14 @@ export function MyStakes() {
 }
 
 export function MyGateways() {
-  const account = useAccount();
-  const squid = useSquid();
-
-  const { data: sources, isLoading: isSourcesLoading } = useMySources();
+  const { selectedSource } = useSourceContext();
+  const selectedSourceAddress = (selectedSource?.id || '0x') as `0x${string}`;
 
   const { data: gatewaysQuery, isLoading: isGatewaysQueryLoading } = useMyGatewaysQuery({
-    address: account?.address || '0x',
+    address: selectedSourceAddress,
   });
 
-  const isLoading = isSourcesLoading || isGatewaysQueryLoading;
+  const isLoading = isGatewaysQueryLoading;
 
   return (
     <DashboardTable
@@ -274,7 +172,7 @@ export function MyGateways() {
             >
               LEARN MORE
             </Button>
-            <AddGatewayButton disabled={isLoading} sources={sources} />
+            <AddGatewayButton disabled={isLoading} />
           </Stack>
         </Box>
       }
@@ -437,13 +335,43 @@ const GettingStarted = () => {
   );
 };
 
+function GatewaysPageContent() {
+  const { sources, selectedSource, setSelectedSourceId, isLoading } = useSourceContext();
+
+  const formik = {
+    values: { source: selectedSource?.id || sources[0]?.id || '' },
+    setFieldValue: () => {},
+    errors: {},
+    touched: {},
+  };
+
+  return (
+    <>
+      <GettingStarted />
+      <Box sx={{ mb: 2 }}>
+        <FormikSelect
+          id="source"
+          formik={formik as any}
+          options={sources.map(source => ({
+            label: <SourceWalletOption source={source} />,
+            value: source.id,
+          }))}
+          onChange={event => setSelectedSourceId(event.target.value as string)}
+        />
+      </Box>
+      <MyStakes />
+      <MyGateways />
+    </>
+  );
+}
+
 export function GatewaysPage() {
   return (
     <CenteredPageWrapper className="wide">
       <ConnectedWalletRequired>
-        <GettingStarted />
-        <MyStakes />
-        <MyGateways />
+        <SourceProvider>
+          <GatewaysPageContent />
+        </SourceProvider>
       </ConnectedWalletRequired>
       <Outlet />
     </CenteredPageWrapper>

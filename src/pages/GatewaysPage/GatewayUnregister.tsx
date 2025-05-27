@@ -8,10 +8,11 @@ import { useClient } from 'wagmi';
 import { gatewayRegistryAbi } from '@api/contracts';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
-import { Gateway } from '@api/subsquid-network-squid';
+import { AccountType, Gateway } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
+import { useSourceContext } from '@contexts/SourceContext';
 
 export function GatewayUnregisterButton({
   gateway,
@@ -50,6 +51,7 @@ export function GatewayUnregisterDialog({
 }) {
   const client = useClient();
   const { setWaitHeight } = useSquidHeight();
+  const { selectedSource } = useSourceContext();
 
   const contracts = useContracts();
   const gatewayRegistryContract = useWriteSQDTransaction();
@@ -63,6 +65,10 @@ export function GatewayUnregisterDialog({
         abi: gatewayRegistryAbi,
         functionName: 'unregister',
         args: [peerIdToHex(gateway.id)],
+        vesting:
+          selectedSource?.type === AccountType.Vesting
+            ? (selectedSource.id as `0x${string}`)
+            : undefined,
       });
       setWaitHeight(receipt.blockNumber, []);
 
