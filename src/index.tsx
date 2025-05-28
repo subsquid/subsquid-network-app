@@ -37,7 +37,7 @@ declare global {
 
 info(`
 ----------------
-Subsquid Network App v.${process.env.APP_VERSION}
+SQD Network App v.${process.env.APP_VERSION}
 ----------------
 `);
 

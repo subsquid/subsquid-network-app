@@ -1,4 +1,4 @@
-# Subsquid Cloud UI
+# SQD Network UI
 
 ## Run
 
