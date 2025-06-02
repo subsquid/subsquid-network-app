@@ -283,7 +283,11 @@ export function useWorkerByPeerId(peerId?: string) {
   const { isPending: isSettingsLoading } = useNetworkSettings();
   const { address } = useAccount();
 
-  const { data: worker, isLoading, promise } = useWorkerByPeerIdQuery(
+  const {
+    data: worker,
+    isLoading,
+    promise,
+  } = useWorkerByPeerIdQuery(
     { peerId: peerId || '', address },
     {
       select: res => {
@@ -371,7 +375,6 @@ export function useMyDelegations({ sortBy, sortDir }: MyWorkersParams) {
   const datasource = useSquid();
 
   const { data: delegationsQuery, isLoading: isDelegationsQueryLoading } = useMyDelegationsQuery(
-    
     { address: address || '0x' },
   );
 
@@ -444,7 +447,6 @@ export function useIsWorkerOperator() {
   const datasource = useSquid();
 
   const { data, isLoading } = useMyWorkersCountQuery(
-    
     { address: address || '' },
     {
       select: res => !!res.workersConnection.totalCount,
@@ -466,7 +468,6 @@ export function useWorkerDelegationInfo({ workerId, enabled }: WorkerDelegationI
   const datasource = useSquid();
 
   const { data, isLoading } = useWorkerDelegationInfoQuery(
-    
     { workerId: workerId || '' },
     {
       select: res => ({
@@ -492,7 +493,6 @@ export function useWorkerOwner({ workerId, enabled }: WorkerOwnerParams) {
   const datasource = useSquid();
 
   const { data, isLoading } = useWorkerOwnerQuery(
-    
     { workerId: workerId || '' },
     {
       select: res => res.workerById,
@@ -516,7 +516,6 @@ export function useMyWorkerDelegations({ peerId, enabled }: MyWorkerDelegationsP
   const datasource = useSquid();
 
   const { data: delegations, isLoading: isDelegationsLoading } = useMyDelegationsQuery(
-    
     {
       workerId: peerId || '',
       address: address || '',

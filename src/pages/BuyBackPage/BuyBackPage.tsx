@@ -17,7 +17,7 @@ export function OtcContracts() {
   const account = useAccount();
   const squid = useSquid();
 
-  const { data: sourcesQuery, isLoading: isSourcesQueryLoading } = useSourcesQuery( {
+  const { data: sourcesQuery, isLoading: isSourcesQueryLoading } = useSourcesQuery({
     address: account.address as `0x${string}`,
   });
   const { BUYBACK } = useContracts();
@@ -45,11 +45,7 @@ export function OtcContracts() {
             BUYBACKs.map(address => (
               <TableRow key={address}>
                 <TableCell>
-                  <NameWithAvatar
-                    title="Contract"
-                    subtitle={address}
-                    avatarValue={address}
-                  />
+                  <NameWithAvatar title="Contract" subtitle={address} avatarValue={address} />
                 </TableCell>
                 <TableCell className="pinned">
                   <Box display="flex" justifyContent="flex-end">

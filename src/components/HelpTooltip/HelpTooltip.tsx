@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { InfoOutlined } from '@mui/icons-material';
-import { Stack, Tooltip, styled, SxProps, Theme } from '@mui/material';
+import { Stack, Tooltip, SxProps, Theme } from '@mui/material';
 import { Box } from '@mui/system';
 
 // export const Help = styled(Box)(({ theme, color }) => ({

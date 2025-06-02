@@ -5,7 +5,7 @@ import { CircleRounded } from '@mui/icons-material';
 import { Box, Chip as MaterialChip, Tooltip, chipClasses, styled } from '@mui/material';
 import capitalize from 'lodash-es/capitalize';
 
-import { WorkerStatus as Status, useCurrentEpoch, WorkerStatus } from '@api/subsquid-network-squid';
+import { WorkerStatus as Status, useCurrentEpoch } from '@api/subsquid-network-squid';
 import { useCountdown } from '@hooks/useCountdown';
 
 export const Chip = styled(MaterialChip)(({ theme }) => ({

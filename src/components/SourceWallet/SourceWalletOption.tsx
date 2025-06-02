@@ -15,6 +15,7 @@ import {
 
 import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
 import { useContracts } from '@network/useContracts';
+import { capitalize, toUpper, upperFirst } from 'lodash-es';
 
 export interface SourceWalletOptionProps {
   /** The source wallet data */
@@ -33,6 +34,8 @@ export interface SourceWalletOptionProps {
   walletLabel?: string;
   /** Custom label for vesting contract type */
   vestingLabel?: string;
+  /** Custom label for temporary holding contract type */
+  temporaryHoldingLabel?: string;
   /** Custom component to render the address */
   addressComponent?: React.ComponentType<{ address: string; isMobile: boolean }>;
   /** Custom component to render the balance */
@@ -76,6 +79,7 @@ export const SourceWalletOption = ({
   showFullAddressOnHover = false,
   walletLabel = 'Wallet',
   vestingLabel = 'Vesting contract',
+  temporaryHoldingLabel = 'Temporary Holding contract',
   addressComponent: AddressComponent,
   balanceComponent: BalanceComponent,
 }: SourceWalletOptionProps) => {
@@ -113,7 +117,12 @@ export const SourceWalletOption = ({
   return (
     <SourceWalletOptionWrapper sx={sx}>
       <SourceWalletLabel sx={labelSx}>
-        {source.type === AccountType.User ? walletLabel : vestingLabel}
+        {source.type === AccountType.User
+          ? walletLabel
+          : `${source.type
+              .split('_')
+              .map(word => word[0]?.toUpperCase() + word.slice(1).toLowerCase())
+              .join(' ')} contract`}
       </SourceWalletLabel>
       <SourceWalletStack direction="row" spacing={1} justifyContent="space-between">
         {renderAddress()}

@@ -14,6 +14,8 @@ import { ContractCallDialog } from '@components/ContractCallDialog';
 import { useCountdown } from '@hooks/useCountdown';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
+import { useSourceContext } from '@contexts/SourceContext';
+import { useStakeInfo } from '@api/contracts/useStakeInfo';
 
 export const stakeSchema = yup.object({
   source: yup.string().label('Source').trim().required('Source is required'),
@@ -34,16 +36,17 @@ function UnlocksTooltip({ timestamp }: { timestamp?: Date | string | number | un
 export function GatewayUnstakeButton({
   sx,
   disabled,
-  source,
 }: {
   sx?: SxProps;
   disabled?: boolean;
-  source: {
-    locked: boolean;
-    unlockedAt?: string;
-  };
 }) {
   const [open, setOpen] = useState(false);
+  const { selectedSource } = useSourceContext();
+  const selectedSourceAddress = (selectedSource?.id || '0x') as `0x${string}`;
+
+  const { isExpired, unlockedAt } = useStakeInfo(selectedSourceAddress);
+
+  const isLocked = !isExpired;
 
   return (
     <>
@@ -51,17 +54,13 @@ export function GatewayUnstakeButton({
         hidden={disabled}
         title={
           !disabled &&
-          source.locked &&
-          (source.unlockedAt ? (
-            <UnlocksTooltip timestamp={source.unlockedAt} />
-          ) : (
-            'Auto-extension is enabled'
-          ))
+          isLocked &&
+          (unlockedAt ? <UnlocksTooltip timestamp={unlockedAt} /> : 'Auto-extension is enabled')
         }
         placement="top"
       >
         <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
-          {source.locked && !disabled && (
+          {isLocked && !disabled && (
             <Lock
               fontSize="small"
               // color="secondary"
@@ -77,7 +76,7 @@ export function GatewayUnstakeButton({
           )}
           <Button
             // startIcon={<LockOpenIcon />}
-            disabled={disabled || source.locked}
+            disabled={disabled || isLocked}
             loading={open}
             variant="contained"
             color="error"

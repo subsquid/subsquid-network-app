@@ -10,7 +10,7 @@ import { upperFirst } from 'lodash-es';
 import { arbitrumSepolia, arbitrum } from 'wagmi/chains';
 
 import { getSubsquidNetwork, NetworkName } from './useSubsquidNetwork';
-import { fallback, http, } from 'wagmi';
+import { fallback, http } from 'wagmi';
 
 // export let CHAIN: Chain = arbitrumSepolia;
 // if (process.env.NETWORK === 'hardhat') {

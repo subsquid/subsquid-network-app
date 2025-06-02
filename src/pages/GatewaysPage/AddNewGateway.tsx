@@ -11,13 +11,14 @@ import { gatewayRegistryAbi } from '@api/contracts';
 import { encodeGatewayMetadata } from '@api/contracts/gateway-registration/GatewayMetadata';
 import { useWriteSQDTransaction } from '@api/contracts/useWriteTransaction';
 import { errorMessage } from '@api/contracts/utils';
-import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
+import { AccountType } from '@api/subsquid-network-squid';
 import { ContractCallDialog } from '@components/ContractCallDialog';
 import { Form, FormikSwitch, FormikTextInput, FormRow } from '@components/Form';
 import { FormikSelect } from '@components/Form/FormikSelect';
 import { HelpTooltip } from '@components/HelpTooltip';
 import { Loader } from '@components/Loader';
 import { SourceWalletOption } from '@components/SourceWallet';
+import { useSourceContext } from '@contexts/SourceContext';
 import { useSquidHeight } from '@hooks/useSquidNetworkHeightHooks';
 import { useContracts } from '@network/useContracts';
 
@@ -26,11 +27,9 @@ import { addGatewaySchema } from './gateway-schema';
 export function AddGatewayButton({
   sx,
   disabled,
-  sources,
 }: {
   sx?: SxProps;
   disabled?: boolean;
-  sources?: SourceWalletWithBalance[];
 }) {
   const [open, setOpen] = useState(false);
 
@@ -47,7 +46,7 @@ export function AddGatewayButton({
       >
         ADD PORTAL
       </Button>
-      <AddGatewayDialog open={open} onClose={() => setOpen(false)} sources={sources} />
+      <AddGatewayDialog open={open} onClose={() => setOpen(false)} />
     </>
   );
 }
@@ -55,24 +54,20 @@ export function AddGatewayButton({
 export function AddGatewayDialog({
   open,
   onClose,
-  sources,
 }: {
   open: boolean;
   onClose: () => void;
-  sources?: SourceWalletWithBalance[];
 }) {
   const client = useClient();
+  const { sources, selectedSource } = useSourceContext();
 
   const contracts = useContracts();
 
   const { writeTransactionAsync, isPending } = useWriteSQDTransaction();
   const { setWaitHeight } = useSquidHeight();
 
-  const isSourceDisabled = (source: SourceWalletWithBalance) => source.type === AccountType.Vesting;
-  const hasAvailableSource = useMemo(() => !!sources?.some(s => !isSourceDisabled(s)), [sources]);
-
   const initialValues = useMemo(() => {
-    const source = sources?.find(s => !isSourceDisabled(s)) || sources?.[0];
+    const source = selectedSource || sources?.[0];
 
     return {
       source: source?.id || '0x',
@@ -84,7 +79,7 @@ export function AddGatewayDialog({
       peerId: '',
       endpointUrl: '',
     };
-  }, [sources]);
+  }, [sources, selectedSource]);
 
   const formik = useFormik({
     initialValues,
@@ -111,6 +106,7 @@ export function AddGatewayDialog({
           abi: gatewayRegistryAbi,
           functionName: 'register',
           args: [peerIdToHex(castedValues.peerId), encodeGatewayMetadata(castedValues)],
+          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
         });
         setWaitHeight(receipt.blockNumber, []);
 
@@ -131,7 +127,6 @@ export function AddGatewayDialog({
         formik.handleSubmit();
       }}
       loading={isPending}
-      disableConfirmButton={!hasAvailableSource}
     >
       {!sources ? (
         <Loader />
@@ -145,7 +140,6 @@ export function AddGatewayDialog({
                 return {
                   label: <SourceWalletOption source={s} />,
                   value: s.id,
-                  disabled: isSourceDisabled(s),
                 };
               })}
               formik={formik}

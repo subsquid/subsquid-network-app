@@ -1,6 +1,6 @@
 import { addressFormatter, tokenFormatter } from '@lib/formatters/formatters';
 import { fromSqd, unwrapMulticallResult } from '@lib/network/utils';
-import { Box, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Box, capitalize, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { keepPreviousData } from '@tanstack/react-query';
 import chunk from 'lodash-es/chunk';
 import { erc20Abi } from 'viem';
@@ -18,6 +18,7 @@ import { ReleaseButton } from './ReleaseButton';
 import { useMemo } from 'react';
 import { CopyToClipboard } from '@components/CopyToClipboard';
 import { Link } from 'react-router-dom';
+import { upperFirst } from 'lodash-es';
 
 export function MyVestings() {
   const account = useAccount();
@@ -104,7 +105,10 @@ export function MyVestings() {
             <TableRow key={vesting.id}>
               <TableCell>
                 <NameWithAvatar
-                  title="Vesting contract"
+                  title={`${vesting.type
+                    .split('_')
+                    .map(word => word[0]?.toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ')} contract`}
                   subtitle={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <CopyToClipboard

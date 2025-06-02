@@ -302,6 +302,7 @@ export type AccountTransfersConnection = {
 };
 
 export enum AccountType {
+  TemporaryHolding = "TEMPORARY_HOLDING",
   User = "USER",
   Vesting = "VESTING",
 }
