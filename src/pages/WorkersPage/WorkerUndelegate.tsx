@@ -190,7 +190,7 @@ function WorkerUndelegateDialog({
           address: stakingAddress,
           functionName: 'withdraw',
           args: [BigInt(worker.id), sqdAmount],
-          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+          vesting: source.type === AccountType.User ? undefined : (source.id as `0x${string}`),
         });
         setWaitHeight(receipt.blockNumber, []);
 

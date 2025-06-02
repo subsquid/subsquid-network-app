@@ -141,7 +141,7 @@ export function WorkerDelegateDialog({
           address: stakingAddress,
           functionName: 'deposit',
           args: [BigInt(worker.id), sqdAmount],
-          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+          vesting: source.type === AccountType.User ? undefined : (source.id as `0x${string}`),
           approve: sqdAmount,
         });
         setWaitHeight(receipt.blockNumber, []);
