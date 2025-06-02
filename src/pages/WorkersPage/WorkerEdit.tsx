@@ -100,7 +100,7 @@ function WorkerEditDialog({
           abi: workerRegistryAbi,
           functionName: 'updateMetadata',
           args: [peerIdHex, encodeWorkerMetadata(metadata)],
-          vesting: owner.type === AccountType.Vesting ? (owner.id as `0x${string}`) : undefined,
+          vesting: owner.type === AccountType.User ? undefined : (owner.id as `0x${string}`),
         });
         setWaitHeight(receipt.blockNumber, []);
 

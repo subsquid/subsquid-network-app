@@ -159,7 +159,7 @@ export function AddNewWorkerDialog({
           abi: workerRegistryAbi,
           functionName: 'register',
           args: [peerIdHex, encodeWorkerMetadata(metadata)],
-          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+          vesting: source.type === AccountType.User ? undefined : (source.id as `0x${string}`),
           approve: bondAmount,
         });
         setWaitHeight(receipt.blockNumber, []);

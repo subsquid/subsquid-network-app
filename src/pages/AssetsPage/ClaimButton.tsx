@@ -121,7 +121,7 @@ export function ClaimDialog({
           abi: rewardTreasuryAbi,
           functionName: 'claimFor',
           args: [contracts.REWARD_DISTRIBUTION, account.address],
-          vesting: wallet.type === AccountType.Vesting ? (wallet.id as `0x${string}`) : undefined,
+          vesting: wallet.type === AccountType.User ? undefined : (wallet.id as `0x${string}`),
         });
         setWaitHeight(receipt.blockNumber, []);
 

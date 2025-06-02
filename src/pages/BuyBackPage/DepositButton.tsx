@@ -112,7 +112,7 @@ export function DepositDialog({
           address: address as `0x${string}`,
           functionName: 'deposit',
           args: [sqdAmount],
-          vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+          vesting: source.type === AccountType.User ? undefined : (source.id as `0x${string}`),
           approve: sqdAmount,
         });
         setWaitHeight(receipt.blockNumber, []);

@@ -84,7 +84,7 @@ export function WorkerUnregisterDialog({
         abi: workerRegistryAbi,
         functionName: 'deregister',
         args: [peerIdHex],
-        vesting: source.type === AccountType.Vesting ? (source.id as `0x${string}`) : undefined,
+        vesting: source.type === AccountType.User ? undefined : (source.id as `0x${string}`),
       });
       setWaitHeight(receipt.blockNumber, []);
 
