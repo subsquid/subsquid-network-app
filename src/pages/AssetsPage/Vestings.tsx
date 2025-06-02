@@ -34,8 +34,6 @@ export function MyVestings() {
 
   const { data: vestings, isLoading: isVestingsLoading } = useReadContracts({
     contracts: vestingsQuery.accounts?.flatMap(s => {
-      if (s.type !== AccountType.Vesting) return [];
-
       const vestingContract = { abi: vestingAbi, address: s.id as `0x${string}` } as const;
       return [
         {
