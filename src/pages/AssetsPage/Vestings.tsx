@@ -107,7 +107,7 @@ export function MyVestings() {
                 <NameWithAvatar
                   title={`${vesting.type
                     .split('_')
-                    .map(word => upperFirst(word))
+                    .map(word => word[0]?.toUpperCase() + word.slice(1).toLowerCase())
                     .join(' ')} contract`}
                   subtitle={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

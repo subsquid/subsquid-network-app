@@ -121,7 +121,7 @@ export const SourceWalletOption = ({
           ? walletLabel
           : `${source.type
               .split('_')
-              .map(word => upperFirst(word))
+              .map(word => word[0]?.toUpperCase() + word.slice(1).toLowerCase())
               .join(' ')} contract`}
       </SourceWalletLabel>
       <SourceWalletStack direction="row" spacing={1} justifyContent="space-between">
