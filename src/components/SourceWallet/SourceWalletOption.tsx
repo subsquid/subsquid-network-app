@@ -15,6 +15,7 @@ import {
 
 import { AccountType, SourceWalletWithBalance } from '@api/subsquid-network-squid';
 import { useContracts } from '@network/useContracts';
+import { capitalize, toUpper, upperFirst } from 'lodash-es';
 
 export interface SourceWalletOptionProps {
   /** The source wallet data */
@@ -118,11 +119,10 @@ export const SourceWalletOption = ({
       <SourceWalletLabel sx={labelSx}>
         {source.type === AccountType.User
           ? walletLabel
-          : source.type === AccountType.Vesting
-            ? vestingLabel
-            : source.type === AccountType.TemporaryHolding
-              ? temporaryHoldingLabel
-              : 'Unknown contract'}
+          : `${source.type
+              .split('_')
+              .map(word => upperFirst(word))
+              .join(' ')} contract`}
       </SourceWalletLabel>
       <SourceWalletStack direction="row" spacing={1} justifyContent="space-between">
         {renderAddress()}
