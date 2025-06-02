@@ -30,7 +30,7 @@ export function MyVestings() {
   const { SQD_TOKEN, SQD } = useContracts();
 
   const vestingsQuery = {
-    accounts: sourcesQuery?.accounts,
+    accounts: sourcesQuery?.accounts.filter(s => s.type !== AccountType.User),
   };
 
   const { data: vestings, isLoading: isVestingsLoading } = useReadContracts({
